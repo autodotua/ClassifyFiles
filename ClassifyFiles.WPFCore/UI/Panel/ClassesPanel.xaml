@@ -1,0 +1,26 @@
+﻿<ui:UserControlBase  
+    xmlns:ui="clr-namespace:ClassifyFiles.UI" 
+    x:Class="ClassifyFiles.UI.Panel.ClassesPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+    xmlns:data="clr-namespace:ClassifyFiles.Data;assembly=ClassifyFiles.Core"
+             d:DesignHeight="450" d:DesignWidth="800" Cursor="Hand" >
+    <Grid>
+        <TreeView Name="tree" Grid.Row="2" Grid.ColumnSpan="999"  ItemsSource="{Binding Classes}" SelectedItemChanged="tree_SelectedItemChanged">
+            <TreeView.ContextMenu>
+                <ContextMenu Opened="ContextMenu_Opened">
+                </ContextMenu>
+            </TreeView.ContextMenu>
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type data:Class}" ItemsSource="{Binding Path= Children}">
+
+                    <TextBlock Text="{Binding Name}"/>
+                </HierarchicalDataTemplate>
+              
+            </TreeView.Resources>
+        </TreeView>
+    </Grid>
+</ui:UserControlBase>

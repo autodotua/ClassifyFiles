@@ -1,0 +1,69 @@
+﻿<local:WindowBase
+    x:Class="ClassifyFiles.UI.SettingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+ xmlns:local="clr-namespace:ClassifyFiles.UI"
+        mc:Ignorable="d"
+    WindowStartupLocation="CenterOwner"
+    Closing="WindowBase_Closing"
+        Title="{DynamicResource win_setting}" Height="450" Width="600">
+    <Grid Margin="4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical">
+                <GroupBox Header="{DynamicResource set_general}"  Style="{DynamicResource MaterialDesignGroupBox}" 
+                          BorderThickness="0"  materialDesign:ShadowAssist.ShadowDepth="Depth3">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="语言/Language"/>
+                        <ComboBox x:Name="cbbLanguage" Margin="8,0,0,0" Width="120" HorizontalAlignment="Left">
+                            <ComboBoxItem Content="简体中文" Tag="zh-CN"/>
+                            <ComboBoxItem Content="English" Tag="en-US"/>
+                        </ComboBox>
+                        <FrameworkElement Height="16"/>
+                         
+                        <TextBlock Text="{DynamicResource set_theme}"/>
+                        <ComboBox x:Name="cbbTheme" Margin="8,0,0,0" Width="120" HorizontalAlignment="Left">
+                            <ComboBoxItem Content="{DynamicResource set_auto}" Tag="0"/>
+                            <ComboBoxItem Content="{DynamicResource set_light}" Tag="1"/>
+                            <ComboBoxItem Content="{DynamicResource set_dark}" Tag="-1"/>
+                        </ComboBox>
+                        <FrameworkElement Height="16"/>
+                        
+                        
+                        <TextBlock Text="{DynamicResource set_launch}"/>
+                        <CheckBox x:Name="chkStartup" Margin="8,0,0,0" Content="{DynamicResource set_startup}" Click="CheckBox_Click"/>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="{DynamicResource set_notification}"  Style="{DynamicResource MaterialDesignGroupBox}" 
+                          BorderThickness="0"  materialDesign:ShadowAssist.ShadowDepth="Depth3" Margin="0,16,0,0">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{DynamicResource set_ring}"/>
+                        <StackPanel Orientation="Vertical" Margin="8,4,0,0">
+                            <RadioButton x:Name="rbtnRingDisabled" GroupName="ring"
+                                         Content="{DynamicResource set_disabled}"  Margin="0,4,0,0"/>
+                            <RadioButton x:Name="rbtnRingDefault" GroupName="ring" 
+                                         Content="{DynamicResource set_default}"  Margin="0,8,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="{DynamicResource set_compare}" Style="{DynamicResource MaterialDesignGroupBox}" 
+                          BorderThickness="0"  materialDesign:ShadowAssist.ShadowDepth="Depth3" Margin="0,16,0,0">
+                    <StackPanel Orientation="Vertical">
+                        <CheckBox Content="{DynamicResource set_regardOneSideParseErrorAsNotSame}"
+                                  ToolTip="{DynamicResource set_regardOneSideParseErrorAsNotSameHint}"
+                                  Click="RegardOneSideParseErrorAsNotSameCheckBox_Click"
+                                  IsChecked="{Binding Config.RegardOneSideParseErrorAsNotSame}"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+
+</local:WindowBase>
