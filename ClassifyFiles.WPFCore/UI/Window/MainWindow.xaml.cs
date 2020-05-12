@@ -62,14 +62,15 @@ namespace ClassifyFiles.UI
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Projects = new ObservableCollection<Project>(await DbUtility.GetProjectsAsync());
-            if (Projects.Count > 0)
+            if (Projects.Count == 0)
             {
-                SelectedProject = Projects[0];
+                Projects.Add(await DbUtility.AddProjectAsync());
             }
+            SelectedProject = Projects[0];
 
         }
 
-        public ProjectPanelBase mainPanel = new ClassSettingPanel();
+        public ProjectPanelBase mainPanel = new FileBrowserPanel();
         public ProjectPanelBase MainPanel
         {
             get => mainPanel;
@@ -110,6 +111,10 @@ namespace ClassifyFiles.UI
             switch (rbtn.Tag)
             {
                 case "1":
+                    if(MainPanel is ClassSettingPanel)
+                    {
+                        (MainPanel as ClassSettingPanel).SaveClassAsync();
+                    }
                     MainPanel = new FileBrowserPanel();
                     break;
                 case "2":

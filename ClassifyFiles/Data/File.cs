@@ -6,7 +6,7 @@ using System.IO;
 namespace ClassifyFiles.Data
 {
     [DebuggerDisplay("Dir={Dir}, Name={Name}")]
-    public class File : WithProjectModelBase
+    public class File : DbModelBase
     {
         public File()
         {

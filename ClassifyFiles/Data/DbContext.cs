@@ -23,9 +23,9 @@ namespace ClassifyFiles.Data
             if (!created)
             {
                 created = true;
-                Database.EnsureDeleted();
+                //Database.EnsureDeleted();
                 Database.EnsureCreated();
-                InsertTestDatas();
+                //InsertTestDatas();
             }
         }
 
@@ -44,12 +44,6 @@ namespace ClassifyFiles.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<File>()
-                .HasOne(p => p.Project)
-                .WithMany(p => p.Files)
-                .HasForeignKey(p => p.ProjectID)
-                .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Class>()
                 .HasOne(p => p.Project)
                 .WithMany(p => p.Classes)
@@ -58,6 +52,11 @@ namespace ClassifyFiles.Data
             modelBuilder.Entity<MatchCondition>()
                 .HasOne(p => p.Class)
                 .WithMany(p => p.MatchConditions)
+                .HasForeignKey(p => p.ClassID)
+                .OnDelete(DeleteBehavior.Cascade);   
+            modelBuilder.Entity<File>()
+                .HasOne(p => p.Class)
+                .WithMany(p => p.Files)
                 .HasForeignKey(p => p.ClassID)
                 .OnDelete(DeleteBehavior.Cascade);
         }

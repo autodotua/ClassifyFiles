@@ -31,7 +31,7 @@ namespace ClassifyFiles.Test
             };
             var classes = new List<Class>() { c };
 
-            var result = FileUtility.GetFiles(new DirectoryInfo("test"), classes);
+            var result = FileUtility.GetFilesAsync(new DirectoryInfo("test"), classes);
             Assert.Pass();
         }
 

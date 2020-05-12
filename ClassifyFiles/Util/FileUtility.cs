@@ -7,29 +7,33 @@ using DI = System.IO.DirectoryInfo;
 using SO = System.IO.SearchOption;
 using System.Text;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ClassifyFiles.Util
 {
     public static class FileUtility
     {
-        public static Dictionary<Class,List<File>> GetFiles(DI dir,IEnumerable<Class> classes)
+        public async static Task<Dictionary<Class, List<File>>> GetFilesAsync(DI dir,IEnumerable<Class> classes)
         {
             Dictionary<Class, List<File>> classFiles = new Dictionary<Class, List<File>>();
-            foreach (var c in classes)
-            {
-                classFiles.Add(c, new List<File>());
-            }
-            var files = dir.EnumerateFiles("*", SO.AllDirectories);
-            foreach (var file in files)
+            await Task.Run(() =>
             {
                 foreach (var c in classes)
                 {
-                    if (IsMatched(file, c))
+                    classFiles.Add(c, new List<File>());
+                }
+                var files = dir.EnumerateFiles("*", SO.AllDirectories);
+                foreach (var file in files)
+                {
+                    foreach (var c in classes)
                     {
-                        classFiles[c].Add(new File(file,dir,c));
+                        if (IsMatched(file, c))
+                        {
+                            classFiles[c].Add(new File(file, dir, c));
+                        }
                     }
                 }
-            }
+            });
             return classFiles;
         }
 

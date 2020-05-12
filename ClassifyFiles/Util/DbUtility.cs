@@ -37,17 +37,17 @@ namespace ClassifyFiles.Util
             return classes.Where(p => p.Parent == null).ToList();
 
         }
-        public static async Task<(List<Class>, List<Class>)> GetTreeAndTileClassesAsync(Project project)
-        {
-            List<Class> classes = await db.Classes
-                .Where(p => p.Project == project)
-                .Include(p => p.MatchConditions)
-                .ToListAsync();
+        //public static async Task<(List<Class>, List<Class>)> GetTreeAndTileClassesAsync(Project project)
+        //{
+        //    List<Class> classes = await db.Classes
+        //        .Where(p => p.Project == project)
+        //        .Include(p => p.MatchConditions)
+        //        .ToListAsync();
 
 
-            return (classes.Where(p => p.Parent == null).ToList(), classes);
+        //    return (classes.Where(p => p.Parent == null).ToList(), classes);
 
-        }
+        //}
 
         public static async Task SaveClassAsync(Class c)
         {
@@ -58,8 +58,16 @@ namespace ClassifyFiles.Util
             }
         }
 
-        public static async Task AddClassAsync(Class c, Class reference, bool inside)
+        public static async Task<Project> AddProjectAsync()
         {
+            Project project = new Project() { Name = "未命名" };
+            Db.Projects.Add(project);
+            await Db.SaveChangesAsync();
+            return project;
+        }
+        public static async Task<Class> AddClassAsync(Project project,Class reference, bool inside)
+        {
+            Class c = new Class() { Project = project, Name = "未命名" };
             if (reference != null)
             {
                 if (inside)
@@ -73,11 +81,29 @@ namespace ClassifyFiles.Util
             }
             Db.Classes.Add(c);
             await db.SaveChangesAsync();
+            return c;
         }
         public static async Task DeleteClassAsync(Class c)
         {
             Db.Entry(c).State = EntityState.Deleted;
             await db.SaveChangesAsync();
+        }
+
+        public static async Task UpdateFilesAsync(Dictionary<Class,List<File>> classFiles)
+        {
+            foreach (var item in classFiles)
+            {
+                Class c = item.Key;
+                List<File> files = item.Value;
+                c.Files = files;
+                Db.Entry(c).State = EntityState.Modified;
+            }
+            await Db.SaveChangesAsync();
+        }     
+        public static  Task<List<File>> GetFilesAsync(Class c)
+        {
+            var files = Db.Files.Where(p => p.Class == c);
+            return files.ToListAsync();
         }
     }
 }

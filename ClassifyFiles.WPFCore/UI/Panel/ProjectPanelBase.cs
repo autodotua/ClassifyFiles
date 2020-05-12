@@ -7,12 +7,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using FzLib.Extension;
 
 namespace ClassifyFiles.UI.Panel
 {
     public abstract class ProjectPanelBase : UserControlBase
     {
-        public async Task LoadAsync(Project project)
+        public virtual async Task LoadAsync(Project project)
         {
             if (Project != null || project == null)
             {
@@ -22,6 +23,15 @@ namespace ClassifyFiles.UI.Panel
          await   GetClassesPanel().LoadAsync(project);
         }
         public abstract ClassesPanel GetClassesPanel();
-        public virtual Project Project { get; private set; }
+        private  Project project;
+        public virtual Project Project
+        {
+            get => project;
+            set
+            {
+                project = value;
+                this.Notify(nameof(Project));
+            }
+        }
     }
 }

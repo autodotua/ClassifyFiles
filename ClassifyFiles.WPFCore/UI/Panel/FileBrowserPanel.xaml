@@ -6,20 +6,127 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ClassifyFiles.UI"
+        xmlns:local="clr-namespace:ClassifyFiles.UI" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     Loaded="WindowBase_Loaded"
-        mc:Ignorable="d"
-    >
+        mc:Ignorable="d"    >
+    <UserControl.Resources>
+        <ui:NotFirst2VisibilityConverter x:Key="i2v"/>
+        <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
+    </UserControl.Resources>
     <Grid Margin="4">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="8"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <panel:ClassesPanel x:Name="classes" Editable="False"/>
+        <Grid Margin="8,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="4"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="8"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Margin="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Project.Name}"   VerticalAlignment="Center"  FontSize="24"/>
 
+                <TextBox Grid.Column="2"
+  materialDesign:HintAssist.Hint="项目根目录"
+  Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+  VerticalAlignment="Center" Text="{Binding Project.RootPath}"/>
+                <materialDesign:PopupBox  Grid.Column="4"   VerticalAlignment="Center"    HorizontalAlignment="Right"        Padding="2 0 2 0">
+                    <StackPanel>
+                        <Button  Content="重命名" />
+                        <Button  Content="删除"/>
+                    </StackPanel>
+                </materialDesign:PopupBox>
+            </Grid>
+            <panel:ClassesPanel x:Name="classes" Grid.Row="99" Editable="False" SelectedClassChanged="classes_SelectedClassChanged"/>
+        </Grid>
+
+
+        <Grid Margin="4" Grid.Column="2" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="4"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="32">
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                    <Button    Style="{StaticResource MaterialDesignFlatButton}" Click="RefreshAllButton_Click">刷新所有</Button>
+                    <Button    Style="{StaticResource MaterialDesignFlatButton}"          IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">刷新此类</Button>
+                </StackPanel>
+                <!-- the following based on https://material.io/guidelines/components/buttons.html#buttons-toggle-buttons -->
+                <ListBox x:Name="lbxDisplayMode" DockPanel.Dock="Right" HorizontalAlignment="Right"  SelectionChanged="ListBox_SelectionChanged"
+                         Style="{StaticResource MaterialDesignToolToggleListBox}"  SelectedIndex="0"
+                          IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">
+                    <ListBoxItem >
+                        <materialDesign:PackIcon    Kind="FormatListBulleted" />
+                    </ListBoxItem>
+                    <ListBoxItem>
+                        <materialDesign:PackIcon      Kind="ViewComfy" />
+                    </ListBoxItem>
+                </ListBox>
+            </DockPanel>
+            <ListBox Grid.Row="2" Style="{StaticResource MaterialDesignGridList}" ItemsSource="{Binding Path=Files}"
+                     Visibility="Collapsed" x:Name="lbxGrdFiles"
+                      IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="8">
+                            <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="80" Height="72"
+                                       ToolTip="{Binding Dir, Mode=OneTime}">
+                                <TextBlock DockPanel.Dock="Bottom" FontSize="12" Text="{Binding Path=Name, Mode=OneTime}"
+                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" MaxHeight="36"/>
+                                <materialDesign:PackIcon Kind="{Binding Path=Kind, Mode=OneTime}"
+                                             Height="32" Width="32"
+                                             HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </DockPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox> 
+            <ListView Grid.Row="2"  ItemsSource="{Binding Files}" x:Name="lvwFiles" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
+                      IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Width="24">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <materialDesign:PackIcon Kind="{Binding Path=Kind, Mode=OneTime}"
+                                             Height="16" Width="16"
+                                             HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="文件名" DisplayMemberBinding="{Binding Name}"/>
+                        <GridViewColumn Header="目录" DisplayMemberBinding="{Binding Dir}"/>
+                    </GridView>
+                </ListView.View>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="8">
+                            <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="80" Height="72"
+                                       ToolTip="{Binding Dir, Mode=OneTime}">
+                                <TextBlock DockPanel.Dock="Bottom" FontSize="12" Text="{Binding Path=Name, Mode=OneTime}"
+                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" MaxHeight="36"/>
+                                <materialDesign:PackIcon Kind="{Binding Path=Kind, Mode=OneTime}"
+                                             Height="32" Width="32"
+                                             HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </DockPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListView>
+        </Grid>
+
+        <ui:ProgressDialog x:Name="loading" Grid.ColumnSpan="99" Margin="-100"/>
     </Grid>
 </panel:ProjectPanelBase>

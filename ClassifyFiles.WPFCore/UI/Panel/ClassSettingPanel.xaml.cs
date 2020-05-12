@@ -70,9 +70,7 @@ namespace ClassifyFiles.UI.Panel
             var old = e.OldValue;
             if (old != null)
             {
-                old.MatchConditions.Clear();
-                old.MatchConditions.AddRange(MatchConditions);
-                await DbUtility.SaveClassAsync(old);
+                await SaveClassAsync(old);
             }
             if (classes.SelectedClass == null)
             {
@@ -83,6 +81,21 @@ namespace ClassifyFiles.UI.Panel
                     (classes.SelectedClass.MatchConditions);
         }
 
+        public Task SaveClassAsync()
+        {
+
+            return SaveClassAsync(classes.SelectedClass);
+
+        }
+        public async Task SaveClassAsync(Class c)
+        {
+            if (c != null)
+            {
+                c.MatchConditions.Clear();
+                c.MatchConditions.AddRange(MatchConditions);
+                await DbUtility.SaveClassAsync(c);
+            }
+        }
     }
 
     public class EnumToItemsSource : MarkupExtension

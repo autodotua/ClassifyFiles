@@ -50,7 +50,8 @@ namespace ClassifyFiles.UI.Panel
         public async Task LoadAsync(Project project)
         {
             Project = project;
-            var (treeClasses, tile) = await DbUtility.GetTreeAndTileClassesAsync(Project);
+            //var (treeClasses, tile) = await DbUtility.GetTreeAndTileClassesAsync(Project);
+            var treeClasses= await DbUtility.GetClassesAsync(Project);
             Classes = new ObservableCollection<Class>(treeClasses);
         }
 
@@ -77,17 +78,9 @@ namespace ClassifyFiles.UI.Panel
 
         private async void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            Class GetNewClass()
-            {
-                return new Class()
-                {
-                    Name = "未命名",
-                    Project = Project,
-                };
-            }
             if (SelectedClass == null)
             {
-                await DbUtility.AddClassAsync(GetNewClass(), null, false);
+                await DbUtility.AddClassAsync(Project, null, false);
                 await LoadAsync(Project);
             }
             else
@@ -96,7 +89,7 @@ namespace ClassifyFiles.UI.Panel
                 menuInside.Click += async (p1, p2) =>
                 {
 
-                    await DbUtility.AddClassAsync(GetNewClass(), SelectedClass, true);
+                    await DbUtility.AddClassAsync(Project, SelectedClass, true);
 
                     await LoadAsync(Project);
                 };
@@ -104,7 +97,7 @@ namespace ClassifyFiles.UI.Panel
                 menuAfter.Click += async (p1, p2) =>
                 {
 
-                    await DbUtility.AddClassAsync(GetNewClass(), SelectedClass, false);
+                    await DbUtility.AddClassAsync(Project, SelectedClass, false);
                     await LoadAsync(Project);
                 };
 

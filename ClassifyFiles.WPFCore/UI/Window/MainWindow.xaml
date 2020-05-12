@@ -15,7 +15,7 @@ xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
     mc:Ignorable="d"
     Closing="Window_Closing"
     WindowStartupLocation="CenterScreen"
-        Title="{DynamicResource win_main}" Height="600" Width="1200" x:Name="win">
+        Title="文件分类浏览器" Height="600" Width="1200" x:Name="win">
     <Grid x:Name="outGrd" >
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -48,7 +48,7 @@ xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
                 </DockPanel>
             </materialDesign:DrawerHost.LeftDrawerContent>
             <DockPanel>
-                <materialDesign:ColorZone Padding="16" materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                <materialDesign:ColorZone Padding="8,4" materialDesign:ShadowAssist.ShadowDepth="Depth2"
                                             Mode="PrimaryMid" DockPanel.Dock="Top">
                     <DockPanel>
                         <ToggleButton
@@ -65,32 +65,17 @@ xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
                             </StackPanel>
                         </materialDesign:PopupBox>
                         <StackPanel    Orientation="Horizontal" DockPanel.Dock="Right"    Margin="2,2,16,2">
-                            <RadioButton      Style="{StaticResource MaterialDesignTabRadioButton}" Margin="4" IsChecked="False" Content="浏览" 
+                            <RadioButton      Style="{StaticResource MaterialDesignTabRadioButton}" Margin="4" IsChecked="True" Content="浏览" 
                                              Tag="1" Checked="RadioButton_Checked"  />
-                            <RadioButton      Style="{StaticResource MaterialDesignTabRadioButton}" Margin="4" IsChecked="True" Content="设置"  
+                            <RadioButton      Style="{StaticResource MaterialDesignTabRadioButton}" Margin="4" IsChecked="False" Content="设置"  
                                              Tag="2" Checked="RadioButton_Checked" />
     
                         </StackPanel>
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22">文件分类浏览器</TextBlock>
                     </DockPanel>
                 </materialDesign:ColorZone>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <ScrollViewer Grid.Row="1" 
-                                  materialDesign:ScrollViewerAssist.IsAutoHideEnabled="True"
-                                  HorizontalScrollBarVisibility="{Binding ElementName=DemoItemsListBox, Path=SelectedItem.HorizontalScrollBarVisibilityRequirement}"
-                                  VerticalScrollBarVisibility="{Binding ElementName=DemoItemsListBox, Path=SelectedItem.VerticalScrollBarVisibilityRequirement}" 
-                                  Padding="{Binding ElementName=DemoItemsListBox, Path=SelectedItem.MarginRequirement}">
-                        <ContentControl Content="{Binding MainPanel}"/>
-                    </ScrollViewer>
-
-                    <materialDesign:Snackbar MessageQueue="{materialDesign:MessageQueue}" x:Name="MainSnackbar"
-                                            Grid.Row="1" />
-                </Grid>
+                <ContentControl Content="{Binding MainPanel}"/>
+            
             </DockPanel>
         </materialDesign:DrawerHost>
 
