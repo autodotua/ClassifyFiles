@@ -10,7 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "其他文件", "其他文�
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassifyFiles", "ClassifyFiles\ClassifyFiles.csproj", "{9160C78F-D80C-4037-B515-2CC74EECDA91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassifyFiles.WPFCore", "ClassifyFiles.WPFCore\ClassifyFiles.WPFCore.csproj", "{81B053E2-6B8E-4130-9E5D-7E4D64B59165}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassifyFiles.WPFCore", "ClassifyFiles.WPFCore\ClassifyFiles.WPFCore.csproj", "{81B053E2-6B8E-4130-9E5D-7E4D64B59165}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassifyFiles.Test", "ClassifyFiles.Test\ClassifyFiles.Test.csproj", "{86A86FAA-37D8-41AC-B416-C2EE69956D7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +38,14 @@ Global
 		{81B053E2-6B8E-4130-9E5D-7E4D64B59165}.Release|Any CPU.Build.0 = Release|Any CPU
 		{81B053E2-6B8E-4130-9E5D-7E4D64B59165}.Release|x64.ActiveCfg = Release|Any CPU
 		{81B053E2-6B8E-4130-9E5D-7E4D64B59165}.Release|x64.Build.0 = Release|Any CPU
+		{86A86FAA-37D8-41AC-B416-C2EE69956D7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86A86FAA-37D8-41AC-B416-C2EE69956D7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86A86FAA-37D8-41AC-B416-C2EE69956D7E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{86A86FAA-37D8-41AC-B416-C2EE69956D7E}.Debug|x64.Build.0 = Debug|Any CPU
+		{86A86FAA-37D8-41AC-B416-C2EE69956D7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86A86FAA-37D8-41AC-B416-C2EE69956D7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86A86FAA-37D8-41AC-B416-C2EE69956D7E}.Release|x64.ActiveCfg = Release|Any CPU
+		{86A86FAA-37D8-41AC-B416-C2EE69956D7E}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
