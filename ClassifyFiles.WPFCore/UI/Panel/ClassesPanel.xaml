@@ -45,9 +45,14 @@
             <FrameworkElement Width="12"/>
             <Button Grid.Row="2" Click="DeleteButton_Click" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}">
                 <materialDesign:PackIcon    Kind="Delete" />
+            </Button>  
+            <FrameworkElement Width="12"/>
+            <Button Grid.Row="2" Click="EditButton_Click"  Style="{StaticResource MaterialDesignFloatingActionMiniButton}">
+                <materialDesign:PackIcon    Kind="Edit" />
             </Button>
 
         </StackPanel>
-   <ui:MessageDialog x:Name="msgDialog"/>
+        <ui:MessageDialog x:Name="msgDialog"/>
+        <ui:InputDialog x:Name="inputDialog"/>
     </Grid>
 </ui:UserControlBase>

@@ -33,9 +33,9 @@
                          VerticalAlignment="Center" Text="{Binding InputContent}"/>
                 <StackPanel  Grid.Row="4" Orientation="Horizontal"  HorizontalAlignment="Right"  Grid.ColumnSpan="999" >
                     <Button x:Name="btnOk" Style="{StaticResource MaterialDesignFlatButton}" Width="96" 
-                        Click="Button_Click_1" Margin="16,0,0,0" Content="{DynamicResource dialog_ok}"/>
+                        Click="Button_Click_1" Margin="16,0,0,0" Content="确定"/>
                     <Button x:Name="btnCancel" Style="{StaticResource MaterialDesignFlatButton}" Width="96" 
-                         Click="Button_Click_1" Margin="16,0,0,0" Content="{DynamicResource dialog_cancel}"/>
+                         Click="Button_Click_1" Margin="16,0,0,0" Content="取消"/>
 
                 </StackPanel>
             </Grid>

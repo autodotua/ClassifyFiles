@@ -130,6 +130,24 @@ namespace ClassifyFiles.UI.Panel
                 await LoadAsync(Project);
             }
         }
+
+        private async void EditButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedClass == null)
+            {
+                await msgDialog.ShowAsync("请先选择一项");
+            }
+            else
+            {
+                string value = await inputDialog.ShowAsync("重命名", false, "请输入新的分类名", SelectedClass.Name);
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    SelectedClass.Name = value;
+                    await DbUtility.SaveClassAsync(SelectedClass);
+                    await LoadAsync(Project);
+                }
+            }
+        }
     }
     public class SelectedItemChanged<T> : EventArgs
     {
