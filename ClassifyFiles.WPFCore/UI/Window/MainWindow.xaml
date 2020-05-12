@@ -59,7 +59,7 @@ xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
                         <materialDesign:PopupBox DockPanel.Dock="Right" PlacementMode="BottomAndAlignRightEdges" StaysOpen="False">
                             <StackPanel>
 
-                                <Button Content="Can't Touch This" IsEnabled="False" />
+                                <Button  Click="Button_Click">设置</Button>
                                 <Separator/>
                                 <Button Content="Goodbye" />
                             </StackPanel>

@@ -25,7 +25,7 @@
             <ColumnDefinition Width="8"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <panel:ClassesPanel x:Name="classes"  SelectedClassChanged="classes_SelectedClassChanged"/>
+        <panel:ClassesPanel x:Name="classes" Editable="True" SelectedClassChanged="classes_SelectedClassChanged"/>
         <GroupBox  Header="匹配条件" Grid.Column="2" 
                               IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">
             <Grid>

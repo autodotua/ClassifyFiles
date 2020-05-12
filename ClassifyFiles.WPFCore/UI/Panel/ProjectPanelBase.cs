@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -18,7 +19,7 @@ namespace ClassifyFiles.UI.Panel
                 return;
             }
             Project = project;
-            GetClassesPanel().Classes = await DbUtility.GetClassesAsync(Project);
+         await   GetClassesPanel().LoadAsync(project);
         }
         public abstract ClassesPanel GetClassesPanel();
         public virtual Project Project { get; private set; }

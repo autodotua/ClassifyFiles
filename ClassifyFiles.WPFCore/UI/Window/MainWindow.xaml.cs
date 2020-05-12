@@ -66,7 +66,7 @@ namespace ClassifyFiles.UI
             {
                 SelectedProject = Projects[0];
             }
-          
+
         }
 
         public ProjectPanelBase mainPanel = new ClassSettingPanel();
@@ -119,6 +119,11 @@ namespace ClassifyFiles.UI
                     return;
             }
             await MainPanel.LoadAsync(SelectedProject);
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            new SettingWindow() { Owner = this }.ShowDialog();
         }
     }
 }

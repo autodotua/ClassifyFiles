@@ -6,15 +6,30 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-    xmlns:data="clr-namespace:ClassifyFiles.Data;assembly=ClassifyFiles.Core"
-             d:DesignHeight="450" d:DesignWidth="800" Cursor="Hand" >
+    xmlns:data="clr-namespace:ClassifyFiles.Data;assembly=ClassifyFiles.Core" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    d:DesignHeight="450" d:DesignWidth="800" Cursor="Hand" >
+    <UserControl.Resources>
+        <ui:Bool2VisibilityConverter x:Key="b2v"/>
+    </UserControl.Resources>
     <Grid>
-        <TreeView Name="tree" Grid.Row="2" Grid.ColumnSpan="999"  ItemsSource="{Binding Classes}" SelectedItemChanged="tree_SelectedItemChanged">
-            <TreeView.ContextMenu>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TreeView Name="tree" Grid.Row="0" Grid.ColumnSpan="999"  ItemsSource="{Binding Classes}" SelectedItemChanged="tree_SelectedItemChanged">
+            <!--<TreeView.ContextMenu>
                 <ContextMenu Opened="ContextMenu_Opened">
+                    <MenuItem Header="删除"  Click="DeleteMenuItem_Click"/>
                 </ContextMenu>
-            </TreeView.ContextMenu>
+            </TreeView.ContextMenu>-->
             <TreeView.Resources>
+                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource MaterialDesignTreeViewItem}">
+                    <Setter Property="IsExpanded" Value="True" />
+                </Style>
+                <!--<Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource MaterialDesignTreeViewItem}">
+                    <EventSetter Event="MouseRightButtonDown" Handler="TreeViewItem_MouseRightButtonDown"/>
+                </Style>-->
                 <HierarchicalDataTemplate DataType="{x:Type data:Class}" ItemsSource="{Binding Path= Children}">
 
                     <TextBlock Text="{Binding Name}"/>
@@ -22,5 +37,17 @@
               
             </TreeView.Resources>
         </TreeView>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Visibility="{Binding Editable, Converter={StaticResource b2v}}" HorizontalAlignment="Center">
+            <Button Grid.Row="2" Click="AddButton_Click"  Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}">
+                <materialDesign:PackIcon    Kind="Add" />
+            </Button>
+            <FrameworkElement Width="12"/>
+            <Button Grid.Row="2" Click="DeleteButton_Click" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}">
+                <materialDesign:PackIcon    Kind="Delete" />
+            </Button>
+
+        </StackPanel>
+   <ui:MessageDialog x:Name="msgDialog"/>
     </Grid>
 </ui:UserControlBase>

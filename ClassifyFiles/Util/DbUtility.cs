@@ -33,46 +33,51 @@ namespace ClassifyFiles.Util
                 .Include(p => p.MatchConditions)
                 .ToListAsync();
 
-            //foreach (var c in classes.ToList())
-            //{
-            //    if (c.ParentID != null)
-            //    {
-            //        Class parent = classes.First(p => p.ID == c.ParentID);
-            //        if (parent.Children == null)
-            //        {
-            //            parent.Children = new List<Class>();
-            //        }
-            //        parent.Children.Add(c);
-            //        //classes.Remove(c);
-            //    }
-            //}
 
             return classes.Where(p => p.Parent == null).ToList();
-            //List<Class> rootClasses =await db.Classes
-            //    .Where(p => p.Project == project)
-            //    .Where(p => p.Parent == null)
-            //    .Include(p=>p.Children)
-            //    .ToListAsync();
-            //Queue<Class> classes = new Queue<Class>(rootClasses);
-            //while(classes.Count>0)
-            //{
-            //    Class c = classes.Dequeue();
-            //    if(c.Children==null || c.Children.Count==0)
-            //    {
-            //        continue;
-            //    }
 
-            //    foreach (var child in c.Children)
-            //    {
-            //        var subChildren=db.Classes.loa
-            //    }
-            //}
+        }
+        public static async Task<(List<Class>, List<Class>)> GetTreeAndTileClassesAsync(Project project)
+        {
+            List<Class> classes = await db.Classes
+                .Where(p => p.Project == project)
+                .Include(p => p.MatchConditions)
+                .ToListAsync();
+
+
+            return (classes.Where(p => p.Parent == null).ToList(), classes);
+
         }
 
         public static async Task SaveClassAsync(Class c)
         {
-            Db.Entry(c).State = EntityState.Modified;
-            await Db.SaveChangesAsync();
+            if (await Db.Classes.AnyAsync(p => p.ID == c.ID))
+            {
+                Db.Entry(c).State = EntityState.Modified;
+                await Db.SaveChangesAsync();
+            }
+        }
+
+        public static async Task AddClassAsync(Class c, Class reference, bool inside)
+        {
+            if (reference != null)
+            {
+                if (inside)
+                {
+                    c.Parent = reference;
+                }
+                else
+                {
+                    c.Parent = reference.Parent;
+                }
+            }
+            Db.Classes.Add(c);
+            await db.SaveChangesAsync();
+        }
+        public static async Task DeleteClassAsync(Class c)
+        {
+            Db.Entry(c).State = EntityState.Deleted;
+            await db.SaveChangesAsync();
         }
     }
 }

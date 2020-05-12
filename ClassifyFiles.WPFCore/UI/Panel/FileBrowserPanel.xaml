@@ -19,7 +19,7 @@
             <ColumnDefinition Width="8"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <panel:ClassesPanel x:Name="classes"/>
+        <panel:ClassesPanel x:Name="classes" Editable="False"/>
 
     </Grid>
 </panel:ProjectPanelBase>

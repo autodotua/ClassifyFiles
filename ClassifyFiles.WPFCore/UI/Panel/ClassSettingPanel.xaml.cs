@@ -74,8 +74,15 @@ namespace ClassifyFiles.UI.Panel
                 old.MatchConditions.AddRange(MatchConditions);
                 await DbUtility.SaveClassAsync(old);
             }
-            MatchConditions = new ObservableCollection<MatchCondition>(classes.SelectedClass.MatchConditions);
+            if (classes.SelectedClass == null)
+            {
+                MatchConditions = new ObservableCollection<MatchCondition>();
+            }
+            else
+                MatchConditions = new ObservableCollection<MatchCondition>
+                    (classes.SelectedClass.MatchConditions);
         }
+
     }
 
     public class EnumToItemsSource : MarkupExtension
