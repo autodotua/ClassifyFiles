@@ -34,9 +34,22 @@ namespace ClassifyFiles.UI.Panel
             set
             {
                 files = value;
-                this.Notify(nameof(Files));
+                page = 0;
+                this.Notify(nameof(Files), nameof(PagingFiles));
             }
         }
+        public IEnumerable<FileWithIcon> PagingFiles => Files == null ? null : Files.Skip(pagingItemsCount * page).Take(pagingItemsCount);
+        private int page;
+        public int Page
+        {
+            get => page;
+            set
+            {
+                page = value;
+                this.Notify(nameof(Page), nameof(PagingFiles));
+            }
+        }
+        public const int pagingItemsCount = 120;
         public FileBrowserPanel()
         {
             InitializeComponent();
@@ -71,9 +84,9 @@ namespace ClassifyFiles.UI.Panel
         private async void RefreshAllButton_Click(object sender, RoutedEventArgs e)
         {
             loading.Show();
-         var   classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().Classes);
+            var classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().Classes);
             await DbUtility.UpdateFilesAsync(classFiles);
-            if(classes.SelectedClass!=null &&classFiles.ContainsKey(classes.SelectedClass))
+            if (classes.SelectedClass != null && classFiles.ContainsKey(classes.SelectedClass))
             {
                 Files = new ObservableCollection<FileWithIcon>(classFiles[classes.SelectedClass].Select(p => new FileWithIcon(p)));
             }
@@ -86,22 +99,44 @@ namespace ClassifyFiles.UI.Panel
             {
                 var files = await DbUtility.GetFilesAsync(e.NewValue);
 
-                Files = new ObservableCollection<FileWithIcon>(files.Select(p=>new FileWithIcon(p)));
+                Files = new ObservableCollection<FileWithIcon>(files.Select(p => new FileWithIcon(p)));
+
+                stkPagging.Children.Clear();
+                if (Files.Count > 0)
+                {
+                    for (int i = 1; i <= Math.Ceiling((double)Files.Count / pagingItemsCount); i++)
+                    {
+                        RadioButton btn = new RadioButton()
+                        {
+                            Style = FindResource("MaterialDesignTabRadioButton") as Style,
+                            Content = i,
+                            Width=24,
+                            Margin = new Thickness(-12, 0, -12, 0)
+                        };
+                        btn.Click += (p1, p2) =>
+                        {
+                            Page = (int)btn.Content;
+                        };
+                        stkPagging.Children.Add(btn);
+                    }
+                   (stkPagging.Children[0] as RadioButton).IsChecked = true;
+                }
             }
         }
 
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(lvwFiles==null)
+            if (lvwFiles == null)
             {
                 return;
             }
-            if(lbxDisplayMode.SelectedIndex==0)
+            if (lbxDisplayMode.SelectedIndex == 0)
             {
                 lvwFiles.Visibility = Visibility.Visible;
                 lbxGrdFiles.Visibility = Visibility.Collapsed;
             }
-            else {
+            else
+            {
                 lvwFiles.Visibility = Visibility.Collapsed;
                 lbxGrdFiles.Visibility = Visibility.Visible;
             }
@@ -109,7 +144,7 @@ namespace ClassifyFiles.UI.Panel
 
         private void lvwFiles_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if(lvwFiles.SelectedItem!=null)
+            if (lvwFiles.SelectedItem != null)
             {
                 var file = lvwFiles.SelectedItem as File; var p = new Process();
                 p.StartInfo = new ProcessStartInfo(System.IO.Path.Combine(Project.RootPath, file.Dir, file.Name))
@@ -118,6 +153,11 @@ namespace ClassifyFiles.UI.Panel
                 };
                 p.Start();
             }
+        }
+
+        private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            scrPagging.ScrollToHorizontalOffset(scrPagging.HorizontalOffset - e.Delta / 20);
         }
     }
 

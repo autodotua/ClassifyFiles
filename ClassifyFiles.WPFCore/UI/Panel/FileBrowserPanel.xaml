@@ -17,7 +17,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="8"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <Grid Margin="8,0,0,0">
             <Grid.RowDefinitions>
@@ -75,24 +75,33 @@
                     </ListBoxItem>
                 </ListBox>
             </DockPanel>
-            <ListBox Grid.Row="2" Style="{StaticResource MaterialDesignGridList}" ItemsSource="{Binding Path=Files}"
-                     Visibility="Collapsed" x:Name="lbxGrdFiles"
-                      IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="8">
-                            <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="80" Height="72"
+            <Grid Grid.Row="2"  IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}"
+                        Visibility="Collapsed" x:Name="lbxGrdFiles">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <ListBox DockPanel.Dock="Top" Style="{StaticResource MaterialDesignGridList}" ItemsSource="{Binding Path=PagingFiles}"                >
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="8">
+                                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="80" Height="72"
                                        ToolTip="{Binding Dir, Mode=OneTime}">
-                                <TextBlock DockPanel.Dock="Bottom" FontSize="12" Text="{Binding Path=Name, Mode=OneTime}"
+                                    <TextBlock DockPanel.Dock="Bottom" FontSize="12" Text="{Binding Path=Name, Mode=OneTime}"
                                Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" MaxHeight="36"/>
-                                <materialDesign:PackIcon Kind="{Binding Path=Kind, Mode=OneTime}"
+                                    <materialDesign:PackIcon Kind="{Binding Path=Kind, Mode=OneTime}"
                                              Height="32" Width="32"
                                              HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </DockPanel>
-                        </Border>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox> 
+                                </DockPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <ScrollViewer x:Name="scrPagging" Grid.Row="2"  VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Hidden" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                    <StackPanel x:Name="stkPagging" Orientation="Horizontal"/>
+                </ScrollViewer>
+            </Grid>
             <ListView Grid.Row="2"  ItemsSource="{Binding Files}" x:Name="lvwFiles" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
                       IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">
                 <ListView.View>
