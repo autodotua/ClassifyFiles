@@ -103,7 +103,7 @@
                                            Height="{Binding IconSize}" Width="{Binding IconSize}" Visibility="{Binding IconVisibility}" 
                                              HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         <Image Source="{Binding Image}" Visibility="{Binding ImageVisibility}"  
-                                              Stretch="Uniform"  Height="{Binding IconSize}" Width="{Binding IconSize}"
+                                              Stretch="UniformToFill"  Height="{Binding IconSize}" Width="{Binding IconSize}"
                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     </Grid>
                                 </DockPanel>

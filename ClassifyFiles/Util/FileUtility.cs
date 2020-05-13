@@ -8,15 +8,25 @@ using SO = System.IO.SearchOption;
 using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace ClassifyFiles.Util
 {
     public static class FileUtility
     {
-        public async static Task<Dictionary<Class, List<File>>> GetFilesAsync(DI dir, IEnumerable<Class> classes)
+        public static readonly IReadOnlyList<string> imgExtensions = new List<string>() {
+        "jpg",
+        "jpeg",
+        "png",
+        "tif",
+        "tiff",
+        "bmp",
+        }.AsReadOnly();
+        public async static Task<Dictionary<Class, List<File>>> GetFilesAsync(DI dir, IEnumerable<Class> classes, bool includeThumbnails)
         {
             Dictionary<Class, List<File>> classFiles = new Dictionary<Class, List<File>>();
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
                 foreach (var c in classes)
                 {
@@ -29,7 +39,12 @@ namespace ClassifyFiles.Util
                     {
                         if (IsMatched(file, c))
                         {
-                            classFiles[c].Add(new File(file, dir, c));
+                            File f = new File(file, dir, c);
+                            if (includeThumbnails)
+                            {
+                              await  GenerateThumbnailAsync(f, dir);
+                            }
+                            classFiles[c].Add(f);
                         }
                     }
                 }
@@ -37,12 +52,42 @@ namespace ClassifyFiles.Util
             return classFiles;
         }
 
+        public static Task GenerateThumbnailAsync(File file, DI dir)
+        {
+            return Task.Run(() =>
+            {
+                string path = file.GetAbsolutePath(dir.FullName);
+                if (imgExtensions.Contains(System.IO.Path.GetExtension(path).ToLower().Trim('.')))
+                {
+                    try
+                    {
+                        using Image image = Image.FromFile(path);
+
+                        using Image thumb = image.GetThumbnailImage(240, (int)(240.0 / image.Width * image.Height), () => false, IntPtr.Zero);
+                        //string guid = Guid.NewGuid().ToString();
+                        //file.ImageID = guid;
+                        //string thumbPath = System.IO.Path.Combine(dir, guid + ".jpg");
+                        //thumb.Save(thumbPath, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        using var ms = new System.IO.MemoryStream();
+                        thumb.Save(ms, ImageFormat.Jpeg);
+                        file.Thumbnail = ms.ToArray();
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+         
+            });
+
+        }
         private static bool IsMatched(FI file, Class c)
         {
             List<List<MatchCondition>> orGroup = new List<List<MatchCondition>>();
             for (int i = 0; i < c.MatchConditions.Count; i++)
             {
-                var mc = c.MatchConditions[i];
+                List<MatchCondition> matchConditions = c.MatchConditions.OrderBy(p => p.Index).ToList();
+                var mc = matchConditions[i];
                 if (i == 0)//首项直接加入列表
                 {
                     orGroup.Add(new List<MatchCondition>() { mc });
@@ -125,7 +170,7 @@ namespace ClassifyFiles.Util
             return root;
         }
 
-        public static string GetAbsolutePath(this File file,string rootPath)
+        public static string GetAbsolutePath(this File file, string rootPath)
         {
             return System.IO.Path.Combine(rootPath, file.Dir, file.Name);
         }

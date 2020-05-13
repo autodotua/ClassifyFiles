@@ -31,6 +31,8 @@ namespace ClassifyFiles.Data
         public string Name { get; set; } = "";
         public Class Class { get; set; }
         public int ClassID { get; set; }
+        //public string ImageID { get; set; }
+        public byte[] Thumbnail { get; set; }
         [NotMapped]
         public List<File> SubFiles { get; set; } = new List<File>();
     }

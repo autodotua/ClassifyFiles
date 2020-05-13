@@ -78,7 +78,7 @@ namespace ClassifyFiles.UI.Panel
             }
             else
                 MatchConditions = new ObservableCollection<MatchCondition>
-                    (classes.SelectedClass.MatchConditions);
+                    (classes.SelectedClass.MatchConditions.OrderBy(p=>p.Index));
         }
 
         public Task SaveClassAsync()

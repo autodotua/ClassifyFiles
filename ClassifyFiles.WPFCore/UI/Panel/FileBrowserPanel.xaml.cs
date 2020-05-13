@@ -39,10 +39,13 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(Files), nameof(PagingFiles), nameof(FileTree));
             }
         }
-        public List<File> FileTree
-        {
-            get => Files == null ? null : new List<File>(new FileWithIcon(FileUtility.GetFileTree(Files)).SubFiles);
-        }
+        /// <summary>
+        /// 供树状图使用的文件树
+        /// </summary>
+        public List<File> FileTree => Files == null ? null : new List<File>(new FileWithIcon(FileUtility.GetFileTree(Files)).SubFiles);
+        /// <summary>
+        /// 供
+        /// </summary>
         public IEnumerable<FileWithIcon> PagingFiles
         {
             get
@@ -50,40 +53,36 @@ namespace ClassifyFiles.UI.Panel
                 var files = Files == null ? null : Files.Skip(pagingItemsCount * page).Take(pagingItemsCount);
                 if (files != null)
                 {
-                    Task.Run(() =>
-                    {
-                        string tempDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "ClassifyFiles");
-                        System.IO.Directory.CreateDirectory(tempDir);
-                        foreach (var file in files)
-                        {
-                            string path = (file as File).GetAbsolutePath(Project.RootPath);
-                            try
-                            {
-                                DImg image = DImg.FromFile(path);
-                                DImg thumb = image.GetThumbnailImage(240, 240, () => false, IntPtr.Zero);
-                                string thumbPath = System.IO.Path.Combine(tempDir, Guid.NewGuid().ToString("N")+".jpg");
-                                thumb.Save(thumbPath, System.Drawing.Imaging.ImageFormat.Jpeg);
-                                Dispatcher.InvokeAsync(() =>
-                                {
-                                    BitmapImage bmImg = new BitmapImage();
-                                    bmImg.BeginInit();
-                                    bmImg.UriSource = new Uri(thumbPath);
-                                    bmImg.EndInit();
-                                    file.Image = bmImg;
-                                });
-                                
-                                //BitmapImage bmImg = new BitmapImage();
-                                //bmImg.BeginInit();
-                                //bmImg.UriSource = new Uri(path);
-                                //bmImg.DecodePixelWidth = 64;
-                                //bmImg.EndInit();
-                            }
-                            catch (Exception ex)
-                            {
+                    //Task.Run(() =>
+                    //{
+                    //    string tempDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "ClassifyFiles");
+                    //    System.IO.Directory.CreateDirectory(tempDir);
+                    //    foreach (var file in files)
+                    //    {
+                    //        string path = (file as File).GetAbsolutePath(Project.RootPath);
+                    //        try
+                    //        {
+                    //            DImg image = DImg.FromFile(path);
+                    //            DImg thumb = image.GetThumbnailImage(240, 240, () => false, IntPtr.Zero);
+                    //            string thumbPath = System.IO.Path.Combine(tempDir, Guid.NewGuid().ToString("N")+".jpg");
+                    //            thumb.Save(thumbPath, System.Drawing.Imaging.ImageFormat.Jpeg);
 
-                            }
-                        }
-                    });
+                    //            //BitmapImage需要使用UI线程进行操纵
+                    //            Dispatcher.InvokeAsync(() =>
+                    //            {
+                    //                BitmapImage bmImg = new BitmapImage();
+                    //                bmImg.BeginInit();
+                    //                bmImg.UriSource = new Uri(thumbPath);
+                    //                bmImg.EndInit();
+                    //                file.Image = bmImg;
+                    //            });
+                    //        }
+                    //        catch (Exception ex)
+                    //        {
+
+                    //        }
+                    //    }
+                    //});
                 }
                 return files;
             }
@@ -97,8 +96,8 @@ namespace ClassifyFiles.UI.Panel
                 page = value;
                 this.Notify(nameof(Page), nameof(PagingFiles));
             }
-        }     
-        private double iconSize =64;
+        }
+        private double iconSize = 64;
         public double IconSize
         {
             get => iconSize;
@@ -143,11 +142,19 @@ namespace ClassifyFiles.UI.Panel
         private async void RefreshAllButton_Click(object sender, RoutedEventArgs e)
         {
             loading.Show();
-            var classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().Classes);
+            loading.SetMessage("正在枚举文件");
+            var classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().Classes,true);
+
+            //loading.SetMessage("正在生成缩略图");
+            //HashSet<File> files = new HashSet<File>();
+            //classFiles.ForEach(p => (p.Value as List<File>).ForEach(q => files.Add(q)));
+            //await FileUtility.GenerateThumbsAsync(files, Project.RootPath, "thumbs");
+            loading.SetMessage("正在保存");
             await DbUtility.UpdateFilesAsync(classFiles);
             if (classes.SelectedClass != null && classFiles.ContainsKey(classes.SelectedClass))
             {
                 Files = new ObservableCollection<FileWithIcon>(classFiles[classes.SelectedClass].Select(p => new FileWithIcon(p)));
+
             }
             loading.Close();
         }
@@ -215,7 +222,7 @@ namespace ClassifyFiles.UI.Panel
         {
             if ((sender as ListBox).SelectedItem != null)
             {
-                var file = (sender as ListBox).SelectedItem as File; 
+                var file = (sender as ListBox).SelectedItem as File;
                 var p = new Process();
                 p.StartInfo = new ProcessStartInfo(file.GetAbsolutePath(Project.RootPath))
                 {
@@ -232,7 +239,7 @@ namespace ClassifyFiles.UI.Panel
 
         private void ListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-          
+
             if (Keyboard.IsKeyDown(Key.LeftCtrl))
             {
                 FileWithIcon.DefualtIconSize += e.Delta / 30;
@@ -246,16 +253,42 @@ namespace ClassifyFiles.UI.Panel
     public class FileWithIcon : File
     {
         public PackIconKind Kind { get; set; } = PackIconKind.File;
-        private BitmapImage image;
         public BitmapImage Image
         {
-            get => image;
-            set
+            get
             {
-                image = value;
-                this.Notify(nameof(Image), nameof(IconVisibility), nameof(ImageVisibility));
+                if (Thumbnail == null)
+                {
+                    return null;
+                }
+                return ToImage(Thumbnail);
+                //BitmapImage bmImg = new BitmapImage();
+                //bmImg.BeginInit();
+                //bmImg.UriSource = new Uri("thumbs/" + ImageID + ".jpg",UriKind.Relative);
+                //bmImg.EndInit();
+                //return bmImg;
             }
         }
+        private BitmapImage ToImage(byte[] array)
+        {
+            using var ms = new System.IO.MemoryStream(array);
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.CacheOption = BitmapCacheOption.OnLoad; // here
+            image.StreamSource = ms;
+            image.EndInit();
+            return image;
+        }
+        //private BitmapImage image;
+        //public BitmapImage Image
+        //{
+        //    get => image;
+        //    set
+        //    {
+        //        image = value;
+        //        this.Notify(nameof(Image), nameof(IconVisibility), nameof(ImageVisibility));
+        //    }
+        //}
         public Visibility IconVisibility => Image == null ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ImageVisibility => Image == null ? Visibility.Collapsed : Visibility.Visible;
         //public Control IconControl
@@ -302,6 +335,7 @@ namespace ClassifyFiles.UI.Panel
             Name = file.Name;
             Dir = file.Dir;
             SubFiles = file.SubFiles.Select(p => new FileWithIcon(p)).Cast<File>().ToList();
+            Thumbnail = file.Thumbnail;
         }
 
     }
