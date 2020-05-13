@@ -24,6 +24,11 @@ namespace ClassifyFiles.UI.Panel
         }
         public abstract ClassesPanel GetClassesPanel();
         private  Project project;
+
+        public ProjectPanelBase()
+        {
+        }
+
         public virtual Project Project
         {
             get => project;

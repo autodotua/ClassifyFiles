@@ -27,14 +27,9 @@
                 <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource MaterialDesignTreeViewItem}">
                     <Setter Property="IsExpanded" Value="True" />
                 </Style>
-                <!--<Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource MaterialDesignTreeViewItem}">
-                    <EventSetter Event="MouseRightButtonDown" Handler="TreeViewItem_MouseRightButtonDown"/>
-                </Style>-->
-                <HierarchicalDataTemplate DataType="{x:Type data:Class}" ItemsSource="{Binding Path= Children}">
-
+                <HierarchicalDataTemplate DataType="{x:Type data:Class}" ItemsSource="{Binding  Children}">
                     <TextBlock Text="{Binding Name}"/>
                 </HierarchicalDataTemplate>
-              
             </TreeView.Resources>
         </TreeView>
 

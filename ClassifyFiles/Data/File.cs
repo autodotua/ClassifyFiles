@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.IO;
 
@@ -29,6 +31,7 @@ namespace ClassifyFiles.Data
         public string Name { get; set; } = "";
         public Class Class { get; set; }
         public int ClassID { get; set; }
-
+        [NotMapped]
+        public List<File> SubFiles { get; set; } = new List<File>();
     }
 }
