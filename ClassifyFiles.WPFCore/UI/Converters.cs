@@ -92,19 +92,19 @@ namespace ClassifyFiles.UI
             throw new NotSupportedException();
         }
     }
-    public sealed class LogTypeConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            string type = value as string;
-            return Strings.Get(type);
-        }
+    //public sealed class LogTypeConverter : IValueConverter
+    //{
+    //    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    //    {
+    //        string type = value as string;
+    //        return Strings.Get(type);
+    //    }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotSupportedException();
-        }
-    }
+    //    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    //    {
+    //        throw new NotSupportedException();
+    //    }
+    //}
     public class ValueMinusConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

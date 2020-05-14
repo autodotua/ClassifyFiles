@@ -16,21 +16,21 @@ namespace ClassifyFiles.UI
         public SettingWindow()
         {
             InitializeComponent();
-            cbbLanguage.SelectedItem = cbbLanguage.Items.Cast<ComboBoxItem>().First(p => p.Tag.Equals(Config.Language));
+            //cbbLanguage.SelectedItem = cbbLanguage.Items.Cast<ComboBoxItem>().First(p => p.Tag.Equals(Config.Language));
             cbbTheme.SelectedItem = cbbTheme.Items.Cast<ComboBoxItem>().First(p => p.Tag.Equals(GUIConfig.Theme.ToString()));
             cbbLanguage.SelectionChanged += cbbLanguage_SelectionChanged;
             cbbTheme.SelectionChanged += cbbTheme_SelectionChanged;
 
            
-            this.Notify(nameof(Config));
+            //this.Notify(nameof(Config));
         }
 
 
         private void cbbLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            Config.Language = (cbbLanguage.SelectedItem as ComboBoxItem).Tag as string;
-            App.Current.SetCulture();
-            Config.Save();
+            //Config.Language = (cbbLanguage.SelectedItem as ComboBoxItem).Tag as string;
+            //App.Current.SetCulture();
+            //Config.Save();
         }
 
         private void CheckBox_Click(object sender, RoutedEventArgs e)
@@ -45,7 +45,7 @@ namespace ClassifyFiles.UI
             GUIConfig.Save();
         }
 
-        public Config Config => Config.Instance;
+        //public Config Config => Config.Instance;
         public GUIConfig GUIConfig => GUIConfig.Instance;
 
      
@@ -55,7 +55,7 @@ namespace ClassifyFiles.UI
 
         private void RegardOneSideParseErrorAsNotSameCheckBox_Click(object sender, RoutedEventArgs e)
         {
-            Config.Save();
+            //Config.Save();
         }
     }
 }

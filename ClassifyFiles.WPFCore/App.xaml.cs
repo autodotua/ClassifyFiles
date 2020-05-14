@@ -36,7 +36,7 @@ namespace ClassifyFiles.WPFCore
 
             SetTheme();
 
-            SetCulture();
+            //SetCulture();
 
 
         }
@@ -85,33 +85,33 @@ namespace ClassifyFiles.WPFCore
         public bool AppsUseLightTheme { get; private set; }
 
 
-        public void SetCulture()
-        {
-            string culture = Config.Instance.Language;
+        //public void SetCulture()
+        //{
+        //    string culture = Config.Instance.Language;
 
-            //Copy all MergedDictionarys into a auxiliar list.
-            var dictionary = Resources.MergedDictionaries;
+        //    //Copy all MergedDictionarys into a auxiliar list.
+        //    var dictionary = Resources.MergedDictionaries;
 
-            //Search for the specified culture.     
-            string requestedCulture = string.Format("/Properties/StringResources.{0}.xaml", culture);
-            var resourceDictionary = dictionary.
-                FirstOrDefault(p => p.Source != null && p.Source.OriginalString == requestedCulture);
-
-
-            //If we have the requested resource, remove it from the list and place at the end.     
-            //Then this language will be our string table to use.      
-            if (resourceDictionary != null)
-            {
-                dictionary.Remove(resourceDictionary);
-                dictionary.Add(resourceDictionary);
-            }
+        //    //Search for the specified culture.     
+        //    string requestedCulture = string.Format("/Properties/StringResources.{0}.xaml", culture);
+        //    var resourceDictionary = dictionary.
+        //        FirstOrDefault(p => p.Source != null && p.Source.OriginalString == requestedCulture);
 
 
-            //Inform the threads of the new culture.     
-            var c = new CultureInfo(culture);
-            Thread.CurrentThread.CurrentCulture = c;
-            Thread.CurrentThread.CurrentUICulture = c;
-        }
+        //    //If we have the requested resource, remove it from the list and place at the end.     
+        //    //Then this language will be our string table to use.      
+        //    if (resourceDictionary != null)
+        //    {
+        //        dictionary.Remove(resourceDictionary);
+        //        dictionary.Add(resourceDictionary);
+        //    }
+
+
+        //    //Inform the threads of the new culture.     
+        //    var c = new CultureInfo(culture);
+        //    Thread.CurrentThread.CurrentCulture = c;
+        //    Thread.CurrentThread.CurrentUICulture = c;
+        //}
 
   
     }

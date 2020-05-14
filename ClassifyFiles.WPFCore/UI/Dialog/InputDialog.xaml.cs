@@ -14,13 +14,25 @@ namespace ClassifyFiles.UI
         {
             InitializeComponent();
         }
-        public async Task<string> ShowAsync(string title, bool multipleLines,string hint="", string defaultContent = "")
+        public async Task<string> ShowAsync(string title, bool multipleLines, string hint = "", string defaultContent = "")
         {
             tbkDialogTitle.Text = title;
             HintAssist.SetHint(textArea, hint);
-            textLine.Visibility = multipleLines ? Visibility.Collapsed : Visibility.Visible;
-            textArea.Visibility = multipleLines ? Visibility.Visible : Visibility.Collapsed;
+
             InputContent = defaultContent;
+            if (multipleLines)
+            {
+                textLine.Visibility = Visibility.Collapsed;
+                textArea.Visibility = Visibility.Visible;
+                textArea.SelectAll();
+            }
+            else
+            {
+                textArea.Visibility = Visibility.Collapsed;
+                textLine.Visibility = Visibility.Visible;
+                textLine.SelectAll();
+            }
+
             Notify(nameof(InputContent));
             await dialog.ShowDialog(dialog.DialogContent);
             return Result ? InputContent : "";

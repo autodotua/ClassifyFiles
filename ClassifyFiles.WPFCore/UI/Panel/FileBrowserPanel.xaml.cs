@@ -143,12 +143,9 @@ namespace ClassifyFiles.UI.Panel
         {
             loading.Show();
             loading.SetMessage("正在枚举文件");
-            var classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().Classes, true);
-
-            //loading.SetMessage("正在生成缩略图");
-            //HashSet<File> files = new HashSet<File>();
-            //classFiles.ForEach(p => (p.Value as List<File>).ForEach(q => files.Add(q)));
-            //await FileUtility.GenerateThumbsAsync(files, Project.RootPath, "thumbs");
+            var classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().Classes, true, p =>{
+                Dispatcher.Invoke(() => loading.SetMessage($"正在生成缩略图：{(p*100):0.00}%"));
+            });
             loading.SetMessage("正在保存");
             await DbUtility.UpdateFilesAsync(classFiles);
             if (classes.SelectedClass != null && classFiles.ContainsKey(classes.SelectedClass))
@@ -157,6 +154,7 @@ namespace ClassifyFiles.UI.Panel
 
             }
             loading.Close();
+            GeneratePaggingButtons();
         }
 
         private async void classes_SelectedClassChanged(object sender, SelectedItemChanged<Class> e)
@@ -167,7 +165,6 @@ namespace ClassifyFiles.UI.Panel
 
                 Files = new ObservableCollection<FileWithIcon>(files.Select(p => new FileWithIcon(p)));
 
-                stkPagging.Children.Clear();
                 GeneratePaggingButtons();
 
                 //var fileTree = FileUtility.GetFileTree(Files);
@@ -176,6 +173,7 @@ namespace ClassifyFiles.UI.Panel
 
         private void GeneratePaggingButtons()
         {
+            stkPagging.Children.Clear();
             if (Files.Count > 0)
             {
                 for (int i = 1; i <= Math.Ceiling((double)Files.Count / pagingItemsCount); i++)
@@ -206,24 +204,35 @@ namespace ClassifyFiles.UI.Panel
             }
             int i = lbxDisplayMode.SelectedIndex;
             lvwFiles.Visibility = i == 0 ? Visibility.Visible : Visibility.Collapsed;
-            lbxGrdFiles.Visibility = i == 1 ? Visibility.Visible : Visibility.Collapsed;
+            grdLbxGrdFiles.Visibility = i == 1 ? Visibility.Visible : Visibility.Collapsed;
             treeFiles.Visibility = i == 2 ? Visibility.Visible : Visibility.Collapsed;
 
+        }
+
+        private File GetSelectedFile()
+        {
+            return lbxDisplayMode.SelectedIndex switch
+            {
+                0=>lvwFiles.SelectedItem as File,
+                1=>lbxGrdFiles.SelectedItem as File,
+                2=>treeFiles.SelectedItem as File,
+                _=>throw new NotImplementedException()
+            };
         }
 
         private async void lvwFiles_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             try
             {
-                File file = null;
-                if (sender is ListBox lbx)
-                {
-                    file = lbx.SelectedItem as File;
-                }
-                else if (sender is TreeView tree)
-                {
-                    file = tree.SelectedItem as File;
-                }
+                File file = GetSelectedFile() ;
+                //if (sender is ListBox lbx)
+                //{
+                //    file = lbx.SelectedItem as File;
+                //}
+                //else if (sender is TreeView tree)
+                //{
+                //    file = tree.SelectedItem as File;
+                //}
 
                 if (file != null)
                 {
@@ -244,7 +253,7 @@ namespace ClassifyFiles.UI.Panel
                     }
                     var p = new Process();
                     p.StartInfo = new ProcessStartInfo()
-                    {
+                    {FileName= path,
                         UseShellExecute = true
                     };
                     p.Start();
@@ -252,7 +261,7 @@ namespace ClassifyFiles.UI.Panel
                     e.Handled = true;
                 }
             }
-            catch
+            catch(Exception ex)
             {
 
             }
@@ -273,12 +282,51 @@ namespace ClassifyFiles.UI.Panel
                 e.Handled = true;
             }
         }
+
+        private void treeFiles_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            TreeViewItem treeViewItem = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+
+            if (treeViewItem != null)
+            {
+                treeViewItem.Focus();
+                e.Handled = true;
+            }
+            TreeViewItem VisualUpwardSearch(DependencyObject source)
+            {
+                while (source != null && !(source is TreeViewItem))
+                    source = VisualTreeHelper.GetParent(source);
+
+                return source as TreeViewItem;
+            }
+        }
+
+        private void OpenDirMernuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if(GetSelectedFile()!=null)
+            {
+                var p = new Process();
+                p.StartInfo = new ProcessStartInfo()
+                {
+                    FileName = "explorer.exe",
+                    Arguments=$"/select, \"{GetSelectedFile().GetAbsolutePath(Project.RootPath, false)}\"",
+                    UseShellExecute = true
+                };
+                p.Start();
+            }
+        }
     }
 
 
     public class FileWithIcon : File
     {
+        /// <summary>
+        /// 无缩略图时的图标样式
+        /// </summary>
         public PackIconKind Kind { get; set; } = PackIconKind.File;
+        /// <summary>
+        /// 缩略图
+        /// </summary>
         public BitmapImage Image
         {
             get
@@ -288,13 +336,13 @@ namespace ClassifyFiles.UI.Panel
                     return null;
                 }
                 return ToImage(Thumbnail);
-                //BitmapImage bmImg = new BitmapImage();
-                //bmImg.BeginInit();
-                //bmImg.UriSource = new Uri("thumbs/" + ImageID + ".jpg",UriKind.Relative);
-                //bmImg.EndInit();
-                //return bmImg;
             }
         }
+        /// <summary>
+        /// 将字符数组转换为<see cref="BitmapImage"/>
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
         private BitmapImage ToImage(byte[] array)
         {
             using var ms = new System.IO.MemoryStream(array);
@@ -305,33 +353,19 @@ namespace ClassifyFiles.UI.Panel
             image.EndInit();
             return image;
         }
-        //private BitmapImage image;
-        //public BitmapImage Image
-        //{
-        //    get => image;
-        //    set
-        //    {
-        //        image = value;
-        //        this.Notify(nameof(Image), nameof(IconVisibility), nameof(ImageVisibility));
-        //    }
-        //}
+        /// <summary>
+        /// 图标是否显示
+        /// </summary>
         public Visibility IconVisibility => Image == null ? Visibility.Visible : Visibility.Collapsed;
+        /// <summary>
+        /// 缩略图是否显示
+        /// </summary>
         public Visibility ImageVisibility => Image == null ? Visibility.Collapsed : Visibility.Visible;
-        //public Control IconControl
-        //{
-        //    get
-        //    {
-        //        if(Image==null)
-        //        {
-        //            return new PackIcon() { Kind = PackIconKind.File ,Width=32,Height=32};
-        //        }
-        //        else
-        //        {
-        //            return new Grid() { Children = { new Image() { Source = Image, Width = 32, Height = 32 } } };
-        //        }
-        //    }
-        //}
+     
         private static double defualtIconSize = 32;
+        /// <summary>
+        /// 默认大图标的大小
+        /// </summary>
         public static double DefualtIconSize
         {
             get => defualtIconSize;
@@ -354,8 +388,6 @@ namespace ClassifyFiles.UI.Panel
             SmallIconSize = DefualtIconSize / 2;
             this.Notify(nameof(LargeIconSize), nameof(SmallIconSize));
         }
-        //public double IconHight => 48;
-        //public double IconWidth => 48;
         public FileWithIcon() { }
 
         public FileWithIcon(File file)

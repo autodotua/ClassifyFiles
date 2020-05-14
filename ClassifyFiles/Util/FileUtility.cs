@@ -23,7 +23,7 @@ namespace ClassifyFiles.Util
         "tiff",
         "bmp",
         }.AsReadOnly();
-        public async static Task<Dictionary<Class, List<File>>> GetFilesAsync(DI dir, IEnumerable<Class> classes, bool includeThumbnails)
+        public async static Task<Dictionary<Class, List<File>>> GetFilesAsync(DI dir, IEnumerable<Class> classes, bool includeThumbnails, Action<double> percentCallback = null)
         {
             Dictionary<Class, List<File>> classFiles = new Dictionary<Class, List<File>>();
             await Task.Run(async () =>
@@ -32,9 +32,12 @@ namespace ClassifyFiles.Util
                 {
                     classFiles.Add(c, new List<File>());
                 }
-                var files = dir.EnumerateFiles("*", SO.AllDirectories);
+                var files = dir.EnumerateFiles("*", SO.AllDirectories).ToList();
+                int index = 0;
+                int count = files.Count;
                 foreach (var file in files)
                 {
+                    byte[] thumb = null;
                     foreach (var c in classes)
                     {
                         if (IsMatched(file, c))
@@ -42,11 +45,20 @@ namespace ClassifyFiles.Util
                             File f = new File(file, dir, c);
                             if (includeThumbnails)
                             {
-                              await  GenerateThumbnailAsync(f, dir);
+                                if (thumb == null)
+                                {
+                                    await GenerateThumbnailAsync(f, dir);
+                                    thumb = f.Thumbnail;
+                                }
+                                else
+                                {
+                                    f.Thumbnail = thumb;
+                                }
                             }
                             classFiles[c].Add(f);
                         }
                     }
+                    percentCallback?.Invoke( (++index*1.0) / count);
                 }
             });
             return classFiles;
@@ -77,7 +89,7 @@ namespace ClassifyFiles.Util
 
                     }
                 }
-         
+
             });
 
         }
@@ -170,8 +182,12 @@ namespace ClassifyFiles.Util
             return root;
         }
 
-        public static string GetAbsolutePath(this File file, string rootPath)
+        public static string GetAbsolutePath(this File file, string rootPath,bool dirOnly=false)
         {
+            if(dirOnly)
+            {
+                return System.IO.Path.Combine(rootPath, file.Dir);
+            }
             return System.IO.Path.Combine(rootPath, file.Dir, file.Name);
         }
     }

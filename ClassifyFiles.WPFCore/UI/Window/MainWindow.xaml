@@ -22,18 +22,28 @@ xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
         </Grid.RowDefinitions>
         <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
             <materialDesign:DrawerHost.LeftDrawerContent>
-                <DockPanel MinWidth="220">
+                <Grid MinWidth="220" Margin="0,0,0,16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
                     <ToggleButton 
                         Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
                         DockPanel.Dock="Top"
                         HorizontalAlignment="Right" 
                         Margin="16"
                         IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
-
+                    <TextBlock Grid.Row="0" Margin="16,0,0,0" FontSize="24" VerticalAlignment="Center">
+                        项目
+                    </TextBlock>
                     <ListBox 
                         x:Name="DemoItemsListBox" 
                         Margin="0 16 0 16"
                         SelectedIndex="0"
+                        Grid.Row="2"
                         SelectedItem="{Binding SelectedProject}"
                         ItemsSource="{Binding Projects}">
                         <ListBox.Resources>
@@ -41,11 +51,16 @@ xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
                         </ListBox.Resources>
                         <ListBox.ItemTemplate>
                             <DataTemplate >
-                                <TextBlock Text="{Binding Name}" Margin="32 0 32 0" />
+                                <TextBlock Text="{Binding Name}" Margin="32 0" />
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-                </DockPanel>
+
+                    <Button Grid.Row="4" Click="AddProjectButton_Click" 
+                            Style="{StaticResource MaterialDesignFloatingActionMiniButton}">
+                        <materialDesign:PackIcon Kind="Add"/>
+                    </Button>
+                </Grid>
             </materialDesign:DrawerHost.LeftDrawerContent>
             <DockPanel>
                 <materialDesign:ColorZone Padding="8,4" materialDesign:ShadowAssist.ShadowDepth="Depth2"

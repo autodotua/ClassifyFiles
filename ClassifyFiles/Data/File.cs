@@ -12,11 +12,14 @@ namespace ClassifyFiles.Data
     {
         public File()
         {
-        } 
-        public File(FileInfo file,DirectoryInfo root,Class c)
+        }
+        public File(FileInfo file, DirectoryInfo root, Class c) : this(file, root)
+        {
+            Class = c;
+        }  
+        public File(FileInfo file,DirectoryInfo root)
         {
             Name = file.Name;
-            Class = c;
             if(!file.FullName.Contains(root.FullName))
             {
                 throw new Exception("根目录路径没有被包含在文件路径中");

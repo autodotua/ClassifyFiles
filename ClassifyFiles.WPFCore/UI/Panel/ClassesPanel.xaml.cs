@@ -61,10 +61,6 @@ namespace ClassifyFiles.UI.Panel
             InitializeComponent();
         }
         public Class SelectedClass { get; private set; }
-        private void ContextMenu_Opened(object sender, RoutedEventArgs e)
-        {
-
-        }
 
         private void tree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
@@ -74,7 +70,6 @@ namespace ClassifyFiles.UI.Panel
             SelectedClassChanged?.Invoke(this, new SelectedItemChanged<Class>(oldValue, SelectedClass));
         }
         public event EventHandler<SelectedItemChanged<Class>> SelectedClassChanged;
-        public event PropertyChangedEventHandler PropertyChanged;
 
 
         private async void AddButton_Click(object sender, RoutedEventArgs e)

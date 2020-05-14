@@ -21,6 +21,7 @@
             <ColumnDefinition Width="8"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
+        
         <Grid Margin="8,0,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -55,6 +56,11 @@
 
 
         <Grid Margin="4" Grid.Column="2" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
+            <Grid.Resources>
+                <ContextMenu x:Key="menu">
+                    <MenuItem Header="打开目录" Click="OpenDirMernuItem_Click"/>
+                </ContextMenu>
+            </Grid.Resources>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="4"/>
@@ -80,14 +86,14 @@
                 </ListBox>
             </DockPanel>
             <Grid Grid.Row="2"  IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}"
-                        Visibility="Collapsed" x:Name="lbxGrdFiles">
+                        Visibility="Collapsed" x:Name="grdLbxGrdFiles">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="8"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <ListBox DockPanel.Dock="Top" 
-                         x:Name="lbx"
+                         x:Name="lbxGrdFiles" ContextMenu="{StaticResource menu}"
                       PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
                          Style="{StaticResource MaterialDesignGridList}" ItemsSource="{Binding Path=PagingFiles}">
                     <ListBox.ItemTemplate>
@@ -96,7 +102,7 @@
                                 <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                        ToolTip="{Binding Dir, Mode=OneTime}">
                                     <TextBlock DockPanel.Dock="Bottom" FontSize="12" Text="{Binding Path=Name, Mode=OneTime}"
-                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" MaxHeight="32" MaxWidth="{Binding IconSize}"/>
+                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" MaxHeight="32" MaxWidth="{Binding LargeIconSize}"/>
                                     <component:FileIcon File="{Binding .}" UseLargeIcon="True"/>
                                 </DockPanel>
                             </Border>
@@ -108,7 +114,7 @@
                 </ScrollViewer>
             </Grid>
             <ListView Grid.Row="2"  ItemsSource="{Binding Files}" x:Name="lvwFiles" 
-                      PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
+                      PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"  ContextMenu="{StaticResource menu}"
                       IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">
                 <ListView.View>
                     <GridView>
@@ -125,9 +131,9 @@
                 </ListView.View>
             </ListView>
 
-            <TreeView Name="treeFiles" Visibility="Collapsed" 
+            <TreeView Name="treeFiles" Visibility="Collapsed"   ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
                        IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}"
-                      Grid.Row="2"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick">
+                      Grid.Row="2"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick" Margin="-33,0,33,0">
 
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type panel:FileWithIcon}" ItemsSource="{Binding SubFiles}">

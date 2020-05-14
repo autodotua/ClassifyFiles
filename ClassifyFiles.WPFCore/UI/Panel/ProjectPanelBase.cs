@@ -15,10 +15,10 @@ namespace ClassifyFiles.UI.Panel
     {
         public virtual async Task LoadAsync(Project project)
         {
-            if (Project != null || project == null)
-            {
-                return;
-            }
+            //if (Project == null || project == null)
+            //{
+            //    return;
+            //}
             Project = project;
          await   GetClassesPanel().LoadAsync(project);
         }

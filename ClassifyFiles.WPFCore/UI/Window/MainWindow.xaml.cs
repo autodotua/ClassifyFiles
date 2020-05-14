@@ -53,6 +53,7 @@ namespace ClassifyFiles.UI
 
         private async Task LoadProject()
         {
+            MenuToggleButton.IsChecked = false;
             if (MainPanel != null)
             {
                 await MainPanel.LoadAsync(SelectedProject);
@@ -94,12 +95,6 @@ namespace ClassifyFiles.UI
         }
 
 
-
-        private void LogsMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            new LogWindow().Show();
-        }
-
         private void MenuToggleButton_OnClick(object sender, RoutedEventArgs e)
         {
 
@@ -111,9 +106,9 @@ namespace ClassifyFiles.UI
             switch (rbtn.Tag)
             {
                 case "1":
-                    if(MainPanel is ClassSettingPanel)
+                    if (MainPanel is ClassSettingPanel)
                     {
-                        (MainPanel as ClassSettingPanel).SaveClassAsync();
+                        await (MainPanel as ClassSettingPanel).SaveClassAsync();
                     }
                     MainPanel = new FileBrowserPanel();
                     break;
@@ -129,6 +124,13 @@ namespace ClassifyFiles.UI
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             new SettingWindow() { Owner = this }.ShowDialog();
+        }
+
+        private async void AddProjectButton_Click(object sender, RoutedEventArgs e)
+        {
+            Project project = await DbUtility.AddProjectAsync();
+            Projects.Add(project);
+            SelectedProject = project;
         }
     }
 }
