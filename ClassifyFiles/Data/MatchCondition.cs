@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FzLib.Extension;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -8,14 +9,35 @@ using System.Text;
 namespace ClassifyFiles.Data
 {
     [DebuggerDisplay("{Type} {Value}")]
-    public class MatchCondition:DbModelBase
+    public class MatchCondition : DbModelBase
     {
         public int Index { get; set; }
-
+        public bool Not { get; set; }
         public Logic ConnectionLogic { get; set; } = Logic.And;
-        public MatchType Type { get; set; } = MatchType.InFileName;
+        private MatchType type = MatchType.InFileName;
+        public MatchType Type
+        {
+            get => type;
+            set
+            {
+                type = value;
+                this.Notify(nameof(Type));
+            }
+        }
+
         [Required]
-        public string Value { get; set; } = "";
+        //private string value2 = "";
+        //public string Value
+        //{
+        //    get => value2;
+        //    set
+        //    {
+        //        value2 = value;
+        //        this.Notify(nameof(Value));
+        //    }
+        //}
+
+        public string Value { get; set; }
         public Class Class { get; set; }
         public int ClassID { get; set; }
     }
@@ -40,7 +62,23 @@ namespace ClassifyFiles.Data
         InFileName,
         [Description("在目录名中包含")]
         InDirName,
+        [Description("在路径中包含")]
+        InPath,
+        [Description("文件名正则匹配")]
+        InFileNameWithRegex,
+        [Description("目录名正则匹配")]
+        InDirNameWithRegex,
+        [Description("路径正则匹配")]
+        InPathWithRegex,
         [Description("后缀名为")]
         WithExtension,
+        [Description("文件尺寸小于")]
+        SizeSmallerThan,
+        [Description("文件尺寸大于")]
+        SizeLargerThan,
+        [Description("修改时间早于")]
+        TimeEarlierThan,
+        [Description("修改时间晚于")]
+        TimeLaterThan
     }
 }

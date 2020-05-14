@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Text.RegularExpressions;
 
 namespace ClassifyFiles.Util
 {
@@ -58,7 +59,7 @@ namespace ClassifyFiles.Util
                             classFiles[c].Add(f);
                         }
                     }
-                    percentCallback?.Invoke( (++index*1.0) / count);
+                    percentCallback?.Invoke((++index * 1.0) / count);
                 }
             });
             return classFiles;
@@ -141,19 +142,61 @@ namespace ClassifyFiles.Util
         {
 
             string value = mc.Value;
-            switch (mc.Type)
+            bool? result = mc.Type switch
             {
-                case MatchType.InFileName:
-                    return file.Name.Contains(value);
-                case MatchType.InDirName:
-                    return file.DirectoryName.Contains(value);
-                case MatchType.WithExtension:
-                    return file.Extension.Contains(value);
-                default:
-                    throw new NotImplementedException();
+                MatchType.InFileName => file.Name.Contains(value),
+                MatchType.InDirName => file.DirectoryName.Contains(value),
+                MatchType.WithExtension => file.Extension.Contains(value),
+                MatchType.InPath => file.FullName.Contains(value),
+                MatchType.InFileNameWithRegex => Regex.IsMatch(file.Name, value),
+                MatchType.InDirNameWithRegex => Regex.IsMatch(file.DirectoryName, value),
+                MatchType.InPathWithRegex => Regex.IsMatch(file.FullName, value),
+                MatchType.SizeSmallerThan => GetFileSize(value).HasValue ? file.Length <= GetFileSize(value) : (bool?)null,
+                MatchType.SizeLargerThan => GetFileSize(value).HasValue ? file.Length >= GetFileSize(value) : (bool?)null,
+                MatchType.TimeEarlierThan => file.LastAccessTime <= GetTime(),
+                MatchType.TimeLaterThan => file.LastAccessTime >= GetTime(),
+                _ => throw new NotImplementedException(),
+            };
+            if (!result.HasValue)
+            {
+                return false;
             }
-        }
+            if (mc.Not)
+            {
+                result = !result;
+            }
+            return result.Value;
 
+            DateTime GetTime()
+            {
+                return DateTime.Parse(mc.Value);
+            }
+       
+        }
+       public static long? GetFileSize(string value)
+        {
+            if (long.TryParse(value, out long result))
+            {
+                return result;
+            }
+            if (Regex.IsMatch(value.ToUpper(), @"^(?<num>[0-9]+(\.[0-9]+)?) *(?<unit>B|KB|MB|GB|TB)"))
+            {
+                var match = Regex.Match(value.ToUpper(), @"^(?<num>[0-9]+(\.[0-9]+)?) *(?<unit>B|KB|MB|GB|TB)");
+                double num = double.Parse(match.Groups["num"].Value);
+                string unit = match.Groups["unit"].Value;
+                num *= unit switch
+                {
+                    "B" => 1.0,
+                    "KB" => 1024.0,
+                    "MB" => 1024.0*1024,
+                    "GB" => 1024.0*1024*1024,
+                    "TB" => 1024.0*1024*1024*1024,
+                    _=>throw new Exception()
+                };
+                return Convert.ToInt64(num);
+            }
+            return null;
+        }
         public static File GetFileTree(IEnumerable<File> files)
         {
             Dictionary<File, Queue<string>> fileDirs = new Dictionary<File, Queue<string>>();
@@ -182,9 +225,9 @@ namespace ClassifyFiles.Util
             return root;
         }
 
-        public static string GetAbsolutePath(this File file, string rootPath,bool dirOnly=false)
+        public static string GetAbsolutePath(this File file, string rootPath, bool dirOnly = false)
         {
-            if(dirOnly)
+            if (dirOnly)
             {
                 return System.IO.Path.Combine(rootPath, file.Dir);
             }

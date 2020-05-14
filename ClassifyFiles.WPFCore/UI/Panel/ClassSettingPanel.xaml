@@ -15,6 +15,7 @@
     <UserControl.Resources>
         <ui:NotFirst2VisibilityConverter x:Key="i2v"/>
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
+        <panel:MatchConditionType2ControlVisibilityConverter x:Key="mt2v"/>
     </UserControl.Resources>
     <Grid Margin="4">
         <Grid.RowDefinitions>
@@ -43,9 +44,11 @@
                                     <ColumnDefinition Width="8"/>
                                     <ColumnDefinition Width="120"/>
                                     <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="8"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="8"/>
-                                    <ColumnDefinition Width="48"/>
+                                    <ColumnDefinition Width="24"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid.Resources>
                                 
@@ -62,13 +65,28 @@
                                             SelectedValuePath="Value"  DisplayMemberPath="DisplayName"
                                           SelectedValue="{Binding Type}"
                                           ItemsSource="{panel:EnumToItemsSource {x:Type data:MatchType}}"/>
+                                <CheckBox Content="取反" VerticalAlignment="Bottom" IsChecked="{Binding Not}" Grid.Column="4"/>
                                 <TextBox VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="请输入内容"  
-                                         Text="{Binding Value}" Grid.Column="4"/>
-                                <Button Grid.Row="2" Click="Button_Click_1"     Style="{StaticResource MaterialDesignFlatButton}"
-                                        Grid.Column="6" VerticalAlignment="Bottom" Tag="{Binding .}" 
+                                         Text="{Binding Value}" Grid.Column="6" Visibility="{Binding Type, Converter={StaticResource mt2v}, ConverterParameter=text}"/>                                
+                                <DatePicker VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="请输入内容"  
+                                         Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Grid.Column="6"
+                                            Visibility="{Binding Type, Converter={StaticResource mt2v}, ConverterParameter=time}"/>
+                           
+                                <materialDesign:PopupBox Grid.Column="8"
+                                                         PlacementMode="BottomAndAlignRightEdges" StaysOpen="False">
+                                    <StackPanel>
+                                        <Button Visibility="{Binding Type, Converter={StaticResource mt2v}, ConverterParameter=time}">选择时间</Button>
+                                        <Button Visibility="{Binding Type, Converter={StaticResource mt2v}, ConverterParameter=fileSize}">选择文件大小</Button>
+                                        <Button>清除</Button>
+                                        <Separator/>
+                                        <Button Content="删除"  Click="Button_Click_1"  Tag="{Binding .}"/>
+                                    </StackPanel>
+                                </materialDesign:PopupBox>
+                                <!--<Button Grid.Row="2" Click="Button_Click_1"     Style="{StaticResource MaterialDesignFlatButton}"
+                                        Grid.Column="8" VerticalAlignment="Bottom" Tag="{Binding .}" 
                                         Visibility="{Binding Index, Converter={StaticResource i2v}}">
                                     <materialDesign:PackIcon    Kind="Delete" Width="20" Height="20" />
-                                </Button>
+                                </Button>-->
                             </Grid>
                             
                         </DataTemplate>

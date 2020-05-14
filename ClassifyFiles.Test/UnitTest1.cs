@@ -31,10 +31,17 @@ namespace ClassifyFiles.Test
             };
             var classes = new List<Class>() { c };
 
-            var result = FileUtility.GetFilesAsync(new DirectoryInfo("test"), classes);
+            var result = FileUtility.GetFilesAsync(new DirectoryInfo("test"), classes,false);
             Assert.Pass();
         }
 
+        [Test]
+        public void FileSizeConvert()
+        {
+            Assert.AreEqual(FileUtility.GetFileSize("132MB"), 132L * 1024 * 1024);
+            Assert.AreEqual(FileUtility.GetFileSize("115.3 KB"), Convert.ToInt64(115.3 * 1024));
+            Assert.AreEqual(FileUtility.GetFileSize("1.03      GB"), Convert.ToInt64(1.03 * 1024 * 1024 * 1024));
+        }
         private void CreateFiles()
         {
             if (Directory.Exists("test"))

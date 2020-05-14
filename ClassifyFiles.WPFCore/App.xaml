@@ -16,7 +16,7 @@
             </Style>
             <Style TargetType="{x:Type TextBlock }">
                 <Setter Property="FontFamily" Value="微软雅黑"/>
-            </Style>
+            </Style> 
             <Style x:Key="NotificationButton" TargetType="{x:Type Button}">
                 <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                 <Setter Property="Background" Value="#222222"/>

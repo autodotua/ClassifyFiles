@@ -53,6 +53,19 @@ namespace ClassifyFiles.UI.Panel
             //var (treeClasses, tile) = await DbUtility.GetTreeAndTileClassesAsync(Project);
             var treeClasses= await DbUtility.GetClassesAsync(Project);
             Classes = new ObservableCollection<Class>(treeClasses);
+
+            Class first = Classes.FirstOrDefault();
+            if (first != null)
+            {
+                while (first.Children?.Count > 0)
+                {
+                    first = first.Children[0];
+                }
+                await Task.Delay(200);
+                var tvi = tree.ItemContainerGenerator.ContainerFromItem(Classes.First()) as TreeViewItem;
+                if(tvi!=null)tvi.IsSelected = true;
+            }
+
         }
 
         public ClassesPanel()
@@ -69,6 +82,9 @@ namespace ClassifyFiles.UI.Panel
             this.Notify(nameof(SelectedClass));
             SelectedClassChanged?.Invoke(this, new SelectedItemChanged<Class>(oldValue, SelectedClass));
         }
+
+
+
         public event EventHandler<SelectedItemChanged<Class>> SelectedClassChanged;
 
 

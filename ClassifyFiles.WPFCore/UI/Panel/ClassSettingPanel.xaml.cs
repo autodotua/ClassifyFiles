@@ -98,6 +98,38 @@ namespace ClassifyFiles.UI.Panel
         }
     }
 
+    public class MatchConditionType2ControlVisibilityConverter : IValueConverter
+    {
+        private static Dictionary<MatchType, string> MatchConditionTypeWithControlType = new Dictionary<MatchType, string>()
+        {
+            [MatchType.InFileName] = "text",
+            [MatchType.InDirName] = "text",
+            [MatchType.InDirNameWithRegex] = "text",
+            [MatchType.InFileNameWithRegex] = "text",
+            [MatchType.InPath] = "text",
+            [MatchType.WithExtension] = "text",
+            [MatchType.InPathWithRegex] = "text",
+            [MatchType.SizeLargerThan] = "text",
+            [MatchType.SizeSmallerThan] = "text",
+            [MatchType.TimeEarlierThan] = "time",
+            [MatchType.TimeLaterThan] = "time",
+
+        };
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if(MatchConditionTypeWithControlType[(MatchType)value]==parameter as string)
+            {
+                return Visibility.Visible;
+            }
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    } 
+
     public class EnumToItemsSource : MarkupExtension
     {
         private Type Type { get; }

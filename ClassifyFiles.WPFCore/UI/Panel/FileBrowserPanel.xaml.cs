@@ -136,18 +136,6 @@ namespace ClassifyFiles.UI.Panel
 
         private async void WindowBase_Loaded(object sender, RoutedEventArgs e)
         {
-            Class c = new Class()
-            {
-                MatchConditions = new List<MatchCondition>()
-                {
-                    new MatchCondition(){Type=MatchType.InFileName,Value="航拍"},
-                    new MatchCondition(){ConnectionLogic=Logic.Or, Type=MatchType.InDirName,Value="航拍"}
-                }
-            };
-            var classes = new List<Class>() { c };
-
-
-            //Files = new ObservableCollection<FileWithIcon>(result.First().Value.Select(p => new FileWithIcon(p)));
         }
 
         public override async Task LoadAsync(Project project)
@@ -195,7 +183,7 @@ namespace ClassifyFiles.UI.Panel
         private void GeneratePaggingButtons()
         {
             stkPagging.Children.Clear();
-            if (Files.Count > 0)
+            if (Files!=null &&Files.Count > 0)
             {
                 for (int i = 1; i <= Math.Ceiling((double)Files.Count / pagingItemsCount); i++)
                 {
