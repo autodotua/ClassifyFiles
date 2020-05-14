@@ -143,7 +143,7 @@ namespace ClassifyFiles.UI.Panel
         {
             loading.Show();
             loading.SetMessage("正在枚举文件");
-            var classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().Classes,true);
+            var classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().Classes, true);
 
             //loading.SetMessage("正在生成缩略图");
             //HashSet<File> files = new HashSet<File>();
@@ -168,27 +168,33 @@ namespace ClassifyFiles.UI.Panel
                 Files = new ObservableCollection<FileWithIcon>(files.Select(p => new FileWithIcon(p)));
 
                 stkPagging.Children.Clear();
-                if (Files.Count > 0)
-                {
-                    for (int i = 1; i <= Math.Ceiling((double)Files.Count / pagingItemsCount); i++)
-                    {
-                        RadioButton btn = new RadioButton()
-                        {
-                            Style = FindResource("MaterialDesignTabRadioButton") as Style,
-                            Content = i,
-                            Width = 24,
-                            Margin = new Thickness(-12, 0, -12, 0)
-                        };
-                        btn.Click += (p1, p2) =>
-                        {
-                            Page = (int)btn.Content;
-                        };
-                        stkPagging.Children.Add(btn);
-                    }
-                   (stkPagging.Children[0] as RadioButton).IsChecked = true;
-                }
+                GeneratePaggingButtons();
 
                 //var fileTree = FileUtility.GetFileTree(Files);
+            }
+        }
+
+        private void GeneratePaggingButtons()
+        {
+            if (Files.Count > 0)
+            {
+                for (int i = 1; i <= Math.Ceiling((double)Files.Count / pagingItemsCount); i++)
+                {
+                    Button btn = new Button()
+                    {
+                        Style = FindResource("MaterialDesignFlatButton") as Style,
+                        Content = i,
+                    };
+                    btn.Click += (p1, p2) =>
+                    {
+                        stkPagging.Children.Cast<Button>()
+                        .ForEach(p => p.Style = FindResource("MaterialDesignFlatButton") as Style);
+                        (p1 as Button).Style = FindResource("MaterialDesignOutlinedButton") as Style;
+                        Page = (int)btn.Content - 1;
+                    };
+                    stkPagging.Children.Add(btn);
+                }
+               (stkPagging.Children[0] as Button).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             }
         }
 
@@ -198,37 +204,57 @@ namespace ClassifyFiles.UI.Panel
             {
                 return;
             }
-            switch (lbxDisplayMode.SelectedIndex)
-            {
-                case 0:
-                    lvwFiles.Visibility = Visibility.Visible;
-                    lbxGrdFiles.Visibility = Visibility.Collapsed;
-                    treeFiles.Visibility = Visibility.Collapsed;
-                    break;
-                case 1:
-                    lvwFiles.Visibility = Visibility.Collapsed;
-                    lbxGrdFiles.Visibility = Visibility.Visible;
-                    treeFiles.Visibility = Visibility.Collapsed;
-                    break;
-                case 2:
-                    lvwFiles.Visibility = Visibility.Collapsed;
-                    lbxGrdFiles.Visibility = Visibility.Collapsed;
-                    treeFiles.Visibility = Visibility.Visible;
-                    break;
-            }
+            int i = lbxDisplayMode.SelectedIndex;
+            lvwFiles.Visibility = i == 0 ? Visibility.Visible : Visibility.Collapsed;
+            lbxGrdFiles.Visibility = i == 1 ? Visibility.Visible : Visibility.Collapsed;
+            treeFiles.Visibility = i == 2 ? Visibility.Visible : Visibility.Collapsed;
+
         }
 
-        private void lvwFiles_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private async void lvwFiles_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if ((sender as ListBox).SelectedItem != null)
+            try
             {
-                var file = (sender as ListBox).SelectedItem as File;
-                var p = new Process();
-                p.StartInfo = new ProcessStartInfo(file.GetAbsolutePath(Project.RootPath))
+                File file = null;
+                if (sender is ListBox lbx)
                 {
-                    UseShellExecute = true
-                };
-                p.Start();
+                    file = lbx.SelectedItem as File;
+                }
+                else if (sender is TreeView tree)
+                {
+                    file = tree.SelectedItem as File;
+                }
+
+                if (file != null)
+                {
+                    if(file.Dir=="")//是目录
+                    {
+                        return;
+                    }
+                    string path = file.GetAbsolutePath(Project.RootPath);
+
+                    if (!System.IO.File.Exists(path))
+                    {
+                        (Window.GetWindow(this) as MainWindow).snack.Message.Content = "文件不存在";
+                        (Window.GetWindow(this) as MainWindow).snack.IsActive = true;
+                        await Task.Delay(3000);
+                        (Window.GetWindow(this) as MainWindow).snack.IsActive = false;
+                        e.Handled = true;
+                        return;
+                    }
+                    var p = new Process();
+                    p.StartInfo = new ProcessStartInfo()
+                    {
+                        UseShellExecute = true
+                    };
+                    p.Start();
+
+                    e.Handled = true;
+                }
+            }
+            catch
+            {
+
             }
         }
 
@@ -318,13 +344,15 @@ namespace ClassifyFiles.UI.Panel
                 defualtIconSize = value;
             }
         }
-        private double iconSize = DefualtIconSize;
-        public double IconSize => iconSize;
+
+        public double LargeIconSize { get; private set; } = DefualtIconSize;
+        public double SmallIconSize { get; private set; } = DefualtIconSize / 2;
 
         public void UpdateIconSize()
         {
-            iconSize = DefualtIconSize;
-            this.Notify(nameof(IconSize));
+            LargeIconSize = DefualtIconSize;
+            SmallIconSize = DefualtIconSize / 2;
+            this.Notify(nameof(LargeIconSize), nameof(SmallIconSize));
         }
         //public double IconHight => 48;
         //public double IconWidth => 48;

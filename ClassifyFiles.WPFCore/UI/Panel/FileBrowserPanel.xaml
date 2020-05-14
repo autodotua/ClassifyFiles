@@ -8,7 +8,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClassifyFiles.UI"
     xmlns:data="clr-namespace:ClassifyFiles.Data;assembly=ClassifyFiles.Core"
-    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
     Loaded="WindowBase_Loaded"
         mc:Ignorable="d"    >
     <UserControl.Resources>
@@ -54,7 +54,7 @@
         </Grid>
 
 
-        <Grid Margin="4" Grid.Column="2" >
+        <Grid Margin="4" Grid.Column="2" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="4"/>
@@ -86,26 +86,18 @@
                     <RowDefinition Height="8"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <ListBox DockPanel.Dock="Top" PreviewMouseWheel="ListBox_PreviewMouseWheel"
-                         
+                <ListBox DockPanel.Dock="Top" 
+                         x:Name="lbx"
                       PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
                          Style="{StaticResource MaterialDesignGridList}" ItemsSource="{Binding Path=PagingFiles}">
                     <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="8">
+                        <DataTemplate >
+                            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="2">
                                 <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                        ToolTip="{Binding Dir, Mode=OneTime}">
                                     <TextBlock DockPanel.Dock="Bottom" FontSize="12" Text="{Binding Path=Name, Mode=OneTime}"
                                Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" MaxHeight="32" MaxWidth="{Binding IconSize}"/>
-                                    <Grid >
-                                        
-                                       <materialDesign:PackIcon Kind="{Binding Path=Kind, Mode=OneTime}"
-                                           Height="{Binding IconSize}" Width="{Binding IconSize}" Visibility="{Binding IconVisibility}" 
-                                             HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                        <Image Source="{Binding Image}" Visibility="{Binding ImageVisibility}"  
-                                              Stretch="UniformToFill"  Height="{Binding IconSize}" Width="{Binding IconSize}"
-                                              HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    </Grid>
+                                    <component:FileIcon File="{Binding .}" UseLargeIcon="True"/>
                                 </DockPanel>
                             </Border>
                         </DataTemplate>
@@ -120,16 +112,14 @@
                       IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Width="24">
+                        <GridViewColumn Width="48">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <materialDesign:PackIcon Kind="{Binding Path=Kind, Mode=OneTime}"
-                                             Height="16" Width="16"
-                                             HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <component:FileIcon File="{Binding .}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="文件名" DisplayMemberBinding="{Binding Name}"/>
+                        <GridViewColumn Header="文件名" DisplayMemberBinding="{Binding Name}" />
                         <GridViewColumn Header="目录" DisplayMemberBinding="{Binding Dir}"/>
                     </GridView>
                 </ListView.View>
@@ -137,14 +127,12 @@
 
             <TreeView Name="treeFiles" Visibility="Collapsed" 
                        IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}"
-                      Grid.Row="2"  ItemsSource="{Binding FileTree}" >
+                      Grid.Row="2"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick">
 
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type panel:FileWithIcon}" ItemsSource="{Binding SubFiles}">
                         <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="{Binding Path=Kind, Mode=OneTime}"
-                                             Height="24" Width="24"
-                                             HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <component:FileIcon File="{Binding .}"/>
                             <TextBlock VerticalAlignment="Center" FontSize="12" Margin="12,0,0,0" Text="{Binding Name}"/>
                         </StackPanel>    
                     </HierarchicalDataTemplate>

@@ -82,6 +82,8 @@ xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
         <local:InputDialog x:Name="inputDialog" Grid.RowSpan="999" Grid.ColumnSpan="999"  Margin="-4" Width="{ Binding ElementName=win, Path=ActualWidth }"/>
         <local:ProgressDialog x:Name="progressDialog" Grid.RowSpan="999" Grid.ColumnSpan="999"  Margin="-4" Width="{ Binding ElementName=win, Path=ActualWidth }"/>
         <local:AboutDialog  x:Name="aboutDialog" Grid.RowSpan="999" Grid.ColumnSpan="999"  Margin="-4" Width="{ Binding ElementName=win, Path=ActualWidth }"/>
-
+        <materialDesign:Snackbar x:Name="snack">
+            <materialDesign:SnackbarMessage   />
+        </materialDesign:Snackbar>
     </Grid>
 </local:WindowBase>

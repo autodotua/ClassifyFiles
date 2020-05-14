@@ -10,7 +10,11 @@ namespace ClassifyFiles.UI
     {
         public UserControlBase()
         {
-            DataContext = this;
+            Initialized += (p1, p2) =>
+            {
+                (Content as System.Windows.FrameworkElement).DataContext = this;
+            };
+            //DataContext = this;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

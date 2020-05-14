@@ -57,6 +57,7 @@ namespace ClassifyFiles.UI.Panel
 
         public ClassesPanel()
         {
+            DataContext = this;
             InitializeComponent();
         }
         public Class SelectedClass { get; private set; }
