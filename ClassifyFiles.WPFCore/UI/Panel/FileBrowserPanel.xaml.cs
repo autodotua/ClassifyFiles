@@ -36,13 +36,29 @@ namespace ClassifyFiles.UI.Panel
             {
                 files = value;
                 page = 0;
-                this.Notify(nameof(Files), nameof(PagingFiles), nameof(FileTree));
+                this.Notify(nameof(Files), nameof(PagingFiles), nameof(FileTree), nameof(Dirs));
             }
         }
         /// <summary>
         /// 供树状图使用的文件树
         /// </summary>
         public List<File> FileTree => Files == null ? null : new List<File>(new FileWithIcon(FileUtility.GetFileTree(Files)).SubFiles);
+        public HashSet<string> Dirs
+        {
+            get
+            {
+                if(Files==null)
+                {
+                    return null;
+                }
+                HashSet<string> set = new HashSet<string>();
+                foreach (var file in Files)
+                {
+                    set.Add(file.Dir);
+                }
+                return set;
+            }
+        }
         /// <summary>
         /// 供
         /// </summary>
@@ -143,18 +159,26 @@ namespace ClassifyFiles.UI.Panel
         {
             loading.Show();
             loading.SetMessage("正在枚举文件");
-            var classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().Classes, true, p =>{
-                Dispatcher.Invoke(() => loading.SetMessage($"正在生成缩略图：{(p*100):0.00}%"));
+            var classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().Classes, true, p =>
+            {
+                Dispatcher.Invoke(() => loading.SetMessage($"正在生成缩略图：{(p * 100):0.00}%"));
             });
             loading.SetMessage("正在保存");
             await DbUtility.UpdateFilesAsync(classFiles);
             if (classes.SelectedClass != null && classFiles.ContainsKey(classes.SelectedClass))
             {
-                Files = new ObservableCollection<FileWithIcon>(classFiles[classes.SelectedClass].Select(p => new FileWithIcon(p)));
-
+                SetFiles(classFiles[classes.SelectedClass]);
             }
             loading.Close();
             GeneratePaggingButtons();
+        }
+
+        private void SetFiles(IEnumerable<File> files)
+        {
+            IEnumerable<FileWithIcon> filesWithIcon = files.Select(p => new FileWithIcon(p));
+            var orderedFiles = filesWithIcon.OrderBy(p => p.Dir).ThenBy(p => p.Name);
+            Files = new ObservableCollection<FileWithIcon>(orderedFiles);
+
         }
 
         private async void classes_SelectedClassChanged(object sender, SelectedItemChanged<Class> e)
@@ -162,12 +186,9 @@ namespace ClassifyFiles.UI.Panel
             if (e.NewValue != null)
             {
                 var files = await DbUtility.GetFilesAsync(e.NewValue);
-
-                Files = new ObservableCollection<FileWithIcon>(files.Select(p => new FileWithIcon(p)));
+                SetFiles(files);
 
                 GeneratePaggingButtons();
-
-                //var fileTree = FileUtility.GetFileTree(Files);
             }
         }
 
@@ -203,8 +224,8 @@ namespace ClassifyFiles.UI.Panel
                 return;
             }
             int i = lbxDisplayMode.SelectedIndex;
-            lvwFiles.Visibility = i == 0 ? Visibility.Visible : Visibility.Collapsed;
-            grdLbxGrdFiles.Visibility = i == 1 ? Visibility.Visible : Visibility.Collapsed;
+            lvwFilesArea.Visibility = i == 0 ? Visibility.Visible : Visibility.Collapsed;
+            grdFilesArea.Visibility = i == 1 ? Visibility.Visible : Visibility.Collapsed;
             treeFiles.Visibility = i == 2 ? Visibility.Visible : Visibility.Collapsed;
 
         }
@@ -213,10 +234,10 @@ namespace ClassifyFiles.UI.Panel
         {
             return lbxDisplayMode.SelectedIndex switch
             {
-                0=>lvwFiles.SelectedItem as File,
-                1=>lbxGrdFiles.SelectedItem as File,
-                2=>treeFiles.SelectedItem as File,
-                _=>throw new NotImplementedException()
+                0 => lvwFiles.SelectedItem as File,
+                1 => lbxGrdFiles.SelectedItem as File,
+                2 => treeFiles.SelectedItem as File,
+                _ => throw new NotImplementedException()
             };
         }
 
@@ -224,7 +245,7 @@ namespace ClassifyFiles.UI.Panel
         {
             try
             {
-                File file = GetSelectedFile() ;
+                File file = GetSelectedFile();
                 //if (sender is ListBox lbx)
                 //{
                 //    file = lbx.SelectedItem as File;
@@ -236,7 +257,7 @@ namespace ClassifyFiles.UI.Panel
 
                 if (file != null)
                 {
-                    if(file.Dir=="")//是目录
+                    if (file.Dir == "")//是目录
                     {
                         return;
                     }
@@ -253,7 +274,8 @@ namespace ClassifyFiles.UI.Panel
                     }
                     var p = new Process();
                     p.StartInfo = new ProcessStartInfo()
-                    {FileName= path,
+                    {
+                        FileName = path,
                         UseShellExecute = true
                     };
                     p.Start();
@@ -261,7 +283,7 @@ namespace ClassifyFiles.UI.Panel
                     e.Handled = true;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
             }
@@ -292,7 +314,8 @@ namespace ClassifyFiles.UI.Panel
                 treeViewItem.Focus();
                 e.Handled = true;
             }
-            TreeViewItem VisualUpwardSearch(DependencyObject source)
+
+            static TreeViewItem VisualUpwardSearch(DependencyObject source)
             {
                 while (source != null && !(source is TreeViewItem))
                     source = VisualTreeHelper.GetParent(source);
@@ -303,16 +326,31 @@ namespace ClassifyFiles.UI.Panel
 
         private void OpenDirMernuItem_Click(object sender, RoutedEventArgs e)
         {
-            if(GetSelectedFile()!=null)
+            if (GetSelectedFile() != null)
             {
                 var p = new Process();
                 p.StartInfo = new ProcessStartInfo()
                 {
                     FileName = "explorer.exe",
-                    Arguments=$"/select, \"{GetSelectedFile().GetAbsolutePath(Project.RootPath, false)}\"",
+                    Arguments = $"/select, \"{GetSelectedFile().GetAbsolutePath(Project.RootPath, false)}\"",
                     UseShellExecute = true
                 };
                 p.Start();
+            }
+        }
+
+        private void JumpToDirComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string dir = e.AddedItems.Count == 0 ? null : e.AddedItems.Cast<string>().First();
+            if(dir!=null)
+            {
+                FileWithIcon file = Files.FirstOrDefault(p => p.Dir == dir);
+                if(file!=null)
+                {
+                    lvwFiles.SelectedItem = file;
+                    lvwFiles.ScrollIntoView(file);
+                }
+                (sender as ComboBox).SelectedItem = null;
             }
         }
     }
@@ -361,8 +399,8 @@ namespace ClassifyFiles.UI.Panel
         /// 缩略图是否显示
         /// </summary>
         public Visibility ImageVisibility => Image == null ? Visibility.Collapsed : Visibility.Visible;
-     
-        private static double defualtIconSize = 32;
+
+        private static double defualtIconSize = 60;
         /// <summary>
         /// 默认大图标的大小
         /// </summary>
@@ -371,7 +409,7 @@ namespace ClassifyFiles.UI.Panel
             get => defualtIconSize;
             set
             {
-                if (value < 16 || value > 144)
+                if (value < 16 || value > 200)
                 {
                     return;
                 }
