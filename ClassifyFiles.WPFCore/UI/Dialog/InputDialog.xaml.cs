@@ -19,6 +19,7 @@ namespace ClassifyFiles.UI
             tbkDialogTitle.Text = title;
             HintAssist.SetHint(textArea, hint);
 
+            Notify(nameof(InputContent));
             InputContent = defaultContent;
             if (multipleLines)
             {
@@ -33,7 +34,6 @@ namespace ClassifyFiles.UI
                 textLine.SelectAll();
             }
 
-            Notify(nameof(InputContent));
             await dialog.ShowDialog(dialog.DialogContent);
             return Result ? InputContent : "";
         }

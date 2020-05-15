@@ -32,15 +32,12 @@ xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
                     </Grid.RowDefinitions>
                     <ToggleButton 
                         Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
-                        DockPanel.Dock="Top"
-                        HorizontalAlignment="Right" 
-                        Margin="16"
-                        IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
-                    <TextBlock Grid.Row="0" Margin="16,0,0,0" FontSize="24" VerticalAlignment="Center">
+                        DockPanel.Dock="Top"  HorizontalAlignment="Right" 
+                        Margin="16" IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
+                    <TextBlock Grid.Row="0" Margin="16,0,0,0" FontSize="24" HorizontalAlignment="Left" VerticalAlignment="Center">
                         项目
                     </TextBlock>
                     <ListBox 
-                        x:Name="DemoItemsListBox" 
                         Margin="0 16 0 16"
                         SelectedIndex="0"
                         Grid.Row="2"

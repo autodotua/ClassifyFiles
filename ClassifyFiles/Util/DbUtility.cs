@@ -57,6 +57,16 @@ namespace ClassifyFiles.Util
                 await Db.SaveChangesAsync();
             }
         }
+        public static async Task UpdateProjectAsync(Project project)
+        {
+            Db.Entry(project).State = EntityState.Modified;
+            await db.SaveChangesAsync();
+        }   
+        public static async Task DeleteProjectAsync(Project project)
+        {
+            Db.Entry(project).State = EntityState.Deleted;
+            await db.SaveChangesAsync();
+        }
 
         public static async Task<Project> AddProjectAsync()
         {
@@ -65,7 +75,7 @@ namespace ClassifyFiles.Util
             await Db.SaveChangesAsync();
             return project;
         }
-        public static async Task<Class> AddClassAsync(Project project,Class reference, bool inside)
+        public static async Task<Class> AddClassAsync(Project project, Class reference, bool inside)
         {
             Class c = new Class() { Project = project, Name = "未命名" };
             if (reference != null)
@@ -89,7 +99,7 @@ namespace ClassifyFiles.Util
             await db.SaveChangesAsync();
         }
 
-        public static async Task UpdateFilesAsync(Dictionary<Class,List<File>> classFiles)
+        public static async Task UpdateFilesAsync(Dictionary<Class, List<File>> classFiles)
         {
             foreach (var item in classFiles)
             {
@@ -99,8 +109,8 @@ namespace ClassifyFiles.Util
                 Db.Entry(c).State = EntityState.Modified;
             }
             await Db.SaveChangesAsync();
-        }     
-        public static  Task<List<File>> GetFilesAsync(Class c)
+        }
+        public static Task<List<File>> GetFilesAsync(Class c)
         {
             var files = Db.Files.Where(p => p.Class == c);
             return files.ToListAsync();

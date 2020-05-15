@@ -49,7 +49,18 @@ namespace ClassifyFiles.UI
         }
 
 
-
+        public async Task DeleteSelectedProjectAsync()
+        {
+            await DbUtility.DeleteProjectAsync(SelectedProject);
+            
+            Projects.Remove(SelectedProject);
+            Projects = new ObservableCollection<Project>(await DbUtility.GetProjectsAsync());
+            if (Projects.Count == 0)
+            {
+                Projects.Add(await DbUtility.AddProjectAsync());
+            }
+            SelectedProject = Projects[0];
+        }
 
         private async Task LoadProject()
         {

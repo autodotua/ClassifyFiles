@@ -47,7 +47,7 @@ namespace ClassifyFiles.UI.Panel
         {
             get
             {
-                if(Files==null)
+                if (Files == null)
                 {
                     return null;
                 }
@@ -183,7 +183,7 @@ namespace ClassifyFiles.UI.Panel
         private void GeneratePaggingButtons()
         {
             stkPagging.Children.Clear();
-            if (Files!=null &&Files.Count > 0)
+            if (Files != null && Files.Count > 0)
             {
                 for (int i = 1; i <= Math.Ceiling((double)Files.Count / pagingItemsCount); i++)
                 {
@@ -330,16 +330,30 @@ namespace ClassifyFiles.UI.Panel
         private void JumpToDirComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             string dir = e.AddedItems.Count == 0 ? null : e.AddedItems.Cast<string>().First();
-            if(dir!=null)
+            if (dir != null)
             {
                 FileWithIcon file = Files.FirstOrDefault(p => p.Dir == dir);
-                if(file!=null)
+                if (file != null)
                 {
                     lvwFiles.SelectedItem = file;
                     lvwFiles.ScrollIntoView(file);
                 }
                 (sender as ComboBox).SelectedItem = null;
             }
+        }
+
+        private async void RenameProjectButton_Click(object sender, RoutedEventArgs e)
+        {
+            string newName = await input.ShowAsync("请输入新的项目名", false, "项目名", Project.Name);
+            Project.Name = newName;
+            await DbUtility.UpdateProjectAsync(Project);
+        }
+
+        private async void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            MainWindow mainWin = (Window.GetWindow(this) as MainWindow);
+            await mainWin.DeleteSelectedProjectAsync();
         }
     }
 
