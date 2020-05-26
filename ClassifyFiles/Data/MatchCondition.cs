@@ -26,18 +26,7 @@ namespace ClassifyFiles.Data
         }
 
         [Required]
-        //private string value2 = "";
-        //public string Value
-        //{
-        //    get => value2;
-        //    set
-        //    {
-        //        value2 = value;
-        //        this.Notify(nameof(Value));
-        //    }
-        //}
-
-        public string Value { get; set; }
+        public string Value { get; set; } = "";
         public Class Class { get; set; }
         public int ClassID { get; set; }
     }

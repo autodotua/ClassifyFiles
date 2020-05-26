@@ -8,6 +8,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClassifyFiles.UI"
     xmlns:data="clr-namespace:ClassifyFiles.Data;assembly=ClassifyFiles.Core"
+    xmlns:m="http://schemas.modernwpf.com/2019"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
     Loaded="WindowBase_Loaded"
         mc:Ignorable="d"    >
@@ -42,16 +43,40 @@
 
                 <TextBox Grid.Column="2"
                       materialDesign:HintAssist.Hint="项目根目录"
-                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                       VerticalAlignment="Center" Text="{Binding Project.RootPath}"/>
-                <materialDesign:PopupBox  Grid.Column="4"   VerticalAlignment="Center"    HorizontalAlignment="Right"        Padding="2 0 2 0">
+
+                <m:DropDownButton  Grid.Column="4" Content="选项">
+                    <!--<m:SymbolIcon Symbol="ProtectedDocument"/>-->
+                    <m:DropDownButton.Flyout>
+                        <m:MenuFlyout Placement="BottomEdgeAlignedLeft">
+                            <MenuItem Header="重命名"   Click="RenameProjectButton_Click"/>
+                            <MenuItem Header="删除"   Click="DeleteButton_Click"/>
+                        </m:MenuFlyout>
+                    </m:DropDownButton.Flyout>
+                </m:DropDownButton>
+                <!--<Button  Grid.Column="4"  Click="Button_Click">
+                    <Button.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="重命名"   Click="RenameProjectButton_Click"/>
+                            <MenuItem Header="删除"   Click="DeleteButton_Click"/>
+                        </ContextMenu>
+                    </Button.ContextMenu>
+                    <m:SymbolIcon Symbol="More"/>
+                </Button>-->
+                <!--<materialDesign:PopupBox  Grid.Column="4"   VerticalAlignment="Center"    HorizontalAlignment="Right"        Padding="2 0 2 0">
                     <StackPanel>
                         <Button  Content="重命名" Click="RenameProjectButton_Click"/>
                         <Button  Content="删除" Click="DeleteButton_Click"/>
                     </StackPanel>
-                </materialDesign:PopupBox>
+                </materialDesign:PopupBox>-->
+                <!--<m:CommandBar x:Name="PrimaryCommandBar"  Grid.Column="4"   IsOpen="False" >
+                    <m:AppBarButton Icon="Rename" Label="重命名" IsCompact="True" Click="RenameProjectButton_Click"/>
+                    <m:AppBarButton Icon="Delete" Label="删除"  IsCompact="True" Click="DeleteButton_Click"/>
+                    <m:CommandBar.SecondaryCommands>
+                    </m:CommandBar.SecondaryCommands>
+                </m:CommandBar>-->
             </Grid>
-            <panel:ClassesPanel x:Name="classes" Grid.Row="99" Editable="False" SelectedClassChanged="classes_SelectedClassChanged"/>
+            <panel:ClassesPanel x:Name="classes" Grid.Row="99"  SelectedClassChanged="classes_SelectedClassChanged"/>
         </Grid>
 
 
@@ -66,14 +91,14 @@
                 <RowDefinition Height="4"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="32">
+            <!--<DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="32">
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
-                    <Button    Style="{StaticResource MaterialDesignFlatButton}" Click="RefreshAllButton_Click">刷新所有</Button>
-                    <Button    Style="{StaticResource MaterialDesignFlatButton}"          IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">刷新此类</Button>
-                </StackPanel>
-                <!-- the following based on https://material.io/guidelines/components/buttons.html#buttons-toggle-buttons -->
-                <ListBox x:Name="lbxDisplayMode" DockPanel.Dock="Right" HorizontalAlignment="Right"  SelectionChanged="ListBox_SelectionChanged"
-                         Style="{StaticResource MaterialDesignToolToggleListBox}"  SelectedIndex="0"
+                    <Button    Click="RefreshAllButton_Click">刷新所有</Button>
+                    <Button             IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">刷新此类</Button>
+                </StackPanel>-->
+            <!-- the following based on https://material.io/guidelines/components/buttons.html#buttons-toggle-buttons -->
+            <!--<ListBox x:Name="lbxDisplayMode" DockPanel.Dock="Right" HorizontalAlignment="Right"  SelectionChanged="ListBox_SelectionChanged"
+                        SelectedIndex="0"
                           IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">
                     <ListBoxItem >
                         <materialDesign:PackIcon    Kind="FormatListBulleted" />
@@ -84,8 +109,45 @@
                     <ListBoxItem>
                         <materialDesign:PackIcon      Kind="FileTree" />
                     </ListBoxItem>
-                </ListBox>
-            </DockPanel>
+                </ListBox>-->
+            <Grid x:Name="grdAppBar">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <m:AppBarButton  Icon="Refresh" IsCompact="False"  Label="刷新全部" Click="RefreshAllButton_Click"/>
+                <m:AppBarButton Grid.Column="1"  Icon="Refresh"  Label="刷新当前"/>
+                <m:AppBarToggleButton Grid.Column="3"  Label="列表模式"  Click="AppBarToggleButton_Click" Tag="1" IsChecked="True">
+                    <m:AppBarToggleButton.Icon>
+                        <m:FontIcon
+                                    FontFamily="Segoe MDL2 Assets"
+                                    Glyph="&#xE8FD;" />
+                    </m:AppBarToggleButton.Icon>
+                </m:AppBarToggleButton>
+                <m:AppBarToggleButton Grid.Column="4" Label="图标模式" Click="AppBarToggleButton_Click" Tag="2">
+                    <m:AppBarToggleButton.Icon>
+                        <m:FontIcon
+                                    FontFamily="Segoe MDL2 Assets"
+                                    Glyph="&#xF0E2;" />
+                    </m:AppBarToggleButton.Icon>
+                </m:AppBarToggleButton>
+                <m:AppBarToggleButton Grid.Column="5"  Label="树型模式"  Click="AppBarToggleButton_Click" Tag="3">
+                    <m:AppBarToggleButton.Icon>
+                        <m:FontIcon
+                                    FontFamily="Segoe MDL2 Assets"
+                                    Glyph="&#xED25;" />
+                    </m:AppBarToggleButton.Icon>
+                </m:AppBarToggleButton>
+                <TextBlock
+                        x:Name="Control5Output"
+                        Margin="8,0,0,0"
+                        VerticalAlignment="Center" />
+            </Grid>
+
             <Grid Grid.Row="2"  IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}"
                         Visibility="Collapsed" x:Name="grdFilesArea">
                 <Grid.RowDefinitions>
@@ -93,44 +155,28 @@
                     <RowDefinition Height="8"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <ListBox DockPanel.Dock="Top" 
+                <m:GridView DockPanel.Dock="Top" 
                          x:Name="lbxGrdFiles" ContextMenu="{StaticResource menu}"
                       PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
-                         Style="{StaticResource MaterialDesignGridList}" ItemsSource="{Binding Path=PagingFiles}">
+                         ItemsSource="{Binding Path=PagingFiles}" >
+
                     <ListBox.ItemTemplate>
                         <DataTemplate >
                             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="2">
                                 <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                        ToolTip="{Binding Dir, Mode=OneTime}">
                                     <TextBlock DockPanel.Dock="Bottom" FontSize="12" Text="{Binding Path=Name, Mode=OneTime}"
-                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" MaxHeight="32" MaxWidth="{Binding LargeIconSize}"/>
+                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" Height="32" MaxWidth="{Binding LargeIconSize}"/>
                                     <component:FileIcon File="{Binding .}" UseLargeIcon="True"/>
                                 </DockPanel>
                             </Border>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
-                </ListBox>
+                </m:GridView>
                 <ScrollViewer x:Name="scrPagging" Grid.Row="2"  VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Hidden" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                     <StackPanel x:Name="stkPagging" Orientation="Horizontal"/>
                 </ScrollViewer>
             </Grid>
-            <!--<ListView Grid.Row="2"  ItemsSource="{Binding Files}" x:Name="lvwFiles" 
-                      PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"  ContextMenu="{StaticResource menu}"
-                      IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Width="48">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <component:FileIcon File="{Binding .}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="文件名" DisplayMemberBinding="{Binding Name}" />
-                        <GridViewColumn Header="目录" DisplayMemberBinding="{Binding Dir}"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>-->
             <Grid Grid.Row="2" x:Name="lvwFilesArea">
                 <Grid.RowDefinitions >
                     <RowDefinition Height="*"/>
@@ -142,7 +188,7 @@
                       IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <Grid>
+                            <Grid Margin="0,4,0,4">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="16"/>
@@ -160,7 +206,23 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-                <ComboBox Grid.Row="2" materialDesign:HintAssist.Hint="跳转到目录" SelectionChanged="JumpToDirComboBox_SelectionChanged" ItemsSource="{Binding Dirs}"/>
+                <Button Grid.Row="2" Content="根据文件夹定位" >
+                    <m:FlyoutService.Flyout>
+                        <m:Flyout x:Name="flyoutJumpToDir" >
+                            <StackPanel>
+                                <ListBox Grid.Row="2" SelectionChanged="JumpToDirComboBox_SelectionChanged" ItemsSource="{Binding Dirs}" MaxHeight="600"/>
+                            </StackPanel>
+                        </m:Flyout>
+                    </m:FlyoutService.Flyout>
+                </Button>
+                <!--<ComboBox Grid.Row="2"  SelectionChanged="JumpToDirComboBox_SelectionChanged" ItemsSource="{Binding Dirs}">
+                    <m:ComboBoxHelper.TextBoxStyle>
+                        <Style TargetType="{x:Type TextBox}">
+                            <Setter Property="Background" Value="Red"/>
+                        </Style>
+                    
+                    </m:ComboBoxHelper.TextBoxStyle>
+                </ComboBox>-->
             </Grid>
             <TreeView Name="treeFiles" Visibility="Collapsed"   ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
                        IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}"
@@ -177,7 +239,5 @@
             </TreeView>
 
         </Grid>
-        <ui:InputDialog x:Name="input" Grid.ColumnSpan="99" Margin="-100"/>
-        <ui:ProgressDialog x:Name="loading" Grid.ColumnSpan="99" Margin="-100"/>
     </Grid>
 </panel:ProjectPanelBase>

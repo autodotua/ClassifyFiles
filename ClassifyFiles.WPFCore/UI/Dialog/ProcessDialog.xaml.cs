@@ -29,45 +29,16 @@ namespace ClassifyFiles.UI
         }
         public void Show()
         {
-            if (dialog.IsOpen)
-            {
-                return;
-            }
-            dialog.ShowDialog(dialog.DialogContent);
+            ring.IsActive = true;
+            Visibility = Visibility.Visible;
         }
-        //private string message;
-        //public string Message
-        //{
-        //    get => message;
-        //    private set
-        //    {
-        //        message = value;
-        //        this.Notify(nameof(Message));
-        //    }
-        //}
+   
 
-        public void SetMessage(string message)
-        {
-            Dispatcher?.Invoke(() =>
-            {
-                if (message == null && tbk.Visibility == Visibility.Visible)
-                {
-                    tbk.Visibility = Visibility.Collapsed;
-                }
-                else if (message != null)
-                {
-                    if (tbk.Visibility == Visibility.Collapsed)
-                    {
-                        tbk.Visibility = Visibility.Visible;
-                    }
-                    tbk.Text = message;
-                }
-            });
-        }
 
         public void Close()
         {
-            dialog.CurrentSession?.Close();
+            ring.IsActive = false;
+            Visibility = Visibility.Collapsed;
         }
 
     }

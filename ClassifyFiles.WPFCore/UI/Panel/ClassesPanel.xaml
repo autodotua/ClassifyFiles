@@ -18,13 +18,8 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <TreeView Name="tree" Grid.Row="0" Grid.ColumnSpan="999"  ItemsSource="{Binding Classes}" SelectedItemChanged="tree_SelectedItemChanged">
-            <!--<TreeView.ContextMenu>
-                <ContextMenu Opened="ContextMenu_Opened">
-                    <MenuItem Header="删除"  Click="DeleteMenuItem_Click"/>
-                </ContextMenu>
-            </TreeView.ContextMenu>-->
             <TreeView.Resources>
-                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource MaterialDesignTreeViewItem}">
+                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource DefaultTreeViewItemStyle}">
                     <Setter Property="IsExpanded" Value="True" />
                 </Style>
                 <HierarchicalDataTemplate DataType="{x:Type data:Class}" ItemsSource="{Binding  Children}">
@@ -33,21 +28,5 @@
             </TreeView.Resources>
         </TreeView>
 
-        <StackPanel Orientation="Horizontal" Grid.Row="2" Visibility="{Binding Editable, Converter={StaticResource b2v}}" HorizontalAlignment="Center">
-            <Button Grid.Row="2" Click="AddButton_Click"  Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}">
-                <materialDesign:PackIcon    Kind="Add" />
-            </Button>
-            <FrameworkElement Width="12"/>
-            <Button Grid.Row="2" Click="DeleteButton_Click" Style="{StaticResource MaterialDesignFloatingActionMiniDarkButton}">
-                <materialDesign:PackIcon    Kind="Delete" />
-            </Button>  
-            <FrameworkElement Width="12"/>
-            <Button Grid.Row="2" Click="EditButton_Click"  Style="{StaticResource MaterialDesignFloatingActionMiniButton}">
-                <materialDesign:PackIcon    Kind="Edit" />
-            </Button>
-
-        </StackPanel>
-        <ui:MessageDialog x:Name="msgDialog"/>
-        <ui:InputDialog x:Name="inputDialog"/>
     </Grid>
 </ui:UserControlBase>

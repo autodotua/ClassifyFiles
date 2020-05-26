@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ClassifyFiles.UI;
+using ModernWpf;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -19,7 +21,7 @@ namespace ClassifyFiles.WPFCore
         private async void Application_Startup(object sender, StartupEventArgs e)
         {
             Current = this;
-           
+
 #if (!DEBUG)
             UnhandledException.RegistAll();
 
@@ -32,9 +34,9 @@ namespace ClassifyFiles.WPFCore
 
             //FzLib.Program.App.SetWorkingDirectoryToAppPath();
 
-            InitializeTheme();
+            //InitializeTheme();
 
-            SetTheme();
+            //SetTheme();
 
             //SetCulture();
 
@@ -54,35 +56,43 @@ namespace ClassifyFiles.WPFCore
                 SystemUsesLightTheme = true;
             }
         }
-        public void SetTheme()
+        public static void SetTheme(FrameworkElement element = null)
         {
-            MaterialDesignThemes.Wpf.BundledTheme theme = new MaterialDesignThemes.Wpf.BundledTheme();
-            theme.PrimaryColor = MaterialDesignColors.PrimaryColor.Purple;
-            theme.SecondaryColor = MaterialDesignColors.SecondaryColor.Lime;
+            ElementTheme theme = ElementTheme.Default;
+
             switch (GUIConfig.Instance.Theme)
             {
                 case 0:
-                     if (AppsUseLightTheme)
+                    if (AppsUseLightTheme)
                     {
                         goto l;
                     }
                     goto d;
                 case -1:
                 d:
-                    theme.BaseTheme = MaterialDesignThemes.Wpf.BaseTheme.Dark;
+                    theme = ElementTheme.Dark;
                     break;
                 case 1:
                 l:
-                    theme.BaseTheme = MaterialDesignThemes.Wpf.BaseTheme.Light;
+                    theme = ElementTheme.Light;
                     break;
             }
+            if (element == null)
+            {
+                foreach (var win in App.Current.Windows)
+                {
+                    ThemeManager.SetRequestedTheme(win as Window, theme);
 
-            Resources.MergedDictionaries.Add(theme);
-
+                }
+            }
+            else
+            {
+                ThemeManager.SetRequestedTheme(element, theme);
+            }
         }
 
-        public bool SystemUsesLightTheme { get; private set; }
-        public bool AppsUseLightTheme { get; private set; }
+        public static bool SystemUsesLightTheme { get; private set; }
+        public static bool AppsUseLightTheme { get; private set; }
 
 
         //public void SetCulture()
@@ -113,6 +123,6 @@ namespace ClassifyFiles.WPFCore
         //    Thread.CurrentThread.CurrentUICulture = c;
         //}
 
-  
+
     }
 }

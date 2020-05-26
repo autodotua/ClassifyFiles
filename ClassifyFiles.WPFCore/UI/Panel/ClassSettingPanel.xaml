@@ -10,6 +10,7 @@
     xmlns:data="clr-namespace:ClassifyFiles.Data;assembly=ClassifyFiles.Core"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    xmlns:m="http://schemas.modernwpf.com/2019"
     Loaded="WindowBase_Loaded"
         mc:Ignorable="d"    >
     <UserControl.Resources>
@@ -17,16 +18,18 @@
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
         <panel:MatchConditionType2ControlVisibilityConverter x:Key="mt2v"/>
     </UserControl.Resources>
-    <Grid Margin="4">
+    <Grid >
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="8"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <panel:ClassesPanel x:Name="classes" Editable="True" SelectedClassChanged="classes_SelectedClassChanged"/>
+        <panel:ClassesPanel x:Name="classes"  SelectedClassChanged="Classes_SelectedClassChanged"/>
         <GroupBox  Header="匹配条件" Grid.Column="2" 
                               IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">
             <Grid>
@@ -40,38 +43,41 @@
                         <DataTemplate>
                             <Grid Margin="0,4">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="64"/>
+                                    <ColumnDefinition Width="88"/>
                                     <ColumnDefinition Width="8"/>
-                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="164"/>
                                     <ColumnDefinition Width="8"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="8"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="8"/>
-                                    <ColumnDefinition Width="24"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="8"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid.Resources>
                                 
                                 </Grid.Resources>
                                 <ComboBox VerticalAlignment="Bottom"  
-                                          Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                                           DisplayMemberPath="DisplayName"  SelectedValuePath="Value"
                                           materialDesign:HintAssist.Hint="连接逻辑"
                                           SelectedValue="{Binding ConnectionLogic}"
                                           Visibility="{Binding Index, Converter={StaticResource i2v}}"
                                           ItemsSource="{panel:EnumToItemsSource {x:Type data:Logic}}"/>
-                                <ComboBox   Style="{StaticResource MaterialDesignFloatingHintComboBox}"
-                                    materialDesign:HintAssist.Hint="匹配类型" VerticalAlignment="Bottom" Grid.Column="2" 
+                                <ComboBox  
+                                    VerticalAlignment="Bottom" Grid.Column="2" 
                                             SelectedValuePath="Value"  DisplayMemberPath="DisplayName"
                                           SelectedValue="{Binding Type}"
                                           ItemsSource="{panel:EnumToItemsSource {x:Type data:MatchType}}"/>
-                                <CheckBox Content="取反" VerticalAlignment="Bottom" IsChecked="{Binding Not}" Grid.Column="4"/>
-                                <TextBox VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="请输入内容"  
+                                <CheckBox Content="取反" VerticalAlignment="Bottom" IsChecked="{Binding Not}" Grid.Column="4" Margin="0,0,-12,0"/>
+                                <TextBox VerticalAlignment="Bottom" 
                                          Text="{Binding Value}" Grid.Column="6" Visibility="{Binding Type, Converter={StaticResource mt2v}, ConverterParameter=text}"/>                                
-                                <DatePicker VerticalAlignment="Bottom" materialDesign:HintAssist.Hint="请输入内容"  
+                                <DatePicker VerticalAlignment="Bottom"   
                                          Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Grid.Column="6"
                                             Visibility="{Binding Type, Converter={StaticResource mt2v}, ConverterParameter=time}"/>
-                           
+                                <Button  Grid.Column="8" Click="Button_Click_1"  Tag="{Binding .}">
+                                    <m:SymbolIcon Symbol="Delete"/>
+                                </Button>
+                                <!--</Button>
                                 <materialDesign:PopupBox Grid.Column="8"
                                                          PlacementMode="BottomAndAlignRightEdges" StaysOpen="False">
                                     <StackPanel>
@@ -81,7 +87,7 @@
                                         <Separator/>
                                         <Button Content="删除"  Click="Button_Click_1"  Tag="{Binding .}"/>
                                     </StackPanel>
-                                </materialDesign:PopupBox>
+                                </materialDesign:PopupBox>-->
                                 <!--<Button Grid.Row="2" Click="Button_Click_1"     Style="{StaticResource MaterialDesignFlatButton}"
                                         Grid.Column="8" VerticalAlignment="Bottom" Tag="{Binding .}" 
                                         Visibility="{Binding Index, Converter={StaticResource i2v}}">
@@ -92,10 +98,19 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-                <Button Grid.Row="2" Click="Button_Click" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}">
+                <Button Grid.Row="2" Click="Button_Click">
                     <materialDesign:PackIcon    Kind="Add" />
                 </Button>
             </Grid>
         </GroupBox>
+        <m:CommandBar  Grid.Row="2" Grid.ColumnSpan="999" DefaultLabelPosition="Right">
+            <m:AppBarButton Icon="Add" Label="在后方新增分类"  Click="AddClassAfterButton_Click"/>
+            <m:AppBarButton Icon="Add" Label="在下级新增分类" Click="AddClassInButton_Click"/>
+            <m:AppBarButton Icon="Delete" Label="删除分类" Click="DeleteClassButton_Click"/>
+            <m:AppBarButton Icon="Rename" Label="重命名分类" Click="RenameClassButton_Click"/>
+            <m:AppBarSeparator/>
+            <m:AppBarButton Icon="Add" Label="新建匹配条件"  Click="AddMatchConditionButton_Click"/>
+
+        </m:CommandBar>
     </Grid>
 </panel:ProjectPanelBase>

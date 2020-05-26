@@ -29,7 +29,7 @@
                 <TextBlock     TextWrapping="Wrap"  FontSize="16"
                                VerticalAlignment="Center" Text="{DynamicResource label_programBy}"/>
                 <StackPanel  Grid.Row="4" Orientation="Horizontal"  HorizontalAlignment="Right"  Grid.ColumnSpan="999" >
-                    <Button x:Name="btnOk" Style="{StaticResource MaterialDesignFlatButton}" Width="96" 
+                    <Button x:Name="btnOk" Width="96" 
                         Click="Button_Click_1" Margin="16,0,0,0" Content="{DynamicResource button_close}"/>
 
                 </StackPanel>

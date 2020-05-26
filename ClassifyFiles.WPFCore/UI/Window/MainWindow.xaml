@@ -6,7 +6,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"             
     xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
 
-        xmlns:wpw="clr-namespace:ClassifyFiles;assembly=ClassifyFiles.Core"
         xmlns:local="clr-namespace:ClassifyFiles.UI"
          xmlns:glo="clr-namespace:System.Globalization;assembly=System.Runtime"
 xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
@@ -14,88 +13,52 @@ xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
     mc:Ignorable="d"
     Closing="Window_Closing"
+    
+    xmlns:m="http://schemas.modernwpf.com/2019"
     WindowStartupLocation="CenterScreen"
         Title="文件分类浏览器" Height="600" Width="1200" x:Name="win">
     <Grid x:Name="outGrd" >
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="4"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
-            <materialDesign:DrawerHost.LeftDrawerContent>
-                <Grid MinWidth="220" Margin="0,0,0,16">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="8"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="8"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <ToggleButton 
-                        Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
-                        DockPanel.Dock="Top"  HorizontalAlignment="Right" 
-                        Margin="16" IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
-                    <TextBlock Grid.Row="0" Margin="16,0,0,0" FontSize="24" HorizontalAlignment="Left" VerticalAlignment="Center">
-                        项目
-                    </TextBlock>
-                    <ListBox 
-                        Margin="0 16 0 16"
-                        SelectedIndex="0"
-                        Grid.Row="2"
-                        SelectedItem="{Binding SelectedProject}"
-                        ItemsSource="{Binding Projects}">
-                        <ListBox.Resources>
-                            <Style TargetType="ScrollBar" BasedOn="{StaticResource MaterialDesignScrollBarMinimal}"/>
-                        </ListBox.Resources>
-                        <ListBox.ItemTemplate>
-                            <DataTemplate >
-                                <TextBlock Text="{Binding Name}" Margin="32 0" />
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
 
-                    <Button Grid.Row="4" Click="AddProjectButton_Click" 
-                            Style="{StaticResource MaterialDesignFloatingActionMiniButton}">
-                        <materialDesign:PackIcon Kind="Add"/>
-                    </Button>
-                </Grid>
-            </materialDesign:DrawerHost.LeftDrawerContent>
-            <DockPanel>
-                <materialDesign:ColorZone Padding="8,4" materialDesign:ShadowAssist.ShadowDepth="Depth2"
-                                            Mode="PrimaryMid" DockPanel.Dock="Top">
-                    <DockPanel>
-                        <ToggleButton
-                            x:Name="MenuToggleButton"
-                            Style="{StaticResource MaterialDesignHamburgerToggleButton}"
-                            IsChecked="False"
-                            Click="MenuToggleButton_OnClick"/>
-                        <materialDesign:PopupBox DockPanel.Dock="Right" PlacementMode="BottomAndAlignRightEdges" StaysOpen="False">
-                            <StackPanel>
+        <TabControl x:Name="tab" ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProject}" Margin="0,0,0,-21.5">
+            <m:TabControlHelper.TabStripHeader>
+                <m:AppBarButton Grid.Column="0" LabelPosition="Collapsed" IsCompact="True" Icon="Add"  Click="AddProjectButton_Click"/>
+            </m:TabControlHelper.TabStripHeader>
+            <m:TabControlHelper.TabStripFooter>
+                <m:SimpleStackPanel HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
+                    <m:CommandBar DefaultLabelPosition="Right" >
+                        <m:AppBarToggleButton x:Name="btnModeView" Grid.Column="0"  Icon="View"  Label="浏览" Checked="RadioButton_Checked" IsChecked="True"/>
+                        <m:AppBarToggleButton x:Name="btnModeClasses" Grid.Column="0" Icon="Setting"  Label="分类" Checked="RadioButton_Checked"/>
 
-                                <Button  Click="Button_Click">设置</Button>
-                                <Separator/>
-                                <Button Content="Goodbye" />
-                            </StackPanel>
-                        </materialDesign:PopupBox>
-                        <StackPanel    Orientation="Horizontal" DockPanel.Dock="Right"    Margin="2,2,16,2">
-                            <RadioButton      Style="{StaticResource MaterialDesignTabRadioButton}" Margin="4" IsChecked="True" Content="浏览" 
-                                             Tag="1" Checked="RadioButton_Checked"  />
-                            <RadioButton      Style="{StaticResource MaterialDesignTabRadioButton}" Margin="4" IsChecked="False" Content="设置"  
-                                             Tag="2" Checked="RadioButton_Checked" />
-    
-                        </StackPanel>
-                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22">文件分类浏览器</TextBlock>
-                    </DockPanel>
-                </materialDesign:ColorZone>
-                <ContentControl Content="{Binding MainPanel}"/>
-            
-            </DockPanel>
-        </materialDesign:DrawerHost>
+                    </m:CommandBar>
+                    <m:DropDownButton  Background="Transparent">
+                        <m:SymbolIcon Symbol="Setting"/>
+                        <m:DropDownButton.Flyout>
+                            <m:MenuFlyout Placement="BottomEdgeAlignedLeft">
+                                <MenuItem Header="设置" Click="SettingMenuItem_Click" />
+                            </m:MenuFlyout>
+                        </m:DropDownButton.Flyout>
+                    </m:DropDownButton>
+                </m:SimpleStackPanel>
+            </m:TabControlHelper.TabStripFooter>
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <TextBlock/>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+   
+        <ContentControl Content="{Binding MainPanel}" Grid.Row="2"/>
 
-        <local:InputDialog x:Name="inputDialog" Grid.RowSpan="999" Grid.ColumnSpan="999"  Margin="-4" Width="{ Binding ElementName=win, Path=ActualWidth }"/>
-        <local:ProgressDialog x:Name="progressDialog" Grid.RowSpan="999" Grid.ColumnSpan="999"  Margin="-4" Width="{ Binding ElementName=win, Path=ActualWidth }"/>
-        <local:AboutDialog  x:Name="aboutDialog" Grid.RowSpan="999" Grid.ColumnSpan="999"  Margin="-4" Width="{ Binding ElementName=win, Path=ActualWidth }"/>
-        <materialDesign:Snackbar x:Name="snack">
-            <materialDesign:SnackbarMessage   />
-        </materialDesign:Snackbar>
+        <local:ProgressDialog x:Name="Progress" Grid.RowSpan="999" Grid.ColumnSpan="999"/>
     </Grid>
 </local:WindowBase>

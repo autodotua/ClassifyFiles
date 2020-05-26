@@ -36,22 +36,22 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(Classes));
             }
         }
-        public bool editable;
-        public bool Editable
-        {
-            get => editable;
-            set
-            {
-                editable = value;
-                this.Notify(nameof(Editable));
-            }
-        }
+        //public bool editable;
+        //public bool Editable
+        //{
+        //    get => editable;
+        //    set
+        //    {
+        //        editable = value;
+        //        this.Notify(nameof(Editable));
+        //    }
+        //}
         public Project Project { get; private set; }
         public async Task LoadAsync(Project project)
         {
             Project = project;
             //var (treeClasses, tile) = await DbUtility.GetTreeAndTileClassesAsync(Project);
-            var treeClasses= await DbUtility.GetClassesAsync(Project);
+            var treeClasses = await DbUtility.GetClassesAsync(Project);
             Classes = new ObservableCollection<Class>(treeClasses);
 
             Class first = Classes.FirstOrDefault();
@@ -63,9 +63,8 @@ namespace ClassifyFiles.UI.Panel
                 }
                 await Task.Delay(200);
                 var tvi = tree.ItemContainerGenerator.ContainerFromItem(Classes.First()) as TreeViewItem;
-                if(tvi!=null)tvi.IsSelected = true;
+                if (tvi != null) tvi.IsSelected = true;
             }
-
         }
 
         public ClassesPanel()
@@ -88,7 +87,7 @@ namespace ClassifyFiles.UI.Panel
         public event EventHandler<SelectedItemChanged<Class>> SelectedClassChanged;
 
 
-        private async void AddButton_Click(object sender, RoutedEventArgs e)
+        public async Task AddClassAfter()
         {
             if (SelectedClass == null)
             {
@@ -97,37 +96,32 @@ namespace ClassifyFiles.UI.Panel
             }
             else
             {
-                MenuItem menuInside = new MenuItem() { Header = "在内部插入" };
-                menuInside.Click += async (p1, p2) =>
-                {
-
-                    await DbUtility.AddClassAsync(Project, SelectedClass, true);
-
-                    await LoadAsync(Project);
-                };
-                MenuItem menuAfter = new MenuItem() { Header = "在同级插入" };
-                menuAfter.Click += async (p1, p2) =>
-                {
-
-                    await DbUtility.AddClassAsync(Project, SelectedClass, false);
-                    await LoadAsync(Project);
-                };
-
-                ContextMenu menu = new ContextMenu()
-                {
-                    Items = { menuInside, menuAfter },
-                    Placement = System.Windows.Controls.Primitives.PlacementMode.Top,
-                    PlacementTarget = sender as Button,
-                    IsOpen = true,
-                };
+                await DbUtility.AddClassAsync(Project, SelectedClass, false);
+                await LoadAsync(Project);
             }
-        }
 
-        private async void DeleteButton_Click(object sender, RoutedEventArgs e)
+        }
+        public async Task AddClassIn()
         {
             if (SelectedClass == null)
             {
-                await msgDialog.ShowAsync("请先选择一项");
+                await DbUtility.AddClassAsync(Project, null, false);
+                await LoadAsync(Project);
+            }
+            else
+            {
+                await DbUtility.AddClassAsync(Project, SelectedClass, true);
+
+                await LoadAsync(Project);
+
+            }
+        }
+
+        public async Task DeleteClass()
+        {
+            if (SelectedClass == null)
+            {
+                await new MessageDialog().ShowAsync("请先选择一项","错误");
             }
             else
             {
@@ -136,15 +130,15 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
-        private async void EditButton_Click(object sender, RoutedEventArgs e)
+        public async Task RenameButton()
         {
             if (SelectedClass == null)
             {
-                await msgDialog.ShowAsync("请先选择一项");
+                await new MessageDialog().ShowAsync("请先选择一项", "错误");
             }
             else
             {
-                string value = await inputDialog.ShowAsync("重命名", false, "请输入新的分类名", SelectedClass.Name);
+                string value = await new InputDialog().ShowAsync("重命名", false, "请输入新的分类名", SelectedClass.Name);
                 if (!string.IsNullOrWhiteSpace(value))
                 {
                     SelectedClass.Name = value;

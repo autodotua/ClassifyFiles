@@ -13,10 +13,11 @@ using System.Windows.Interop;
 using System.Drawing;
 using System.Windows.Media.Imaging;
 using System.Globalization;
+using ModernWpf.Controls.Primitives;
 
 namespace ClassifyFiles.UI
 {
-    public class WindowBase : MaterialWindow, INotifyPropertyChanged
+    public class WindowBase : Window, INotifyPropertyChanged
     {
         [DllImport("gdi32.dll", EntryPoint = "DeleteObject")]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -24,13 +25,8 @@ namespace ClassifyFiles.UI
         public WindowBase()
         {
             DataContext = this;
-            if (icon == null)
-            {
-                //icon = ImageSourceFromBitmap(Properties.Resources.app_png);
-            }
-            TitleBarIcon = icon;
-            SetResourceReference(BackgroundProperty, "MaterialDesignPaper");
-            SetResourceReference(TextElement.ForegroundProperty, "MaterialDesignBody");
+            WindowHelper.SetUseModernWindowStyle(this, true);
+            ClassifyFiles.WPFCore.App.SetTheme(this);
         }
         private static ImageSource icon;
 

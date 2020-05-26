@@ -18,7 +18,6 @@ namespace ClassifyFiles.UI
             InitializeComponent();
             //cbbLanguage.SelectedItem = cbbLanguage.Items.Cast<ComboBoxItem>().First(p => p.Tag.Equals(Config.Language));
             cbbTheme.SelectedItem = cbbTheme.Items.Cast<ComboBoxItem>().First(p => p.Tag.Equals(GUIConfig.Theme.ToString()));
-            cbbLanguage.SelectionChanged += cbbLanguage_SelectionChanged;
             cbbTheme.SelectionChanged += cbbTheme_SelectionChanged;
 
            
@@ -41,7 +40,7 @@ namespace ClassifyFiles.UI
         private void cbbTheme_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             GUIConfig.Theme = int.Parse((cbbTheme.SelectedItem as ComboBoxItem).Tag as string);
-            App.Current.SetTheme();
+            App.SetTheme();
             GUIConfig.Save();
         }
 

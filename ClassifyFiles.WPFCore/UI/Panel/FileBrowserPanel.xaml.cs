@@ -23,6 +23,7 @@ using ClassifyFiles.UI.Panel;
 using MaterialDesignThemes.Wpf;
 using System.Diagnostics;
 using DImg = System.Drawing.Image;
+using ModernWpf.Controls;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -142,22 +143,23 @@ namespace ClassifyFiles.UI.Panel
         {
             await base.LoadAsync(project);
         }
-
+        private ProgressDialog GetProgress()
+        {
+            return (Window.GetWindow(this) as MainWindow).Progress;
+        }
         private async void RefreshAllButton_Click(object sender, RoutedEventArgs e)
         {
-            loading.Show();
-            loading.SetMessage("正在枚举文件");
+            GetProgress().Show();
             var classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().Classes, true, p =>
             {
-                Dispatcher.Invoke(() => loading.SetMessage($"正在生成缩略图：{(p * 100):0.00}%"));
+
             });
-            loading.SetMessage("正在保存");
             await DbUtility.UpdateFilesAsync(classFiles);
             if (classes.SelectedClass != null && classFiles.ContainsKey(classes.SelectedClass))
             {
                 SetFiles(classFiles[classes.SelectedClass]);
             }
-            loading.Close();
+            GetProgress().Close();
             GeneratePaggingButtons();
         }
 
@@ -189,14 +191,14 @@ namespace ClassifyFiles.UI.Panel
                 {
                     Button btn = new Button()
                     {
-                        Style = FindResource("MaterialDesignFlatButton") as Style,
+                        //Style = FindResource("MaterialDesignFlatButton") as Style,
                         Content = i,
                     };
                     btn.Click += (p1, p2) =>
                     {
                         stkPagging.Children.Cast<Button>()
-                        .ForEach(p => p.Style = FindResource("MaterialDesignFlatButton") as Style);
-                        (p1 as Button).Style = FindResource("MaterialDesignOutlinedButton") as Style;
+                        .ForEach(p => p.Background=Brushes.Transparent);
+                        (p1 as Button).SetResourceReference(Button.BackgroundProperty, "SystemAccentColorLight3Brush");
                         Page = (int)btn.Content - 1;
                     };
                     stkPagging.Children.Add(btn);
@@ -211,22 +213,23 @@ namespace ClassifyFiles.UI.Panel
             {
                 return;
             }
-            int i = lbxDisplayMode.SelectedIndex;
-            lvwFilesArea.Visibility = i == 0 ? Visibility.Visible : Visibility.Collapsed;
-            grdFilesArea.Visibility = i == 1 ? Visibility.Visible : Visibility.Collapsed;
-            treeFiles.Visibility = i == 2 ? Visibility.Visible : Visibility.Collapsed;
+            //int i = lbxDisplayMode.SelectedIndex;
+            //lvwFilesArea.Visibility = i == 0 ? Visibility.Visible : Visibility.Collapsed;
+            //grdFilesArea.Visibility = i == 1 ? Visibility.Visible : Visibility.Collapsed;
+            //treeFiles.Visibility = i == 2 ? Visibility.Visible : Visibility.Collapsed;
 
         }
 
         private File GetSelectedFile()
         {
-            return lbxDisplayMode.SelectedIndex switch
+            return CurrentViewType switch
             {
-                0 => lvwFiles.SelectedItem as File,
-                1 => lbxGrdFiles.SelectedItem as File,
-                2 => treeFiles.SelectedItem as File,
+                1 => lvwFiles.SelectedItem as File,
+                2 => lbxGrdFiles.SelectedItem as File,
+                3 => treeFiles.SelectedItem as File,
                 _ => throw new NotImplementedException()
             };
+            return null;
         }
 
         private async void lvwFiles_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -253,10 +256,11 @@ namespace ClassifyFiles.UI.Panel
 
                     if (!System.IO.File.Exists(path))
                     {
-                        (Window.GetWindow(this) as MainWindow).snack.Message.Content = "文件不存在";
-                        (Window.GetWindow(this) as MainWindow).snack.IsActive = true;
-                        await Task.Delay(3000);
-                        (Window.GetWindow(this) as MainWindow).snack.IsActive = false;
+                        throw new NotImplementedException("文件不存在");
+                        //(Window.GetWindow(this) as MainWindow).snack.Message.Content = "文件不存在";
+                        //(Window.GetWindow(this) as MainWindow).snack.IsActive = true;
+                        //await Task.Delay(3000);
+                        //(Window.GetWindow(this) as MainWindow).snack.IsActive = false;
                         e.Handled = true;
                         return;
                     }
@@ -338,22 +342,39 @@ namespace ClassifyFiles.UI.Panel
                     lvwFiles.SelectedItem = file;
                     lvwFiles.ScrollIntoView(file);
                 }
-                (sender as ComboBox).SelectedItem = null;
+                (sender as ListBox).SelectedItem = null;
+                flyoutJumpToDir.Hide();// = false;
             }
         }
 
         private async void RenameProjectButton_Click(object sender, RoutedEventArgs e)
         {
-            string newName = await input.ShowAsync("请输入新的项目名", false, "项目名", Project.Name);
+            string newName = await new InputDialog().ShowAsync("请输入新的项目名", false, "项目名", Project.Name);
             Project.Name = newName;
             await DbUtility.UpdateProjectAsync(Project);
         }
 
         private async void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-
             MainWindow mainWin = (Window.GetWindow(this) as MainWindow);
             await mainWin.DeleteSelectedProjectAsync();
+        }
+
+        private void AppBarToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            int i = int.Parse((sender as FrameworkElement).Tag as string);
+            CurrentViewType = i;
+            grdAppBar.Children.OfType<AppBarToggleButton>().ForEach(p => p.IsChecked = false);
+            (sender as AppBarToggleButton).IsChecked = true;
+            lvwFilesArea.Visibility = i == 1 ? Visibility.Visible : Visibility.Collapsed;
+            grdFilesArea.Visibility = i == 2 ? Visibility.Visible : Visibility.Collapsed;
+            treeFiles.Visibility = i == 3 ? Visibility.Visible : Visibility.Collapsed;
+        }
+        private int CurrentViewType { get; set; } = 1;
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            (sender as Button).ContextMenu.IsOpen = true;
         }
     }
 

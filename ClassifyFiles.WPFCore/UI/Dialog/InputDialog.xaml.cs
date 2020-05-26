@@ -1,4 +1,5 @@
 ﻿using ClassifyFiles.UI.Dialog;
+using FzLib.Extension;
 using MaterialDesignThemes.Wpf;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,9 +19,8 @@ namespace ClassifyFiles.UI
         {
             tbkDialogTitle.Text = title;
             HintAssist.SetHint(textArea, hint);
-
-            Notify(nameof(InputContent));
             InputContent = defaultContent;
+            this.Notify(nameof(InputContent));
             if (multipleLines)
             {
                 textLine.Visibility = Visibility.Collapsed;
@@ -33,24 +33,27 @@ namespace ClassifyFiles.UI
                 textLine.Visibility = Visibility.Visible;
                 textLine.SelectAll();
             }
-
-            await dialog.ShowDialog(dialog.DialogContent);
+            PrimaryButtonClick += (p1, p2) =>
+            {
+                Result = true;
+            };
+            await base.ShowAsync();
             return Result ? InputContent : "";
         }
         public string InputContent { get; set; }
         public bool Result { get; set; }
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            if (sender == btnOk)
-            {
-                Result = true;
-            }
-            else if (sender == btnCancel)
-            {
-                Result = false;
-            }
+        //private void Button_Click_1(object sender, RoutedEventArgs e)
+        //{
+        //    if (sender == btnOk)
+        //    {
+        //        Result = true;
+        //    }
+        //    else if (sender == btnCancel)
+        //    {
+        //        Result = false;
+        //    }
 
-            dialog.CurrentSession.Close();
-        }
+        //    dialog.CurrentSession.Close();
+        //}
     }
 }

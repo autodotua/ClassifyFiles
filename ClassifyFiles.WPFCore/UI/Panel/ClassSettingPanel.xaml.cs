@@ -20,6 +20,7 @@ using ClassifyFiles.Data;
 using ClassifyFiles.Util;
 using ClassifyFiles.UI;
 using System.Windows.Markup;
+using System.Diagnostics;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -51,7 +52,6 @@ namespace ClassifyFiles.UI.Panel
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            MatchConditions.Add(new MatchCondition() { Index = MatchConditions.Count });
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -65,7 +65,7 @@ namespace ClassifyFiles.UI.Panel
 
 
 
-        private async void classes_SelectedClassChanged(object sender, SelectedItemChanged<Class> e)
+        private async void Classes_SelectedClassChanged(object sender, SelectedItemChanged<Class> e)
         {
             var old = e.OldValue;
             if (old != null)
@@ -91,10 +91,44 @@ namespace ClassifyFiles.UI.Panel
         {
             if (c != null)
             {
+                foreach (var m in c.MatchConditions)
+                {
+                    if(m.Value==null)
+                    {
+                        Debug.Assert(false);
+                        m.Value ="";
+                    }
+                }
                 c.MatchConditions.Clear();
                 c.MatchConditions.AddRange(MatchConditions);
                 await DbUtility.SaveClassAsync(c);
             }
+        }
+
+        private void AddClassAfterButton_Click(object sender, RoutedEventArgs e)
+        {
+            classes.AddClassAfter();
+        }
+
+        private void AddClassInButton_Click(object sender, RoutedEventArgs e)
+        {
+            classes.AddClassIn();
+        }
+
+        private void DeleteClassButton_Click(object sender, RoutedEventArgs e)
+        {
+            classes.DeleteClass();
+        }
+
+        private void RenameClassButton_Click(object sender, RoutedEventArgs e)
+        {
+            classes.RenameButton();
+        }
+
+        private void AddMatchConditionButton_Click(object sender, RoutedEventArgs e)
+        {
+            MatchConditions.Add(new MatchCondition() { Index = MatchConditions.Count });
+
         }
     }
 

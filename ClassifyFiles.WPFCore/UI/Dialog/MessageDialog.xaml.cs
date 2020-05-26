@@ -1,6 +1,10 @@
-﻿using MaterialDesignThemes.Wpf;
+﻿using ClassifyFiles.UI.Dialog;
+using FzLib.Extension;
+using MaterialDesignThemes.Wpf;
+using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -20,21 +24,34 @@ namespace ClassifyFiles.UI
     /// <summary>
     /// Dialog.xaml 的交互逻辑
     /// </summary>
-    public partial class MessageDialog : UserControl
+    public partial class MessageDialog : DialogBase
     {
         public MessageDialog()
         {
             InitializeComponent();
+            base.PrimaryButtonText = "确定";
+        }
+        private string message;
 
+        public string Message
+        {
+            get => message;
+            set
+            {
+                message = value;
+                this.Notify(nameof(Message));
+            }
+        }
+        public async new Task ShowAsync()
+        {
+            await base.ShowAsync();
+        }
+        public async new Task ShowAsync(string message, string title)
+        {
+            Message = message;
+            Title = title;
+            await base.ShowAsync();
         }
 
-        public async Task ShowAsync(string message)
-        {
-            await dialog.ShowDialog(dialog.DialogContent);
-        }
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            dialog.CurrentSession.Close();
-        }
     }
 }

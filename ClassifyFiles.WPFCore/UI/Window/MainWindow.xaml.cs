@@ -13,6 +13,9 @@ using System.Collections.ObjectModel;
 using FzLib.Extension;
 using System.Threading.Tasks;
 using ClassifyFiles.UI.Panel;
+using System.Windows.Controls.Primitives;
+using ModernWpf.Controls;
+using ModernWpf;
 
 namespace ClassifyFiles.UI
 {
@@ -45,14 +48,13 @@ namespace ClassifyFiles.UI
         public MainWindow()
         {
             InitializeComponent();
-
         }
 
 
         public async Task DeleteSelectedProjectAsync()
         {
             await DbUtility.DeleteProjectAsync(SelectedProject);
-            
+
             Projects.Remove(SelectedProject);
             Projects = new ObservableCollection<Project>(await DbUtility.GetProjectsAsync());
             if (Projects.Count == 0)
@@ -64,7 +66,6 @@ namespace ClassifyFiles.UI
 
         private async Task LoadProject()
         {
-            MenuToggleButton.IsChecked = false;
             if (MainPanel != null)
             {
                 await MainPanel.LoadAsync(SelectedProject);
@@ -112,18 +113,23 @@ namespace ClassifyFiles.UI
         }
 
         private async void RadioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            RadioButton rbtn = sender as RadioButton;
-            switch (rbtn.Tag)
+        {if(!IsLoaded)
             {
-                case "1":
+                return;
+            }
+            ToggleButton rbtn = sender as ToggleButton;
+            switch (rbtn.Name)
+            {
+                case nameof(btnModeView):
+                    btnModeClasses.IsChecked = false;
                     if (MainPanel is ClassSettingPanel)
                     {
                         await (MainPanel as ClassSettingPanel).SaveClassAsync();
                     }
                     MainPanel = new FileBrowserPanel();
                     break;
-                case "2":
+                case nameof(btnModeClasses):
+                    btnModeView.IsChecked = false;
                     MainPanel = new ClassSettingPanel();
                     break;
                 case null:
@@ -142,6 +148,11 @@ namespace ClassifyFiles.UI
             Project project = await DbUtility.AddProjectAsync();
             Projects.Add(project);
             SelectedProject = project;
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
