@@ -6,7 +6,9 @@
 
 ## 截图
 
+![image](https://github.com/autodotua/ClassifyFiles/blob/master/Image/MainWindow_Light.png)
 
+![image](https://github.com/autodotua/ClassifyFiles/blob/master/Image/MainWindow_Dark.png)
 
 ## 特性
 
