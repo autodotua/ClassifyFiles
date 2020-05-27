@@ -7,21 +7,20 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ClassifyFiles.UI"
     PrimaryButtonText="确定"
-    IsPrimaryButtonEnabled="True"
+    CloseButtonText="取消"
              mc:Ignorable="d" >
     <dialog:DialogBase.Resources>
         <local:ValueMinusConverter x:Key="minus"/>
     </dialog:DialogBase.Resources>
             <Grid Margin="8" MinWidth="160" MaxHeight="600" >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="8"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="8"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <TextBlock FontSize="20" Grid.ColumnSpan="999" x:Name="tbkDialogTitle"/>
-                <TextBox x:Name="textArea" Width="{Binding ElementName=uc, Path=ActualWidth, Converter={StaticResource minus}, ConverterParameter=20}" 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBox x:Name="textArea" Width="{Binding ElementName=uc, Path=ActualWidth, Converter={StaticResource minus}, ConverterParameter=20}" 
                                Grid.Row="2" TextWrapping="Wrap"   Margin="16,0,16,0"          AcceptsReturn="True"      AcceptsTab="True"
                                VerticalScrollBarVisibility="Auto"             
                          VerticalAlignment="Center" Text="{Binding InputContent}"/>

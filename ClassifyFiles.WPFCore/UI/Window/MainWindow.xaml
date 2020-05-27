@@ -26,7 +26,7 @@
                 <m:SimpleStackPanel HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
                     <m:CommandBar DefaultLabelPosition="Right" x:Name="cmdBarPanel">
                         <m:AppBarToggleButton x:Name="btnModeView" Grid.Column="0"  Icon="View"  Label="浏览" Checked="RadioButton_Checked" IsChecked="True"/>
-                        <m:AppBarToggleButton x:Name="btnModeClasses" Grid.Column="0" Icon="Setting"  Label="分类" Checked="RadioButton_Checked"/>
+                        <m:AppBarToggleButton x:Name="btnModeClasses" Grid.Column="0" Icon="List"  Label="分类" Checked="RadioButton_Checked"/>
                         <m:AppBarToggleButton x:Name="btnModeProjectSettings" Grid.Column="0" Icon="Setting"  Label="项目设置" Checked="RadioButton_Checked"/>
 
                     </m:CommandBar>

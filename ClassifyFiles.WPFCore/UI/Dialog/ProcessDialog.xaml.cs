@@ -11,6 +11,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -26,10 +27,14 @@ namespace ClassifyFiles.UI
         {
             InitializeComponent();
         }
-        public void Show()
+        public void Show(bool overlay)
         {
+            grdOverlay.Opacity = overlay ? 0.75 : 0;
             ring.IsActive = true;
+            Opacity = 0;
             Visibility = Visibility.Visible;
+            DoubleAnimation ani = new DoubleAnimation(1, TimeSpan.FromSeconds(0.2));
+            BeginAnimation(OpacityProperty, ani);
         }
    
 
@@ -37,7 +42,13 @@ namespace ClassifyFiles.UI
         public void Close()
         {
             ring.IsActive = false;
-            Visibility = Visibility.Collapsed;
+            DoubleAnimation ani = new DoubleAnimation(0, TimeSpan.FromSeconds(0.2)); 
+            ani.Completed += (p1, p2) =>
+            {
+                Visibility = Visibility.Collapsed;
+            };
+            BeginAnimation(OpacityProperty, ani);
+            
         }
 
     }

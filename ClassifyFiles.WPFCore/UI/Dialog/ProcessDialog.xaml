@@ -4,13 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ClassifyFiles.UI"
-             mc:Ignorable="d"      Background="#66AAAAAA" 
+             mc:Ignorable="d"      
                        xmlns:ui="http://schemas.modernwpf.com/2019"    Visibility="Collapsed" >
 
     <UserControl.Resources>
         <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="{StaticResource SystemAccentColor}" />
     </UserControl.Resources>
     <Grid    >
+        <Grid x:Name="grdOverlay" Background="{DynamicResource SystemControlBackgroundAltHighBrush}" Opacity="0.75"/>
         <ui:ProgressRing
         x:Name="ring"
         Width="60"

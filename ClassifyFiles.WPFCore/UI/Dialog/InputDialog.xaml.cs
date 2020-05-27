@@ -17,7 +17,7 @@ namespace ClassifyFiles.UI
         }
         public async Task<string> ShowAsync(string title, bool multipleLines, string hint = "", string defaultContent = "")
         {
-            tbkDialogTitle.Text = title;
+            Title= title;
             InputContent = defaultContent;
             this.Notify(nameof(InputContent));
             if (multipleLines)

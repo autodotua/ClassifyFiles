@@ -119,7 +119,7 @@ namespace ClassifyFiles.UI.Panel
         }
         private async void RefreshAllButton_Click(object sender, RoutedEventArgs e)
         {
-            GetProgress().Show();
+            GetProgress().Show(true);
             var classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().Classes, true, p =>
             {
 

@@ -42,7 +42,7 @@ namespace ClassifyFiles.UI
             {
                 selectedProject = value;
                 this.Notify(nameof(SelectedProject));
-                LoadProject();
+                LoadProjectAsync();
             }
         }
         public MainWindow()
@@ -65,11 +65,13 @@ namespace ClassifyFiles.UI
             RadioButton_Checked(btnModeView, null);
         }
 
-        private async Task LoadProject()
+        private async Task LoadProjectAsync()
         {
             if (MainPanel != null)
             {
-                await MainPanel.LoadAsync(SelectedProject);
+                Progress.Show(false);
+                await MainPanel.LoadAsync(SelectedProject); 
+                Progress.Close();
             }
         }
 
@@ -114,7 +116,8 @@ namespace ClassifyFiles.UI
         }
 
         private async void RadioButton_Checked(object sender, RoutedEventArgs e)
-        {if(!IsLoaded)
+        {
+            if (!IsLoaded)
             {
                 return;
             }
@@ -135,14 +138,15 @@ namespace ClassifyFiles.UI
                     break;
                 case nameof(btnModeClasses):
                     MainPanel = new ClassSettingPanel();
-                    break; 
+                    break;
                 case nameof(btnModeProjectSettings):
                     MainPanel = new ProjectSettingsPanel();
                     break;
                 case null:
                     return;
             }
-            await MainPanel.LoadAsync(SelectedProject);
+
+         await   LoadProjectAsync();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

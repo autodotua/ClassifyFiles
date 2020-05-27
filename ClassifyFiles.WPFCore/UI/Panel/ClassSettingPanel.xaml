@@ -27,7 +27,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="8"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <panel:ClassesPanel x:Name="classes"  SelectedClassChanged="Classes_SelectedClassChanged"/>
         <GroupBox  Header="匹配条件" Grid.Column="2" 
@@ -85,12 +85,16 @@
             </Grid>
         </GroupBox>
         <m:CommandBar  Grid.Row="2" Grid.ColumnSpan="999" DefaultLabelPosition="Right">
-            <m:AppBarButton Icon="Add" Label="在后方新增分类"  Click="AddClassAfterButton_Click"/>
-            <m:AppBarButton Icon="Add" Label="在下级新增分类" Click="AddClassInButton_Click"/>
-            <m:AppBarButton Icon="Delete" Label="删除分类" Click="DeleteClassButton_Click"/>
-            <m:AppBarButton Icon="Rename" Label="重命名分类" Click="RenameClassButton_Click"/>
+            <m:AppBarButton Icon="Add" Label="在后方新增分类" Click="AddClassAfterButton_Click"/>
+            <m:AppBarButton Icon="Add" Label="在下级新增分类" Click="AddClassInButton_Click" 
+                            IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}" />
+            <m:AppBarButton Icon="Delete" Label="删除分类" Click="DeleteClassButton_Click"
+                             IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}" />
+            <m:AppBarButton Icon="Rename" Label="重命名分类" Click="RenameClassButton_Click"
+                             IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}" />
             <m:AppBarSeparator/>
-            <m:AppBarButton Icon="Add" Label="新建匹配条件"  Click="AddMatchConditionButton_Click"/>
+            <m:AppBarButton Icon="Add" Label="新建匹配条件"  Click="AddMatchConditionButton_Click"
+                             IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}" />
 
         </m:CommandBar>
     </Grid>
