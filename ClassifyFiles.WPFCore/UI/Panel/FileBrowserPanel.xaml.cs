@@ -20,10 +20,10 @@ using ClassifyFiles.Data;
 using ClassifyFiles.Util;
 using ClassifyFiles.UI;
 using ClassifyFiles.UI.Panel;
-using MaterialDesignThemes.Wpf;
 using System.Diagnostics;
 using DImg = System.Drawing.Image;
 using ModernWpf.Controls;
+using ClassifyFiles.UI.Model;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -191,7 +191,6 @@ namespace ClassifyFiles.UI.Panel
                 {
                     Button btn = new Button()
                     {
-                        //Style = FindResource("MaterialDesignFlatButton") as Style,
                         Content = i,
                     };
                     btn.Click += (p1, p2) =>
@@ -379,85 +378,4 @@ namespace ClassifyFiles.UI.Panel
     }
 
 
-    public class FileWithIcon : File
-    {
-        /// <summary>
-        /// 无缩略图时的图标样式
-        /// </summary>
-        public PackIconKind Kind { get; set; } = PackIconKind.File;
-        /// <summary>
-        /// 缩略图
-        /// </summary>
-        public BitmapImage Image
-        {
-            get
-            {
-                if (Thumbnail == null)
-                {
-                    return null;
-                }
-                return ToImage(Thumbnail);
-            }
-        }
-        /// <summary>
-        /// 将字符数组转换为<see cref="BitmapImage"/>
-        /// </summary>
-        /// <param name="array"></param>
-        /// <returns></returns>
-        private BitmapImage ToImage(byte[] array)
-        {
-            using var ms = new System.IO.MemoryStream(array);
-            var image = new BitmapImage();
-            image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad; // here
-            image.StreamSource = ms;
-            image.EndInit();
-            return image;
-        }
-        /// <summary>
-        /// 图标是否显示
-        /// </summary>
-        public Visibility IconVisibility => Image == null ? Visibility.Visible : Visibility.Collapsed;
-        /// <summary>
-        /// 缩略图是否显示
-        /// </summary>
-        public Visibility ImageVisibility => Image == null ? Visibility.Collapsed : Visibility.Visible;
-
-        private static double defualtIconSize = 60;
-        /// <summary>
-        /// 默认大图标的大小
-        /// </summary>
-        public static double DefualtIconSize
-        {
-            get => defualtIconSize;
-            set
-            {
-                if (value < 16 || value > 200)
-                {
-                    return;
-                }
-                defualtIconSize = value;
-            }
-        }
-
-        public double LargeIconSize { get; private set; } = DefualtIconSize;
-        public double SmallIconSize { get; private set; } = DefualtIconSize / 2;
-
-        public void UpdateIconSize()
-        {
-            LargeIconSize = DefualtIconSize;
-            SmallIconSize = DefualtIconSize / 2;
-            this.Notify(nameof(LargeIconSize), nameof(SmallIconSize));
-        }
-        public FileWithIcon() { }
-
-        public FileWithIcon(File file)
-        {
-            Name = file.Name;
-            Dir = file.Dir;
-            SubFiles = file.SubFiles.Select(p => new FileWithIcon(p)).Cast<File>().ToList();
-            Thumbnail = file.Thumbnail;
-        }
-
-    }
 }

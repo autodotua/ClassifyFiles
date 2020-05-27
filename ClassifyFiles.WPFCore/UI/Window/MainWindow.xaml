@@ -4,16 +4,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"             
-    xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
-
         xmlns:local="clr-namespace:ClassifyFiles.UI"
-         xmlns:glo="clr-namespace:System.Globalization;assembly=System.Runtime"
-xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
     Loaded="Window_Loaded"
-    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
     mc:Ignorable="d"
     Closing="Window_Closing"
-    
     xmlns:m="http://schemas.modernwpf.com/2019"
     WindowStartupLocation="CenterScreen"
         Title="文件分类浏览器" Height="600" Width="1200" x:Name="win">

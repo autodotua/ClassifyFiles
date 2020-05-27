@@ -1,6 +1,6 @@
 ﻿using ClassifyFiles.UI.Dialog;
 using FzLib.Extension;
-using MaterialDesignThemes.Wpf;
+
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -18,7 +18,6 @@ namespace ClassifyFiles.UI
         public async Task<string> ShowAsync(string title, bool multipleLines, string hint = "", string defaultContent = "")
         {
             tbkDialogTitle.Text = title;
-            HintAssist.SetHint(textArea, hint);
             InputContent = defaultContent;
             this.Notify(nameof(InputContent));
             if (multipleLines)

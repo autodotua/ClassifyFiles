@@ -9,7 +9,7 @@
         xmlns:local="clr-namespace:ClassifyFiles.UI"
     xmlns:data="clr-namespace:ClassifyFiles.Data;assembly=ClassifyFiles.Core"
     xmlns:m="http://schemas.modernwpf.com/2019"
-    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
+     xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
     Loaded="WindowBase_Loaded"
         mc:Ignorable="d"    >
     <UserControl.Resources>
@@ -42,7 +42,6 @@
                 <TextBlock Text="{Binding Project.Name}"   VerticalAlignment="Center"  FontSize="24"/>
 
                 <TextBox Grid.Column="2"
-                      materialDesign:HintAssist.Hint="项目根目录"
                       VerticalAlignment="Center" Text="{Binding Project.RootPath}"/>
 
                 <m:DropDownButton  Grid.Column="4" Content="选项">
@@ -229,7 +228,7 @@
                       Grid.Row="2"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick" Margin="-33,0,33,0">
 
                 <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type panel:FileWithIcon}" ItemsSource="{Binding SubFiles}">
+                    <HierarchicalDataTemplate  ItemsSource="{Binding SubFiles}">
                         <StackPanel Orientation="Horizontal">
                             <component:FileIcon File="{Binding .}"/>
                             <TextBlock VerticalAlignment="Center" FontSize="12" Margin="12,0,0,0" Text="{Binding Name}"/>

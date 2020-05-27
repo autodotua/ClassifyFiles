@@ -1,6 +1,6 @@
 ﻿using ClassifyFiles.UI.Dialog;
 using FzLib.Extension;
-using MaterialDesignThemes.Wpf;
+
 using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;

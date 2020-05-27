@@ -1,4 +1,6 @@
 ﻿using ClassifyFiles.Data;
+using ClassifyFiles.UI.Model;
+using ClassifyFiles.UI.Panel;
 using FzLib.Extension;
 using System;
 using System.Collections.Generic;
@@ -27,13 +29,13 @@ namespace ClassifyFiles.UI.Component
 
         }
         public static readonly DependencyProperty FileProperty =
-DependencyProperty.Register("File", typeof(File), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
+DependencyProperty.Register("File", typeof(FileWithIcon), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
         static void OnFileChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
         }
-        public File File
+        public FileWithIcon File
         {
-            get => GetValue(FileProperty) as File; //file;
+            get => GetValue(FileProperty) as FileWithIcon; //file;
             set
             {
                 SetValue(FileProperty, value);
