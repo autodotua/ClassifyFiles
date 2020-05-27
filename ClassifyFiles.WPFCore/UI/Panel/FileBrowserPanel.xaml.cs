@@ -70,36 +70,6 @@ namespace ClassifyFiles.UI.Panel
                 var files = Files == null ? null : Files.Skip(pagingItemsCount * page).Take(pagingItemsCount);
                 if (files != null)
                 {
-                    //Task.Run(() =>
-                    //{
-                    //    string tempDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "ClassifyFiles");
-                    //    System.IO.Directory.CreateDirectory(tempDir);
-                    //    foreach (var file in files)
-                    //    {
-                    //        string path = (file as File).GetAbsolutePath(Project.RootPath);
-                    //        try
-                    //        {
-                    //            DImg image = DImg.FromFile(path);
-                    //            DImg thumb = image.GetThumbnailImage(240, 240, () => false, IntPtr.Zero);
-                    //            string thumbPath = System.IO.Path.Combine(tempDir, Guid.NewGuid().ToString("N")+".jpg");
-                    //            thumb.Save(thumbPath, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-                    //            //BitmapImage需要使用UI线程进行操纵
-                    //            Dispatcher.InvokeAsync(() =>
-                    //            {
-                    //                BitmapImage bmImg = new BitmapImage();
-                    //                bmImg.BeginInit();
-                    //                bmImg.UriSource = new Uri(thumbPath);
-                    //                bmImg.EndInit();
-                    //                file.Image = bmImg;
-                    //            });
-                    //        }
-                    //        catch (Exception ex)
-                    //        {
-
-                    //        }
-                    //    }
-                    //});
                 }
                 return files;
             }
@@ -212,11 +182,6 @@ namespace ClassifyFiles.UI.Panel
             {
                 return;
             }
-            //int i = lbxDisplayMode.SelectedIndex;
-            //lvwFilesArea.Visibility = i == 0 ? Visibility.Visible : Visibility.Collapsed;
-            //grdFilesArea.Visibility = i == 1 ? Visibility.Visible : Visibility.Collapsed;
-            //treeFiles.Visibility = i == 2 ? Visibility.Visible : Visibility.Collapsed;
-
         }
 
         private File GetSelectedFile()
@@ -228,7 +193,6 @@ namespace ClassifyFiles.UI.Panel
                 3 => treeFiles.SelectedItem as File,
                 _ => throw new NotImplementedException()
             };
-            return null;
         }
 
         private async void lvwFiles_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -236,15 +200,6 @@ namespace ClassifyFiles.UI.Panel
             try
             {
                 File file = GetSelectedFile();
-                //if (sender is ListBox lbx)
-                //{
-                //    file = lbx.SelectedItem as File;
-                //}
-                //else if (sender is TreeView tree)
-                //{
-                //    file = tree.SelectedItem as File;
-                //}
-
                 if (file != null)
                 {
                     if (file.Dir == "")//是目录
@@ -255,11 +210,7 @@ namespace ClassifyFiles.UI.Panel
 
                     if (!System.IO.File.Exists(path))
                     {
-                        throw new NotImplementedException("文件不存在");
-                        //(Window.GetWindow(this) as MainWindow).snack.Message.Content = "文件不存在";
-                        //(Window.GetWindow(this) as MainWindow).snack.IsActive = true;
-                        //await Task.Delay(3000);
-                        //(Window.GetWindow(this) as MainWindow).snack.IsActive = false;
+                        await new MessageDialog().ShowAsync("文件不存在","打开");
                         e.Handled = true;
                         return;
                     }
@@ -335,12 +286,34 @@ namespace ClassifyFiles.UI.Panel
             string dir = e.AddedItems.Count == 0 ? null : e.AddedItems.Cast<string>().First();
             if (dir != null)
             {
-                FileWithIcon file = Files.FirstOrDefault(p => p.Dir == dir);
-                if (file != null)
+                FileWithIcon file;
+                switch (CurrentViewType)
                 {
-                    lvwFiles.SelectedItem = file;
-                    lvwFiles.ScrollIntoView(file);
+                    case 1:
+                         file = Files.FirstOrDefault(p => p.Dir == dir);
+                        if (file != null)
+                        {
+                            lvwFiles.SelectedItem = file;
+                            lvwFiles.ScrollIntoView(file);
+                        }
+                        break;
+                    case 2:
+                         file = Files.FirstOrDefault(p => p.Dir == dir);
+                        if (file != null)
+                        {
+                            int index = Files.IndexOf(file);
+                            int page = (int)Math.Ceiling((double)index / pagingItemsCount);
+                            stkPagging.Children.Cast<Button>().FirstOrDefault(p => (int)p.Content == page)?.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                            lbxGrdFiles.SelectedItem = file;
+                            lbxGrdFiles.ScrollIntoView( file);  //无效
+                        }
+                            break;
+                    case 3:
+                        break;
+                    default:
+                        break;
                 }
+             
                 (sender as ListBox).SelectedItem = null;
                 flyoutJumpToDir.Hide();// = false;
             }
@@ -359,7 +332,7 @@ namespace ClassifyFiles.UI.Panel
             await mainWin.DeleteSelectedProjectAsync();
         }
 
-        private void AppBarToggleButton_Click(object sender, RoutedEventArgs e)
+        private void ViewTypeButton_Click(object sender, RoutedEventArgs e)
         {
             int i = int.Parse((sender as FrameworkElement).Tag as string);
             CurrentViewType = i;
@@ -368,6 +341,7 @@ namespace ClassifyFiles.UI.Panel
             lvwFilesArea.Visibility = i == 1 ? Visibility.Visible : Visibility.Collapsed;
             grdFilesArea.Visibility = i == 2 ? Visibility.Visible : Visibility.Collapsed;
             treeFiles.Visibility = i == 3 ? Visibility.Visible : Visibility.Collapsed;
+            btnLocateByDir.IsEnabled = i != 3;
         }
         private int CurrentViewType { get; set; } = 1;
 

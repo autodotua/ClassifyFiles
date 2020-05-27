@@ -62,9 +62,14 @@ namespace ClassifyFiles.UI.Panel
                     first = first.Children[0];
                 }
                 await Task.Delay(200);
-                var tvi = tree.ItemContainerGenerator.ContainerFromItem(Classes.First()) as TreeViewItem;
-                if (tvi != null) tvi.IsSelected = true;
+               // SelectClass(Classes.First());
             }
+        }
+
+        public void SelectClass(Class c)
+        {
+            var tvi = tree.ItemContainerGenerator.ContainerFromItem(c) as TreeViewItem;
+            if (tvi != null) tvi.IsSelected = true;
         }
 
         public ClassesPanel()

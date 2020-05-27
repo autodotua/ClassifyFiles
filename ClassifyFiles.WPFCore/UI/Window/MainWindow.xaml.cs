@@ -62,6 +62,7 @@ namespace ClassifyFiles.UI
                 Projects.Add(await DbUtility.AddProjectAsync());
             }
             SelectedProject = Projects[0];
+            RadioButton_Checked(btnModeView, null);
         }
 
         private async Task LoadProject()
@@ -117,11 +118,15 @@ namespace ClassifyFiles.UI
             {
                 return;
             }
-            ToggleButton rbtn = sender as ToggleButton;
-            switch (rbtn.Name)
+            ToggleButton btn = sender as ToggleButton;
+            var a = cmdBarPanel.Content;
+            foreach (var t in cmdBarPanel.PrimaryCommands)
+            {
+                (t as ToggleButton).IsChecked = btn == t;
+            }
+            switch (btn.Name)
             {
                 case nameof(btnModeView):
-                    btnModeClasses.IsChecked = false;
                     if (MainPanel is ClassSettingPanel)
                     {
                         await (MainPanel as ClassSettingPanel).SaveClassAsync();
@@ -129,8 +134,10 @@ namespace ClassifyFiles.UI
                     MainPanel = new FileBrowserPanel();
                     break;
                 case nameof(btnModeClasses):
-                    btnModeView.IsChecked = false;
                     MainPanel = new ClassSettingPanel();
+                    break; 
+                case nameof(btnModeProjectSettings):
+                    MainPanel = new ProjectSettingsPanel();
                     break;
                 case null:
                     return;
@@ -150,7 +157,8 @@ namespace ClassifyFiles.UI
             SelectedProject = project;
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+
+        private void AboutButton_Click(object sender, RoutedEventArgs e)
         {
 
         }

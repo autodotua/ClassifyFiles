@@ -16,14 +16,18 @@
         <ui:NotFirst2VisibilityConverter x:Key="i2v"/>
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
     </UserControl.Resources>
-    <Grid Margin="4">
+    <Grid >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="8"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
-
-        <Grid Margin="8,0,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Margin="8,4,4,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="4"/>
@@ -31,50 +35,13 @@
                 <RowDefinition Height="8"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid Margin="4">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="8"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="8"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+            <m:SimpleStackPanel Orientation="Horizontal" Spacing="16">  
                 <TextBlock Text="{Binding Project.Name}"   VerticalAlignment="Center"  FontSize="24"/>
 
-                <TextBox Grid.Column="2"
-                      VerticalAlignment="Center" Text="{Binding Project.RootPath}"/>
-
-                <m:DropDownButton  Grid.Column="4" Content="选项">
-                    <!--<m:SymbolIcon Symbol="ProtectedDocument"/>-->
-                    <m:DropDownButton.Flyout>
-                        <m:MenuFlyout Placement="BottomEdgeAlignedLeft">
-                            <MenuItem Header="重命名"   Click="RenameProjectButton_Click"/>
-                            <MenuItem Header="删除"   Click="DeleteButton_Click"/>
-                        </m:MenuFlyout>
-                    </m:DropDownButton.Flyout>
-                </m:DropDownButton>
-                <!--<Button  Grid.Column="4"  Click="Button_Click">
-                    <Button.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="重命名"   Click="RenameProjectButton_Click"/>
-                            <MenuItem Header="删除"   Click="DeleteButton_Click"/>
-                        </ContextMenu>
-                    </Button.ContextMenu>
-                    <m:SymbolIcon Symbol="More"/>
-                </Button>-->
-                <!--<materialDesign:PopupBox  Grid.Column="4"   VerticalAlignment="Center"    HorizontalAlignment="Right"        Padding="2 0 2 0">
-                    <StackPanel>
-                        <Button  Content="重命名" Click="RenameProjectButton_Click"/>
-                        <Button  Content="删除" Click="DeleteButton_Click"/>
-                    </StackPanel>
-                </materialDesign:PopupBox>-->
-                <!--<m:CommandBar x:Name="PrimaryCommandBar"  Grid.Column="4"   IsOpen="False" >
-                    <m:AppBarButton Icon="Rename" Label="重命名" IsCompact="True" Click="RenameProjectButton_Click"/>
-                    <m:AppBarButton Icon="Delete" Label="删除"  IsCompact="True" Click="DeleteButton_Click"/>
-                    <m:CommandBar.SecondaryCommands>
-                    </m:CommandBar.SecondaryCommands>
-                </m:CommandBar>-->
-            </Grid>
+                <TextBlock Grid.Column="2"
+                      VerticalAlignment="Bottom" Text="{Binding Project.RootPath}"/>
+            </m:SimpleStackPanel>
+              
             <panel:ClassesPanel x:Name="classes" Grid.Row="99"  SelectedClassChanged="classes_SelectedClassChanged"/>
         </Grid>
 
@@ -90,25 +57,7 @@
                 <RowDefinition Height="4"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <!--<DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="32">
-                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
-                    <Button    Click="RefreshAllButton_Click">刷新所有</Button>
-                    <Button             IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">刷新此类</Button>
-                </StackPanel>-->
-            <!-- the following based on https://material.io/guidelines/components/buttons.html#buttons-toggle-buttons -->
-            <!--<ListBox x:Name="lbxDisplayMode" DockPanel.Dock="Right" HorizontalAlignment="Right"  SelectionChanged="ListBox_SelectionChanged"
-                        SelectedIndex="0"
-                          IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}">
-                    <ListBoxItem >
-                        <materialDesign:PackIcon    Kind="FormatListBulleted" />
-                    </ListBoxItem>
-                    <ListBoxItem>
-                        <materialDesign:PackIcon      Kind="ViewComfy" />
-                    </ListBoxItem>
-                    <ListBoxItem>
-                        <materialDesign:PackIcon      Kind="FileTree" />
-                    </ListBoxItem>
-                </ListBox>-->
+        
             <Grid x:Name="grdAppBar">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -120,21 +69,21 @@
                 </Grid.ColumnDefinitions>
                 <m:AppBarButton  Icon="Refresh" IsCompact="False"  Label="刷新全部" Click="RefreshAllButton_Click"/>
                 <m:AppBarButton Grid.Column="1"  Icon="Refresh"  Label="刷新当前"/>
-                <m:AppBarToggleButton Grid.Column="3"  Label="列表模式"  Click="AppBarToggleButton_Click" Tag="1" IsChecked="True">
+                <m:AppBarToggleButton Grid.Column="3"  Label="列表模式"  Click="ViewTypeButton_Click" Tag="1" IsChecked="True">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon
                                     FontFamily="Segoe MDL2 Assets"
                                     Glyph="&#xE8FD;" />
                     </m:AppBarToggleButton.Icon>
                 </m:AppBarToggleButton>
-                <m:AppBarToggleButton Grid.Column="4" Label="图标模式" Click="AppBarToggleButton_Click" Tag="2">
+                <m:AppBarToggleButton Grid.Column="4" Label="图标模式" Click="ViewTypeButton_Click" Tag="2">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon
                                     FontFamily="Segoe MDL2 Assets"
                                     Glyph="&#xF0E2;" />
                     </m:AppBarToggleButton.Icon>
                 </m:AppBarToggleButton>
-                <m:AppBarToggleButton Grid.Column="5"  Label="树型模式"  Click="AppBarToggleButton_Click" Tag="3">
+                <m:AppBarToggleButton Grid.Column="5"  Label="树型模式"  Click="ViewTypeButton_Click" Tag="3">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon
                                     FontFamily="Segoe MDL2 Assets"
@@ -154,8 +103,7 @@
                     <RowDefinition Height="8"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <m:GridView DockPanel.Dock="Top" 
-                         x:Name="lbxGrdFiles" ContextMenu="{StaticResource menu}"
+                <m:GridView     x:Name="lbxGrdFiles" ContextMenu="{StaticResource menu}"
                       PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
                          ItemsSource="{Binding Path=PagingFiles}" >
 
@@ -205,23 +153,6 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-                <Button Grid.Row="2" Content="根据文件夹定位" >
-                    <m:FlyoutService.Flyout>
-                        <m:Flyout x:Name="flyoutJumpToDir" >
-                            <StackPanel>
-                                <ListBox Grid.Row="2" SelectionChanged="JumpToDirComboBox_SelectionChanged" ItemsSource="{Binding Dirs}" MaxHeight="600"/>
-                            </StackPanel>
-                        </m:Flyout>
-                    </m:FlyoutService.Flyout>
-                </Button>
-                <!--<ComboBox Grid.Row="2"  SelectionChanged="JumpToDirComboBox_SelectionChanged" ItemsSource="{Binding Dirs}">
-                    <m:ComboBoxHelper.TextBoxStyle>
-                        <Style TargetType="{x:Type TextBox}">
-                            <Setter Property="Background" Value="Red"/>
-                        </Style>
-                    
-                    </m:ComboBoxHelper.TextBoxStyle>
-                </ComboBox>-->
             </Grid>
             <TreeView Name="treeFiles" Visibility="Collapsed"   ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
                        IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}"
@@ -238,5 +169,17 @@
             </TreeView>
 
         </Grid>
+        <m:CommandBar  Grid.Row="2" Grid.ColumnSpan="999" DefaultLabelPosition="Right">
+            <m:AppBarButton x:Name="btnLocateByDir" Icon="OpenLocal" Label="根据文件夹定位" >
+                <m:FlyoutService.Flyout>
+                    <m:Flyout x:Name="flyoutJumpToDir" >
+                        <StackPanel>
+                            <ListBox Grid.Row="2" SelectionChanged="JumpToDirComboBox_SelectionChanged" ItemsSource="{Binding Dirs}" MaxHeight="600"/>
+                        </StackPanel>
+                    </m:Flyout>
+                </m:FlyoutService.Flyout>
+            </m:AppBarButton>
+           
+        </m:CommandBar>
     </Grid>
 </panel:ProjectPanelBase>

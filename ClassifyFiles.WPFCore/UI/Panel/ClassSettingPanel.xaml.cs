@@ -78,7 +78,7 @@ namespace ClassifyFiles.UI.Panel
             }
             else
                 MatchConditions = new ObservableCollection<MatchCondition>
-                    (classes.SelectedClass.MatchConditions.OrderBy(p=>p.Index));
+                    (classes.SelectedClass.MatchConditions.OrderBy(p => p.Index));
         }
 
         public Task SaveClassAsync()
@@ -93,10 +93,10 @@ namespace ClassifyFiles.UI.Panel
             {
                 foreach (var m in c.MatchConditions)
                 {
-                    if(m.Value==null)
+                    if (m.Value == null)
                     {
                         Debug.Assert(false);
-                        m.Value ="";
+                        m.Value = "";
                     }
                 }
                 c.MatchConditions.Clear();
@@ -105,24 +105,24 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
-        private void AddClassAfterButton_Click(object sender, RoutedEventArgs e)
+        private async void AddClassAfterButton_Click(object sender, RoutedEventArgs e)
         {
-            classes.AddClassAfter();
+            await classes.AddClassAfter();
         }
 
-        private void AddClassInButton_Click(object sender, RoutedEventArgs e)
+        private async void AddClassInButton_Click(object sender, RoutedEventArgs e)
         {
-            classes.AddClassIn();
+            await classes.AddClassIn();
         }
 
-        private void DeleteClassButton_Click(object sender, RoutedEventArgs e)
+        private async void DeleteClassButton_Click(object sender, RoutedEventArgs e)
         {
-            classes.DeleteClass();
+            await classes.DeleteClass();
         }
 
-        private void RenameClassButton_Click(object sender, RoutedEventArgs e)
+        private async void RenameClassButton_Click(object sender, RoutedEventArgs e)
         {
-            classes.RenameButton();
+            await classes.RenameButton();
         }
 
         private void AddMatchConditionButton_Click(object sender, RoutedEventArgs e)
@@ -151,7 +151,7 @@ namespace ClassifyFiles.UI.Panel
         };
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if(MatchConditionTypeWithControlType[(MatchType)value]==parameter as string)
+            if (MatchConditionTypeWithControlType[(MatchType)value] == parameter as string)
             {
                 return Visibility.Visible;
             }
@@ -162,7 +162,7 @@ namespace ClassifyFiles.UI.Panel
         {
             throw new NotImplementedException();
         }
-    } 
+    }
 
     public class EnumToItemsSource : MarkupExtension
     {

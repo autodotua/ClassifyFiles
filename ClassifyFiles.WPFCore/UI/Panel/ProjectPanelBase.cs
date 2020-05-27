@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using FzLib.Extension;
+using System.Windows;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -20,12 +21,27 @@ namespace ClassifyFiles.UI.Panel
             //    return;
             //}
             Project = project;
-         await   GetClassesPanel().LoadAsync(project);
+            if (GetClassesPanel() != null)
+            {
+                await GetClassesPanel().LoadAsync(project);
+                if (SelectedClass != null)
+                {
+                    GetClassesPanel().SelectClass(SelectedClass);
+                }
+                else if (GetClassesPanel().Classes.Count > 0)
+                {
+                    GetClassesPanel().SelectClass(GetClassesPanel().Classes[0]);
+                }
+                GetClassesPanel().SelectedClassChanged += (p1, p2) =>
+                {
+                    SelectedClass = GetClassesPanel().SelectedClass;
+                };
+            }
         }
         public abstract ClassesPanel GetClassesPanel();
-        private  Project project;
+        private Project project;
 
-        public ProjectPanelBase():base()
+        public ProjectPanelBase() : base()
         {
         }
 
@@ -38,5 +54,10 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(Project));
             }
         }
+        protected ProgressDialog GetProgress()
+        {
+            return (Window.GetWindow(this) as MainWindow).Progress;
+        }
+        public static Class SelectedClass { get; private set; }
     }
 }

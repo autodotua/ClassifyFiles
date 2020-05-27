@@ -5,6 +5,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <RootNamespace>ClassifyFiles</RootNamespace>
+    <AssemblyName>ClassifyFiles.WPFCore</AssemblyName>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,6 +29,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="UI\Panel\ClassSettingPanel.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="UI\Panel\ProjectSettingsPanel.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="UI\Panel\FileBrowserPanel.xaml">

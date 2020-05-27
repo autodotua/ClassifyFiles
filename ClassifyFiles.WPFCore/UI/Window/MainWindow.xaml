@@ -24,17 +24,25 @@
             </m:TabControlHelper.TabStripHeader>
             <m:TabControlHelper.TabStripFooter>
                 <m:SimpleStackPanel HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
-                    <m:CommandBar DefaultLabelPosition="Right" >
+                    <m:CommandBar DefaultLabelPosition="Right" x:Name="cmdBarPanel">
                         <m:AppBarToggleButton x:Name="btnModeView" Grid.Column="0"  Icon="View"  Label="浏览" Checked="RadioButton_Checked" IsChecked="True"/>
                         <m:AppBarToggleButton x:Name="btnModeClasses" Grid.Column="0" Icon="Setting"  Label="分类" Checked="RadioButton_Checked"/>
+                        <m:AppBarToggleButton x:Name="btnModeProjectSettings" Grid.Column="0" Icon="Setting"  Label="项目设置" Checked="RadioButton_Checked"/>
 
                     </m:CommandBar>
                     <m:DropDownButton  Background="Transparent">
                         <m:SymbolIcon Symbol="Setting"/>
                         <m:DropDownButton.Flyout>
-                            <m:MenuFlyout Placement="BottomEdgeAlignedLeft">
-                                <MenuItem Header="设置" Click="SettingMenuItem_Click" />
-                            </m:MenuFlyout>
+                            <m:CommandBarFlyout Placement="Bottom">
+                                <m:CommandBarFlyout.SecondaryCommands>
+                                    <m:AppBarButton Icon="Setting" Label="设置"  Click="SettingMenuItem_Click" />
+                                    <m:AppBarButton Label="关于"  Click="AboutButton_Click" >
+                                        <m:AppBarButton.Icon>
+                                            <m:FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xECAA;"/>
+                                        </m:AppBarButton.Icon>
+                                    </m:AppBarButton>
+                                </m:CommandBarFlyout.SecondaryCommands>
+                            </m:CommandBarFlyout>
                         </m:DropDownButton.Flyout>
                     </m:DropDownButton>
                 </m:SimpleStackPanel>

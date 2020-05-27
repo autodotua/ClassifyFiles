@@ -1,0 +1,40 @@
+﻿<panel:ProjectPanelBase
+    xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
+    xmlns:ui="clr-namespace:ClassifyFiles.UI"
+    x:Class="ClassifyFiles.UI.Panel.ProjectSettingsPanel"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ClassifyFiles.UI"
+    xmlns:data="clr-namespace:ClassifyFiles.Data;assembly=ClassifyFiles.Core"
+    xmlns:m="http://schemas.modernwpf.com/2019"
+     xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
+    Loaded="WindowBase_Loaded"
+        mc:Ignorable="d"    >
+    <m:SimpleStackPanel  Orientation="Vertical" Spacing="8" Margin="8">
+        <GroupBox Header="项目名">
+            <TextBox Text="{Binding Project.Name}"   VerticalAlignment="Center"  FontSize="24"/>
+        </GroupBox>       
+        <GroupBox Header="项目根目录">
+            <TextBox Text="{Binding Project.RootPath}"   VerticalAlignment="Center"  FontSize="24"/>
+        </GroupBox>
+        <GroupBox Header="操作">
+            <Button Background="Red" Foreground="White"   >
+                <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                    <m:SymbolIcon Symbol="Delete" VerticalAlignment="Center"/>
+                    <TextBlock  VerticalAlignment="Center">删除</TextBlock>
+                </m:SimpleStackPanel>
+                <m:FlyoutService.Flyout>
+                    <m:Flyout x:Name="flyoutDelete">
+                        <m:SimpleStackPanel Spacing="8">
+                            <TextBlock>即将删除项目</TextBlock>
+                            <Button Content="确定" Click="DeleteButton_Click" />
+                        </m:SimpleStackPanel>
+                    </m:Flyout>
+                </m:FlyoutService.Flyout>
+            </Button>
+        </GroupBox>
+
+    </m:SimpleStackPanel>
+</panel:ProjectPanelBase>
