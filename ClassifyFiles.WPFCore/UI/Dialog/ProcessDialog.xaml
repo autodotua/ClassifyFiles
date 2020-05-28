@@ -12,10 +12,14 @@
     </UserControl.Resources>
     <Grid    >
         <Grid x:Name="grdOverlay" Background="{DynamicResource SystemControlBackgroundAltHighBrush}" Opacity="0.75"/>
-        <ui:ProgressRing
+        <ui:SimpleStackPanel Orientation="Vertical" Spacing="12"
+                             VerticalAlignment="Center" HorizontalAlignment="Center">
+            <ui:ProgressRing
         x:Name="ring"
         Width="60"
         Height="60"/>
+            <TextBlock Text="{Binding Message}"/>
+        </ui:SimpleStackPanel>
     </Grid>
  
 </local:UserControlBase>

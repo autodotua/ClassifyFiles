@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using Dir = System.IO.Directory;
+using F = System.IO.File;
+using P = System.IO.Path;
 using FI = System.IO.FileInfo;
 using DI = System.IO.DirectoryInfo;
 using SO = System.IO.SearchOption;
@@ -11,6 +13,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
+using System.ComponentModel;
 
 namespace ClassifyFiles.Util
 {
@@ -146,7 +149,7 @@ namespace ClassifyFiles.Util
             {
                 MatchType.InFileName => file.Name.Contains(value),
                 MatchType.InDirName => file.DirectoryName.Contains(value),
-                MatchType.WithExtension => file.Extension.Contains(value),
+                MatchType.WithExtension => file.Extension.ToLower().Replace(".","")==value.ToLower(),
                 MatchType.InPath => file.FullName.Contains(value),
                 MatchType.InFileNameWithRegex => Regex.IsMatch(file.Name, value),
                 MatchType.InDirNameWithRegex => Regex.IsMatch(file.DirectoryName, value),
@@ -171,9 +174,9 @@ namespace ClassifyFiles.Util
             {
                 return DateTime.Parse(mc.Value);
             }
-       
+
         }
-       public static long? GetFileSize(string value)
+        public static long? GetFileSize(string value)
         {
             if (long.TryParse(value, out long result))
             {
@@ -188,10 +191,10 @@ namespace ClassifyFiles.Util
                 {
                     "B" => 1.0,
                     "KB" => 1024.0,
-                    "MB" => 1024.0*1024,
-                    "GB" => 1024.0*1024*1024,
-                    "TB" => 1024.0*1024*1024*1024,
-                    _=>throw new Exception()
+                    "MB" => 1024.0 * 1024,
+                    "GB" => 1024.0 * 1024 * 1024,
+                    "TB" => 1024.0 * 1024 * 1024 * 1024,
+                    _ => throw new Exception()
                 };
                 return Convert.ToInt64(num);
             }
@@ -233,5 +236,105 @@ namespace ClassifyFiles.Util
             }
             return System.IO.Path.Combine(rootPath, file.Dir, file.Name);
         }
+
+        public async static Task Export(string distFolder,
+                                         Project project,
+                                         ExportFormat format,
+                                         Action<string, string> exportMethod,
+                                         string splitter = "-",
+                                         Action<File> afterExportAFile = null)
+        {
+            var classes = await DbUtility.GetClassesAsync(project);
+            foreach (var c in classes)
+            {
+                var files = await DbUtility.GetFilesAsync(c);
+                await Task.Run(() =>
+                {
+                    string folder = P.Combine(distFolder, GetValidFileName(c.Name));
+                    if (!Dir.Exists(folder))
+                    {
+                        Dir.CreateDirectory(folder);
+                    }
+                    switch (format)
+                    {
+                        case ExportFormat.FileName:
+                            foreach (var file in files)
+                            {
+                                string newName = GetUniqueFileName(file.Name, folder);
+                                string newPath = P.Combine(folder, newName);
+                                exportMethod(file.GetAbsolutePath(project.RootPath), newPath);
+                                afterExportAFile?.Invoke(file);
+                            }
+                            break;
+                        case ExportFormat.Path:
+                            foreach (var file in files)
+                            {
+                                string newName = P.Combine(folder, file.Name).Replace(":", splitter).Replace("\\", splitter).Replace("/", splitter);
+                                newName = GetUniqueFileName(newName, folder);
+                                string newPath = P.Combine(folder, newName);
+                                exportMethod(file.GetAbsolutePath(project.RootPath), newPath);
+                                afterExportAFile?.Invoke(file);
+                            }
+                            break;
+                        case ExportFormat.Tree:
+                            var tree = GetFileTree(files);
+                            void ExportSub(File file, string currentFolder)
+                            {
+                                if (string.IsNullOrEmpty(file.Dir))//是目录
+                                {
+                                    foreach (var sub in file.SubFiles)
+                                    {
+                                        string newFolder = P.Combine(currentFolder, file.Name);
+                                        Dir.CreateDirectory(newFolder);
+                                        ExportSub(sub, newFolder);
+                                    }
+                                }
+                                else
+                                {
+                                    string newName = GetUniqueFileName(file.Name, folder);
+                                    string newPath = P.Combine(currentFolder, newName);
+                                    exportMethod(file.GetAbsolutePath(project.RootPath), newPath);
+                                    afterExportAFile?.Invoke(file);
+                                }
+                            }
+                            ExportSub(tree, folder);
+                            break;
+                    }
+                });
+            }
+
+        }
+
+        private static string GetValidFileName(string name)
+        {
+            foreach (char c in P.GetInvalidFileNameChars())
+            {
+                name = name.Replace(c, '_');
+            }
+            return name;
+        }
+        private static string GetUniqueFileName(string name, string dir)
+        {
+            if (!F.Exists(P.Combine(dir, name)))
+            {
+                return name;
+            }
+            string newName;
+            int i = 1;
+            do
+            {
+                newName = P.GetFileNameWithoutExtension(name) + $" ({++i})" + P.GetExtension(name);
+            } while (F.Exists(P.Combine(dir, newName)));
+            return newName;
+        }
+    }
+    public enum ExportFormat
+    {
+        [Description("文件名")]
+        FileName,
+        [Description("路径")]
+        Path,
+        [Description("树型")]
+        Tree
     }
 }

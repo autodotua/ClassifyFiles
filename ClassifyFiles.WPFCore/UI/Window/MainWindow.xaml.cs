@@ -127,13 +127,13 @@ namespace ClassifyFiles.UI
             {
                 (t as ToggleButton).IsChecked = btn == t;
             }
+            if (MainPanel is ClassSettingPanel)
+            {
+                await (MainPanel as ClassSettingPanel).SaveClassAsync();
+            }
             switch (btn.Name)
             {
                 case nameof(btnModeView):
-                    if (MainPanel is ClassSettingPanel)
-                    {
-                        await (MainPanel as ClassSettingPanel).SaveClassAsync();
-                    }
                     MainPanel = new FileBrowserPanel();
                     break;
                 case nameof(btnModeClasses):

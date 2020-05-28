@@ -7,9 +7,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClassifyFiles.UI"
-    xmlns:data="clr-namespace:ClassifyFiles.Data;assembly=ClassifyFiles.Core"
+    xmlns:util="clr-namespace:ClassifyFiles.Util;assembly=ClassifyFiles.Core"
     xmlns:m="http://schemas.modernwpf.com/2019"
      xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     Loaded="WindowBase_Loaded"
         mc:Ignorable="d"    >
     <m:SimpleStackPanel  Orientation="Vertical" Spacing="8" Margin="8">
@@ -20,20 +21,51 @@
             <TextBox Text="{Binding Project.RootPath}"   VerticalAlignment="Center"  FontSize="24"/>
         </GroupBox>
         <GroupBox Header="操作">
-            <Button Background="Red" Foreground="White"   >
-                <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
-                    <m:SymbolIcon Symbol="Delete" VerticalAlignment="Center"/>
-                    <TextBlock  VerticalAlignment="Center">删除</TextBlock>
+            <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                <Button Background="Red" Foreground="White"   >
+                    <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                        <m:SymbolIcon Symbol="Delete" VerticalAlignment="Center"/>
+                        <TextBlock  VerticalAlignment="Center">删除</TextBlock>
+                    </m:SimpleStackPanel>
+                    <m:FlyoutService.Flyout>
+                        <m:Flyout x:Name="flyoutDelete">
+                            <m:SimpleStackPanel Spacing="8">
+                                <TextBlock>即将删除项目</TextBlock>
+                                <Button Content="确定" Click="DeleteButton_Click" />
+                            </m:SimpleStackPanel>
+                        </m:Flyout>
+                    </m:FlyoutService.Flyout>
+                </Button>
+             
+            </m:SimpleStackPanel>
+        </GroupBox>
+        <GroupBox Header="导出">
+            <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
+                <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                    <TextBlock  VerticalAlignment="Center">导出文件格式：</TextBlock>
+                    <ComboBox VerticalAlignment="Bottom"  Width="120"
+                                          DisplayMemberPath="DisplayName"  SelectedValuePath="Value"
+                                          SelectedValue="{Binding ExportFormat}"
+                                                                          SelectedIndex="0"         ItemsSource="{panel:EnumToItemsSource {x:Type util:ExportFormat}}"/>
+
+                    <TextBlock VerticalAlignment="Center" >分隔符：</TextBlock>
+                    <TextBox MinWidth="120" Text="{Binding Splitter}"/>
                 </m:SimpleStackPanel>
-                <m:FlyoutService.Flyout>
-                    <m:Flyout x:Name="flyoutDelete">
-                        <m:SimpleStackPanel Spacing="8">
-                            <TextBlock>即将删除项目</TextBlock>
-                            <Button Content="确定" Click="DeleteButton_Click" />
+                <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                    <Button  Click="Button_Click" >
+                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                            <m:SymbolIcon Symbol="Link" VerticalAlignment="Center"/>
+                            <TextBlock  VerticalAlignment="Center">导出为快捷方式</TextBlock>
                         </m:SimpleStackPanel>
-                    </m:Flyout>
-                </m:FlyoutService.Flyout>
-            </Button>
+                    </Button>
+                    <Button  Click="Button_Click_1" >
+                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                            <m:SymbolIcon Symbol="Copy" VerticalAlignment="Center"/>
+                            <TextBlock  VerticalAlignment="Center">导出为副本</TextBlock>
+                        </m:SimpleStackPanel>
+                    </Button>
+                </m:SimpleStackPanel>
+            </m:SimpleStackPanel>
         </GroupBox>
 
     </m:SimpleStackPanel>

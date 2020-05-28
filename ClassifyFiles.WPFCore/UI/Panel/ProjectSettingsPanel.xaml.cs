@@ -15,7 +15,6 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using ClassifyFiles.Data;
 using ClassifyFiles.Util;
 using ClassifyFiles.UI;
@@ -24,12 +23,17 @@ using System.Diagnostics;
 using DImg = System.Drawing.Image;
 using ModernWpf.Controls;
 using ClassifyFiles.UI.Model;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
+using FzLib.Program;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace ClassifyFiles.UI.Panel
 {
     public partial class ProjectSettingsPanel : ProjectPanelBase
     {
-
+        public string Splitter { get; set; } = "-";
         public ProjectSettingsPanel()
         {
             InitializeComponent();
@@ -42,7 +46,7 @@ namespace ClassifyFiles.UI.Panel
 
         private async void WindowBase_Loaded(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         public override async Task LoadAsync(Project project)
@@ -50,15 +54,100 @@ namespace ClassifyFiles.UI.Panel
             await base.LoadAsync(project);
         }
 
-
+        public ExportFormat ExportFormat { get; set; }
         private async void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             flyoutDelete.Hide();
             MainWindow mainWin = (Window.GetWindow(this) as MainWindow);
             await mainWin.DeleteSelectedProjectAsync();
         }
+        void ShowProgressMessage(Data.File file)
+        {
+            Dispatcher.Invoke(() => GetProgress().Message = "正在导出" + file.Name);
+        }
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            CommonFileDialog dialog = new CommonOpenFileDialog()
+            {
+                IsFolderPicker = true,
+                Title = "请选择用于存放快捷方式的文件夹"
+            };
+            if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
+            {
+                string path = dialog.FileName;
+                GetProgress().Show(true);
+                await FileUtility.Export(path, Project, ExportFormat, CreateLink, Splitter, ShowProgressMessage);
 
 
+                GetProgress().Close();
+            }
+        }
+
+        private void CreateLink(string filePath, string distPath)
+        {
+            if (!distPath.EndsWith(".lnk"))
+            {
+                distPath += ".lnk";
+            }
+            IShellLink link = (IShellLink)new ShellLink();
+
+            // setup shortcut information
+            //link.SetDescription("My Description");
+            link.SetPath(filePath);
+
+            // save it
+            IPersistFile file = (IPersistFile)link;
+            file.Save(distPath, false);
+        }
+
+        [ComImport]
+        [Guid("00021401-0000-0000-C000-000000000046")]
+        internal class ShellLink
+        {
+        }
+
+        [ComImport]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        [Guid("000214F9-0000-0000-C000-000000000046")]
+        internal interface IShellLink
+        {
+            void GetPath([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile, int cchMaxPath, out IntPtr pfd, int fFlags);
+            void GetIDList(out IntPtr ppidl);
+            void SetIDList(IntPtr pidl);
+            void GetDescription([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszName, int cchMaxName);
+            void SetDescription([MarshalAs(UnmanagedType.LPWStr)] string pszName);
+            void GetWorkingDirectory([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszDir, int cchMaxPath);
+            void SetWorkingDirectory([MarshalAs(UnmanagedType.LPWStr)] string pszDir);
+            void GetArguments([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszArgs, int cchMaxPath);
+            void SetArguments([MarshalAs(UnmanagedType.LPWStr)] string pszArgs);
+            void GetHotkey(out short pwHotkey);
+            void SetHotkey(short wHotkey);
+            void GetShowCmd(out int piShowCmd);
+            void SetShowCmd(int iShowCmd);
+            void GetIconLocation([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszIconPath, int cchIconPath, out int piIcon);
+            void SetIconLocation([MarshalAs(UnmanagedType.LPWStr)] string pszIconPath, int iIcon);
+            void SetRelativePath([MarshalAs(UnmanagedType.LPWStr)] string pszPathRel, int dwReserved);
+            void Resolve(IntPtr hwnd, int fFlags);
+            void SetPath([MarshalAs(UnmanagedType.LPWStr)] string pszFile);
+        }
+
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            CommonFileDialog dialog = new CommonOpenFileDialog()
+            {
+                IsFolderPicker = true,
+                Title = "请选择导出的目标文件夹"
+            };
+            if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
+            {
+                string path = dialog.FileName;
+                GetProgress().Show(true);
+                await FileUtility.Export(path, Project, ExportFormat, (from, to) => System.IO.File.Copy(from, to, true),
+                                    Splitter, ShowProgressMessage);
+
+                GetProgress().Close();
+            }
+        }
     }
 
 
