@@ -65,7 +65,7 @@ namespace ClassifyFiles.UI.Panel
         {
             Dispatcher.Invoke(() => GetProgress().Message = "正在导出" + file.Name);
         }
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        private async void ExportLinkButton_Click(object sender, RoutedEventArgs e)
         {
             CommonFileDialog dialog = new CommonOpenFileDialog()
             {
@@ -131,7 +131,7 @@ namespace ClassifyFiles.UI.Panel
             void SetPath([MarshalAs(UnmanagedType.LPWStr)] string pszFile);
         }
 
-        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        private async void ExportFileButton_Click(object sender, RoutedEventArgs e)
         {
             CommonFileDialog dialog = new CommonOpenFileDialog()
             {
@@ -148,7 +148,28 @@ namespace ClassifyFiles.UI.Panel
                 GetProgress().Close();
             }
         }
+
+        private async void ExportProjectButton_Click(object sender, RoutedEventArgs e)
+        {
+            CommonSaveFileDialog dialog = new CommonSaveFileDialog()
+            {
+                Title = "请选择导出的位置",
+                DefaultFileName = Project.Name
+            };
+            dialog.Filters.Add(new CommonFileDialogFilter("SQLite数据库", "db"));
+            if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
+            {
+                string path = dialog.FileName;
+                GetProgress().Show(true);
+                await DbUtility.ExportProject(path, Project.ID);
+                GetProgress().Close();
+                await new MessageDialog().ShowAsync("导出成功", "导出");
+            }
+
+        }
+
+
     }
-
-
 }
+
+

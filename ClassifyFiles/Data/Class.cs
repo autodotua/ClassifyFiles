@@ -10,7 +10,6 @@ namespace ClassifyFiles.Data
         public string Name { get; set; } = "";
 
         public Class Parent { get; set; }
-        public int? ParentID { get; set; }
         public List<Class> Children { get; set; }
         public List<MatchCondition> MatchConditions { get; set; }
         public List<File> Files { get; set; }

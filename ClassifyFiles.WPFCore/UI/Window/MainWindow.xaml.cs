@@ -16,6 +16,8 @@ using ClassifyFiles.UI.Panel;
 using System.Windows.Controls.Primitives;
 using ModernWpf.Controls;
 using ModernWpf;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using FzLib.Basic;
 
 namespace ClassifyFiles.UI
 {
@@ -70,7 +72,7 @@ namespace ClassifyFiles.UI
             if (MainPanel != null)
             {
                 Progress.Show(false);
-                await MainPanel.LoadAsync(SelectedProject); 
+                await MainPanel.LoadAsync(SelectedProject);
                 Progress.Close();
             }
         }
@@ -146,10 +148,10 @@ namespace ClassifyFiles.UI
                     return;
             }
 
-         await   LoadProjectAsync();
+            await LoadProjectAsync();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void SettingMenu_Click(object sender, RoutedEventArgs e)
         {
             new SettingWindow() { Owner = this }.ShowDialog();
         }
@@ -162,9 +164,60 @@ namespace ClassifyFiles.UI
         }
 
 
-        private void AboutButton_Click(object sender, RoutedEventArgs e)
+        private void AboutMenu_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private async void ImportMenu_Click(object sender, RoutedEventArgs e)
+        {
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog()
+            {
+                Title = "请选择导入的文件",
+            };
+            dialog.Filters.Add(new CommonFileDialogFilter("SQLite数据库", "db"));
+            dialog.Filters.Add(new CommonFileDialogFilter("所有文件", "*"));
+            if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
+            {
+                string path = dialog.FileName;
+                Progress.Show(true);
+                var projects = await DbUtility.Import(path);
+                Progress.Close();
+                await new MessageDialog().ShowAsync("导入成功", "导出");
+                projects.ForEach(p => Projects.Add(p));
+            }
+        }
+
+        private async void ExportMenu_Click(object sender, RoutedEventArgs e)
+        {
+            CommonSaveFileDialog dialog = new CommonSaveFileDialog()
+            {
+                Title = "请选择导出的位置",
+                DefaultFileName = "文件分类"
+            };
+            dialog.Filters.Add(new CommonFileDialogFilter("SQLite数据库", "db"));
+            if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
+            {
+                string path = dialog.FileName;
+                Progress.Show(true);
+                await DbUtility.ExportAll(path);
+                Progress.Close();
+                await new MessageDialog().ShowAsync("导出成功", "导出");
+            }
+
+        }
+
+        private async void DeleteAllMenu_Click(object sender, RoutedEventArgs e)
+        {
+            if(await new ConfirmDialog().ShowAsync("真的要删除所有项目吗？", "删除"))
+            {
+                foreach (var project in Projects.ToArray())
+                {
+                   await DbUtility.DeleteProjectAsync(project);
+                    Projects.Remove(project);
+                }
+                await new MessageDialog().ShowAsync("删除成功", "删除");
+            }
         }
     }
 }

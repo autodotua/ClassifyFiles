@@ -10,6 +10,7 @@ namespace ClassifyFiles.Util
 {
     public static class DbUtility
     {
+        public static string DbPath { get; private set; } = "data.db";
         private static AppDbContext db;
         public static AppDbContext Db
         {
@@ -17,7 +18,7 @@ namespace ClassifyFiles.Util
             {
                 if (db == null)
                 {
-                    db = new AppDbContext("data.db");
+                    db = new AppDbContext(DbPath);
                 }
                 return db;
             }
@@ -37,17 +38,6 @@ namespace ClassifyFiles.Util
             return classes.Where(p => p.Parent == null).ToList();
 
         }
-        //public static async Task<(List<Class>, List<Class>)> GetTreeAndTileClassesAsync(Project project)
-        //{
-        //    List<Class> classes = await db.Classes
-        //        .Where(p => p.Project == project)
-        //        .Include(p => p.MatchConditions)
-        //        .ToListAsync();
-
-
-        //    return (classes.Where(p => p.Parent == null).ToList(), classes);
-
-        //}
 
         public static async Task SaveClassAsync(Class c)
         {
@@ -61,7 +51,7 @@ namespace ClassifyFiles.Util
         {
             Db.Entry(project).State = EntityState.Modified;
             await db.SaveChangesAsync();
-        }   
+        }
         public static async Task DeleteProjectAsync(Project project)
         {
             Db.Entry(project).State = EntityState.Deleted;
@@ -114,6 +104,68 @@ namespace ClassifyFiles.Util
         {
             var files = Db.Files.Where(p => p.Class == c);
             return files.ToListAsync();
+        }
+
+        public async static Task ExportProject(string path, int projectID)
+        {
+            Project project = await Db.Projects.Where(p => p.ID == projectID)
+               .Include(p => p.Classes).ThenInclude(p => p.Files)
+               .Include(p => p.Classes).ThenInclude(p => p.MatchConditions)
+               .Include(p => p.Classes).ThenInclude(p => p.Files)
+               .FirstOrDefaultAsync();
+
+            var newDb = new AppDbContext(path);
+            newDb.Database.EnsureDeleted();
+            newDb.Database.EnsureCreated();
+
+            newDb.Projects.Add(project);
+            await newDb.SaveChangesAsync();
+            await newDb.DisposeAsync();
+        }
+        public static Task ExportAll(string path)
+        {
+            return Task.Run(() =>
+            {
+                System.IO.File.Copy(DbPath, path);
+            });
+        }
+        public async static Task<Project[]> Import(string path)
+        {
+            if (!System.IO.File.Exists(path))
+            {
+                throw new System.IO.FileNotFoundException();
+            }
+            var importDb = new AppDbContext(path);
+            List<Project> projects = new List<Project>();
+            foreach (var projectID in await importDb.Projects.Select(p => p.ID).ToListAsync())
+            {
+                Project project = await importDb.Projects.Where(p => p.ID == projectID)
+              .Include(p => p.Classes).ThenInclude(p => p.Files)
+              .Include(p => p.Classes).ThenInclude(p => p.MatchConditions)
+              .Include(p => p.Classes).ThenInclude(p => p.Files)
+              .FirstAsync();
+                await Task.Run(() =>
+                {
+                    projects.Add(project);
+                    project.ID = 0;
+                    foreach (var c in project.Classes)
+                    {
+                        c.ID = 0;
+                        foreach (var file in c.Files)
+                        {
+                            file.ID = 0;
+                        }
+                        foreach (var m in c.MatchConditions)
+                        {
+                            m.ID = 0;
+                        }
+                    }
+                Db.Add(project);
+                });
+            }
+            await Db.SaveChangesAsync();
+            await importDb.DisposeAsync();
+            return projects.ToArray();
         }
     }
 }
