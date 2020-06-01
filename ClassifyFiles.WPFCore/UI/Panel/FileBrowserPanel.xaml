@@ -11,14 +11,14 @@
     xmlns:m="http://schemas.modernwpf.com/2019"
      xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
     Loaded="WindowBase_Loaded"
-        mc:Ignorable="d"    >
+        mc:Ignorable="d">
     <UserControl.Resources>
         <ui:NotFirst2VisibilityConverter x:Key="i2v"/>
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
     </UserControl.Resources>
     <Grid >
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" MinWidth="200" MaxWidth="400"/>
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="8"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
@@ -29,7 +29,7 @@
         </Grid.RowDefinitions>
 
         <Expander Margin="8,4,4,0" Header="分&#13;类" ExpandDirection="Right" FocusVisualStyle="{x:Null}" IsExpanded="True">
-            <Grid Margin="8,0,0,0">
+            <Grid Margin="8,0,0,0" MinWidth="200" MaxWidth="400">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="4"/>
@@ -72,8 +72,13 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <m:AppBarButton  Icon="Refresh" IsCompact="False"  Label="刷新全部" Click="RefreshAllButton_Click"/>
-                <m:AppBarButton Grid.Column="1"  Icon="Refresh"  Label="刷新当前"/>
+                <m:AppBarButton  IsCompact="False"  Label="刷新全部" Click="RefreshAllButton_Click">
+                    <m:AppBarButton.Icon>
+                        <m:FontIcon Glyph="&#xE72C;&#xEA37;"/>
+                       
+                    </m:AppBarButton.Icon>
+                </m:AppBarButton>
+                <m:AppBarButton Grid.Column="1"  Icon="Refresh"  Label="刷新当前" Click="RefreshButton_Click"/>
                 <m:AppBarToggleButton Grid.Column="3"  Label="列表模式"  Click="ViewTypeButton_Click" Tag="1" IsChecked="True">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon

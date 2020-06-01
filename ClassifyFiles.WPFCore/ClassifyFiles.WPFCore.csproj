@@ -29,6 +29,9 @@
     <Page Update="UI\Dialog\ConfirmDialog.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="UI\Dialog\ErrorDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="UI\Dialog\MessageDialog.xaml">
       <SubType>Designer</SubType>
     </Page>

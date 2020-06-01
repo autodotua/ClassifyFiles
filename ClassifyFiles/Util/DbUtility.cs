@@ -93,12 +93,22 @@ namespace ClassifyFiles.Util
         {
             foreach (var item in classFiles)
             {
-                Class c = item.Key;
-                List<File> files = item.Value;
-                c.Files = files;
-                Db.Entry(c).State = EntityState.Modified;
+                await UpdateFilesAsync(item.Key, item.Value, false);
             }
             await Db.SaveChangesAsync();
+        }
+        public static Task UpdateFilesAsync(Class c, List<File> file)
+        {
+            return UpdateFilesAsync(c, file, true);
+        }
+        private static async Task UpdateFilesAsync(Class c, List<File> files, bool saveChanges)
+        {
+            c.Files = files;
+            Db.Entry(c).State = EntityState.Modified;
+            if (saveChanges)
+            {
+                await Db.SaveChangesAsync();
+            }
         }
         public static Task<List<File>> GetFilesAsync(Class c)
         {
@@ -160,7 +170,7 @@ namespace ClassifyFiles.Util
                             m.ID = 0;
                         }
                     }
-                Db.Add(project);
+                    Db.Add(project);
                 });
             }
             await Db.SaveChangesAsync();

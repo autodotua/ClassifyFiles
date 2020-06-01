@@ -120,20 +120,57 @@ namespace ClassifyFiles.UI.Panel
         private async void RefreshAllButton_Click(object sender, RoutedEventArgs e)
         {
             GetProgress().Show(true);
-            var classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().Classes, true, (p, f) =>
+            try
+            {
+                var classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().Classes, true, (p, f) =>
             {
                 Dispatcher.Invoke(() =>
                 {
                     GetProgress().Message = p.ToString("P") + (f == null ? "" : $"（{f.Name}）");
                 });
             });
-            await DbUtility.UpdateFilesAsync(classFiles);
-            if (classes.SelectedClass != null && classFiles.ContainsKey(classes.SelectedClass))
-            {
-                SetFiles(classFiles[classes.SelectedClass]);
+                await DbUtility.UpdateFilesAsync(classFiles);
+                if (classes.SelectedClass != null && classFiles.ContainsKey(classes.SelectedClass))
+                {
+                    SetFiles(classFiles[classes.SelectedClass]);
+                }
+                GeneratePaggingButtons();
             }
-            GetProgress().Close();
-            GeneratePaggingButtons();
+            catch (Exception ex)
+            {
+                await new ErrorDialog().ShowAsync(ex, "刷新错误");
+            }
+            finally
+            {
+
+                GetProgress().Close();
+            }
+        }
+        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            GetProgress().Show(true);
+            try
+            {
+                var files = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().SelectedClass, true, (p, f) =>
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        GetProgress().Message = p.ToString("P") + (f == null ? "" : $"（{f.Name}）");
+                    });
+                });
+                await DbUtility.UpdateFilesAsync(GetClassesPanel().SelectedClass, files);
+
+                SetFiles(files);
+                GeneratePaggingButtons();
+            }
+            catch (Exception ex)
+            {
+                await new ErrorDialog().ShowAsync(ex, "刷新错误");
+            }
+            finally
+            {
+                GetProgress().Close();
+            }
         }
 
         private void SetFiles(IEnumerable<File> files)
@@ -352,6 +389,8 @@ namespace ClassifyFiles.UI.Panel
         {
             (sender as Button).ContextMenu.IsOpen = true;
         }
+
+
     }
 
 

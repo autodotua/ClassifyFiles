@@ -27,6 +27,10 @@ namespace ClassifyFiles.Util
         "tiff",
         "bmp",
         }.AsReadOnly();
+        public async static Task< List<File>> GetFilesAsync(DI dir, Class c, bool includeThumbnails, Action<double, Data.File> callback = null)
+        {
+            return (await GetFilesAsync(dir, new List<Class>() { c }, includeThumbnails, callback))[c];
+        }
         public async static Task<Dictionary<Class, List<File>>> GetFilesAsync(DI dir, IEnumerable<Class> classes, bool includeThumbnails, Action<double,Data.File> callback = null)
         {
             Dictionary<Class, List<File>> classFiles = new Dictionary<Class, List<File>>();
