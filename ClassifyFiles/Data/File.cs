@@ -29,7 +29,7 @@ namespace ClassifyFiles.Data
         }
 
         [Required]
-        public string Dir { get; set; } = "";
+        public string Dir { get; set; }
         [Required]
         public string Name { get; set; } = "";
         public Class Class { get; set; }

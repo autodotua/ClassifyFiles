@@ -168,7 +168,19 @@ namespace ClassifyFiles.UI.Panel
 
         }
 
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            CommonFileDialog dialog = new CommonOpenFileDialog()
+            {
+                IsFolderPicker = true,
+                Title = "请选择文件夹"
+            };
+            if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
+            {
+                Project.RootPath = dialog.FileName;
 
+            }
+        }
     }
 }
 

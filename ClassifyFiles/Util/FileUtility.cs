@@ -27,7 +27,7 @@ namespace ClassifyFiles.Util
         "tiff",
         "bmp",
         }.AsReadOnly();
-        public async static Task<Dictionary<Class, List<File>>> GetFilesAsync(DI dir, IEnumerable<Class> classes, bool includeThumbnails, Action<double> percentCallback = null)
+        public async static Task<Dictionary<Class, List<File>>> GetFilesAsync(DI dir, IEnumerable<Class> classes, bool includeThumbnails, Action<double,Data.File> callback = null)
         {
             Dictionary<Class, List<File>> classFiles = new Dictionary<Class, List<File>>();
             await Task.Run(async () =>
@@ -41,12 +41,13 @@ namespace ClassifyFiles.Util
                 int count = files.Count;
                 foreach (var file in files)
                 {
+                    File f=null;
                     byte[] thumb = null;
                     foreach (var c in classes)
                     {
                         if (IsMatched(file, c))
                         {
-                            File f = new File(file, dir, c);
+                            f = new File(file, dir, c);
                             if (includeThumbnails)
                             {
                                 if (thumb == null)
@@ -62,7 +63,7 @@ namespace ClassifyFiles.Util
                             classFiles[c].Add(f);
                         }
                     }
-                    percentCallback?.Invoke((++index * 1.0) / count);
+                    callback?.Invoke((++index * 1.0) / count,f);
                 }
             });
             return classFiles;
@@ -232,9 +233,9 @@ namespace ClassifyFiles.Util
         {
             if (dirOnly)
             {
-                return System.IO.Path.Combine(rootPath, file.Dir);
+                return P.Combine(rootPath, file.Dir);
             }
-            return System.IO.Path.Combine(rootPath, file.Dir, file.Name);
+            return P.Combine(rootPath, file.Dir, file.Name);
         }
 
         public async static Task Export(string distFolder,

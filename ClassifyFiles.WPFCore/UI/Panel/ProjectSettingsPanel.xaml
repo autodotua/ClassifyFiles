@@ -13,14 +13,22 @@
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     Loaded="WindowBase_Loaded"
         mc:Ignorable="d"    >
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled " Padding="8" VerticalScrollBarVisibility="Auto">
 
-        <m:SimpleStackPanel  Orientation="Vertical" Spacing="8" Margin="8">
+        <m:SimpleStackPanel  Orientation="Vertical" Spacing="8" Margin="0,8,16,8">
             <GroupBox Header="项目名">
                 <TextBox Text="{Binding Project.Name}"   VerticalAlignment="Center"  FontSize="24"/>
             </GroupBox>
             <GroupBox Header="项目根目录">
-                <TextBox Text="{Binding Project.RootPath}"   VerticalAlignment="Center"  FontSize="24"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Text="{Binding Project.RootPath}" Grid.Column="0"   VerticalAlignment="Center"  FontSize="24"/>
+                    <Button Content="浏览.." Grid.Column="2" VerticalAlignment="Stretch" Click="Button_Click"/>
+                </Grid>
             </GroupBox>
             <GroupBox Header="操作">
                 <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">

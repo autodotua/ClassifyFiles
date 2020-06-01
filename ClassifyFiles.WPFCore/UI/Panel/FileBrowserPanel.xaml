@@ -18,7 +18,7 @@
     </UserControl.Resources>
     <Grid >
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto" MinWidth="200" MaxWidth="400"/>
             <ColumnDefinition Width="8"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
@@ -27,26 +27,31 @@
             <RowDefinition Height="8"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid Margin="8,4,4,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="4"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="8"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <m:SimpleStackPanel Orientation="Horizontal" Spacing="16">  
-                <TextBlock Text="{Binding Project.Name}"   VerticalAlignment="Center"  FontSize="24"/>
 
-                <TextBlock Grid.Column="2"
+        <Expander Margin="8,4,4,0" Header="分&#13;类" ExpandDirection="Right" FocusVisualStyle="{x:Null}" IsExpanded="True">
+            <Grid Margin="8,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="4"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <m:SimpleStackPanel Orientation="Horizontal" Spacing="16">
+                    <TextBlock Text="{Binding Project.Name}"   VerticalAlignment="Center"  FontSize="24"/>
+
+                    <TextBlock Grid.Column="2"
                       VerticalAlignment="Bottom" Text="{Binding Project.RootPath}"/>
-            </m:SimpleStackPanel>
-              
-            <panel:ClassesPanel x:Name="classes" Grid.Row="99"  SelectedClassChanged="classes_SelectedClassChanged"/>
-        </Grid>
+                </m:SimpleStackPanel>
+
+                <panel:ClassesPanel x:Name="classes" Grid.Row="99"  SelectedClassChanged="classes_SelectedClassChanged"/>
+            </Grid>
+
+        </Expander>
 
 
-        <Grid Margin="4" Grid.Column="2" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
+
+        <Grid Margin="8,4,4,4" Grid.Column="2" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
             <Grid.Resources>
                 <ContextMenu x:Key="menu">
                     <MenuItem Header="打开目录" Click="OpenDirMernuItem_Click"/>
@@ -164,7 +169,7 @@
             </Grid>
             <TreeView Name="treeFiles" Visibility="Collapsed"   ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
                        IsEnabled="{Binding ElementName=classes, Path=SelectedClass, Converter={StaticResource nn2b}}"
-                      Grid.Row="2"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick" Margin="-33,0,33,0">
+                      Grid.Row="2"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick" >
 
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate  ItemsSource="{Binding SubFiles}">

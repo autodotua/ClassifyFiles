@@ -115,7 +115,7 @@ namespace ClassifyFiles.UI.Model
             Dir = file.Dir;
             SubFiles = file.SubFiles.Select(p => new FileWithIcon(p)).Cast<File>().ToList();
             Thumbnail = file.Thumbnail;
-            if (string.IsNullOrEmpty(Dir))
+            if (Dir==null)
             {
                 Glyph = FolderGlyph;
             }

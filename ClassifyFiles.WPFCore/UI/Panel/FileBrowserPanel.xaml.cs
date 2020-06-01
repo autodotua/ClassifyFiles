@@ -120,9 +120,12 @@ namespace ClassifyFiles.UI.Panel
         private async void RefreshAllButton_Click(object sender, RoutedEventArgs e)
         {
             GetProgress().Show(true);
-            var classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().Classes, true, p =>
+            var classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetClassesPanel().Classes, true, (p, f) =>
             {
-
+                Dispatcher.Invoke(() =>
+                {
+                    GetProgress().Message = p.ToString("P") + (f == null ? "" : $"（{f.Name}）");
+                });
             });
             await DbUtility.UpdateFilesAsync(classFiles);
             if (classes.SelectedClass != null && classFiles.ContainsKey(classes.SelectedClass))
@@ -166,7 +169,7 @@ namespace ClassifyFiles.UI.Panel
                     btn.Click += (p1, p2) =>
                     {
                         stkPagging.Children.Cast<Button>()
-                        .ForEach(p => p.Background=Brushes.Transparent);
+                        .ForEach(p => p.Background = Brushes.Transparent);
                         (p1 as Button).SetResourceReference(Button.BackgroundProperty, "SystemAccentColorLight3Brush");
                         Page = (int)btn.Content - 1;
                     };
@@ -202,7 +205,7 @@ namespace ClassifyFiles.UI.Panel
                 File file = GetSelectedFile();
                 if (file != null)
                 {
-                    if (file.Dir == "")//是目录
+                    if (file.Dir == null)//是目录
                     {
                         return;
                     }
@@ -210,7 +213,7 @@ namespace ClassifyFiles.UI.Panel
 
                     if (!System.IO.File.Exists(path))
                     {
-                        await new MessageDialog().ShowAsync("文件不存在","打开");
+                        await new MessageDialog().ShowAsync("文件不存在", "打开");
                         e.Handled = true;
                         return;
                     }
@@ -290,7 +293,7 @@ namespace ClassifyFiles.UI.Panel
                 switch (CurrentViewType)
                 {
                     case 1:
-                         file = Files.FirstOrDefault(p => p.Dir == dir);
+                        file = Files.FirstOrDefault(p => p.Dir == dir);
                         if (file != null)
                         {
                             lvwFiles.SelectedItem = file;
@@ -298,22 +301,22 @@ namespace ClassifyFiles.UI.Panel
                         }
                         break;
                     case 2:
-                         file = Files.FirstOrDefault(p => p.Dir == dir);
+                        file = Files.FirstOrDefault(p => p.Dir == dir);
                         if (file != null)
                         {
                             int index = Files.IndexOf(file);
                             int page = (int)Math.Ceiling((double)index / pagingItemsCount);
                             stkPagging.Children.Cast<Button>().FirstOrDefault(p => (int)p.Content == page)?.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                             lbxGrdFiles.SelectedItem = file;
-                            lbxGrdFiles.ScrollIntoView( file);  //无效
+                            lbxGrdFiles.ScrollIntoView(file);  //无效
                         }
-                            break;
+                        break;
                     case 3:
                         break;
                     default:
                         break;
                 }
-             
+
                 (sender as ListBox).SelectedItem = null;
                 flyoutJumpToDir.Hide();// = false;
             }
