@@ -31,7 +31,11 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace ClassifyFiles.UI.Panel
 {
-    public partial class ProjectSettingsPanel : ProjectPanelBase
+    public abstract class ProjectSettingPanelBase : ProjectPanelBase<ClassifyItemModelBase>
+    {
+
+    }
+    public partial class ProjectSettingsPanel : ProjectSettingPanelBase
     {
         public string Splitter { get; set; } = "-";
         public ProjectSettingsPanel()
@@ -39,10 +43,6 @@ namespace ClassifyFiles.UI.Panel
             InitializeComponent();
         }
 
-        public override ClassesPanel GetClassesPanel()
-        {
-            return null;
-        }
 
         private async void WindowBase_Loaded(object sender, RoutedEventArgs e)
         {
@@ -52,6 +52,14 @@ namespace ClassifyFiles.UI.Panel
         public override async Task LoadAsync(Project project)
         {
             await base.LoadAsync(project);
+            if (Project.Type == Project.ClassifyType.FileProps)
+            {
+                rbtnTypeFileProps.IsChecked = true;
+            }
+            else
+            {
+                rbtnTypeTag.IsChecked = true;
+            }
         }
 
         public ExportFormat ExportFormat { get; set; }
@@ -180,6 +188,23 @@ namespace ClassifyFiles.UI.Panel
                 Project.RootPath = dialog.FileName;
 
             }
+        }
+
+        private void rbtnTypeFileProps_Checked(object sender, RoutedEventArgs e)
+        {
+            if (sender == rbtnTypeFileProps)
+            {
+                Project.Type = Project.ClassifyType.FileProps;
+            }
+            else
+            {
+                Project.Type = Project.ClassifyType.Tag;
+            }
+        }
+
+        public override ListPanelBase<ClassifyItemModelBase> GetItemsPanel()
+        {
+            return null;
         }
     }
 }

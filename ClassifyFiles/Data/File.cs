@@ -33,7 +33,9 @@ namespace ClassifyFiles.Data
         [Required]
         public string Name { get; set; } = "";
         public Class Class { get; set; }
-        public int ClassID { get; set; }
+        public int? ClassID { get; set; }
+        public Tag Tag { get; set; }
+        public int? TagID { get; set; }
         //public string ImageID { get; set; }
         public byte[] Thumbnail { get; set; }
         [NotMapped]

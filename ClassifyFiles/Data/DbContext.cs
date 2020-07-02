@@ -32,6 +32,7 @@ namespace ClassifyFiles.Data
         public DbSet<Log> Logs { get; set; }
         public DbSet<File> Files { get; set; }
         public DbSet<Class> Classes { get; set; }
+        public DbSet<Tag> Tags { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<MatchCondition> MatchConditions { get; set; }
 
@@ -59,6 +60,11 @@ namespace ClassifyFiles.Data
                 .WithMany(p => p.Files)
                 .HasForeignKey(p => p.ClassID)
                 .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<File>()
+                .HasOne(p => p.Tag)
+                .WithMany(p => p.Files)
+                .HasForeignKey(p => p.TagID)
+                .OnDelete(DeleteBehavior.Cascade);
         }
         private void InsertTestDatas()
         {
@@ -73,35 +79,6 @@ namespace ClassifyFiles.Data
             {
                 Name = GetName(),
                 Project = project,
-                Children = new List<Class>() {
-                    new Class()
-                    {
-                        Name = GetName(),
-                        Project = project,
-                        Children = new List<Class>() {
-                            new Class()
-                    {
-                        Name = GetName(),
-                        Project = project,
-                        Children = new List<Class>() {
-                        }
-                    },new Class()
-                    {
-                        Name = GetName(),
-                        Project = project,
-                        Children = new List<Class>() {
-                        }
-                    },
-                        }
-                    },
-                    new Class()
-                    {
-                        Name = GetName(),
-                        Project = project,
-                        Children = new List<Class>() {
-                        }
-                    },
-                }
 
             };
             Classes.Add(c);

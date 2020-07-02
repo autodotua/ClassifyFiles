@@ -51,7 +51,9 @@ namespace ClassifyFiles.UI
             set
             {
                 message = value;
-                this.Notify(nameof(Detail), nameof(DetailVisibility)); 
+                this.Notify(nameof(Detail), nameof(DetailVisibility));
+                System.Diagnostics.Debug.WriteLine("New Error：");
+                System.Diagnostics.Debug.WriteLine(value);
             }
         }
         public async new Task ShowAsync()

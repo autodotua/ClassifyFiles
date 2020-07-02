@@ -12,39 +12,38 @@ using System.Windows;
 
 namespace ClassifyFiles.UI.Panel
 {
-    public abstract class ProjectPanelBase : UserControlBase
+    public interface ILoadable
+    {
+        public Task LoadAsync(Project project);
+
+    }
+    public abstract class ProjectPanelBase<T> : UserControlBase, ILoadable where T : ClassifyItemModelBase
     {
         public virtual async Task LoadAsync(Project project)
         {
-            //if (Project == null || project == null)
-            //{
-            //    return;
-            //}
             Project = project;
-            if (GetClassesPanel() != null)
+            if (GetItemsPanel() != null)
             {
-                await GetClassesPanel().LoadAsync(project);
-                if (SelectedClass != null)
+                await GetItemsPanel().LoadAsync(project);
+                if (SelectedItem != null)
                 {
-                    GetClassesPanel().SelectClass(SelectedClass);
+                    GetItemsPanel().SelectedItem = SelectedItem;
                 }
-                else if (GetClassesPanel().Classes.Count > 0)
+                else if (GetItemsPanel().Items.Count > 0)
                 {
-                    GetClassesPanel().SelectClass(GetClassesPanel().Classes[0]);
+                    GetItemsPanel().SelectedItem = GetItemsPanel().Items[0];
                 }
-                GetClassesPanel().SelectedClassChanged += (p1, p2) =>
+                GetItemsPanel().PropertyChanged += (p1, p2) =>
                 {
-                    SelectedClass = GetClassesPanel().SelectedClass;
+                    if (p2.PropertyName == nameof(ListPanelBase<ClassifyItemModelBase>.SelectedItem))
+                    {
+                        SelectedItem = GetItemsPanel().SelectedItem;
+                    }
                 };
             }
         }
-        public abstract ClassesPanel GetClassesPanel();
+        public abstract ListPanelBase<T> GetItemsPanel();
         private Project project;
-
-        public ProjectPanelBase() : base()
-        {
-        }
-
         public virtual Project Project
         {
             get => project;
@@ -58,6 +57,6 @@ namespace ClassifyFiles.UI.Panel
         {
             return (Window.GetWindow(this) as MainWindow).Progress;
         }
-        public static Class SelectedClass { get; private set; }
+        public static T SelectedItem { get; private set; }
     }
 }

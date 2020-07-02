@@ -34,9 +34,17 @@ namespace ClassifyFiles.Util
                 .Include(p => p.MatchConditions)
                 .ToListAsync();
 
+            return classes;
+            //return classes.Where(p => p.Parent == null).ToList();
 
-            return classes.Where(p => p.Parent == null).ToList();
+        }
+        public static async Task<List<Tag>> GetTagsAsync(Project project)
+        {
+            List<Tag> tags = await db.Tags
+                .Where(p => p.Project == project)
+                .ToListAsync();
 
+            return tags;
         }
 
         public static async Task SaveClassAsync(Class c)
@@ -44,6 +52,13 @@ namespace ClassifyFiles.Util
             if (await Db.Classes.AnyAsync(p => p.ID == c.ID))
             {
                 Db.Entry(c).State = EntityState.Modified;
+                await Db.SaveChangesAsync();
+            }
+        }public static async Task SaveTagAsync(Tag t)
+        {
+            if (await Db.Tags.AnyAsync(p => p.ID == t.ID))
+            {
+                Db.Entry(t).State = EntityState.Modified;
                 await Db.SaveChangesAsync();
             }
         }
@@ -65,21 +80,17 @@ namespace ClassifyFiles.Util
             await Db.SaveChangesAsync();
             return project;
         }
-        public static async Task<Class> AddClassAsync(Project project, Class reference, bool inside)
+        public static async Task<Class> AddClassAsync(Project project)
         {
-            Class c = new Class() { Project = project, Name = "未命名" };
-            if (reference != null)
-            {
-                if (inside)
-                {
-                    c.Parent = reference;
-                }
-                else
-                {
-                    c.Parent = reference.Parent;
-                }
-            }
+            Class c = new Class() { Project = project, Name = "未命名类" };
             Db.Classes.Add(c);
+            await db.SaveChangesAsync();
+            return c;
+        }
+        public static async Task<Tag> AddTagAsync(Project project)
+        {
+            Tag c = new Tag() { Project = project, Name = "未命名类" };
+            Db.Tags.Add(c);
             await db.SaveChangesAsync();
             return c;
         }
@@ -88,8 +99,13 @@ namespace ClassifyFiles.Util
             Db.Entry(c).State = EntityState.Deleted;
             await db.SaveChangesAsync();
         }
+        public static async Task DeleteTagAsync(Tag t)
+        {
+            Db.Entry(t).State = EntityState.Deleted;
+            await db.SaveChangesAsync();
+        }
 
-        public static async Task UpdateFilesAsync(Dictionary<Class, List<File>> classFiles)
+        public static async Task UpdateFilesAsync<T>(Dictionary<T, List<File>> classFiles)  where T: ClassifyItemModelBase
         {
             foreach (var item in classFiles)
             {
@@ -97,11 +113,11 @@ namespace ClassifyFiles.Util
             }
             await Db.SaveChangesAsync();
         }
-        public static Task UpdateFilesAsync(Class c, List<File> file)
+        public static Task UpdateFilesAsync(ClassifyItemModelBase c, List<File> file)
         {
             return UpdateFilesAsync(c, file, true);
         }
-        private static async Task UpdateFilesAsync(Class c, List<File> files, bool saveChanges)
+        private static async Task UpdateFilesAsync(ClassifyItemModelBase c, List<File> files, bool saveChanges)
         {
             c.Files = files;
             Db.Entry(c).State = EntityState.Modified;
@@ -110,7 +126,7 @@ namespace ClassifyFiles.Util
                 await Db.SaveChangesAsync();
             }
         }
-        public static Task<List<File>> GetFilesAsync(Class c)
+        public static Task<List<File>> GetFilesAsync(ClassifyItemModelBase c)
         {
             var files = Db.Files.Where(p => p.Class == c);
             return files.ToListAsync();

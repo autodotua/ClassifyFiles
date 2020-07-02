@@ -17,11 +17,15 @@ namespace ClassifyFiles.Data
 
     }
 
-    public abstract class WithProjectModelBase : DbModelBase
+    public abstract class ClassifyItemModelBase : DbModelBase
     {
+        [Required]
+        public string Name { get; set; } = "";
         public Project Project { get; set; }
         [Required]
         public int ProjectID { get; set; }
+        public List<File> Files { get; set; }
+
     }
 
 }

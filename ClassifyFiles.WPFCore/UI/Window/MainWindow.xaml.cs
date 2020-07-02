@@ -72,7 +72,12 @@ namespace ClassifyFiles.UI
             if (MainPanel != null)
             {
                 Progress.Show(false);
-                await MainPanel.LoadAsync(SelectedProject);
+                try
+                {
+                    await MainPanel.LoadAsync(SelectedProject);
+                }
+                catch (Exception ex)
+                { }
                 Progress.Close();
             }
         }
@@ -88,8 +93,8 @@ namespace ClassifyFiles.UI
 
         }
 
-        public ProjectPanelBase mainPanel = new FileBrowserPanel();
-        public ProjectPanelBase MainPanel
+        public ILoadable mainPanel = new FilePropsBrowserPanel();
+        public ILoadable MainPanel
         {
             get => mainPanel;
             set
@@ -136,7 +141,7 @@ namespace ClassifyFiles.UI
             switch (btn.Name)
             {
                 case nameof(btnModeView):
-                    MainPanel = new FileBrowserPanel();
+                    MainPanel = new FilePropsBrowserPanel();
                     break;
                 case nameof(btnModeClasses):
                     MainPanel = new ClassSettingPanel();

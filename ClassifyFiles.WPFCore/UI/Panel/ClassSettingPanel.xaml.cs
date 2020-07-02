@@ -24,14 +24,18 @@ using System.Diagnostics;
 
 namespace ClassifyFiles.UI.Panel
 {
-    public partial class ClassSettingPanel : ProjectPanelBase
+    public abstract class ClassesSettingPanelBase : ProjectPanelBase<Class>
+    {
+
+    }
+    public partial class ClassSettingPanel : ClassesSettingPanelBase
     {
         public ClassSettingPanel()
         {
             InitializeComponent();
         }
 
-        public override ClassesPanel GetClassesPanel()
+        public override ListPanelBase<Class> GetItemsPanel()
         {
             return classes;
         }
@@ -65,26 +69,10 @@ namespace ClassifyFiles.UI.Panel
 
 
 
-        private async void Classes_SelectedClassChanged(object sender, SelectedItemChanged<Class> e)
-        {
-            var old = e.OldValue;
-            if (old != null)
-            {
-                await SaveClassAsync(old);
-            }
-            if (classes.SelectedClass == null)
-            {
-                MatchConditions = new ObservableCollection<MatchCondition>();
-            }
-            else
-                MatchConditions = new ObservableCollection<MatchCondition>
-                    (classes.SelectedClass.MatchConditions.OrderBy(p => p.Index));
-        }
-
         public Task SaveClassAsync()
         {
 
-            return SaveClassAsync(classes.SelectedClass);
+            return SaveClassAsync(classes.SelectedItem);
 
         }
         public async Task SaveClassAsync(Class c)
@@ -105,14 +93,9 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
-        private async void AddClassAfterButton_Click(object sender, RoutedEventArgs e)
-        {
-            await classes.AddClassAfter();
-        }
-
         private async void AddClassInButton_Click(object sender, RoutedEventArgs e)
         {
-            await classes.AddClassIn();
+            await classes.AddClass();
         }
 
         private async void DeleteClassButton_Click(object sender, RoutedEventArgs e)
@@ -128,6 +111,25 @@ namespace ClassifyFiles.UI.Panel
         private void AddMatchConditionButton_Click(object sender, RoutedEventArgs e)
         {
             MatchConditions.Add(new MatchCondition() { Index = MatchConditions.Count });
+
+        }
+
+
+     
+        private async void classes_SelectedItemChanged_1(object sender, SelectedItemChanged<Class> e)
+        {
+            var old = e.OldValue as Class;
+            if (old != null)
+            {
+                await SaveClassAsync(old);
+            }
+            if (classes.SelectedItem == null)
+            {
+                MatchConditions = new ObservableCollection<MatchCondition>();
+            }
+            else
+                MatchConditions = new ObservableCollection<MatchCondition>
+                    (classes.SelectedItem.MatchConditions.OrderBy(p => p.Index));
 
         }
     }
