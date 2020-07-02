@@ -17,32 +17,30 @@ namespace ClassifyFiles.UI.Panel
         public Task LoadAsync(Project project);
 
     }
-    public abstract class ProjectPanelBase<T> : UserControlBase, ILoadable where T : ClassifyItemModelBase
+    public abstract class ProjectPanelBase : UserControlBase, ILoadable 
     {
         public virtual async Task LoadAsync(Project project)
         {
             Project = project;
             if (GetItemsPanel() != null)
             {
-                await GetItemsPanel().LoadAsync(project);
-                if (SelectedItem != null)
+                ListPanelBase panel = GetItemsPanel();
+                await panel.LoadAsync(project);
+                if (selectedItem != null)
                 {
-                    GetItemsPanel().SelectedItem = SelectedItem;
+                    panel.SelectedItem = selectedItem;
                 }
-                else if (GetItemsPanel().Items.Count > 0)
+                else if (panel.Items.Count > 0)
                 {
-                    GetItemsPanel().SelectedItem = GetItemsPanel().Items[0];
+                    panel.SelectedItem = panel.Items[0];
                 }
-                GetItemsPanel().PropertyChanged += (p1, p2) =>
+                panel.SelectedItemChanged += (p1, p2) =>
                 {
-                    if (p2.PropertyName == nameof(ListPanelBase<ClassifyItemModelBase>.SelectedItem))
-                    {
-                        SelectedItem = GetItemsPanel().SelectedItem;
-                    }
+                    selectedItem = panel.SelectedItem;
                 };
             }
         }
-        public abstract ListPanelBase<T> GetItemsPanel();
+        public abstract ListPanelBase GetItemsPanel();
         private Project project;
         public virtual Project Project
         {
@@ -57,6 +55,6 @@ namespace ClassifyFiles.UI.Panel
         {
             return (Window.GetWindow(this) as MainWindow).Progress;
         }
-        public static T SelectedItem { get; private set; }
+        public static ClassifyItemModelBase selectedItem { get; private set; }
     }
 }

@@ -27,13 +27,39 @@ namespace ClassifyFiles.Util
         "tiff",
         "bmp",
         }.AsReadOnly();
-        public async static Task< List<File>> GetFilesAsync(DI dir, Class c, bool includeThumbnails, Action<double, Data.File> callback = null)
+        public async static Task< List<File>> GetFilesAsync(DI dir, ClassifyItemModelBase item, bool includeThumbnails, Action<double, Data.File> callback = null)
         {
-            return (await GetFilesAsync(dir, new List<Class>() { c }, includeThumbnails, callback))[c];
+            if (item is Class c)
+            {
+                return (await GetFilesAsync(dir, new List<Class>() { c }, includeThumbnails, callback))[c];
+            }
+            else if(item is Tag t)
+            {
+                return (await GetFilesAsync(dir, new List<Tag>() { t }, includeThumbnails, callback))[t];
+
+            }
+            throw new Exception();
         }
-        public async static Task<Dictionary<Class, List<File>>> GetFilesAsync(DI dir, IEnumerable<Class> classes, bool includeThumbnails, Action<double,Data.File> callback = null)
+
+        public async static Task<Dictionary<ClassifyItemModelBase, List<File>>> GetFilesAsync(DI dir, IEnumerable<ClassifyItemModelBase> items, bool includeThumbnails, Action<double, Data.File> callback = null)
         {
-            Dictionary<Class, List<File>> classFiles = new Dictionary<Class, List<File>>();
+            if(!items.Any())
+            {
+                return null;
+            }
+            if (items.First() is Class)
+            {
+                return await GetFilesOfClassesAsync(dir, items.Cast<Class>(), includeThumbnails, callback);
+            }
+            else if (items.First() is Tag)
+            {
+                throw new NotImplementedException();
+            }
+            throw new NotImplementedException();
+        }
+        private async static Task<Dictionary<ClassifyItemModelBase, List<File>>> GetFilesOfClassesAsync(DI dir, IEnumerable<Class> classes, bool includeThumbnails, Action<double,Data.File> callback = null)
+        {
+            Dictionary<ClassifyItemModelBase, List<File>> classFiles = new Dictionary<ClassifyItemModelBase, List<File>>();
             await Task.Run(async () =>
             {
                 foreach (var c in classes)

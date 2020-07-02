@@ -1,4 +1,4 @@
-﻿<local:ClassesSettingPanelBase
+﻿<local:ProjectPanelBase
     xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
     x:Class="ClassifyFiles.UI.Panel.ClassSettingPanel"
@@ -96,4 +96,4 @@
 
         </m:CommandBar>
     </Grid>
-</local:ClassesSettingPanelBase>
+</local:ProjectPanelBase>

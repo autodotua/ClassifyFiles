@@ -93,7 +93,7 @@ namespace ClassifyFiles.UI
 
         }
 
-        public ILoadable mainPanel = new FilePropsBrowserPanel();
+        public ILoadable mainPanel = new FileBrowserPanel();
         public ILoadable MainPanel
         {
             get => mainPanel;
@@ -141,7 +141,7 @@ namespace ClassifyFiles.UI
             switch (btn.Name)
             {
                 case nameof(btnModeView):
-                    MainPanel = new FilePropsBrowserPanel();
+                    MainPanel = new FileBrowserPanel();
                     break;
                 case nameof(btnModeClasses):
                     MainPanel = new ClassSettingPanel();

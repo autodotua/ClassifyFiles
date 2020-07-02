@@ -12,60 +12,60 @@ using System.Windows.Data;
 
 namespace ClassifyFiles.UI.Panel
 {
-    public class ClassesPanel : ListPanelBase<Class>
+    public class ClassesPanel : ListPanelBase
     {
         public override async Task LoadAsync(Project project)
         {
             Project = project;
             //var (treeClasses, tile) = await DbUtility.GetTreeAndTileClassesAsync(Project);
             var treeClasses = await DbUtility.GetClassesAsync(Project);
-            Items = new ObservableCollection<Class>(treeClasses);
+            Items = new ObservableCollection<ClassifyItemModelBase>(treeClasses);
 
-            Class first = Items.FirstOrDefault();
+            Class first = Items.FirstOrDefault() as Class;
             SelectedItem = first;
         }
         public async override Task RenameAsync(string newName)
         {
             SelectedItem.Name = newName;
-            await DbUtility.SaveClassAsync(SelectedItem);
+            await DbUtility.SaveClassAsync(SelectedItem as Class);
             await LoadAsync(Project);
         }
         public async override Task DeleteAsync()
         {
-            await DbUtility.DeleteClassAsync(SelectedItem);
+            await DbUtility.DeleteClassAsync(SelectedItem  as Class);
             await LoadAsync(Project);
         }
     }
 
-    public class TagsPanel : ListPanelBase<Tag>
+    public class TagsPanel : ListPanelBase
     {
         public override async Task LoadAsync(Project project)
         {
             Project = project;
             //var (treeClasses, tile) = await DbUtility.GetTreeAndTileClassesAsync(Project);
             var tags = await DbUtility.GetTagsAsync(Project);
-            Items = new ObservableCollection<Tag>(tags);
+            Items = new ObservableCollection<ClassifyItemModelBase>(tags);
 
-            Tag first = Items.FirstOrDefault();
+            Tag first = Items.FirstOrDefault() as Tag;
             SelectedItem = first;
         }
         public async override Task RenameAsync(string newName)
         {
             SelectedItem.Name = newName;
-            await DbUtility.SaveTagAsync(SelectedItem);
+            await DbUtility.SaveTagAsync(SelectedItem as Tag);
             await LoadAsync(Project);
         }
         public async override Task DeleteAsync()
         {
-            await DbUtility.DeleteTagAsync(SelectedItem);
+            await DbUtility.DeleteTagAsync(SelectedItem as Tag);
             await LoadAsync(Project);
         }
     }
 
-    public abstract class ListPanelBase<T> : UserControlBase, INotifyPropertyChanged where T : ClassifyItemModelBase
+    public abstract class ListPanelBase : UserControlBase, INotifyPropertyChanged
     {
-        private ObservableCollection<T> items;
-        public ObservableCollection<T> Items
+        private ObservableCollection<ClassifyItemModelBase> items;
+        public ObservableCollection<ClassifyItemModelBase> Items
         {
             get => items;
             protected set
@@ -74,8 +74,8 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(Items));
             }
         }
-        private T selectedItem;
-        public T SelectedItem
+        private ClassifyItemModelBase selectedItem;
+        public ClassifyItemModelBase SelectedItem
         {
             get => selectedItem;
             set
@@ -83,7 +83,7 @@ namespace ClassifyFiles.UI.Panel
                 var oldValue = selectedItem;
                 selectedItem = value;
                 this.Notify(nameof(SelectedItem));
-                SelectedItemChanged?.Invoke(this, new SelectedItemChanged<T>(oldValue, value));
+                SelectedItemChanged?.Invoke(this, new SelectedItemChanged(oldValue, value));
             }
         }
         public Project Project { get; protected set; }
@@ -136,18 +136,18 @@ namespace ClassifyFiles.UI.Panel
 
         public abstract Task RenameAsync(string newName);
         public abstract Task DeleteAsync();
-        public event EventHandler<SelectedItemChanged<T>> SelectedItemChanged;
+        public event EventHandler<SelectedItemChanged> SelectedItemChanged;
     }
 
-    public class SelectedItemChanged<T> : EventArgs
+    public class SelectedItemChanged : EventArgs
     {
-        public SelectedItemChanged(T oldValue, T newValue)
+        public SelectedItemChanged(ClassifyItemModelBase oldValue, ClassifyItemModelBase newValue)
         {
             OldValue = oldValue;
             NewValue = newValue;
         }
 
-        public T OldValue { get; set; }
-        public T NewValue { get; set; }
+        public ClassifyItemModelBase OldValue { get; set; }
+        public ClassifyItemModelBase NewValue { get; set; }
     }
 }

@@ -27,22 +27,20 @@ using ClassifyFiles.UI.Model;
 
 namespace ClassifyFiles.UI.Panel
 {
-    public abstract class FilePropsBrowserPanelBase : ProjectPanelBase<Class>
+  
+    public partial class FileBrowserPanel : ProjectPanelBase
     {
 
-    }
-    public partial class FilePropsBrowserPanel : FilePropsBrowserPanelBase
-    {
-
-        public FilePropsBrowserPanel()
+        public FileBrowserPanel()
         {
             InitializeComponent();
         }
 
-        public override ListPanelBase<Class> GetItemsPanel()
+        public override ListPanelBase GetItemsPanel()
         {
-            return classes;
+            return leftPanel;
         }
+        ListPanelBase leftPanel;
 
         private async void WindowBase_Loaded(object sender, RoutedEventArgs e)
         {
@@ -50,8 +48,22 @@ namespace ClassifyFiles.UI.Panel
 
         public override async Task LoadAsync(Project project)
         {
+            switch (project.Type)
+            {
+                case Project.ClassifyType.FileProps:
+                    classPanel.Visibility = Visibility.Visible;
+                    tagPanel.Visibility = Visibility.Collapsed;
+                    leftPanel = classPanel;
+                    break;
+                case Project.ClassifyType.Tag:
+                    classPanel.Visibility = Visibility.Visible;
+                    tagPanel.Visibility = Visibility.Collapsed;
+                    leftPanel = tagPanel;
+                    break;
+            }
             await base.LoadAsync(project);
             filesViewer.Project = project;
+            
         }
         private ProgressDialog GetProgress()
         {
@@ -82,9 +94,9 @@ namespace ClassifyFiles.UI.Panel
         }
 
 
-        private async void classes_SelectedItemChanged_1(object sender, SelectedItemChanged<Class> e)
+        private async void classes_SelectedItemChanged_1(object sender, SelectedItemChanged e)
         {
-            var files = await DbUtility.GetFilesAsync(SelectedItem);
+            var files = await DbUtility.GetFilesAsync(GetItemsPanel().SelectedItem);
             filesViewer.SetFiles(files);
 
             filesViewer.GeneratePaggingButtons();
@@ -105,9 +117,9 @@ namespace ClassifyFiles.UI.Panel
                         });
                     });
                     await DbUtility.UpdateFilesAsync(classFiles);
-                    if (classes.SelectedItem != null && classFiles.ContainsKey(classes.SelectedItem))
+                    if (classPanel.SelectedItem != null && classFiles.ContainsKey(classPanel.SelectedItem))
                     {
-                        filesViewer.SetFiles(classFiles[classes.SelectedItem]);
+                        filesViewer.SetFiles(classFiles[classPanel.SelectedItem]);
                     }
                     filesViewer.GeneratePaggingButtons();
                 }

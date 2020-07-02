@@ -1,12 +1,12 @@
-﻿<panel:FilePropsBrowserPanelBase
+﻿<local:ProjectPanelBase
     xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
-    x:Class="ClassifyFiles.UI.Panel.FilePropsBrowserPanel"
+    x:Class="ClassifyFiles.UI.Panel.FileBrowserPanel"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ClassifyFiles.UI"
+        xmlns:local="clr-namespace:ClassifyFiles.UI.Panel"
     xmlns:data="clr-namespace:ClassifyFiles.Data;assembly=ClassifyFiles.Core"
     xmlns:m="http://schemas.modernwpf.com/2019"
      xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
@@ -41,16 +41,15 @@
                       VerticalAlignment="Bottom" Text="{Binding Project.RootPath}"/>
                 </m:SimpleStackPanel>
 
-                <panel:ClassesPanel x:Name="classes" Grid.Row="99" SelectedItemChanged="classes_SelectedItemChanged_1"/>
+                <panel:ClassesPanel x:Name="classPanel" Grid.Row="99" SelectedItemChanged="classes_SelectedItemChanged_1"/>
+                <panel:TagsPanel x:Name="tagPanel" Grid.Row="99" SelectedItemChanged="classes_SelectedItemChanged_1"/>
             </Grid>
 
         </Expander>
 
 
 
-        <panel:FilesViewer ViewTypeChanged="filesViewer_ViewTypeChanged"  x:Name="filesViewer" Grid.Column="2" RefreshButtonClick="FilesViewer_RefreshButtonClick">
-            
-        </panel:FilesViewer>     
+        <panel:FilesViewer ViewTypeChanged="filesViewer_ViewTypeChanged"  x:Name="filesViewer" Grid.Column="2" RefreshButtonClick="FilesViewer_RefreshButtonClick"/>
         <m:CommandBar  Grid.Row="2" Grid.ColumnSpan="999" DefaultLabelPosition="Right">
             <m:AppBarButton x:Name="btnLocateByDir" Icon="OpenLocal" Label="根据文件夹定位" >
                 <m:FlyoutService.Flyout>
@@ -64,4 +63,4 @@
            
         </m:CommandBar>
     </Grid>
-</panel:FilePropsBrowserPanelBase>
+</local:ProjectPanelBase>

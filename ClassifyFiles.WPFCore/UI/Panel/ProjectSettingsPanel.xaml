@@ -1,4 +1,4 @@
-﻿<panel:ProjectSettingPanelBase
+﻿<local:ProjectPanelBase
     xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
     x:Class="ClassifyFiles.UI.Panel.ProjectSettingsPanel"
@@ -6,7 +6,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ClassifyFiles.UI"
+        xmlns:local="clr-namespace:ClassifyFiles.UI.Panel"
     xmlns:util="clr-namespace:ClassifyFiles.Util;assembly=ClassifyFiles.Core"
     xmlns:m="http://schemas.modernwpf.com/2019"
      xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
@@ -99,4 +99,4 @@
         </m:SimpleStackPanel>
 
     </ScrollViewer>
-</panel:ProjectSettingPanelBase>
+</local:ProjectPanelBase>

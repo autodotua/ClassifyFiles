@@ -31,11 +31,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace ClassifyFiles.UI.Panel
 {
-    public abstract class ProjectSettingPanelBase : ProjectPanelBase<ClassifyItemModelBase>
-    {
-
-    }
-    public partial class ProjectSettingsPanel : ProjectSettingPanelBase
+      public partial class ProjectSettingsPanel : ProjectPanelBase
     {
         public string Splitter { get; set; } = "-";
         public ProjectSettingsPanel()
@@ -202,7 +198,7 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
-        public override ListPanelBase<ClassifyItemModelBase> GetItemsPanel()
+        public override ListPanelBase GetItemsPanel()
         {
             return null;
         }

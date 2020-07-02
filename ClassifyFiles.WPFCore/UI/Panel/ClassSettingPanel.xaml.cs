@@ -24,18 +24,14 @@ using System.Diagnostics;
 
 namespace ClassifyFiles.UI.Panel
 {
-    public abstract class ClassesSettingPanelBase : ProjectPanelBase<Class>
-    {
-
-    }
-    public partial class ClassSettingPanel : ClassesSettingPanelBase
+    public partial class ClassSettingPanel : ProjectPanelBase
     {
         public ClassSettingPanel()
         {
             InitializeComponent();
         }
 
-        public override ListPanelBase<Class> GetItemsPanel()
+        public override ListPanelBase GetItemsPanel()
         {
             return classes;
         }
@@ -72,7 +68,7 @@ namespace ClassifyFiles.UI.Panel
         public Task SaveClassAsync()
         {
 
-            return SaveClassAsync(classes.SelectedItem);
+            return SaveClassAsync(classes.SelectedItem as Class);
 
         }
         public async Task SaveClassAsync(Class c)
@@ -115,8 +111,8 @@ namespace ClassifyFiles.UI.Panel
         }
 
 
-     
-        private async void classes_SelectedItemChanged_1(object sender, SelectedItemChanged<Class> e)
+
+        private async void classes_SelectedItemChanged_1(object sender, SelectedItemChanged e)
         {
             var old = e.OldValue as Class;
             if (old != null)
@@ -129,7 +125,7 @@ namespace ClassifyFiles.UI.Panel
             }
             else
                 MatchConditions = new ObservableCollection<MatchCondition>
-                    (classes.SelectedItem.MatchConditions.OrderBy(p => p.Index));
+                    ((classes.SelectedItem as Class).MatchConditions.OrderBy(p => p.Index));
 
         }
     }
