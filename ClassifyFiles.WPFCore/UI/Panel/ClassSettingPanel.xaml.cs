@@ -91,12 +91,12 @@ namespace ClassifyFiles.UI.Panel
 
         private async void AddClassInButton_Click(object sender, RoutedEventArgs e)
         {
-            await classes.AddClass();
+            await classes.AddAsync();
         }
 
         private async void DeleteClassButton_Click(object sender, RoutedEventArgs e)
         {
-            await classes.DeleteClass();
+            await classes.DeleteSelectedAsync();
         }
 
         private async void RenameClassButton_Click(object sender, RoutedEventArgs e)

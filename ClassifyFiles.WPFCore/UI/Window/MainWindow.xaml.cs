@@ -18,6 +18,8 @@ using ModernWpf.Controls;
 using ModernWpf;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using FzLib.Basic;
+using System.ComponentModel;
+using static ClassifyFiles.Data.Project;
 
 namespace ClassifyFiles.UI
 {
@@ -42,11 +44,37 @@ namespace ClassifyFiles.UI
             get => selectedProject;
             set
             {
+                if(selectedProject!=null)
+                {
+                    selectedProject.PropertyChanged -= Project_PropertyChanged;
+                }
                 selectedProject = value;
                 this.Notify(nameof(SelectedProject));
+                if (value != null)
+                {
+                    value.PropertyChanged += Project_PropertyChanged;
+                }
+                btnModeClasses.Label = SelectedProject.Type switch
+                {
+                    ClassifyType.FileProps => "分类",
+                    ClassifyType.Tag => "标签"
+                };
                 LoadProjectAsync();
             }
         }
+      
+        private void Project_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName==nameof(Project.Type))
+            {
+                btnModeClasses.Label = SelectedProject.Type switch
+                {
+                    ClassifyType.FileProps => "分类",
+                    ClassifyType.Tag => "标签"
+                };
+            }
+        }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -144,7 +172,11 @@ namespace ClassifyFiles.UI
                     MainPanel = new FileBrowserPanel();
                     break;
                 case nameof(btnModeClasses):
-                    MainPanel = new ClassSettingPanel();
+                    MainPanel = SelectedProject.Type switch
+                    {
+                        ClassifyType.FileProps => new ClassSettingPanel(),
+                        ClassifyType.Tag => new TagSettingPanel()
+                    };
                     break;
                 case nameof(btnModeProjectSettings):
                     MainPanel = new ProjectSettingsPanel();

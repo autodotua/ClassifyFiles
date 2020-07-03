@@ -35,6 +35,9 @@
     <Page Update="UI\Dialog\MessageDialog.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="UI\Panel\TagSettingPanel.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="UI\Panel\ClassSettingPanel.xaml">
       <SubType>Designer</SubType>
     </Page>

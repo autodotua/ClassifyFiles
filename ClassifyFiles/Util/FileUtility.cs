@@ -27,105 +27,113 @@ namespace ClassifyFiles.Util
         "tiff",
         "bmp",
         }.AsReadOnly();
-        public async static Task< List<File>> GetFilesAsync(DI dir, ClassifyItemModelBase item, bool includeThumbnails, Action<double, Data.File> callback = null)
-        {
-            if (item is Class c)
-            {
-                return (await GetFilesAsync(dir, new List<Class>() { c }, includeThumbnails, callback))[c];
-            }
-            else if(item is Tag t)
-            {
-                return (await GetFilesAsync(dir, new List<Tag>() { t }, includeThumbnails, callback))[t];
 
-            }
-            throw new Exception();
-        }
-
-        public async static Task<Dictionary<ClassifyItemModelBase, List<File>>> GetFilesAsync(DI dir, IEnumerable<ClassifyItemModelBase> items, bool includeThumbnails, Action<double, Data.File> callback = null)
+        public static async Task<IReadOnlyList<File>> AddFilesToTag(IEnumerable<string> paths, Tag tag, DI root, Action<double, Data.File> callback = null)
         {
-            if(!items.Any())
+            List<File> files = new List<File>();
+            await Task.Run(() =>
             {
-                return null;
-            }
-            if (items.First() is Class)
-            {
-                return await GetFilesOfClassesAsync(dir, items.Cast<Class>(), includeThumbnails, callback);
-            }
-            else if (items.First() is Tag)
-            {
-                throw new NotImplementedException();
-            }
-            throw new NotImplementedException();
-        }
-        private async static Task<Dictionary<ClassifyItemModelBase, List<File>>> GetFilesOfClassesAsync(DI dir, IEnumerable<Class> classes, bool includeThumbnails, Action<double,Data.File> callback = null)
-        {
-            Dictionary<ClassifyItemModelBase, List<File>> classFiles = new Dictionary<ClassifyItemModelBase, List<File>>();
-            await Task.Run(async () =>
-            {
-                foreach (var c in classes)
-                {
-                    classFiles.Add(c, new List<File>());
-                }
-                var files = dir.EnumerateFiles("*", SO.AllDirectories).ToList();
+                paths = paths.ToArray();
                 int index = 0;
-                int count = files.Count;
-                foreach (var file in files)
+                int count = (paths as string[]).Length;
+                foreach (var path in paths as string[])
                 {
-                    File f=null;
-                    byte[] thumb = null;
-                    foreach (var c in classes)
+                    File f = new File(new FI(path), root);
+                    if (tag.Files.Any(p => p.Equals(f)))
                     {
-                        if (IsMatched(file, c))
-                        {
-                            f = new File(file, dir, c);
-                            if (includeThumbnails)
-                            {
-                                if (thumb == null)
-                                {
-                                    await GenerateThumbnailAsync(f, dir);
-                                    thumb = f.Thumbnail;
-                                }
-                                else
-                                {
-                                    f.Thumbnail = thumb;
-                                }
-                            }
-                            classFiles[c].Add(f);
-                        }
+                        continue;
                     }
-                    callback?.Invoke((++index * 1.0) / count,f);
+                    files.Add(f);
+                    TryGenerateThumbnail(f, root);
+                    tag.Files.Add(f);
+                    callback?.Invoke((++index * 1.0) / count, f);
                 }
             });
+            return files.AsReadOnly();
+        }
+        public async static Task<List<File>> GetFilesOfClassesAsync(DI dir, Class c, bool includeThumbnails, Action<double, Data.File> callback = null)
+        {
+            return (await GetFilesOfClassesAsync(dir, new List<Class>() { c }, includeThumbnails, callback))[c];
+        }
+        public async static Task<List<File>> GetAllFiles(DI dir, bool includeThumbnails, Action<double, File> callback = null)
+        {
+            Class c = new Class();
+            var cFiles = await GetFilesOfClassesAsync(dir, new Class[] { c }, includeThumbnails, callback);
+            return cFiles[c];
+        }
+        public async static Task<Dictionary<Class, List<File>>> GetFilesOfClassesAsync(DI dir, IEnumerable<Class> classes, bool includeThumbnails, Action<double, File> callback = null)
+        {
+            Dictionary<Class, List<File>> classFiles = new Dictionary<Class, List<File>>();
+            await Task.Run(() =>
+           {
+               foreach (var c in classes)
+               {
+                   classFiles.Add(c, new List<File>());
+               }
+               var files = dir.EnumerateFiles("*", SO.AllDirectories).ToList();
+               int index = 0;
+               int count = files.Count;
+               foreach (var file in files)
+               {
+                   File f = null;
+                   byte[] thumb = null;
+                   foreach (var c in classes)
+                   {
+                       if (c.MatchConditions == null || IsMatched(file, c))
+                       {
+                           f = new File(file, dir, c);
+                           if (includeThumbnails)
+                           {
+                               if (thumb == null)
+                               {
+                                   TryGenerateThumbnail(f, dir);
+                                   thumb = f.Thumbnail;
+                               }
+                               else
+                               {
+                                   f.Thumbnail = thumb;
+                               }
+                           }
+                           classFiles[c].Add(f);
+                       }
+                   }
+                   callback?.Invoke((++index * 1.0) / count, f);
+               }
+           });
             return classFiles;
         }
-
-        public static Task GenerateThumbnailAsync(File file, DI dir)
+       
+        public static async Task<bool> TryGenerateThumbnailAsync(File file, DI dir)
         {
-            return Task.Run(() =>
+            bool result=false;
+            await Task.Run(() =>result= TryGenerateThumbnail(file, dir));
+            return result;
+        }
+        public static bool TryGenerateThumbnail(File file, DI dir)
+        {
+            string path = file.GetAbsolutePath(dir.FullName);
+            if (imgExtensions.Contains(System.IO.Path.GetExtension(path).ToLower().Trim('.')))
             {
-                string path = file.GetAbsolutePath(dir.FullName);
-                if (imgExtensions.Contains(System.IO.Path.GetExtension(path).ToLower().Trim('.')))
+                try
                 {
-                    try
-                    {
-                        using Image image = Image.FromFile(path);
+                    using Image image = Image.FromFile(path);
 
-                        using Image thumb = image.GetThumbnailImage(240, (int)(240.0 / image.Width * image.Height), () => false, IntPtr.Zero);
-                        //string guid = Guid.NewGuid().ToString();
-                        //file.ImageID = guid;
-                        //string thumbPath = System.IO.Path.Combine(dir, guid + ".jpg");
-                        //thumb.Save(thumbPath, System.Drawing.Imaging.ImageFormat.Jpeg);
-                        using var ms = new System.IO.MemoryStream();
-                        thumb.Save(ms, ImageFormat.Jpeg);
-                        file.Thumbnail = ms.ToArray();
-                    }
-                    catch (Exception ex)
-                    {
-
-                    }
+                    using Image thumb = image.GetThumbnailImage(240, (int)(240.0 / image.Width * image.Height), () => false, IntPtr.Zero);
+                    //string guid = Guid.NewGuid().ToString();
+                    //file.ImageID = guid;
+                    //string thumbPath = System.IO.Path.Combine(dir, guid + ".jpg");
+                    //thumb.Save(thumbPath, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    using var ms = new System.IO.MemoryStream();
+                    thumb.Save(ms, ImageFormat.Jpeg);
+                    file.Thumbnail = ms.ToArray();
+                    return true;
                 }
-
-            });
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
+            return false;
 
         }
         private static bool IsMatched(FI file, Class c)
@@ -180,7 +188,7 @@ namespace ClassifyFiles.Util
             {
                 MatchType.InFileName => file.Name.Contains(value),
                 MatchType.InDirName => file.DirectoryName.Contains(value),
-                MatchType.WithExtension => file.Extension.ToLower().Replace(".","")==value.ToLower(),
+                MatchType.WithExtension => file.Extension.ToLower().Replace(".", "") == value.ToLower(),
                 MatchType.InPath => file.FullName.Contains(value),
                 MatchType.InFileNameWithRegex => Regex.IsMatch(file.Name, value),
                 MatchType.InDirNameWithRegex => Regex.IsMatch(file.DirectoryName, value),

@@ -128,8 +128,36 @@ namespace ClassifyFiles.Util
         }
         public static Task<List<File>> GetFilesAsync(ClassifyItemModelBase c)
         {
+            if(c is Class)
+            {
+                return GetFilesAsync(c as Class);
+            }
+            else if(c is Tag)
+            {
+                return GetFilesAsync(c as Tag);
+            }
+            throw new NotImplementedException();
+        }
+        public static Task<List<File>> GetFilesAsync(Tag t)
+        {
+            var files = Db.Files.Where(p => p.Tag == t);
+            return files.ToListAsync();
+        }
+        public static Task<List<File>> GetFilesAsync(Class c)
+        {
             var files = Db.Files.Where(p => p.Class == c);
             return files.ToListAsync();
+        }
+
+        public static async Task<IReadOnlyList<Tag>> GetTagsOfFile(Project project, string dir, string name)
+        {
+            var files2 = Db.Files
+                .Where(p => p.Tag != null && p.Tag.Project == project).ToList();
+            var files = Db.Files
+                .Where(p => p.Tag != null && p.Tag.Project == project)
+                .Where(p => p.Dir == dir && p.Name == name);
+            var result = (await files.Select(p => p.Tag).ToListAsync()).AsReadOnly(); ;
+            return result;
         }
 
         public async static Task ExportProject(string path, int projectID)

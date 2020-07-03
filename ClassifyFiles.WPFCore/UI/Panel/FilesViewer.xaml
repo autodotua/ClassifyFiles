@@ -13,6 +13,7 @@
     <UserControl.Resources>
         <ui:NotFirst2VisibilityConverter x:Key="i2v"/>
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
+        <ui:IsNotNull2VisibilityConverter x:Key="nn2v"/>
     </UserControl.Resources>
     <Grid>
         <Grid Margin="8,4,4,4" Grid.Column="2" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
@@ -36,13 +37,6 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <m:AppBarButton  IsCompact="False"  Label="刷新全部" Click="RefreshAllButton_Click">
-                    <m:AppBarButton.Icon>
-                        <m:FontIcon Glyph="&#xE72C;&#xEA37;"/>
-
-                    </m:AppBarButton.Icon>
-                </m:AppBarButton>
-                <m:AppBarButton Grid.Column="1"  Icon="Refresh"  Label="刷新当前" Click="RefreshButton_Click"/>
                 <m:AppBarToggleButton Grid.Column="3"  Label="列表模式"  Click="ViewTypeButton_Click" Tag="1" IsChecked="True">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon
@@ -115,10 +109,17 @@
                 <ListView   ItemsSource="{Binding Files}" x:Name="lvwFiles" 
                       PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"  ContextMenu="{StaticResource menu}"
                       IsEnabled="{Binding ElementName=classes, Path=SelectedItem, Converter={StaticResource nn2b}}">
+                    <ListView.ItemContainerStyle >
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <Grid Margin="0,4,0,4">
+                            <Grid Margin="0,4,24,4"  >
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="16"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="16"/>
                                     <ColumnDefinition Width="*"/>
@@ -131,6 +132,36 @@
                                 <component:FileIcon File="{Binding .}" Grid.RowSpan="99"/>
                                 <TextBlock Text="{Binding Name}" Grid.Column="2" Grid.Row="0"/>
                                 <TextBlock Text="{Binding Dir}" Grid.Column="2" Grid.Row="2" Opacity="0.5"/>
+                                   <!--横向的标签列表-->
+                                <ListBox Grid.Column="4" Background="Transparent" 
+                                         BorderBrush="Transparent" Grid.RowSpan="99" ItemsSource="{Binding Tags}" 
+                                         HorizontalAlignment="Right" VerticalAlignment="Center"
+                                         VerticalContentAlignment="Center" Visibility="{Binding Tags, Converter={StaticResource nn2v}}">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"></StackPanel>
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    <ListBox.ItemContainerStyle>
+
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="Focusable" Value="false"/>
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="ContentTemplate">
+                                                <Setter.Value>
+                                                    <DataTemplate>
+                                                        <Border Padding="8,4" CornerRadius="2" Background="{DynamicResource SystemAccentColorDark1Brush}">
+                                                            <Grid >
+                                                                <TextBlock Text="{Binding Name}"/>
+                                                            </Grid>
+                                                        </Border>                                                  
+                                                    </DataTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <EventSetter Event="MouseDoubleClick" Handler="ListBoxItem_MouseDoubleClick"/>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                </ListBox>
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>

@@ -41,16 +41,25 @@
                       VerticalAlignment="Bottom" Text="{Binding Project.RootPath}"/>
                 </m:SimpleStackPanel>
 
-                <panel:ClassesPanel x:Name="classPanel" Grid.Row="99" SelectedItemChanged="classes_SelectedItemChanged_1"/>
-                <panel:TagsPanel x:Name="tagPanel" Grid.Row="99" SelectedItemChanged="classes_SelectedItemChanged_1"/>
+                <panel:ClassesPanel x:Name="classPanel" Visibility="Collapsed" Grid.Row="99" SelectedItemChanged="classes_SelectedItemChanged_1"/>
+                <panel:TagsPanel x:Name="tagPanel" Visibility="Collapsed" Grid.Row="99" SelectedItemChanged="classes_SelectedItemChanged_1"/>
             </Grid>
 
         </Expander>
 
 
 
-        <panel:FilesViewer ViewTypeChanged="filesViewer_ViewTypeChanged"  x:Name="filesViewer" Grid.Column="2" RefreshButtonClick="FilesViewer_RefreshButtonClick"/>
+        <panel:FilesViewer ViewTypeChanged="filesViewer_ViewTypeChanged" 
+                           x:Name="filesViewer" Grid.Column="2"  ClickTag="filesViewer_ClickTag"/>
         <m:CommandBar  Grid.Row="2" Grid.ColumnSpan="999" DefaultLabelPosition="Right">
+            <m:AppBarButton  x:Name="btnAddFile" Visibility="Collapsed" Grid.Column="1"  Icon="Add"  Label="添加文件" Click="btnAddFile_Click"/>
+            <m:AppBarButton x:Name="btnRefreshAll" Visibility="Collapsed" IsCompact="False"  Label="刷新全部" Click="RefreshAllButton_Click">
+                <m:AppBarButton.Icon>
+                    <m:FontIcon Glyph="&#xE72C;&#xEA37;"/>
+
+                </m:AppBarButton.Icon>
+            </m:AppBarButton>
+            <m:AppBarButton  x:Name="btnRefreshCurrent" Visibility="Collapsed" Grid.Column="1"  Icon="Refresh"  Label="刷新当前" Click="RefreshButton_Click"/>
             <m:AppBarButton x:Name="btnLocateByDir" Icon="OpenLocal" Label="根据文件夹定位" >
                 <m:FlyoutService.Flyout>
                     <m:Flyout x:Name="flyoutJumpToDir" >

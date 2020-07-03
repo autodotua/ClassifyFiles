@@ -24,7 +24,7 @@ namespace ClassifyFiles.Data
         public Project Project { get; set; }
         [Required]
         public int ProjectID { get; set; }
-        public List<File> Files { get; set; }
+        public List<File> Files { get; set; } = new List<File>();
 
     }
 

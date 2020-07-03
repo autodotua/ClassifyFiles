@@ -35,6 +35,11 @@ namespace ClassifyFiles.UI.Panel
             await DbUtility.DeleteClassAsync(SelectedItem  as Class);
             await LoadAsync(Project);
         }
+
+        protected async override Task AddItemAsync()
+        {
+            await DbUtility.AddClassAsync(Project);
+        }
     }
 
     public class TagsPanel : ListPanelBase
@@ -60,6 +65,11 @@ namespace ClassifyFiles.UI.Panel
             await DbUtility.DeleteTagAsync(SelectedItem as Tag);
             await LoadAsync(Project);
         }
+
+        protected async override Task AddItemAsync()
+        {
+            await DbUtility.AddTagAsync(Project);
+        }
     }
 
     public abstract class ListPanelBase : UserControlBase, INotifyPropertyChanged
@@ -83,8 +93,10 @@ namespace ClassifyFiles.UI.Panel
                 var oldValue = selectedItem;
                 selectedItem = value;
                 this.Notify(nameof(SelectedItem));
-                SelectedItemChanged?.Invoke(this, new SelectedItemChanged(oldValue, value));
-            }
+                if (value != null)
+                {
+                    SelectedItemChanged?.Invoke(this, new SelectedItemChanged(oldValue, value));
+                }       }
         }
         public Project Project { get; protected set; }
         public abstract Task LoadAsync(Project project);
@@ -100,13 +112,14 @@ namespace ClassifyFiles.UI.Panel
             Content = list;
         }
 
-        public async Task AddClass()
+        public async Task AddAsync()
         {
-            await DbUtility.AddClassAsync(Project);
+            await AddItemAsync();
             await LoadAsync(Project);
         }
+        protected abstract Task AddItemAsync();
 
-        public async Task DeleteClass()
+        public async Task DeleteSelectedAsync()
         {
             if (SelectedItem == null)
             {
@@ -117,6 +130,7 @@ namespace ClassifyFiles.UI.Panel
                 await DeleteAsync();
             }
         }
+
 
         public async Task RenameButton()
         {

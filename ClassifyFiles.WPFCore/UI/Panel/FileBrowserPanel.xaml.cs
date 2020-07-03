@@ -24,10 +24,11 @@ using System.Diagnostics;
 using DImg = System.Drawing.Image;
 using ModernWpf.Controls;
 using ClassifyFiles.UI.Model;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace ClassifyFiles.UI.Panel
 {
-  
+
     public partial class FileBrowserPanel : ProjectPanelBase
     {
 
@@ -52,18 +53,19 @@ namespace ClassifyFiles.UI.Panel
             {
                 case Project.ClassifyType.FileProps:
                     classPanel.Visibility = Visibility.Visible;
-                    tagPanel.Visibility = Visibility.Collapsed;
+                    btnRefreshAll.Visibility = Visibility.Visible;
+                    btnRefreshCurrent.Visibility = Visibility.Visible;
                     leftPanel = classPanel;
                     break;
                 case Project.ClassifyType.Tag:
-                    classPanel.Visibility = Visibility.Visible;
-                    tagPanel.Visibility = Visibility.Collapsed;
+                    tagPanel.Visibility = Visibility.Visible;
+                    btnAddFile.Visibility = Visibility.Visible;
                     leftPanel = tagPanel;
                     break;
             }
-            await base.LoadAsync(project);
             filesViewer.Project = project;
-            
+            await base.LoadAsync(project);
+
         }
         private ProgressDialog GetProgress()
         {
@@ -102,64 +104,6 @@ namespace ClassifyFiles.UI.Panel
             filesViewer.GeneratePaggingButtons();
         }
 
-        private async void FilesViewer_RefreshButtonClick(object sender, RefreshButtonClickEventArgs e)
-        {
-            if (e.RefreshAll)
-            {
-                GetProgress().Show(true);
-                try
-                {
-                    var classFiles = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetItemsPanel().Items, true, (p, f) =>
-                    {
-                        Dispatcher.Invoke(() =>
-                        {
-                            GetProgress().Message = p.ToString("P") + (f == null ? "" : $"（{f.Name}）");
-                        });
-                    });
-                    await DbUtility.UpdateFilesAsync(classFiles);
-                    if (classPanel.SelectedItem != null && classFiles.ContainsKey(classPanel.SelectedItem))
-                    {
-                        filesViewer.SetFiles(classFiles[classPanel.SelectedItem]);
-                    }
-                    filesViewer.GeneratePaggingButtons();
-                }
-                catch (Exception ex)
-                {
-                    await new ErrorDialog().ShowAsync(ex, "刷新错误");
-                }
-                finally
-                {
-
-                    GetProgress().Close();
-                }
-            }
-            else
-            {
-                GetProgress().Show(true);
-                try
-                {
-                    var files = await FileUtility.GetFilesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetItemsPanel().SelectedItem, true, (p, f) =>
-                    {
-                        Dispatcher.Invoke(() =>
-                        {
-                            GetProgress().Message = p.ToString("P") + (f == null ? "" : $"（{f.Name}）");
-                        });
-                    });
-                    await DbUtility.UpdateFilesAsync(GetItemsPanel().SelectedItem, files);
-
-                    filesViewer.SetFiles(files);
-                    filesViewer.GeneratePaggingButtons();
-                }
-                catch (Exception ex)
-                {
-                    await new ErrorDialog().ShowAsync(ex, "刷新错误");
-                }
-                finally
-                {
-                    GetProgress().Close();
-                }
-            }
-        }
 
         private void JumpToDirComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -176,6 +120,96 @@ namespace ClassifyFiles.UI.Panel
         private void filesViewer_ViewTypeChanged(object sender, EventArgs e)
         {
             btnLocateByDir.IsEnabled = filesViewer.CurrentViewType != 3;
+        }
+
+        private async void RefreshAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            GetProgress().Show(true);
+            try
+            {
+                var classFiles = await FileUtility.GetFilesOfClassesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetItemsPanel().Items.Cast<Class>(), true, (p, f) =>
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        GetProgress().Message = p.ToString("P") + (f == null ? "" : $"（{f.Name}）");
+                    });
+                });
+                await DbUtility.UpdateFilesAsync(classFiles);
+                if (classPanel.SelectedItem != null && classFiles.ContainsKey(classPanel.SelectedItem as Class))
+                {
+                    filesViewer.SetFiles(classFiles[classPanel.SelectedItem as Class]);
+                }
+                filesViewer.GeneratePaggingButtons();
+            }
+            catch (Exception ex)
+            {
+                await new ErrorDialog().ShowAsync(ex, "刷新错误");
+            }
+            finally
+            {
+
+                GetProgress().Close();
+            }
+        }
+
+        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            GetProgress().Show(true);
+            try
+            {
+                var files = await FileUtility.GetFilesOfClassesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetItemsPanel().SelectedItem as Class, true, (p, f) =>
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        GetProgress().Message = p.ToString("P") + (f == null ? "" : $"（{f.Name}）");
+                    });
+                });
+                await DbUtility.UpdateFilesAsync(GetItemsPanel().SelectedItem, files);
+
+                filesViewer.SetFiles(files);
+                filesViewer.GeneratePaggingButtons();
+            }
+            catch (Exception ex)
+            {
+                await new ErrorDialog().ShowAsync(ex, "刷新错误");
+            }
+            finally
+            {
+                GetProgress().Close();
+            }
+
+        }
+
+        private async void btnAddFile_Click(object sender, RoutedEventArgs e)
+        {
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog()
+            {
+                Multiselect = true,
+                DefaultDirectory = Project.RootPath
+            };
+            if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
+            {
+                GetProgress().Show(true);
+                Tag tag = tagPanel.SelectedItem as Tag;
+                var files = await FileUtility.AddFilesToTag(dialog.FileNames, tag, new System.IO.DirectoryInfo(base.Project.RootPath), (p, f) =>
+                  {
+                      Dispatcher.Invoke(() =>
+                      {
+                          GetProgress().Message = p.ToString("P") + (f == null ? "" : $"（{f.Name}）");
+                      });
+                  });
+                await DbUtility.SaveTagAsync(tag);
+                filesViewer.AddFiles(files);
+                GetProgress().Close();
+            }
+        }
+
+        private void filesViewer_ClickTag(object sender, ClickTagEventArgs e)
+        {
+            if(e.Tag!= tagPanel.SelectedItem)
+            {
+                tagPanel.SelectedItem= e.Tag;
+            }
         }
     }
 

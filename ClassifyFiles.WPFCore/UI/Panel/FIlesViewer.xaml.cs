@@ -135,23 +135,21 @@ namespace ClassifyFiles.UI.Panel
         public const int pagingItemsCount = 120;
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public event EventHandler<RefreshButtonClickEventArgs> RefreshButtonClick;
 
-        private async void RefreshAllButton_Click(object sender, RoutedEventArgs e)
+        public void SetFiles(IEnumerable<File> files,bool tags=true)
         {
-            RefreshButtonClick?.Invoke(this, new RefreshButtonClickEventArgs(true));
-        }
-        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
-        {
-            RefreshButtonClick?.Invoke(this, new RefreshButtonClickEventArgs(false));
-
-        }
-
-        public void SetFiles(IEnumerable<File> files)
-        {
-            IEnumerable<FileWithIcon> filesWithIcon = files.Select(p => new FileWithIcon(p));
+            IEnumerable<FileWithIcon> filesWithIcon = files.Select(p => new FileWithIcon(p,tags,Project));
             var orderedFiles = filesWithIcon.OrderBy(p => p.Dir).ThenBy(p => p.Name);
             Files = new ObservableCollection<FileWithIcon>(orderedFiles);
+
+        }
+        public void AddFiles(IEnumerable<File> files, bool tags = true)
+        {
+            IEnumerable<FileWithIcon> filesWithIcon = files.Select(p => new FileWithIcon(p, tags, Project));
+            foreach (var file in filesWithIcon)
+            {
+                Files.Add(file);
+            }
 
         }
 
@@ -328,15 +326,22 @@ namespace ClassifyFiles.UI.Panel
                 return;
             }
         }
+
+        private void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            Tag tag = (e.Source as ListBoxItem).Content as Tag;
+            ClickTag?.Invoke(this, new ClickTagEventArgs(tag));
+        }
+        public event EventHandler<ClickTagEventArgs> ClickTag;
     }
 
-    public class RefreshButtonClickEventArgs : EventArgs
+    public class ClickTagEventArgs : EventArgs
     {
-        public RefreshButtonClickEventArgs(bool refreshAll)
+        public ClickTagEventArgs(Tag tag)
         {
-            RefreshAll = refreshAll;
+            Tag = tag;
         }
 
-        public bool RefreshAll { get; private set; }
+        public Tag Tag { get; }
     }
 }
