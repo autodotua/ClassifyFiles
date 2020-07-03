@@ -114,6 +114,7 @@ namespace ClassifyFiles.UI.Model
 
         public UIFile(File file, bool tags = false, Project project = null)
         {
+            ID = file.ID;
             Name = file.Name;
             Dir = file.Dir;
             SubFiles = file.SubFiles.Select(p => new UIFile(p)).Cast<File>().ToList();
@@ -147,10 +148,12 @@ namespace ClassifyFiles.UI.Model
 
         public async Task LoadAsync(Project project)
         {
-            Tags = new ObservableCollection<Tag>(await DbUtility.GetTagsOfFile(project, Dir, Name));
+            IEnumerable<Class> classes = await DbUtility.GetClassesOfFileAsync(ID);
+            classes = classes.OrderBy(p => p.Name);
+            Classes = new ObservableCollection<Class>(classes);
         }
 
-        public ObservableCollection<Tag> Tags { get; private set; } 
+        public ObservableCollection<Class> Classes { get; private set; } 
 
     }
 }

@@ -19,7 +19,7 @@ namespace ClassifyFiles.UI.Panel
             Project = project;
             //var (treeClasses, tile) = await DbUtility.GetTreeAndTileClassesAsync(Project);
             var treeClasses = await DbUtility.GetClassesAsync(Project);
-            Items = new ObservableCollection<ClassifyItemModelBase>(treeClasses);
+            Items = new ObservableCollection<Class>(treeClasses);
 
             Class first = Items.FirstOrDefault() as Class;
             SelectedItem = first;
@@ -42,40 +42,11 @@ namespace ClassifyFiles.UI.Panel
         }
     }
 
-    public class TagsPanel : ListPanelBase
-    {
-        public override async Task LoadAsync(Project project)
-        {
-            Project = project;
-            //var (treeClasses, tile) = await DbUtility.GetTreeAndTileClassesAsync(Project);
-            var tags = await DbUtility.GetTagsAsync(Project);
-            Items = new ObservableCollection<ClassifyItemModelBase>(tags);
-
-            Tag first = Items.FirstOrDefault() as Tag;
-            SelectedItem = first;
-        }
-        public async override Task RenameAsync(string newName)
-        {
-            SelectedItem.Name = newName;
-            await DbUtility.SaveTagAsync(SelectedItem as Tag);
-            await LoadAsync(Project);
-        }
-        public async override Task DeleteAsync()
-        {
-            await DbUtility.DeleteTagAsync(SelectedItem as Tag);
-            await LoadAsync(Project);
-        }
-
-        protected async override Task AddItemAsync()
-        {
-            await DbUtility.AddTagAsync(Project);
-        }
-    }
 
     public abstract class ListPanelBase : UserControlBase, INotifyPropertyChanged
     {
-        private ObservableCollection<ClassifyItemModelBase> items;
-        public ObservableCollection<ClassifyItemModelBase> Items
+        private ObservableCollection<Class> items;
+        public ObservableCollection<Class> Items
         {
             get => items;
             protected set
@@ -84,8 +55,8 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(Items));
             }
         }
-        private ClassifyItemModelBase selectedItem;
-        public ClassifyItemModelBase SelectedItem
+        private Class selectedItem;
+        public Class SelectedItem
         {
             get => selectedItem;
             set
@@ -155,13 +126,13 @@ namespace ClassifyFiles.UI.Panel
 
     public class SelectedItemChanged : EventArgs
     {
-        public SelectedItemChanged(ClassifyItemModelBase oldValue, ClassifyItemModelBase newValue)
+        public SelectedItemChanged(Class oldValue, Class newValue)
         {
             OldValue = oldValue;
             NewValue = newValue;
         }
 
-        public ClassifyItemModelBase OldValue { get; set; }
-        public ClassifyItemModelBase NewValue { get; set; }
+        public Class OldValue { get; set; }
+        public Class NewValue { get; set; }
     }
 }

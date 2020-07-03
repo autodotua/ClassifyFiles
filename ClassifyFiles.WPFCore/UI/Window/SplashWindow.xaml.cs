@@ -24,11 +24,12 @@ namespace ClassifyFiles.UI
             var bytes = File.ReadAllBytes("Images/icon.png");
             (Content as Grid).Background = new ImageBrush(ToImage(bytes));
             //image.Source = new BitmapImage(new Uri("./icon.png", UriKind.Relative));
-        }  /// <summary>
-           /// 将字符数组转换为<see cref="BitmapImage"/>
-           /// </summary>
-           /// <param name="array"></param>
-           /// <returns></returns>
+        }
+        /// <summary>
+        /// 将字符数组转换为<see cref="BitmapImage"/>
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
         private BitmapImage ToImage(byte[] array)
         {
             using var ms = new System.IO.MemoryStream(array);

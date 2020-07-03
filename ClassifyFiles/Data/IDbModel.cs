@@ -16,16 +16,4 @@ namespace ClassifyFiles.Data
         public event PropertyChangedEventHandler PropertyChanged;
 
     }
-
-    public abstract class ClassifyItemModelBase : DbModelBase
-    {
-        [Required]
-        public string Name { get; set; } = "";
-        public Project Project { get; set; }
-        [Required]
-        public int ProjectID { get; set; }
-        public List<File> Files { get; set; } = new List<File>();
-
-    }
-
 }

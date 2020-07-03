@@ -28,135 +28,17 @@ namespace ClassifyFiles.Util
         "bmp",
         }.AsReadOnly();
 
-        public static async Task<IReadOnlyList<File>> AddFilesToTag(IEnumerable<string> paths, Tag tag, DI root, Action<double, Data.File> callback = null)
+
+        public static bool TryGenerateThumbnail(File file)
         {
-            List<File> files = new List<File>();
-            await Task.Run(() =>
-            {
-                paths = paths.ToArray();
-                int index = 0;
-                int count = (paths as string[]).Length;
-                foreach (var path in paths as string[])
-                {
-                    File f = new File(new FI(path), root);
-                    if (tag.Files.Any(p => p.Equals(f)))
-                    {
-                        continue;
-                    }
-                    files.Add(f);
-                    TryGenerateThumbnail(f, root);
-                    tag.Files.Add(f);
-                    callback?.Invoke((++index * 1.0) / count, f);
-                }
-            });
-            return files.AsReadOnly();
-        }
-        public static  Task AddFilesToTag(IEnumerable<File> files, Tag tag, Action<double, Data.File> callback = null)
-        {
-            return Task.Run(() =>
-            {
-                int index = 0;
-                int count =files.Count();
-                foreach (var file in files)
-                {
-                    if (tag.Files.Any(p => p.Equals(file)))
-                    {
-                        continue;
-                    }
-                    tag.Files.Add(file);
-                    callback?.Invoke((++index * 1.0) / count, file);
-                }
-            });
-        }
-        public static  Task RemoveFilesToTag(IEnumerable<File> files, Tag tag, Action<double, Data.File> callback = null)
-        {
-            return Task.Run(() =>
-            {
-                int index = 0;
-                int count =files.Count();
-                foreach (var file in files)
-                {
-                    if (tag.Files.Any(p => p.Equals(file)))
-                    {
-                        continue;
-                    }
-                    tag.Files.Add(file);
-                    callback?.Invoke((++index * 1.0) / count, file);
-                }
-            });
-        }
-        public async static Task<List<File>> GetFilesOfClassesAsync(DI dir, Class c, bool includeThumbnails, Action<double, Data.File> callback = null)
-        {
-            return (await GetFilesOfClassesAsync(dir, new List<Class>() { c }, includeThumbnails, callback))[c];
-        }
-        public async static Task<List<File>> GetAllFiles(DI dir, bool includeThumbnails, Action<double, File> callback = null)
-        {
-            Class c = new Class();
-            var cFiles = await GetFilesOfClassesAsync(dir, new Class[] { c }, includeThumbnails, callback);
-            return cFiles[c];
-        }
-        public async static Task<Dictionary<Class, List<File>>> GetFilesOfClassesAsync(DI dir, IEnumerable<Class> classes, bool includeThumbnails, Action<double, File> callback = null)
-        {
-            Dictionary<Class, List<File>> classFiles = new Dictionary<Class, List<File>>();
-            await Task.Run(() =>
-           {
-               foreach (var c in classes)
-               {
-                   classFiles.Add(c, new List<File>());
-               }
-               var files = dir.EnumerateFiles("*", SO.AllDirectories).ToList();
-               int index = 0;
-               int count = files.Count;
-               foreach (var file in files)
-               {
-                   File f = null;
-                   byte[] thumb = null;
-                   foreach (var c in classes)
-                   {
-                       if (c.MatchConditions == null || IsMatched(file, c))
-                       {
-                           f = new File(file, dir, c);
-                           if (includeThumbnails)
-                           {
-                               if (thumb == null)
-                               {
-                                   TryGenerateThumbnail(f, dir);
-                                   thumb = f.Thumbnail;
-                               }
-                               else
-                               {
-                                   f.Thumbnail = thumb;
-                               }
-                           }
-                           classFiles[c].Add(f);
-                       }
-                   }
-                   callback?.Invoke((++index * 1.0) / count, f);
-               }
-           });
-            return classFiles;
-        }
-       
-        public static async Task<bool> TryGenerateThumbnailAsync(File file, DI dir)
-        {
-            bool result=false;
-            await Task.Run(() =>result= TryGenerateThumbnail(file, dir));
-            return result;
-        }
-        public static bool TryGenerateThumbnail(File file, DI dir)
-        {
-            string path = file.GetAbsolutePath(dir.FullName);
-            if (imgExtensions.Contains(System.IO.Path.GetExtension(path).ToLower().Trim('.')))
+            string path = file.GetAbsolutePath();
+            if (imgExtensions.Contains(P.GetExtension(path).ToLower().Trim('.')))
             {
                 try
                 {
                     using Image image = Image.FromFile(path);
 
                     using Image thumb = image.GetThumbnailImage(240, (int)(240.0 / image.Width * image.Height), () => false, IntPtr.Zero);
-                    //string guid = Guid.NewGuid().ToString();
-                    //file.ImageID = guid;
-                    //string thumbPath = System.IO.Path.Combine(dir, guid + ".jpg");
-                    //thumb.Save(thumbPath, System.Drawing.Imaging.ImageFormat.Jpeg);
                     using var ms = new System.IO.MemoryStream();
                     thumb.Save(ms, ImageFormat.Jpeg);
                     file.Thumbnail = ms.ToArray();
@@ -170,7 +52,7 @@ namespace ClassifyFiles.Util
             return false;
 
         }
-        private static bool IsMatched(FI file, Class c)
+        public static bool IsMatched(FI file, Class c)
         {
             List<List<MatchCondition>> orGroup = new List<List<MatchCondition>>();
             for (int i = 0; i < c.MatchConditions.Count; i++)
@@ -273,7 +155,7 @@ namespace ClassifyFiles.Util
             }
             return null;
         }
-        public static File GetFileTree<T>(IEnumerable<T> files) where T:File,new()
+        public static File GetFileTree<T>(IEnumerable<T> files) where T : File, new()
         {
             Dictionary<T, Queue<string>> fileDirs = new Dictionary<T, Queue<string>>();
             T root = new T() { Name = "根" };
@@ -301,8 +183,9 @@ namespace ClassifyFiles.Util
             return root;
         }
 
-        public static string GetAbsolutePath(this File file, string rootPath, bool dirOnly = false)
+        public static string GetAbsolutePath(this File file, bool dirOnly = false)
         {
+            string rootPath = file.Project.RootPath;
             if (dirOnly)
             {
                 return P.Combine(rootPath, file.Dir);
@@ -320,7 +203,7 @@ namespace ClassifyFiles.Util
             var classes = await DbUtility.GetClassesAsync(project);
             foreach (var c in classes)
             {
-                var files = await DbUtility.GetFilesAsync(c);
+                var files = await DbUtility.GetFilesByClassAsync(c.ID);
                 await Task.Run(() =>
                 {
                     string folder = P.Combine(distFolder, GetValidFileName(c.Name));
@@ -335,7 +218,7 @@ namespace ClassifyFiles.Util
                             {
                                 string newName = GetUniqueFileName(file.Name, folder);
                                 string newPath = P.Combine(folder, newName);
-                                exportMethod(file.GetAbsolutePath(project.RootPath), newPath);
+                                exportMethod(file.GetAbsolutePath(), newPath);
                                 afterExportAFile?.Invoke(file);
                             }
                             break;
@@ -345,7 +228,7 @@ namespace ClassifyFiles.Util
                                 string newName = P.Combine(folder, file.Name).Replace(":", splitter).Replace("\\", splitter).Replace("/", splitter);
                                 newName = GetUniqueFileName(newName, folder);
                                 string newPath = P.Combine(folder, newName);
-                                exportMethod(file.GetAbsolutePath(project.RootPath), newPath);
+                                exportMethod(file.GetAbsolutePath(), newPath);
                                 afterExportAFile?.Invoke(file);
                             }
                             break;
@@ -366,7 +249,7 @@ namespace ClassifyFiles.Util
                                 {
                                     string newName = GetUniqueFileName(file.Name, folder);
                                     string newPath = P.Combine(currentFolder, newName);
-                                    exportMethod(file.GetAbsolutePath(project.RootPath), newPath);
+                                    exportMethod(file.GetAbsolutePath(), newPath);
                                     afterExportAFile?.Invoke(file);
                                 }
                             }

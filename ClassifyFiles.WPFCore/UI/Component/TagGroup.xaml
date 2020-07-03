@@ -14,9 +14,9 @@
     </UserControl.Resources>
     <Grid x:Name="grd">
         <ListBox  Background="Transparent" 
-                    BorderBrush="Transparent"  ItemsSource="{Binding File.Tags}" 
+                    BorderBrush="Transparent"  ItemsSource="{Binding File.Classes}" 
                      HorizontalAlignment="Right" VerticalAlignment="Center"
-                    VerticalContentAlignment="Center" Visibility="{Binding File.Tags, Converter={StaticResource nn2v}}">
+                    VerticalContentAlignment="Center" Visibility="{Binding File.Classes, Converter={StaticResource nn2v}}">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <StackPanel Orientation="Horizontal"></StackPanel>

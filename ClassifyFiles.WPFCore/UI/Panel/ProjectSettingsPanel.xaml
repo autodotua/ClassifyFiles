@@ -19,12 +19,12 @@
             <GroupBox Header="项目名">
                 <TextBox Text="{Binding Project.Name}"   VerticalAlignment="Center"  FontSize="24"/>
             </GroupBox>
-            <GroupBox Header="分类方式">
+            <!--<GroupBox Header="分类方式">
                 <m:SimpleStackPanel Spacing="12" Orientation="Horizontal">
                     <RadioButton x:Name="rbtnTypeFileProps" Checked="rbtnTypeFileProps_Checked">文件属性</RadioButton>
                     <RadioButton x:Name="rbtnTypeTag" Checked="rbtnTypeFileProps_Checked">标签</RadioButton>
                 </m:SimpleStackPanel>         
-            </GroupBox>
+            </GroupBox>-->
             <GroupBox Header="项目根目录">
                 <Grid>
                     <Grid.ColumnDefinitions>

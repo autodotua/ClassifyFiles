@@ -54,25 +54,17 @@ namespace ClassifyFiles.UI
                 {
                     value.PropertyChanged += Project_PropertyChanged;
                 }
-                btnModeClasses.Label = SelectedProject.Type switch
-                {
-                    ClassifyType.FileProps => "分类",
-                    ClassifyType.Tag => "标签"
-                };
+                //btnModeClasses.Label = SelectedProject.Type switch
+                //{
+                //    ClassifyType.FileProps => "分类",
+                //    ClassifyType.Tag => "标签"
+                //};
                 LoadProjectAsync();
             }
         }
       
         private void Project_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if(e.PropertyName==nameof(Project.Type))
-            {
-                btnModeClasses.Label = SelectedProject.Type switch
-                {
-                    ClassifyType.FileProps => "分类",
-                    ClassifyType.Tag => "标签"
-                };
-            }
         }
 
         public MainWindow()
@@ -166,17 +158,17 @@ namespace ClassifyFiles.UI
             {
                 await (MainPanel as ClassSettingPanel).SaveClassAsync();
             }
+            else if(MainPanel is ProjectSettingsPanel)
+            {
+                DbUtility.SaveChangesAsync();
+            }
             switch (btn.Name)
             {
                 case nameof(btnModeView):
                     MainPanel = new FileBrowserPanel();
                     break;
                 case nameof(btnModeClasses):
-                    MainPanel = SelectedProject.Type switch
-                    {
-                        ClassifyType.FileProps => new ClassSettingPanel(),
-                        ClassifyType.Tag => new TagSettingPanel()
-                    };
+                    MainPanel = new ClassSettingPanel();
                     break;
                 case nameof(btnModeProjectSettings):
                     MainPanel = new ProjectSettingsPanel();

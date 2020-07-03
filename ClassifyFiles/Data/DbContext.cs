@@ -32,7 +32,7 @@ namespace ClassifyFiles.Data
         public DbSet<Log> Logs { get; set; }
         public DbSet<File> Files { get; set; }
         public DbSet<Class> Classes { get; set; }
-        public DbSet<Tag> Tags { get; set; }
+        public DbSet<FileClass> FileClasses { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<MatchCondition> MatchConditions { get; set; }
 
@@ -50,26 +50,33 @@ namespace ClassifyFiles.Data
                 .WithMany(p => p.Classes)
                 .HasForeignKey(p => p.ProjectID)
                 .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Tag>()
+
+            modelBuilder.Entity<File>()
                 .HasOne(p => p.Project)
-                .WithMany(p => p.Tags)
+                .WithMany(/*p => p.Files*/)
                 .HasForeignKey(p => p.ProjectID)
                 .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<MatchCondition>()
                 .HasOne(p => p.Class)
                 .WithMany(p => p.MatchConditions)
                 .HasForeignKey(p => p.ClassID)
-                .OnDelete(DeleteBehavior.Cascade);   
-            modelBuilder.Entity<File>()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<FileClass>()
                 .HasOne(p => p.Class)
-                .WithMany(p => p.Files)
+                .WithMany(/*p => p.Files*/)
                 .HasForeignKey(p => p.ClassID)
                 .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<File>()
-                .HasOne(p => p.Tag)
-                .WithMany(p => p.Files)
-                .HasForeignKey(p => p.TagID)
+
+
+            modelBuilder.Entity<FileClass>()
+                .HasOne(p => p.File)
+                .WithMany(/*p => p.Classes*/)
+                .HasForeignKey(p => p.FileID)
                 .OnDelete(DeleteBehavior.Cascade);
+
+
         }
         private void InsertTestDatas()
         {

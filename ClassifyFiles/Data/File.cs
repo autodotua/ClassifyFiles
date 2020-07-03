@@ -13,42 +13,32 @@ namespace ClassifyFiles.Data
         public File()
         {
         }
-        public File(FileInfo file, DirectoryInfo root, Class c) : this(file, root)
-        {
-            Class = c;
-        }
-        public File(FileInfo file, DirectoryInfo root, Tag t) : this(file, root)
-        {
-            Tag = t;
-        }
-        public File(FileInfo file, DirectoryInfo root)
+        public File(FileInfo file, Project project)
         {
             Name = file.Name;
+            var root = new DirectoryInfo(project.RootPath);
             if (!file.FullName.Contains(root.FullName))
             {
                 throw new Exception("根目录路径没有被包含在文件路径中");
             }
-
-            Dir = file.FullName.Replace(root.FullName, "").Replace(file.Name, "").Trim('\\');
+            Project = project;
+            //Dir = file.FullName.Replace(root.FullName, "").Replace(file.Name, "").Trim('\\');
+            Dir = file.FullName.Substring(root.FullName.Length, file.FullName.Length - file.Name.Length - root.FullName.Length - 1).TrimEnd('\\');
         }
 
         [Required]
         public string Dir { get; set; }
         [Required]
         public string Name { get; set; } = "";
-        public Class Class { get; set; }
-        public int? ClassID { get; set; }
-        public Tag Tag { get; set; }
-        public int? TagID { get; set; }
-        //public string ImageID { get; set; }
         public byte[] Thumbnail { get; set; }
+        [Required]
+        public Project Project { get; set; }
+        public int ProjectID { get; set; }
         [NotMapped]
         public List<File> SubFiles { get; set; } = new List<File>();
-
         public override bool Equals(object obj)
         {
-            var item = obj as File;
-            if(item==null)
+            if (!(obj is File item))
             {
                 return false;
             }

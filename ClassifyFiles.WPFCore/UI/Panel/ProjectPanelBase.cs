@@ -55,6 +55,6 @@ namespace ClassifyFiles.UI.Panel
         {
             return (Window.GetWindow(this) as MainWindow).Progress;
         }
-        public static ClassifyItemModelBase selectedItem { get; private set; }
+        public static Class selectedItem { get; private set; }
     }
 }

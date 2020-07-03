@@ -48,14 +48,14 @@ namespace ClassifyFiles.UI.Panel
         public override async Task LoadAsync(Project project)
         {
             await base.LoadAsync(project);
-            if (Project.Type == Project.ClassifyType.FileProps)
-            {
-                rbtnTypeFileProps.IsChecked = true;
-            }
-            else
-            {
-                rbtnTypeTag.IsChecked = true;
-            }
+            //if (Project.Type == Project.ClassifyType.FileProps)
+            //{
+            //    rbtnTypeFileProps.IsChecked = true;
+            //}
+            //else
+            //{
+            //    rbtnTypeTag.IsChecked = true;
+            //}
         }
 
         public ExportFormat ExportFormat { get; set; }
@@ -188,14 +188,14 @@ namespace ClassifyFiles.UI.Panel
 
         private void rbtnTypeFileProps_Checked(object sender, RoutedEventArgs e)
         {
-            if (sender == rbtnTypeFileProps)
-            {
-                Project.Type = Project.ClassifyType.FileProps;
-            }
-            else
-            {
-                Project.Type = Project.ClassifyType.Tag;
-            }
+            //if (sender == rbtnTypeFileProps)
+            //{
+            //    Project.Type = Project.ClassifyType.FileProps;
+            //}
+            //else
+            //{
+            //    Project.Type = Project.ClassifyType.Tag;
+            //}
         }
 
         public override ListPanelBase GetItemsPanel()

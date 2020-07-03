@@ -4,11 +4,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ClassifyFiles.Data
 {
-    public class Tag : ClassifyItemModelBase
+    public class Class : DbModelBase
     {
-    }
-    public class Class : ClassifyItemModelBase
-    {
+        [Required]
+        public string Name { get; set; } = "";
+        public Project Project { get; set; }
+        [Required]
+        public int ProjectID { get; set; }
         public List<MatchCondition> MatchConditions { get; set; }
 
     }

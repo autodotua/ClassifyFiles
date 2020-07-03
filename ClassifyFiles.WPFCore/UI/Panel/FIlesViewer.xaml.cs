@@ -200,7 +200,7 @@ namespace ClassifyFiles.UI.Panel
                     {
                         return;
                     }
-                    string path = file.GetAbsolutePath(Project.RootPath);
+                    string path = file.GetAbsolutePath();
 
                     if (!System.IO.File.Exists(path))
                     {
@@ -268,7 +268,7 @@ namespace ClassifyFiles.UI.Panel
                 p.StartInfo = new ProcessStartInfo()
                 {
                     FileName = "explorer.exe",
-                    Arguments = $"/select, \"{GetSelectedFile().GetAbsolutePath(Project.RootPath, false)}\"",
+                    Arguments = $"/select, \"{GetSelectedFile().GetAbsolutePath(false)}\"",
                     UseShellExecute = true
                 };
                 p.Start();
@@ -329,8 +329,8 @@ namespace ClassifyFiles.UI.Panel
 
         private void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            Tag tag = (e.Source as ContentPresenter).Content as Tag;
-            ClickTag?.Invoke(this, new ClickTagEventArgs(tag));
+            Class c = (e.Source as ContentPresenter).Content as Class;
+            ClickTag?.Invoke(this, new ClickTagEventArgs(c));
         }
         public event EventHandler<ClickTagEventArgs> ClickTag;
 
@@ -342,16 +342,16 @@ namespace ClassifyFiles.UI.Panel
             {
                 menu.Items.RemoveAt(menu.Items.Count - 1);
             }
-            foreach (var tag in Project.Tags)
+            foreach (var tag in Project.Classes)
             {
                 CheckBox chk = new CheckBox()
                 {
                     Content = tag.Name,
-                    IsChecked = file.Tags.Contains(tag)
+                    IsChecked = file.Classes.Contains(tag)
                 };
                 chk.Click += (p1, p2) =>
                 {
-                    FileUtility.AddFilesToTag(new string)
+
                 };
                 menu.Items.Add(chk);
             }
@@ -362,11 +362,11 @@ namespace ClassifyFiles.UI.Panel
 
     public class ClickTagEventArgs : EventArgs
     {
-        public ClickTagEventArgs(Tag tag)
+        public ClickTagEventArgs(Class c)
         {
-            Tag = tag;
+            Class = c;
         }
 
-        public Tag Tag { get; }
+        public Class Class { get; }
     }
 }
