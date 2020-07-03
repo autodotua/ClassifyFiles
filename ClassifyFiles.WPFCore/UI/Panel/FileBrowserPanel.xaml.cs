@@ -110,7 +110,7 @@ namespace ClassifyFiles.UI.Panel
             string dir = e.AddedItems.Count == 0 ? null : e.AddedItems.Cast<string>().First();
             if (dir != null)
             {
-                FileWithIcon file;
+                UIFile file;
                 filesViewer.SelectFileByDir(dir);
                 (sender as ListBox).SelectedItem = null;
                 flyoutJumpToDir.Hide();// = false;

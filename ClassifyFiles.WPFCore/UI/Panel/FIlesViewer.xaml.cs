@@ -67,8 +67,8 @@ namespace ClassifyFiles.UI.Panel
             DataContext = this;
             InitializeComponent();
         }
-        private ObservableCollection<FileWithIcon> files;
-        public ObservableCollection<FileWithIcon> Files
+        private ObservableCollection<UIFile> files;
+        public ObservableCollection<UIFile> Files
         {
             get => files;
             set
@@ -81,7 +81,7 @@ namespace ClassifyFiles.UI.Panel
         /// <summary>
         /// 供树状图使用的文件树
         /// </summary>
-        public List<File> FileTree => Files == null ? null : new List<File>(new FileWithIcon(FileUtility.GetFileTree(Files)).SubFiles);
+        public List<UIFile> FileTree => Files == null ? null : new List<UIFile>(FileUtility.GetFileTree(Files).SubFiles.Cast<UIFile>());
         public HashSet<string> Dirs
         {
             get
@@ -101,7 +101,7 @@ namespace ClassifyFiles.UI.Panel
         /// <summary>
         /// 供
         /// </summary>
-        public IEnumerable<FileWithIcon> PagingFiles
+        public IEnumerable<UIFile> PagingFiles
         {
             get
             {
@@ -136,16 +136,16 @@ namespace ClassifyFiles.UI.Panel
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void SetFiles(IEnumerable<File> files,bool tags=true)
+        public void SetFiles(IEnumerable<File> files, bool tags = true)
         {
-            IEnumerable<FileWithIcon> filesWithIcon = files.Select(p => new FileWithIcon(p,tags,Project));
+            IEnumerable<UIFile> filesWithIcon = files.Select(p => new UIFile(p, tags, Project));
             var orderedFiles = filesWithIcon.OrderBy(p => p.Dir).ThenBy(p => p.Name);
-            Files = new ObservableCollection<FileWithIcon>(orderedFiles);
+            Files = new ObservableCollection<UIFile>(orderedFiles);
 
         }
         public void AddFiles(IEnumerable<File> files, bool tags = true)
         {
-            IEnumerable<FileWithIcon> filesWithIcon = files.Select(p => new FileWithIcon(p, tags, Project));
+            IEnumerable<UIFile> filesWithIcon = files.Select(p => new UIFile(p, tags, Project));
             foreach (var file in filesWithIcon)
             {
                 Files.Add(file);
@@ -178,13 +178,13 @@ namespace ClassifyFiles.UI.Panel
                (stkPagging.Children[0] as Button).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             }
         }
-        private File GetSelectedFile()
+        private UIFile GetSelectedFile()
         {
             return CurrentViewType switch
             {
-                1 => lvwFiles.SelectedItem as File,
-                2 => lbxGrdFiles.SelectedItem as File,
-                3 => treeFiles.SelectedItem as File,
+                1 => lvwFiles.SelectedItem as UIFile,
+                2 => lbxGrdFiles.SelectedItem as UIFile,
+                3 => treeFiles.SelectedItem as UIFile,
                 _ => throw new NotImplementedException()
             };
         }
@@ -235,7 +235,7 @@ namespace ClassifyFiles.UI.Panel
 
             if (Keyboard.IsKeyDown(Key.LeftCtrl))
             {
-                FileWithIcon.DefualtIconSize += e.Delta / 30;
+                UIFile.DefualtIconSize += e.Delta / 30;
                 Files.ForEach(p => p.UpdateIconSize());
                 e.Handled = true;
             }
@@ -289,7 +289,7 @@ namespace ClassifyFiles.UI.Panel
 
         public void SelectFileByDir(string dir)
         {
-            FileWithIcon file = null;
+            UIFile file = null;
             switch (CurrentViewType)
             {
                 case 1:
@@ -329,10 +329,35 @@ namespace ClassifyFiles.UI.Panel
 
         private void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            Tag tag = (e.Source as ListBoxItem).Content as Tag;
+            Tag tag = (e.Source as ContentPresenter).Content as Tag;
             ClickTag?.Invoke(this, new ClickTagEventArgs(tag));
         }
         public event EventHandler<ClickTagEventArgs> ClickTag;
+
+        private void ContextMenu_Opened(object sender, RoutedEventArgs e)
+        {
+            ContextMenu menu = FindResource("menu") as ContextMenu;
+            UIFile file = GetSelectedFile();
+            while (menu.Items.Count > 1)
+            {
+                menu.Items.RemoveAt(menu.Items.Count - 1);
+            }
+            foreach (var tag in Project.Tags)
+            {
+                CheckBox chk = new CheckBox()
+                {
+                    Content = tag.Name,
+                    IsChecked = file.Tags.Contains(tag)
+                };
+                chk.Click += (p1, p2) =>
+                {
+                    FileUtility.AddFilesToTag(new string)
+                };
+                menu.Items.Add(chk);
+            }
+
+        }
+
     }
 
     public class ClickTagEventArgs : EventArgs

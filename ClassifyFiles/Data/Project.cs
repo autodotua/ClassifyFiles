@@ -27,6 +27,16 @@ namespace ClassifyFiles.Data
                 this.Notify(nameof(Classes));
             }
         }
+        private List<Tag> tags;
+        public List<Tag> Tags
+        {
+            get => tags;
+            set
+            {
+                tags = value;
+                this.Notify(nameof(Tags));
+            }
+        }
         private ClassifyType type = ClassifyType.FileProps;
         /// <summary>
         /// 分类的方式：0代表文件属性，1代表标签

@@ -29,18 +29,16 @@ namespace ClassifyFiles.UI.Component
 
         }
         public static readonly DependencyProperty FileProperty =
-DependencyProperty.Register("File", typeof(FileWithIcon), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
+DependencyProperty.Register("File", typeof(UIFile), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
         static void OnFileChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
         }
-        public FileWithIcon File
+        public UIFile File
         {
-            get => GetValue(FileProperty) as FileWithIcon; //file;
+            get => GetValue(FileProperty) as UIFile; //file;
             set
             {
                 SetValue(FileProperty, value);
-                //file = value;
-                //this.Notify(nameof(File));
             }
         }
         public static readonly DependencyProperty UseLargeIconProperty =

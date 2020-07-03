@@ -4,8 +4,10 @@ using FzLib.Extension;
 using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -35,7 +37,7 @@ namespace ClassifyFiles.UI.Model
 
         public static List<FileType> FileTypes { get; private set; } = new List<FileType>();
     }
-    public class FileWithIcon : File
+    public class UIFile : File
     {
         public const string FileGlyph = "\uED41";
         public const string FolderGlyph = "\uED43";
@@ -108,13 +110,13 @@ namespace ClassifyFiles.UI.Model
             SmallIconSize = DefualtIconSize / 2;
             this.Notify(nameof(LargeIconSize), nameof(SmallIconSize));
         }
-        public FileWithIcon() { }
+        public UIFile() { }
 
-        public FileWithIcon(File file, bool tags = false, Project project = null)
+        public UIFile(File file, bool tags = false, Project project = null)
         {
             Name = file.Name;
             Dir = file.Dir;
-            SubFiles = file.SubFiles.Select(p => new FileWithIcon(p)).Cast<File>().ToList();
+            SubFiles = file.SubFiles.Select(p => new UIFile(p)).Cast<File>().ToList();
             Thumbnail = file.Thumbnail;
             if (Dir == null)
             {
@@ -139,12 +141,16 @@ namespace ClassifyFiles.UI.Model
             }
             if (tags)
             {
-                Tags.AddRange(DbUtility.GetTagsOfFile(project, Dir, Name).Result);
+                LoadAsync(project);
             }
         }
 
-        public List<Tag> Tags { get; } = new List<Tag>();
-        public string TagsString => string.Join(", ", Tags.Select(p => p.Name));
+        public async Task LoadAsync(Project project)
+        {
+            Tags = new ObservableCollection<Tag>(await DbUtility.GetTagsOfFile(project, Dir, Name));
+        }
+
+        public ObservableCollection<Tag> Tags { get; private set; } 
 
     }
 }

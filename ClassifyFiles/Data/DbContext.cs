@@ -50,6 +50,11 @@ namespace ClassifyFiles.Data
                 .WithMany(p => p.Classes)
                 .HasForeignKey(p => p.ProjectID)
                 .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Tag>()
+                .HasOne(p => p.Project)
+                .WithMany(p => p.Tags)
+                .HasForeignKey(p => p.ProjectID)
+                .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<MatchCondition>()
                 .HasOne(p => p.Class)
                 .WithMany(p => p.MatchConditions)

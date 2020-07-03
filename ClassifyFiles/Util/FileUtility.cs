@@ -51,6 +51,40 @@ namespace ClassifyFiles.Util
             });
             return files.AsReadOnly();
         }
+        public static  Task AddFilesToTag(IEnumerable<File> files, Tag tag, Action<double, Data.File> callback = null)
+        {
+            return Task.Run(() =>
+            {
+                int index = 0;
+                int count =files.Count();
+                foreach (var file in files)
+                {
+                    if (tag.Files.Any(p => p.Equals(file)))
+                    {
+                        continue;
+                    }
+                    tag.Files.Add(file);
+                    callback?.Invoke((++index * 1.0) / count, file);
+                }
+            });
+        }
+        public static  Task RemoveFilesToTag(IEnumerable<File> files, Tag tag, Action<double, Data.File> callback = null)
+        {
+            return Task.Run(() =>
+            {
+                int index = 0;
+                int count =files.Count();
+                foreach (var file in files)
+                {
+                    if (tag.Files.Any(p => p.Equals(file)))
+                    {
+                        continue;
+                    }
+                    tag.Files.Add(file);
+                    callback?.Invoke((++index * 1.0) / count, file);
+                }
+            });
+        }
         public async static Task<List<File>> GetFilesOfClassesAsync(DI dir, Class c, bool includeThumbnails, Action<double, Data.File> callback = null)
         {
             return (await GetFilesOfClassesAsync(dir, new List<Class>() { c }, includeThumbnails, callback))[c];
@@ -239,10 +273,10 @@ namespace ClassifyFiles.Util
             }
             return null;
         }
-        public static File GetFileTree(IEnumerable<File> files)
+        public static File GetFileTree<T>(IEnumerable<T> files) where T:File,new()
         {
-            Dictionary<File, Queue<string>> fileDirs = new Dictionary<File, Queue<string>>();
-            File root = new File() { Name = "根" };
+            Dictionary<T, Queue<string>> fileDirs = new Dictionary<T, Queue<string>>();
+            T root = new T() { Name = "根" };
 
             foreach (var file in files)
             {
@@ -250,14 +284,14 @@ namespace ClassifyFiles.Util
                 var current = root;
                 foreach (var dir in dirs)
                 {
-                    var sub = current.SubFiles.FirstOrDefault(p => p.Name == dir);
+                    T sub = current.SubFiles.FirstOrDefault(p => p.Name == dir) as T;
                     if (sub != null)
                     {
-                        current = sub;
+                        current = sub as T;
                     }
                     else
                     {
-                        sub = new File() { Name = dir };
+                        sub = new T() { Name = dir };
                         current.SubFiles.Add(sub);
                         current = sub;
                     }

@@ -14,14 +14,15 @@
         <ui:NotFirst2VisibilityConverter x:Key="i2v"/>
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
         <ui:IsNotNull2VisibilityConverter x:Key="nn2v"/>
+  
+            <ContextMenu x:Key="menu" Opened="ContextMenu_Opened">
+                <MenuItem Header="打开目录" Click="OpenDirMernuItem_Click"/>
+            </ContextMenu>
     </UserControl.Resources>
     <Grid>
-        <Grid Margin="8,4,4,4" Grid.Column="2" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
-            <Grid.Resources>
-                <ContextMenu x:Key="menu">
-                    <MenuItem Header="打开目录" Click="OpenDirMernuItem_Click"/>
-                </ContextMenu>
-            </Grid.Resources>
+        <Grid  Margin="8,4,4,4" Grid.Column="2" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
+            
+       
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="4"/>
@@ -133,35 +134,7 @@
                                 <TextBlock Text="{Binding Name}" Grid.Column="2" Grid.Row="0"/>
                                 <TextBlock Text="{Binding Dir}" Grid.Column="2" Grid.Row="2" Opacity="0.5"/>
                                    <!--横向的标签列表-->
-                                <ListBox Grid.Column="4" Background="Transparent" 
-                                         BorderBrush="Transparent" Grid.RowSpan="99" ItemsSource="{Binding Tags}" 
-                                         HorizontalAlignment="Right" VerticalAlignment="Center"
-                                         VerticalContentAlignment="Center" Visibility="{Binding Tags, Converter={StaticResource nn2v}}">
-                                    <ListBox.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal"></StackPanel>
-                                        </ItemsPanelTemplate>
-                                    </ListBox.ItemsPanel>
-                                    <ListBox.ItemContainerStyle>
-
-                                        <Style TargetType="ListBoxItem">
-                                            <Setter Property="Focusable" Value="false"/>
-                                            <Setter Property="Background" Value="Transparent"/>
-                                            <Setter Property="ContentTemplate">
-                                                <Setter.Value>
-                                                    <DataTemplate>
-                                                        <Border Padding="8,4" CornerRadius="2" Background="{DynamicResource SystemAccentColorDark1Brush}">
-                                                            <Grid >
-                                                                <TextBlock Text="{Binding Name}"/>
-                                                            </Grid>
-                                                        </Border>                                                  
-                                                    </DataTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                            <EventSetter Event="MouseDoubleClick" Handler="ListBoxItem_MouseDoubleClick"/>
-                                        </Style>
-                                    </ListBox.ItemContainerStyle>
-                                </ListBox>
+                                <component:TagGroup Grid.Column="4" Grid.RowSpan="99" File="{Binding .}" TagMouseDown="ListBoxItem_MouseDoubleClick"/>
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
@@ -176,6 +149,7 @@
                         <StackPanel Orientation="Horizontal">
                             <component:FileIcon File="{Binding .}"/>
                             <TextBlock VerticalAlignment="Center" FontSize="12" Margin="12,0,0,0" Text="{Binding Name}"/>
+                            <component:TagGroup Margin="24,0,0,0" File="{Binding .}" TagMouseDown="ListBoxItem_MouseDoubleClick"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
