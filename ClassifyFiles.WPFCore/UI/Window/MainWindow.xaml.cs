@@ -54,11 +54,6 @@ namespace ClassifyFiles.UI
                 {
                     value.PropertyChanged += Project_PropertyChanged;
                 }
-                //btnModeClasses.Label = SelectedProject.Type switch
-                //{
-                //    ClassifyType.FileProps => "分类",
-                //    ClassifyType.Tag => "标签"
-                //};
                 LoadProjectAsync();
             }
         }
@@ -69,7 +64,9 @@ namespace ClassifyFiles.UI
 
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent(); 
+            
+          
         }
 
 

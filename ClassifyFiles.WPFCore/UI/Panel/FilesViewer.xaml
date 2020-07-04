@@ -134,7 +134,7 @@
                                 <TextBlock Text="{Binding Name}" Grid.Column="2" Grid.Row="0"/>
                                 <TextBlock Text="{Binding Dir}" Grid.Column="2" Grid.Row="2" Opacity="0.5"/>
                                    <!--横向的标签列表-->
-                                <component:TagGroup Grid.Column="4" Grid.RowSpan="99" File="{Binding .}" TagMouseDown="ListBoxItem_MouseDoubleClick"/>
+                                <component:TagGroup Grid.Column="4" Grid.RowSpan="99" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
@@ -148,7 +148,7 @@
                         <StackPanel Orientation="Horizontal">
                             <component:FileIcon File="{Binding .}"/>
                             <TextBlock VerticalAlignment="Center" FontSize="12" Margin="12,0,0,0" Text="{Binding Name}"/>
-                            <component:TagGroup Margin="24,0,0,0" File="{Binding .}" TagMouseDown="ListBoxItem_MouseDoubleClick"/>
+                            <component:TagGroup Margin="24,0,0,0" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>

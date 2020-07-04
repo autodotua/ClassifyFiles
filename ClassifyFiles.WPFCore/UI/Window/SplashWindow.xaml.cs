@@ -18,6 +18,17 @@ namespace ClassifyFiles.UI
     /// </summary>
     public partial class SplashWindow : Window
     {
+        private static SplashWindow instance = null;
+        public static void ShowScreen()
+        {
+            instance = new SplashWindow();
+            instance.Show();
+        }
+
+        public static void CloseScreen()
+        {
+            instance.Close();
+        }
         public SplashWindow()
         {
             InitializeComponent();

@@ -29,7 +29,7 @@ namespace ClassifyFiles.UI.Component
  
         private void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            TagMouseDown?.Invoke(sender, e);
+            TagMouseDown?.Invoke(this, e);
         }
         public static readonly DependencyProperty FileProperty =
 DependencyProperty.Register("File", typeof(UIFile), typeof(TagGroup), new PropertyMetadata(OnFileChanged));

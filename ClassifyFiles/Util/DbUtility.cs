@@ -14,24 +14,17 @@ namespace ClassifyFiles.Util
 {
     public static class DbUtility
     {
+        static DbUtility()
+        {
+            db=new AppDbContext(DbPath);
+        }
         public static string DbPath { get; private set; } = "data.db";
         private static AppDbContext db;
-        private static AppDbContext Db
-        {
-            get
-            {
-                if (db == null)
-                {
-                    db = new AppDbContext(DbPath);
-                }
-                return db;
-            }
-        }
         public static async Task<List<Project>> GetProjectsAsync()
         {
             Debug.WriteLine("db: " + nameof(GetProjectsAsync));
 
-            return await Db.Projects.ToListAsync();
+            return await db.Projects.ToListAsync();
         }
         public static async Task<List<Class>> GetClassesAsync(Project project)
         {
@@ -49,46 +42,47 @@ namespace ClassifyFiles.Util
 
         public static Task SaveChangesAsync()
         {
-            return Db.SaveChangesAsync();
+            return db.SaveChangesAsync();
         }
         public static async Task SaveClassAsync(Class c)
         {
             Debug.WriteLine("db: " + nameof(SaveClassAsync));
 
-            if (await Db.Classes.AnyAsync(p => p.ID == c.ID))
+            if (await db.Classes.AnyAsync(p => p.ID == c.ID))
             {
-                Db.Entry(c).State = EntityState.Modified;
-                await Db.SaveChangesAsync();
+                db.Entry(c).State = EntityState.Modified;
+                await db.SaveChangesAsync();
             }
         }
         public static async Task UpdateProjectAsync(Project project)
         {
             Debug.WriteLine("db: " + nameof(UpdateProjectAsync));
 
-            Db.Entry(project).State = EntityState.Modified;
+            db.Entry(project).State = EntityState.Modified;
             await db.SaveChangesAsync();
         }
         public static async Task DeleteProjectAsync(Project project)
         {
             Debug.WriteLine("db: " + nameof(DeleteProjectAsync));
 
-            Db.Entry(project).State = EntityState.Deleted;
+            db.Entry(project).State = EntityState.Deleted;
             await db.SaveChangesAsync();
         }
         public static Task DeleteFilesOfProjectAsync(Project project)
         {
             Debug.WriteLine("db: " + nameof(DeleteFilesOfProjectAsync));
 
-            return Db.Database.ExecuteSqlRawAsync("delete from Files where ProjectID = " + project.ID);
+            return db.Database.ExecuteSqlRawAsync("delete from Files where ProjectID = " + project.ID);
             //await db.SaveChangesAsync();
         }
 
-        public static async Task<Project> AddProjectAsync() { 
+        public static async Task<Project> AddProjectAsync()
+        {
             Debug.WriteLine("db: " + nameof(AddProjectAsync));
-        
+
             Project project = new Project() { Name = "未命名" };
-            Db.Projects.Add(project);
-            await Db.SaveChangesAsync();
+            db.Projects.Add(project);
+            await db.SaveChangesAsync();
             return project;
         }
         public static async Task<Class> AddClassAsync(Project project)
@@ -96,20 +90,21 @@ namespace ClassifyFiles.Util
             Debug.WriteLine("db: " + nameof(AddClassAsync));
 
             Class c = new Class() { Project = project, Name = "未命名类" };
-            Db.Classes.Add(c);
+            db.Classes.Add(c);
             await db.SaveChangesAsync();
             return c;
         }
-        public static async Task DeleteClassAsync(Class c) { 
+        public static async Task DeleteClassAsync(Class c)
+        {
             Debug.WriteLine("db: " + nameof(DeleteClassAsync));
-            Db.Entry(c).State = EntityState.Deleted;
+            db.Entry(c).State = EntityState.Deleted;
             await db.SaveChangesAsync();
         }
 
         public static Task<List<Class>> GetClassesOfFileAsync(int fileID)
         {
-            Debug.WriteLine("db: " + nameof(GetClassesOfFileAsync));
-            return Db.FileClasses
+            //Debug.WriteLine("db: " + nameof(GetClassesOfFileAsync));
+            return db.FileClasses
                 .Where(p => p.FileID == fileID)
                 .IncludeAll()
                 .Select(p => p.Class).ToListAsync();
@@ -117,9 +112,9 @@ namespace ClassifyFiles.Util
         public async static Task<List<File>> GetFilesByClassAsync(int classID)
         {
             Debug.WriteLine("db: " + nameof(GetFilesByClassAsync));
-            var files = Db.FileClasses
+            var files = db.FileClasses
                 .Where(p => p.Class.ID == classID)
-                .Where(p=>p.Disabled==false)
+                .Where(p => p.Disabled == false)
                 .IncludeAll()
                 .OrderBy(p => p.File.Dir)
                 .ThenBy(p => p.File.Name)
@@ -131,14 +126,14 @@ namespace ClassifyFiles.Util
         public async static Task<List<File>> GetFilesByProjectAsync(int projectID)
         {
             Debug.WriteLine("db: " + nameof(GetFilesByProjectAsync));
-            var files = Db.Files.Where(p => p.Project.ID == projectID).Include(p=>p.Project);
+            var files = db.Files.Where(p => p.Project.ID == projectID).Include(p => p.Project);
             return await files.ToListAsync();
         }
 
 
         public async static Task ExportProject(string path, int projectID)
         {
-            Project project = await Db.Projects.Where(p => p.ID == projectID)
+            Project project = await db.Projects.Where(p => p.ID == projectID)
                .Include(p => p.Classes).ThenInclude(p => p.MatchConditions)
                .FirstOrDefaultAsync();
 
@@ -174,14 +169,14 @@ namespace ClassifyFiles.Util
                 Project project = await importDb.Projects.Where(p => p.ID == projectID)
               .Include(p => p.Classes).ThenInclude(p => p.MatchConditions)
               .FirstAsync();
-                await Task.Run(() =>
+                await Task.Run((Action)(() =>
                 {
                     projects.Add(project);
                     project.ID = 0;
                     foreach (var c in project.Classes)
                     {
                         c.ID = 0;
-                        foreach (var file in Db.FileClasses.Where(p => p.Class == c).IncludeAll().Select(p => p.File))
+                        foreach (var file in Queryable.Where<FileClass>(DbUtility.db.FileClasses, (System.Linq.Expressions.Expression<Func<FileClass, bool>>)(p => (bool)(p.Class == c))).IncludeAll().Select(p => p.File))
                         {
                             file.ID = 0;
                         }
@@ -190,78 +185,113 @@ namespace ClassifyFiles.Util
                             m.ID = 0;
                         }
                     }
-                    Db.Add(project);
-                });
+                    DbUtility.db.Add<Project>(project);
+                }));
             }
-            await Db.SaveChangesAsync();
+            await db.SaveChangesAsync();
             await importDb.DisposeAsync();
             return projects.ToArray();
         }
 
         public async static Task<IReadOnlyList<File>> AddFilesToClass(IEnumerable<string> files, Class c, bool includeThumbnails)
         {
-            var existed = await GetFilesByClassAsync(c.ID);
             List<File> fs = new List<File>();
-            foreach (var path in files)
+            //var existed = await GetFilesByProjectAsync(c.Project.ID);
+            await Task.Run((Action)(() =>
             {
-                File f = new File(new System.IO.FileInfo(path), c.Project);
-                //重写了HashCode，因此可以这样来判断
-                if (!existed.Contains(f))
+                if (files.Any(p => !p.StartsWith(c.Project.RootPath)))
                 {
-                    if (includeThumbnails)
+                    throw new Exception("文件不在项目目录下");
+                }
+                foreach (var path in files)
+                {
+                    File f = new File(new System.IO.FileInfo(path), c.Project);
+                    File existedFile = Queryable.FirstOrDefault<File>(DbUtility.db.Files, (System.Linq.Expressions.Expression<Func<File, bool>>)(p => (bool)(p.Name == f.Name && p.Dir == f.Dir)));
+                    //文件不存在的话，需要首先新增文件
+                    if (existedFile == null)
                     {
-                        FileUtility.TryGenerateThumbnail(f);
+                        if (includeThumbnails)
+                        {
+                            FileUtility.TryGenerateThumbnail(f);
+                        }
+                        DbUtility.db.Files.Add(f);
                     }
-                    Db.Files.Add(f);
-                    Db.FileClasses.Add(new FileClass(c, f, true));
+                    else
+                    {
+                        //如果文件已存在，就搜索一下是否存在关系，存在关系就不需要继续了
+                        if(Queryable.Any<FileClass>(DbUtility.db.FileClasses, (System.Linq.Expressions.Expression<Func<FileClass, bool>>)(p => (bool)(p.Class == c && p.File == existedFile))))
+                        {
+                            continue; 
+                        }
+                        f = existedFile;
+                    }
+                    DbUtility.db.FileClasses.Add(new FileClass(c, f, true));
                     fs.Add(f);
                 }
-            }
-            await Db.SaveChangesAsync();
+                DbUtility.db.SaveChanges();
+            }));
             return fs.AsReadOnly();
 
+        }
+
+        public static void CancelChanges()
+        {
+            foreach (var entry in db.ChangeTracker.Entries())
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Modified:
+                    case EntityState.Deleted:
+                        entry.State = EntityState.Modified; //Revert changes made to deleted entity.
+                        entry.State = EntityState.Unchanged;
+                        break;
+                    case EntityState.Added:
+                        entry.State = EntityState.Detached;
+                        break;
+                }
+            }
         }
         public async static Task AddFilesToClass(IEnumerable<File> files, Class c)
         {
             foreach (var file in files)
             {
-                if (!await Db.FileClasses.AnyAsync(p => p.FileID == file.ID && p.ClassID==c.ID))
+                if (!await db.FileClasses.AnyAsync(p => p.FileID == file.ID && p.ClassID == c.ID))
                 {
-                    Db.FileClasses.Add(new FileClass(c, file, true));
+                    db.FileClasses.Add(new FileClass(c, file, true));
                 }
             }
-            await Db.SaveChangesAsync();
+            await db.SaveChangesAsync();
         }
         public async static Task RemoveFilesFromClass(IEnumerable<File> files, Class c)
         {
             foreach (var file in files)
             {
-                var existed =await Db.FileClasses.FirstOrDefaultAsync(p => p.FileID == file.ID);
-                if (existed!=null)
+                var existed = await db.FileClasses.FirstOrDefaultAsync(p => p.FileID == file.ID);
+                if (existed != null)
                 {
                     existed.Disabled = true;
-                    Db.Entry(existed).State = EntityState.Modified;
+                    db.Entry(existed).State = EntityState.Modified;
                 }
             }
-            await Db.SaveChangesAsync();
+            await db.SaveChangesAsync();
         }
         public static async Task UpdateFilesOfClassesAsync(UpdateFilesArgs args)
         {
-            await Task.Run(() =>
+            await Task.Run((Action)(() =>
             {
                 var files = new DI(args.Project.RootPath).EnumerateFiles("*", SO.AllDirectories).ToList();
                 HashSet<string> paths = new HashSet<string>(files.Select(p => p.FullName));
-                HashSet<File> dbFiles = new HashSet<File>(Db.Files.Where(p => p.Project == args.Project));
+                HashSet<File> dbFiles = new HashSet<File>(Queryable.Where<File>(DbUtility.db.Files, (System.Linq.Expressions.Expression<Func<File, bool>>)(p => (bool)(p.Project == args.Project))));
 
                 //删除已不存在的文件
                 foreach (var file in dbFiles)
                 {
                     if (!paths.Contains(file.GetAbsolutePath()))
                     {
-                        Db.Entry(file).State = EntityState.Deleted;
+                        DbUtility.db.Entry<File>(file).State = EntityState.Deleted;
                     }
                 }
-                Db.SaveChanges();
+                DbUtility.db.SaveChanges();
 
                 //现在数据库中该项目的所有文件应该都存在相对应的物理文件
                 int index = 0;
@@ -269,10 +299,10 @@ namespace ClassifyFiles.Util
                 foreach (var file in files)
                 {
                     File f = new File(file, args.Project);
-                    //重写了HashCode，因此可以这样来判断
+                    //先判断一下数据库中是否已存在该文件
                     if (!dbFiles.Contains(f))
                     {
-                        Db.Files.Add(f);
+                        DbUtility.db.Files.Add(f);
                         if (args.IncludeThumbnails)
                         {
                             FileUtility.TryGenerateThumbnail(f);
@@ -280,9 +310,11 @@ namespace ClassifyFiles.Util
                     }
                     else
                     {
+                        //如果数据库中存在该文件，则从HashSet中提取该文件
                         if (!dbFiles.TryGetValue(f, out File newF))
                         {
-                            System.Diagnostics.Debug.Assert(false);
+                            //理论上不会进来
+                            Debug.Assert(false);
                         }
                         f = newF;
                     }
@@ -291,38 +323,38 @@ namespace ClassifyFiles.Util
                     {
                         foreach (var c in args.Classes)
                         {
-                            FileClass fc = Db.FileClasses.IncludeAll().FirstOrDefault(p => p.Class == c && p.File == f);
+                            FileClass fc = DbUtility.IncludeAll(DbUtility.db.FileClasses).FirstOrDefault(p => p.Class == c && p.File == f);
                             bool isMatched = FileUtility.IsMatched(file, c);
                             if (fc == null && isMatched)
                             {
-                                Db.Add(new FileClass(c, f, false));
+                                //如果匹配并且不存在，那么新增关系
+                                DbUtility.db.Add<FileClass>(new FileClass(c, f, false));
                             }
                             else if (fc != null && !isMatched)
                             {
-                                Db.Entry(fc).State = EntityState.Deleted;
+                                //如果存在关系但不匹配，那么应该删除已存在的关系
+                                //注意，手动删除的关系并不会走到这一步
+                                DbUtility.db.Entry<FileClass>(fc).State = EntityState.Deleted;
                             }
-                            else if (fc != null && isMatched)
-                            {
-
-                            }
+                            //其他情况，既不需要增加，也不需要删除
                         }
                     }
                     args.Callback?.Invoke((++index * 1.0) / count, f);
                 }
-                Db.SaveChanges();
-            });
+                DbUtility.db.SaveChanges();
+            }));
         }
         public static Task<int> GetFilesCountAsync(Project project)
         {
-            return Db.Files.CountAsync(p => p.Project == project);
+            return db.Files.CountAsync(p => p.Project == project);
         }
         public static Task<int> GetFileClassesCountAsync(Project project)
         {
-            return Db.FileClasses.CountAsync(p => p.File.Project == project);
+            return db.FileClasses.CountAsync(p => p.File.Project == project);
         }
         public static Task<int> GetClassesCountAsync(Project project)
         {
-            return Db.Classes.CountAsync(p => p.Project == project);
+            return db.Classes.CountAsync(p => p.Project == project);
         }
     }
 

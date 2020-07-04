@@ -269,6 +269,7 @@ namespace ClassifyFiles.Util
             }
             return name;
         }
+
         private static string GetUniqueFileName(string name, string dir)
         {
             if (!F.Exists(P.Combine(dir, name)))

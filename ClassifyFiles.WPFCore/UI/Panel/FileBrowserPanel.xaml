@@ -12,7 +12,9 @@
      xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
     Loaded="WindowBase_Loaded"
         mc:Ignorable="d">
- 
+    <UserControl.Resources>
+        <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
+    </UserControl.Resources>
     <Grid >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -57,8 +59,11 @@
                     <m:FontIcon Glyph="&#xE8B9;"/>
                 </m:AppBarToggleButton.Icon>
             </m:AppBarToggleButton>
-            <m:AppBarButton  x:Name="btnAddFile" Grid.Column="1"  Icon="Add"  Label="添加文件" Click="btnAddFile_Click"/>
-            <m:AppBarButton x:Name="btnRefreshAll"  IsCompact="False"  Label="刷新全部" Click="RefreshAllButton_Click">
+            <m:AppBarButton  x:Name="btnAddFile" Icon="Add"  Label="添加文件" Click="btnAddFile_Click"
+                             IsEnabled="{Binding ElementName=classPanel, Path=SelectedItem, Converter={StaticResource nn2b}}"/>
+            <m:AppBarButton  x:Name="btnRefresh" Icon="Refresh"  Label="刷新" Click="RefreshButton_Click"
+                                                          IsEnabled="{Binding ElementName=classPanel, Path=SelectedItem, Converter={StaticResource nn2b}}"/>
+            <m:AppBarButton x:Name="btn"  IsCompact="False"  Label="自动分类" Click="ClassifyButton_Click">
                 <m:AppBarButton.Icon>
                     <m:FontIcon Glyph="&#xE72C;&#xEA37;"/>
 

@@ -40,6 +40,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ClassifyFiles.UI.Component;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -144,16 +145,16 @@ namespace ClassifyFiles.UI.Panel
             }
             else
             {
-                List<UIFile> filesWithIcon = new List<UIFile>() ;
-                await Task.Run ( async() =>
-                {
-                    foreach (var file in files)
-                    {
-                        UIFile uiFile = new UIFile(file);
-                        await uiFile.LoadTagsAsync(Project);
-                        filesWithIcon.Add(uiFile);
-                    }
-                });
+                List<UIFile> filesWithIcon = new List<UIFile>();
+                await Task.Run(async () =>
+              {
+                  foreach (var file in files)
+                  {
+                      UIFile uiFile = new UIFile(file);
+                      await uiFile.LoadTagsAsync(Project);
+                      filesWithIcon.Add(uiFile);
+                  }
+              });
                 Files = new ObservableCollection<UIFile>(filesWithIcon);
             }
             GeneratePaggingButtons();
@@ -362,10 +363,21 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
-        private void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private async void Tags_MouseDown(object sender, MouseButtonEventArgs e)
         {
             Class c = (e.Source as ContentPresenter).Content as Class;
-            ClickTag?.Invoke(this, new ClickTagEventArgs(c));
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                ClickTag?.Invoke(this, new ClickTagEventArgs(c));
+            }
+            else if (e.MiddleButton == MouseButtonState.Pressed)
+            {
+                TagGroup tg = sender as TagGroup;
+
+                await DbUtility.RemoveFilesFromClass(new File[] { tg.File.Raw }, c);
+                tg.File.Classes.Remove(c);
+            }
+            e.Handled = true;
         }
         public event EventHandler<ClickTagEventArgs> ClickTag;
 
@@ -385,37 +397,37 @@ namespace ClassifyFiles.UI.Panel
                 CheckBox chk = new CheckBox()
                 {
                     Content = tag.Name,
-                    IsChecked =(! files.Any(p => p.Classes.Contains(tag)))?false:
-                    files.All(p => p.Classes.Contains(tag)) ? true :(bool?) null
+                    IsChecked = (!files.Any(p => p.Classes.Contains(tag))) ? false :
+                    files.All(p => p.Classes.Contains(tag)) ? true : (bool?)null
                 };
-                chk.Click +=async (p1, p2) =>
-                {
-                    GetProgress().Show(false);
-                    if (chk.IsChecked==true)
-                    {
-                        await DbUtility.AddFilesToClass(files.Select(p=>p.Raw), tag);
-                        foreach (var file in files)
-                        {
-                            if(!file.Classes.Contains(tag))
-                            {
-                                file.Classes.Add(tag);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        await DbUtility.RemoveFilesFromClass(files.Select(p=>p.Raw), tag);
-                        foreach (var file in files)
-                        {
-                            if (file.Classes.Contains(tag))
-                            {
-                                file.Classes.Remove(tag);
-                            }
-                        }
-                    }
+                chk.Click += async (p1, p2) =>
+                 {
+                     GetProgress().Show(false);
+                     if (chk.IsChecked == true)
+                     {
+                         await DbUtility.AddFilesToClass(files.Select(p => p.Raw), tag);
+                         foreach (var file in files)
+                         {
+                             if (!file.Classes.Contains(tag))
+                             {
+                                 file.Classes.Add(tag);
+                             }
+                         }
+                     }
+                     else
+                     {
+                         await DbUtility.RemoveFilesFromClass(files.Select(p => p.Raw), tag);
+                         foreach (var file in files)
+                         {
+                             if (file.Classes.Contains(tag))
+                             {
+                                 file.Classes.Remove(tag);
+                             }
+                         }
+                     }
 
-                    GetProgress().Close();
-                };
+                     GetProgress().Close();
+                 };
                 menu.Items.Add(chk);
             }
 

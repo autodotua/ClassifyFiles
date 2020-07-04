@@ -25,6 +25,7 @@ using DImg = System.Drawing.Image;
 using ModernWpf.Controls;
 using ClassifyFiles.UI.Model;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using IO =System. IO;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -80,8 +81,8 @@ namespace ClassifyFiles.UI.Panel
 
         private async void SelectedItemChanged(object sender, SelectedItemChanged e)
         {
-                Debug.WriteLine("Selected Class Changed, Project Hashcode is " + Project.GetHashCode()
-                + ", Class is " + (GetItemsPanel().SelectedItem == null ? "null" : GetItemsPanel().SelectedItem.Name));
+            Debug.WriteLine("Selected Class Changed, Project Hashcode is " + Project.GetHashCode()
+            + ", Class is " + (GetItemsPanel().SelectedItem == null ? "null" : GetItemsPanel().SelectedItem.Name));
             GetProgress().Show(false);
             List<File> files = GetItemsPanel().SelectedItem == null ?
                 await DbUtility.GetFilesByProjectAsync(Project.ID)
@@ -107,7 +108,7 @@ namespace ClassifyFiles.UI.Panel
             btnLocateByDir.IsEnabled = filesViewer.CurrentViewType != 3;
         }
 
-        private async void RefreshAllButton_Click(object sender, RoutedEventArgs e)
+        private async void ClassifyButton_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(Project.RootPath))
             {
@@ -120,7 +121,7 @@ namespace ClassifyFiles.UI.Panel
                 await DbUtility.UpdateFilesOfClassesAsync(new UpdateFilesArgs()
                 {
                     Classes = GetItemsPanel().Items,
-                    IncludeThumbnails = true,
+                    IncludeThumbnails = btnIncludeThumbnails.IsChecked.Value,
                     Project = Project,
                     RefreshClasses = true,
                     Callback = (p, f) => Dispatcher.Invoke(() =>
@@ -139,7 +140,6 @@ namespace ClassifyFiles.UI.Panel
             }
             finally
             {
-
                 GetProgress().Close();
             }
         }
@@ -154,9 +154,19 @@ namespace ClassifyFiles.UI.Panel
             if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
             {
                 GetProgress().Show(true);
-                Class tag = GetItemsPanel().SelectedItem as Class;
-                var files = await DbUtility.AddFilesToClass(dialog.FileNames, tag, true);
-                await filesViewer.AddFilesAsync(files);
+                try
+                {
+                    var files = await DbUtility.AddFilesToClass(dialog.FileNames, GetItemsPanel().SelectedItem, btnIncludeThumbnails.IsChecked.Value);
+                    await filesViewer.AddFilesAsync(files);
+                }
+                catch (Exception ex)
+                {
+                    await new ErrorDialog().ShowAsync(ex, "加入文件失败");
+                }
+                finally
+                {
+                    GetProgress().Close();
+                }
                 GetProgress().Close();
             }
         }
@@ -169,16 +179,46 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
-        private void UserControl_Drop(object sender, DragEventArgs e)
+        private async void UserControl_Drop(object sender, DragEventArgs e)
         {
+            if (classPanel.SelectedItem == null)
+            {
+                return;
+            }
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-
+                GetProgress().Show(false);
+                try
+                {
+                    List<string> files = new List<string>();
+                    foreach (var file in (string[])e.Data.GetData(DataFormats.FileDrop))
+                    {
+                        if (IO.File.Exists(file))
+                        {
+                            files.Add(file);
+                        }
+                        else if (IO.Directory.Exists(file))
+                        {
+                            files.AddRange(IO.Directory.EnumerateFiles(file, "*", IO.SearchOption.AllDirectories));
+                        }
+                    }
+                    var newFiles = await DbUtility.AddFilesToClass(files, classPanel.SelectedItem, btnIncludeThumbnails.IsChecked.Value);
+                    await filesViewer.AddFilesAsync(newFiles);
+                }
+                catch (Exception ex)
+                {
+                    await new ErrorDialog().ShowAsync(ex, "加入文件失败");
+                }
+                finally
+                {
+                    GetProgress().Close();
+                }
             }
+        }
+
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            SelectedItemChanged(null, null);
         }
     }
 }
-
-
-

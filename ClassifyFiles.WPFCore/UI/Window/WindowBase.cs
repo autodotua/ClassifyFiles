@@ -25,7 +25,8 @@ namespace ClassifyFiles.UI
         {
             DataContext = this;
             WindowHelper.SetUseModernWindowStyle(this, true);
-            ClassifyFiles.WPFCore.App.SetTheme(this);
+            WPFCore.App.SetTheme(this);
+           
         }
         private static ImageSource icon;
 

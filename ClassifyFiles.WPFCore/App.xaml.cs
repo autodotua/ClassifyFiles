@@ -21,10 +21,9 @@ namespace ClassifyFiles.WPFCore
         private async void Application_Startup(object sender, StartupEventArgs e)
         {
             Current = this;
-            Window splash = new SplashWindow();
-            splash.Show();
+            SplashWindow.ShowScreen();
             MainWindow win = new MainWindow();
-            win.Loaded += (p1, p2) => splash.Close();
+            win.ContentRendered += (p1, p2) => SplashWindow.CloseScreen();
 #if (!DEBUG)
             UnhandledException.RegistAll();
 
