@@ -49,8 +49,14 @@
 
 
         <panel:FilesViewer ViewTypeChanged="filesViewer_ViewTypeChanged" 
-                           x:Name="filesViewer" Grid.Column="2"  ClickTag="filesViewer_ClickTag"/>
+                           x:Name="filesViewer" Grid.Column="2"  AllowDrop="True"
+             Drop="UserControl_Drop" ClickTag="filesViewer_ClickTag"/>
         <m:CommandBar  Grid.Row="2" Grid.ColumnSpan="999" DefaultLabelPosition="Right">
+            <m:AppBarToggleButton  x:Name="btnIncludeThumbnails"      Label="生成缩略图">
+                <m:AppBarToggleButton.Icon>
+                    <m:FontIcon Glyph="&#xE8B9;"/>
+                </m:AppBarToggleButton.Icon>
+            </m:AppBarToggleButton>
             <m:AppBarButton  x:Name="btnAddFile" Grid.Column="1"  Icon="Add"  Label="添加文件" Click="btnAddFile_Click"/>
             <m:AppBarButton x:Name="btnRefreshAll"  IsCompact="False"  Label="刷新全部" Click="RefreshAllButton_Click">
                 <m:AppBarButton.Icon>
@@ -58,7 +64,6 @@
 
                 </m:AppBarButton.Icon>
             </m:AppBarButton>
-            <m:AppBarButton  x:Name="btnRefreshCurrent"  Grid.Column="1"  Icon="Refresh"  Label="刷新当前" Click="RefreshButton_Click"/>
             <m:AppBarButton x:Name="btnLocateByDir" Icon="OpenLocal" Label="根据文件夹定位" >
                 <m:FlyoutService.Flyout>
                     <m:Flyout x:Name="flyoutJumpToDir" >

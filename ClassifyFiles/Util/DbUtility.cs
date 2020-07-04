@@ -42,7 +42,7 @@ namespace ClassifyFiles.Util
 
         }
 
-        public static  Task SaveChangesAsync()
+        public static Task SaveChangesAsync()
         {
             return Db.SaveChangesAsync();
         }
@@ -63,6 +63,11 @@ namespace ClassifyFiles.Util
         {
             Db.Entry(project).State = EntityState.Deleted;
             await db.SaveChangesAsync();
+        }
+        public static Task DeleteFilesOfProjectAsync(Project project)
+        {
+            return Db.Database.ExecuteSqlRawAsync("delete from Files where ProjectID = " + project.ID);
+            //await db.SaveChangesAsync();
         }
 
         public static async Task<Project> AddProjectAsync()
@@ -94,7 +99,12 @@ namespace ClassifyFiles.Util
         }
         public async static Task<List<File>> GetFilesByClassAsync(int classID)
         {
-            var files = Db.FileClasses.Where(p => p.Class.ID == classID).IncludeAll().Select(p => p.File);
+            var files = Db.FileClasses
+                .Where(p => p.Class.ID == classID)
+                .IncludeAll()
+                .OrderBy(p => p.File.Dir)
+                .ThenBy(p => p.File.Name)
+                .Select(p => p.File);
             return await files.ToListAsync();
         }
         public async static Task<List<File>> GetFilesByProjectAsync(int projectID)
@@ -170,7 +180,7 @@ namespace ClassifyFiles.Util
             return projects.ToArray();
         }
 
-        public async static Task<IReadOnlyList<File>> AddFilesToClass(IEnumerable<string> files, Class c)
+        public async static Task<IReadOnlyList<File>> AddFilesToClass(IEnumerable<string> files, Class c, bool includeThumbnails)
         {
             var existed = await GetFilesByClassAsync(c.ID);
             List<File> fs = new List<File>();
@@ -180,6 +190,10 @@ namespace ClassifyFiles.Util
                 //重写了HashCode，因此可以这样来判断
                 if (!existed.Contains(f))
                 {
+                    if (includeThumbnails)
+                    {
+                        FileUtility.TryGenerateThumbnail(f);
+                    }
                     Db.Files.Add(f);
                     Db.FileClasses.Add(new FileClass(c, f, true));
                     fs.Add(f);
@@ -206,8 +220,10 @@ namespace ClassifyFiles.Util
             {
                 var files = new DI(args.Project.RootPath).EnumerateFiles("*", SO.AllDirectories).ToList();
                 HashSet<string> paths = new HashSet<string>(files.Select(p => p.FullName));
+                HashSet<File> dbFiles = new HashSet<File>(Db.Files.Where(p => p.Project == args.Project));
+
                 //删除已不存在的文件
-                foreach (var file in GetFilesByProject(args.Project.ID))
+                foreach (var file in dbFiles)
                 {
                     if (!paths.Contains(file.GetAbsolutePath()))
                     {
@@ -217,8 +233,6 @@ namespace ClassifyFiles.Util
                 Db.SaveChanges();
 
                 //现在数据库中该项目的所有文件应该都存在相对应的物理文件
-                HashSet<File> dbFiles = new HashSet<File>(Db.Files.Where(p => p.Project == args.Project));
-
                 int index = 0;
                 int count = files.Count;
                 foreach (var file in files)
@@ -232,6 +246,14 @@ namespace ClassifyFiles.Util
                         {
                             FileUtility.TryGenerateThumbnail(f);
                         }
+                    }
+                    else
+                    {
+                        if (!dbFiles.TryGetValue(f, out File newF))
+                        {
+                            System.Diagnostics.Debug.Assert(false);
+                        }
+                        f = newF;
                     }
 
                     if (args.RefreshClasses)
@@ -248,14 +270,29 @@ namespace ClassifyFiles.Util
                             {
                                 Db.Entry(fc).State = EntityState.Deleted;
                             }
+                            else if (fc != null && isMatched)
+                            {
+
+                            }
                         }
                     }
                     args.Callback?.Invoke((++index * 1.0) / count, f);
                 }
+                Db.SaveChanges();
             });
-            await SaveChangesAsync();
         }
-
+        public static Task<int> GetFilesCountAsync(Project project)
+        {
+            return Db.Files.CountAsync(p => p.Project == project);
+        }
+        public static Task<int> GetFileClassesCountAsync(Project project)
+        {
+            return Db.FileClasses.CountAsync(p => p.File.Project == project);
+        }
+        public static Task<int> GetClassesCountAsync(Project project)
+        {
+            return Db.Classes.CountAsync(p => p.Project == project);
+        }
     }
 
     public class UpdateFilesArgs

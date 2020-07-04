@@ -136,12 +136,23 @@ namespace ClassifyFiles.UI.Panel
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void SetFiles(IEnumerable<File> files, bool tags = true)
+        public async Task SetFilesAsync(IEnumerable<File> files, bool tags = true)
         {
-            IEnumerable<UIFile> filesWithIcon = files.Select(p => new UIFile(p, tags, Project));
-            var orderedFiles = filesWithIcon.OrderBy(p => p.Dir).ThenBy(p => p.Name);
-            Files = new ObservableCollection<UIFile>(orderedFiles);
-
+            Debug.WriteLine("SetFiles");
+            if (files == null || !files.Any())
+            {
+                Files = null;
+            }
+            else
+            {
+                List<UIFile> filesWithIcon = null;
+                await Task.Run(() =>
+                {
+                    filesWithIcon = files.Select(p => new UIFile(p, tags, Project)).ToList();
+                });
+                Files = new ObservableCollection<UIFile>(filesWithIcon);
+            }
+            GeneratePaggingButtons();
         }
         public void AddFiles(IEnumerable<File> files, bool tags = true)
         {
@@ -151,11 +162,12 @@ namespace ClassifyFiles.UI.Panel
                 Files.Add(file);
             }
 
+            GeneratePaggingButtons();
         }
 
 
 
-        public void GeneratePaggingButtons()
+        private void GeneratePaggingButtons()
         {
             stkPagging.Children.Clear();
             if (Files != null && Files.Count > 0)

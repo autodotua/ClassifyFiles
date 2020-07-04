@@ -23,7 +23,7 @@ namespace ClassifyFiles.Data
             }
             Project = project;
             //Dir = file.FullName.Replace(root.FullName, "").Replace(file.Name, "").Trim('\\');
-            Dir = file.FullName.Substring(root.FullName.Length, file.FullName.Length - file.Name.Length - root.FullName.Length - 1).TrimEnd('\\');
+            Dir = file.FullName.Substring(root.FullName.Length, file.FullName.Length - file.Name.Length - root.FullName.Length - 1).Trim('\\');
         }
 
         [Required]

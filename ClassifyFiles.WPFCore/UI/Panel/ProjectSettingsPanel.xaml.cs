@@ -31,7 +31,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace ClassifyFiles.UI.Panel
 {
-      public partial class ProjectSettingsPanel : ProjectPanelBase
+    public partial class ProjectSettingsPanel : ProjectPanelBase
     {
         public string Splitter { get; set; } = "-";
         public ProjectSettingsPanel()
@@ -48,14 +48,9 @@ namespace ClassifyFiles.UI.Panel
         public override async Task LoadAsync(Project project)
         {
             await base.LoadAsync(project);
-            //if (Project.Type == Project.ClassifyType.FileProps)
-            //{
-            //    rbtnTypeFileProps.IsChecked = true;
-            //}
-            //else
-            //{
-            //    rbtnTypeTag.IsChecked = true;
-            //}
+            tbkFilesCount.Text = (await DbUtility.GetFilesCountAsync(project)).ToString();
+            tbkClassesCount.Text =( await DbUtility.GetClassesCountAsync(project)).ToString();
+            tbkFileClassesCount.Text = (await DbUtility.GetFileClassesCountAsync(project)).ToString();
         }
 
         public ExportFormat ExportFormat { get; set; }
@@ -185,22 +180,17 @@ namespace ClassifyFiles.UI.Panel
 
             }
         }
-
-        private void rbtnTypeFileProps_Checked(object sender, RoutedEventArgs e)
-        {
-            //if (sender == rbtnTypeFileProps)
-            //{
-            //    Project.Type = Project.ClassifyType.FileProps;
-            //}
-            //else
-            //{
-            //    Project.Type = Project.ClassifyType.Tag;
-            //}
-        }
-
         public override ListPanelBase GetItemsPanel()
         {
             return null;
+        }
+
+        private async void DeleteFiles_Click(object sender, RoutedEventArgs e)
+        {
+            flyoutDeleteFiles.Hide();
+            GetProgress().Show(false);
+            await DbUtility.DeleteFilesOfProjectAsync(Project);
+            GetProgress().Close();
         }
     }
 }

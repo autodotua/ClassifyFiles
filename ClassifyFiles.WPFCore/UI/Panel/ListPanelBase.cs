@@ -17,12 +17,8 @@ namespace ClassifyFiles.UI.Panel
         public override async Task LoadAsync(Project project)
         {
             Project = project;
-            //var (treeClasses, tile) = await DbUtility.GetTreeAndTileClassesAsync(Project);
             var treeClasses = await DbUtility.GetClassesAsync(Project);
             Items = new ObservableCollection<Class>(treeClasses);
-
-            Class first = Items.FirstOrDefault() as Class;
-            SelectedItem = first;
         }
         public async override Task RenameAsync(string newName)
         {
@@ -64,10 +60,11 @@ namespace ClassifyFiles.UI.Panel
                 var oldValue = selectedItem;
                 selectedItem = value;
                 this.Notify(nameof(SelectedItem));
-                if (value != null)
-                {
+                //if (value != null)
+                //{
                     SelectedItemChanged?.Invoke(this, new SelectedItemChanged(oldValue, value));
-                }       }
+                }    
+        //}
         }
         public Project Project { get; protected set; }
         public abstract Task LoadAsync(Project project);

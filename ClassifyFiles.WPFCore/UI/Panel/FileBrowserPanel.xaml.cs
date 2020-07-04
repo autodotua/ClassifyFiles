@@ -58,9 +58,6 @@ namespace ClassifyFiles.UI.Panel
         }
 
 
-
-
-
         private async void RenameProjectButton_Click(object sender, RoutedEventArgs e)
         {
             string newName = await new InputDialog().ShowAsync("请输入新的项目名", false, "项目名", Project.Name);
@@ -83,10 +80,17 @@ namespace ClassifyFiles.UI.Panel
 
         private async void classes_SelectedItemChanged_1(object sender, SelectedItemChanged e)
         {
-            var files = await DbUtility.GetFilesByClassAsync(GetItemsPanel().SelectedItem.ID);
-            filesViewer.SetFiles(files);
-
-            filesViewer.GeneratePaggingButtons();
+            if (GetItemsPanel().SelectedItem == null)
+            {
+                await filesViewer.SetFilesAsync(null);
+            }
+            else
+            {
+                GetProgress().Show(false);
+                var files = await DbUtility.GetFilesByClassAsync(GetItemsPanel().SelectedItem.ID);
+                await filesViewer.SetFilesAsync(files);
+                GetProgress().Close();
+            }
         }
 
 
@@ -109,6 +113,11 @@ namespace ClassifyFiles.UI.Panel
 
         private async void RefreshAllButton_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrEmpty(Project.RootPath))
+            {
+                await new ErrorDialog().ShowAsync("请先设置根目录地址！", "错误");
+                return;
+            }
             GetProgress().Show(true);
             try
             {
@@ -123,11 +132,10 @@ namespace ClassifyFiles.UI.Panel
                           GetProgress().Message = p.ToString("P") + (f == null ? "" : $"（{f.Name}）");
                       })
                 });
-                if (classPanel.SelectedItem != null )
+                if (classPanel.SelectedItem != null)
                 {
-                    filesViewer.SetFiles(await DbUtility.GetFilesByClassAsync(classPanel.SelectedItem.ID));
+                    await filesViewer.SetFilesAsync(await DbUtility.GetFilesByClassAsync(classPanel.SelectedItem.ID));
                 }
-                filesViewer.GeneratePaggingButtons();
             }
             catch (Exception ex)
             {
@@ -138,34 +146,6 @@ namespace ClassifyFiles.UI.Panel
 
                 GetProgress().Close();
             }
-        }
-
-        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
-        {
-            //GetProgress().Show(true);
-            //try
-            //{
-            //    var files = await FileUtility.GetFilesOfClassesAsync(new System.IO.DirectoryInfo(Project.RootPath), GetItemsPanel().SelectedItem as Class, true, (p, f) =>
-            //    {
-            //        Dispatcher.Invoke(() =>
-            //        {
-            //            GetProgress().Message = p.ToString("P") + (f == null ? "" : $"（{f.Name}）");
-            //        });
-            //    });
-            //    await DbUtility.UpdateFilesAsync(GetItemsPanel().SelectedItem, files);
-
-            //    filesViewer.SetFiles(files);
-            //    filesViewer.GeneratePaggingButtons();
-            //}
-            //catch (Exception ex)
-            //{
-            //    await new ErrorDialog().ShowAsync(ex, "刷新错误");
-            //}
-            //finally
-            //{
-            //    GetProgress().Close();
-            //}
-
         }
 
         private async void btnAddFile_Click(object sender, RoutedEventArgs e)
@@ -179,15 +159,7 @@ namespace ClassifyFiles.UI.Panel
             {
                 GetProgress().Show(true);
                 Class tag = GetItemsPanel().SelectedItem as Class;
-                var files = await DbUtility.AddFilesToClass(dialog.FileNames, tag);
-                //var files = await DbUtility.AddFilesToTag(dialog.FileNames, tag, new System.IO.DirectoryInfo(base.Project.RootPath), (p, f) =>
-                //  {
-                //      Dispatcher.Invoke(() =>
-                //      {
-                //          GetProgress().Message = p.ToString("P") + (f == null ? "" : $"（{f.Name}）");
-                //      });
-                //  });
-                //await DbUtility.SaveTagAsync(tag);
+                var files = await DbUtility.AddFilesToClass(dialog.FileNames, tag, true);
                 filesViewer.AddFiles(files);
                 GetProgress().Close();
             }
@@ -200,7 +172,17 @@ namespace ClassifyFiles.UI.Panel
                 GetItemsPanel().SelectedItem = e.Class;
             }
         }
+
+        private void UserControl_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+            }
+        }
     }
-
-
 }
+
+
+

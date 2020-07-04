@@ -37,22 +37,45 @@
                 </Grid>
             </GroupBox>
             <GroupBox Header="操作">
-                <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
-                    <Button Background="Red" Foreground="White"   >
-                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
-                            <m:SymbolIcon Symbol="Delete" VerticalAlignment="Center"/>
-                            <TextBlock  VerticalAlignment="Center">删除</TextBlock>
-                        </m:SimpleStackPanel>
-                        <m:FlyoutService.Flyout>
-                            <m:Flyout x:Name="flyoutDelete">
-                                <m:SimpleStackPanel Spacing="8">
-                                    <TextBlock>即将删除项目</TextBlock>
-                                    <Button Content="确定" Click="DeleteButton_Click" />
-                                </m:SimpleStackPanel>
-                            </m:Flyout>
-                        </m:FlyoutService.Flyout>
-                    </Button>
-
+                <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
+                    <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                        <Button Background="Red" Foreground="White"   >
+                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                                <m:SymbolIcon Symbol="Delete" VerticalAlignment="Center"/>
+                                <TextBlock  VerticalAlignment="Center">删除项目</TextBlock>
+                            </m:SimpleStackPanel>
+                            <m:FlyoutService.Flyout>
+                                <m:Flyout x:Name="flyoutDelete">
+                                    <m:SimpleStackPanel Spacing="8">
+                                        <TextBlock>即将删除项目</TextBlock>
+                                        <Button Content="确定" Click="DeleteButton_Click" />
+                                    </m:SimpleStackPanel>
+                                </m:Flyout>
+                            </m:FlyoutService.Flyout>
+                        </Button>
+                        <Button Background="Red" Foreground="White"   >
+                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                                <m:SymbolIcon Symbol="Delete" VerticalAlignment="Center"/>
+                                <TextBlock  VerticalAlignment="Center">删除数据库中的文件</TextBlock>
+                            </m:SimpleStackPanel>
+                            <m:FlyoutService.Flyout>
+                                <m:Flyout x:Name="flyoutDeleteFiles">
+                                    <m:SimpleStackPanel Spacing="8">
+                                        <TextBlock>即将删除项目中的文件。这部删除硬盘中的物理文件。</TextBlock>
+                                        <Button Content="确定" Click="DeleteFiles_Click" />
+                                    </m:SimpleStackPanel>
+                                </m:Flyout>
+                            </m:FlyoutService.Flyout>
+                        </Button>
+                    </m:SimpleStackPanel>
+                    <m:SimpleStackPanel Orientation="Horizontal"     Spacing="12">
+                        <TextBlock>文件数量：</TextBlock>
+                        <TextBlock x:Name="tbkFilesCount" Margin="0,0,12,0"></TextBlock>
+                        <TextBlock>分类数量：</TextBlock>
+                        <TextBlock x:Name="tbkClassesCount"  Margin="0,0,12,0"></TextBlock>
+                        <TextBlock>文件分类关系数量：</TextBlock>
+                        <TextBlock x:Name="tbkFileClassesCount"  Margin="0,0,12,0"></TextBlock>
+                    </m:SimpleStackPanel>
                 </m:SimpleStackPanel>
             </GroupBox>
             <GroupBox Header="文件导出">
