@@ -26,23 +26,6 @@ namespace ClassifyFiles.UI.Panel
             {
                 ClassesPanel panel = GetItemsPanel();
                 await panel.LoadAsync(project);
-                if(selectedItem!=null &&selectedItem.Project!=Project)
-                {
-                    selectedItem = null;
-                }
-                panel.SelectedItem = selectedItem; 
-                //if (selectedItem != null)
-                //{
-                //    panel.SelectedItem = selectedItem;
-                //}
-                //else if (panel.Items.Count > 0)
-                //{
-                //    panel.SelectedItem = panel.Items[0];
-                //}
-                panel.SelectedItemChanged += (p1, p2) =>
-                {
-                    selectedItem = panel.SelectedItem;
-                };
             }
         }
         public abstract ClassesPanel GetItemsPanel();
@@ -60,6 +43,5 @@ namespace ClassifyFiles.UI.Panel
         {
             return (Window.GetWindow(this) as MainWindow).Progress;
         }
-        public static Class selectedItem { get; private set; }
     }
 }

@@ -11,6 +11,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid >
         <m:FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="{Binding File.Glyph}"
+                    FontSize="{Binding File.FontSize}"
                                            Height="{Binding File.SmallIconSize}" Width="{Binding File.SmallIconSize}" Visibility="{Binding File.IconVisibility}" 
                                              HorizontalAlignment="Center" VerticalAlignment="Center" />
         <Image Source="{Binding File.Image}" Visibility="{Binding File.ImageVisibility}"  

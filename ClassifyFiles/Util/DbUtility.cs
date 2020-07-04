@@ -119,6 +119,7 @@ namespace ClassifyFiles.Util
             Debug.WriteLine("db: " + nameof(GetFilesByClassAsync));
             var files = Db.FileClasses
                 .Where(p => p.Class.ID == classID)
+                .Where(p=>p.Disabled==false)
                 .IncludeAll()
                 .OrderBy(p => p.File.Dir)
                 .ThenBy(p => p.File.Name)
@@ -224,9 +225,22 @@ namespace ClassifyFiles.Util
         {
             foreach (var file in files)
             {
-                if (!await Db.FileClasses.AnyAsync(p => p.FileID == file.ID))
+                if (!await Db.FileClasses.AnyAsync(p => p.FileID == file.ID && p.ClassID==c.ID))
                 {
                     Db.FileClasses.Add(new FileClass(c, file, true));
+                }
+            }
+            await Db.SaveChangesAsync();
+        }
+        public async static Task RemoveFilesFromClass(IEnumerable<File> files, Class c)
+        {
+            foreach (var file in files)
+            {
+                var existed =await Db.FileClasses.FirstOrDefaultAsync(p => p.FileID == file.ID);
+                if (existed!=null)
+                {
+                    existed.Disabled = true;
+                    Db.Entry(existed).State = EntityState.Modified;
                 }
             }
             await Db.SaveChangesAsync();

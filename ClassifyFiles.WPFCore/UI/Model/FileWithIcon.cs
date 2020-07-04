@@ -103,17 +103,20 @@ namespace ClassifyFiles.UI.Model
 
         public double LargeIconSize { get; private set; } = DefualtIconSize;
         public double SmallIconSize { get; private set; } = DefualtIconSize / 2;
+        public double FontSize { get; private set; } = DefualtIconSize / 3;
 
         public void UpdateIconSize()
         {
             LargeIconSize = DefualtIconSize;
             SmallIconSize = DefualtIconSize / 2;
-            this.Notify(nameof(LargeIconSize), nameof(SmallIconSize));
+            FontSize = DefualtIconSize / 3;
+            this.Notify(nameof(LargeIconSize), nameof(SmallIconSize),nameof(FontSize));
         }
         public UIFile() { }
-
+        public File Raw { get; private set; }
         public UIFile(File file)
         {
+            Raw = file;
             ID = file.ID;
             Name = file.Name;
             Dir = file.Dir;

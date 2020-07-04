@@ -18,6 +18,6 @@
         public File File { get; set; }
         public int FileID { get; set; }
         public bool Manual { get; set; } = false;
-
+        public bool Disabled { get; set; } = false;
     }
 }

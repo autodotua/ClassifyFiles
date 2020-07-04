@@ -16,7 +16,6 @@
         <ui:IsNotNull2VisibilityConverter x:Key="nn2v"/>
   
             <ContextMenu x:Key="menu" Opened="ContextMenu_Opened">
-                <MenuItem Header="打开目录" Click="OpenDirMernuItem_Click"/>
             </ContextMenu>
     </UserControl.Resources>
     <Grid>
@@ -107,7 +106,7 @@
                     <RowDefinition Height="8"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <ListView   ItemsSource="{Binding Files}" x:Name="lvwFiles" 
+                <ListView   ItemsSource="{Binding Files}" x:Name="lvwFiles" SelectionMode="Extended"
                       PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"  ContextMenu="{StaticResource menu}"
                   
                             >

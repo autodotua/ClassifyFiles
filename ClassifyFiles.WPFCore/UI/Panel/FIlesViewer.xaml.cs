@@ -213,6 +213,16 @@ namespace ClassifyFiles.UI.Panel
                 _ => throw new NotImplementedException()
             };
         }
+        private IReadOnlyList<UIFile> GetSelectedFiles()
+        {
+            return CurrentViewType switch
+            {
+                1 => lvwFiles.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
+                2 => lbxGrdFiles.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
+                3 => new List<UIFile>().AsReadOnly(),
+                _ => throw new NotImplementedException()
+            };
+        }
 
         private async void lvwFiles_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -362,21 +372,49 @@ namespace ClassifyFiles.UI.Panel
         private void ContextMenu_Opened(object sender, RoutedEventArgs e)
         {
             ContextMenu menu = FindResource("menu") as ContextMenu;
-            UIFile file = GetSelectedFile();
-            while (menu.Items.Count > 1)
+            menu.Items.Clear();
+            var files = GetSelectedFiles();
+            if (files.Count == 1)
             {
-                menu.Items.RemoveAt(menu.Items.Count - 1);
+                MenuItem menuOpenFolder = new MenuItem() { Header = "打开目录" };
+                menuOpenFolder.Click += OpenDirMernuItem_Click;
+                menu.Items.Add(menuOpenFolder);
             }
             foreach (var tag in Project.Classes)
             {
                 CheckBox chk = new CheckBox()
                 {
                     Content = tag.Name,
-                    IsChecked = file.Classes.Contains(tag)
+                    IsChecked =(! files.Any(p => p.Classes.Contains(tag)))?false:
+                    files.All(p => p.Classes.Contains(tag)) ? true :(bool?) null
                 };
-                chk.Click += (p1, p2) =>
+                chk.Click +=async (p1, p2) =>
                 {
+                    GetProgress().Show(false);
+                    if (chk.IsChecked==true)
+                    {
+                        await DbUtility.AddFilesToClass(files.Select(p=>p.Raw), tag);
+                        foreach (var file in files)
+                        {
+                            if(!file.Classes.Contains(tag))
+                            {
+                                file.Classes.Add(tag);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        await DbUtility.RemoveFilesFromClass(files.Select(p=>p.Raw), tag);
+                        foreach (var file in files)
+                        {
+                            if (file.Classes.Contains(tag))
+                            {
+                                file.Classes.Remove(tag);
+                            }
+                        }
+                    }
 
+                    GetProgress().Close();
                 };
                 menu.Items.Add(chk);
             }
