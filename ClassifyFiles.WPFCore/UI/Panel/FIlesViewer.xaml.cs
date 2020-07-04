@@ -138,25 +138,38 @@ namespace ClassifyFiles.UI.Panel
 
         public async Task SetFilesAsync(IEnumerable<File> files, bool tags = true)
         {
-            Debug.WriteLine("SetFiles");
             if (files == null || !files.Any())
             {
                 Files = null;
             }
             else
             {
-                List<UIFile> filesWithIcon = null;
-                await Task.Run(() =>
+                List<UIFile> filesWithIcon = new List<UIFile>() ;
+                await Task.Run ( async() =>
                 {
-                    filesWithIcon = files.Select(p => new UIFile(p, tags, Project)).ToList();
+                    foreach (var file in files)
+                    {
+                        UIFile uiFile = new UIFile(file);
+                        await uiFile.LoadTagsAsync(Project);
+                        filesWithIcon.Add(uiFile);
+                    }
                 });
                 Files = new ObservableCollection<UIFile>(filesWithIcon);
             }
             GeneratePaggingButtons();
         }
-        public void AddFiles(IEnumerable<File> files, bool tags = true)
+        public async Task AddFilesAsync(IEnumerable<File> files, bool tags = true)
         {
-            IEnumerable<UIFile> filesWithIcon = files.Select(p => new UIFile(p, tags, Project));
+            List<UIFile> filesWithIcon = new List<UIFile>();
+            await Task.Run(async () =>
+            {
+                foreach (var file in files)
+                {
+                    UIFile uiFile = new UIFile(file);
+                    await uiFile.LoadTagsAsync(Project);
+                    filesWithIcon.Add(uiFile);
+                }
+            });
             foreach (var file in filesWithIcon)
             {
                 Files.Add(file);

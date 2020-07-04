@@ -44,7 +44,7 @@ namespace ClassifyFiles.UI
             get => selectedProject;
             set
             {
-                if(selectedProject!=null)
+                if (selectedProject != null)
                 {
                     selectedProject.PropertyChanged -= Project_PropertyChanged;
                 }
@@ -62,7 +62,7 @@ namespace ClassifyFiles.UI
                 LoadProjectAsync();
             }
         }
-      
+
         private void Project_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
         }
@@ -94,6 +94,7 @@ namespace ClassifyFiles.UI
                 Progress.Show(false);
                 try
                 {
+                    MainPanel =Activator.CreateInstance(MainPanel.GetType()) as ILoadable;
                     await MainPanel.LoadAsync(SelectedProject);
                 }
                 catch (Exception ex)
@@ -125,7 +126,7 @@ namespace ClassifyFiles.UI
         }
 
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
 
         }
@@ -137,10 +138,6 @@ namespace ClassifyFiles.UI
         }
 
 
-        private void MenuToggleButton_OnClick(object sender, RoutedEventArgs e)
-        {
-
-        }
 
         private async void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
@@ -158,9 +155,9 @@ namespace ClassifyFiles.UI
             {
                 await (MainPanel as ClassSettingPanel).SaveClassAsync();
             }
-            else if(MainPanel is ProjectSettingsPanel)
+            else if (MainPanel is ProjectSettingsPanel)
             {
-                DbUtility.SaveChangesAsync();
+                await DbUtility.SaveChangesAsync();
             }
             switch (btn.Name)
             {
@@ -238,11 +235,11 @@ namespace ClassifyFiles.UI
 
         private async void DeleteAllMenu_Click(object sender, RoutedEventArgs e)
         {
-            if(await new ConfirmDialog().ShowAsync("真的要删除所有项目吗？", "删除"))
+            if (await new ConfirmDialog().ShowAsync("真的要删除所有项目吗？", "删除"))
             {
                 foreach (var project in Projects.ToArray())
                 {
-                   await DbUtility.DeleteProjectAsync(project);
+                    await DbUtility.DeleteProjectAsync(project);
                     Projects.Remove(project);
                 }
                 await new MessageDialog().ShowAsync("删除成功", "删除");

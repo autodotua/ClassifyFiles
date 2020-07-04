@@ -41,7 +41,7 @@
                       VerticalAlignment="Bottom" Text="{Binding Project.RootPath}"/>
                 </m:SimpleStackPanel>
 
-                <panel:ClassesPanel x:Name="classPanel"  Grid.Row="99" SelectedItemChanged="classes_SelectedItemChanged_1"/>
+                <panel:ClassesPanel x:Name="classPanel" AllFilesButtonVisiable="True"  Grid.Row="99" SelectedItemChanged="SelectedItemChanged"/>
              </Grid>
 
         </Expander>

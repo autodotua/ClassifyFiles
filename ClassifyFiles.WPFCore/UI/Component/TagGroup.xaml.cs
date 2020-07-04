@@ -25,40 +25,8 @@ namespace ClassifyFiles.UI.Component
         {
             InitializeComponent();
             grd.DataContext = this;
-            //Loaded += (p1, p2) =>
-            //{
-            //    var a = Tags;
-
-            //};
-            System.Threading.Tasks.Task.Delay(1000).ContinueWith(p =>
-            {
-                Dispatcher.Invoke(() =>
-                {
-                    //var a = Tags;
-                    //var b = File;
-                    System.Diagnostics.Debug.WriteLine(File);
-                });
-            });
         }
-        //public ObservableCollection<Tag> Tags=> new ObservableCollection<Tag>(File.Tags);
-        //        public static readonly DependencyProperty TagsProperty =
-        //DependencyProperty.Register(nameof(Tags),
-        //    typeof(ObservableCollection<Tag>), typeof(TagGroup),
-        //    new PropertyMetadata(OnTagsChanged));
-        //        static void OnTagsChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
-        //        {
-        //        }
-        //        public ObservableCollection<Tag> Tags
-        //        {
-        //            get => GetValue(TagProperty) as ObservableCollection<Tag>; //file;
-        //            set
-        //            {
-        //                SetValue(TagProperty, value);
-        //                //file = value;
-        //                //this.Notify(nameof(File));
-        //            }
-        //        }
-
+ 
         private void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             TagMouseDown?.Invoke(sender, e);

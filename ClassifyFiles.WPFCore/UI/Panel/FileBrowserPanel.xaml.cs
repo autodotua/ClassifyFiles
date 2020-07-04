@@ -37,7 +37,7 @@ namespace ClassifyFiles.UI.Panel
             InitializeComponent();
         }
 
-        public override ListPanelBase GetItemsPanel()
+        public override ClassesPanel GetItemsPanel()
         {
             return classPanel;
         }
@@ -78,19 +78,16 @@ namespace ClassifyFiles.UI.Panel
         }
 
 
-        private async void classes_SelectedItemChanged_1(object sender, SelectedItemChanged e)
+        private async void SelectedItemChanged(object sender, SelectedItemChanged e)
         {
-            if (GetItemsPanel().SelectedItem == null)
-            {
-                await filesViewer.SetFilesAsync(null);
-            }
-            else
-            {
-                GetProgress().Show(false);
-                var files = await DbUtility.GetFilesByClassAsync(GetItemsPanel().SelectedItem.ID);
-                await filesViewer.SetFilesAsync(files);
-                GetProgress().Close();
-            }
+                Debug.WriteLine("Selected Class Changed, Project Hashcode is " + Project.GetHashCode()
+                + ", Class is " + (GetItemsPanel().SelectedItem == null ? "null" : GetItemsPanel().SelectedItem.Name));
+            GetProgress().Show(false);
+            List<File> files = GetItemsPanel().SelectedItem == null ?
+                await DbUtility.GetFilesByProjectAsync(Project.ID)
+                : await DbUtility.GetFilesByClassAsync(GetItemsPanel().SelectedItem.ID);
+            await filesViewer.SetFilesAsync(files);
+            GetProgress().Close();
         }
 
 
@@ -99,7 +96,6 @@ namespace ClassifyFiles.UI.Panel
             string dir = e.AddedItems.Count == 0 ? null : e.AddedItems.Cast<string>().First();
             if (dir != null)
             {
-                UIFile file;
                 filesViewer.SelectFileByDir(dir);
                 (sender as ListBox).SelectedItem = null;
                 flyoutJumpToDir.Hide();// = false;
@@ -160,7 +156,7 @@ namespace ClassifyFiles.UI.Panel
                 GetProgress().Show(true);
                 Class tag = GetItemsPanel().SelectedItem as Class;
                 var files = await DbUtility.AddFilesToClass(dialog.FileNames, tag, true);
-                filesViewer.AddFiles(files);
+                await filesViewer.AddFilesAsync(files);
                 GetProgress().Close();
             }
         }

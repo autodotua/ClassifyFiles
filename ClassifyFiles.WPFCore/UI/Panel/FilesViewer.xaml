@@ -65,7 +65,7 @@
                         VerticalAlignment="Center" />
             </Grid>
 
-            <Grid Grid.Row="2"  IsEnabled="{Binding ElementName=classes, Path=SelectedItem, Converter={StaticResource nn2b}}"
+            <Grid Grid.Row="2" 
                         Visibility="Collapsed" x:Name="grdFilesArea">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -109,7 +109,8 @@
                 </Grid.RowDefinitions>
                 <ListView   ItemsSource="{Binding Files}" x:Name="lvwFiles" 
                       PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"  ContextMenu="{StaticResource menu}"
-                      IsEnabled="{Binding ElementName=classes, Path=SelectedItem, Converter={StaticResource nn2b}}">
+                  
+                            >
                     <ListView.ItemContainerStyle >
                         <Style TargetType="ListViewItem">
                             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -141,8 +142,7 @@
                 </ListView>
             </Grid>
             <TreeView Name="treeFiles" Visibility="Collapsed"   ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
-                       IsEnabled="{Binding ElementName=classes, Path=SelectedItem, Converter={StaticResource nn2b}}"
-                      Grid.Row="2"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick" >
+                                          Grid.Row="2"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick" >
 
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate  ItemsSource="{Binding SubFiles}">

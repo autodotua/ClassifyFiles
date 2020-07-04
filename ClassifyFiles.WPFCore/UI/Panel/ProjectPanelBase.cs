@@ -24,23 +24,28 @@ namespace ClassifyFiles.UI.Panel
             Project = project;
             if (GetItemsPanel() != null)
             {
-                ListPanelBase panel = GetItemsPanel();
+                ClassesPanel panel = GetItemsPanel();
                 await panel.LoadAsync(project);
-                if (selectedItem != null)
+                if(selectedItem!=null &&selectedItem.Project!=Project)
                 {
-                    panel.SelectedItem = selectedItem;
+                    selectedItem = null;
                 }
-                else if (panel.Items.Count > 0)
-                {
-                    panel.SelectedItem = panel.Items[0];
-                }
+                panel.SelectedItem = selectedItem; 
+                //if (selectedItem != null)
+                //{
+                //    panel.SelectedItem = selectedItem;
+                //}
+                //else if (panel.Items.Count > 0)
+                //{
+                //    panel.SelectedItem = panel.Items[0];
+                //}
                 panel.SelectedItemChanged += (p1, p2) =>
                 {
                     selectedItem = panel.SelectedItem;
                 };
             }
         }
-        public abstract ListPanelBase GetItemsPanel();
+        public abstract ClassesPanel GetItemsPanel();
         private Project project;
         public virtual Project Project
         {

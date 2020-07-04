@@ -31,7 +31,7 @@ namespace ClassifyFiles.UI.Panel
             InitializeComponent();
         }
 
-        public override ListPanelBase GetItemsPanel()
+        public override ClassesPanel GetItemsPanel()
         {
             return classes;
         }

@@ -1,4 +1,16 @@
-﻿using ClassifyFiles.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using ClassifyFiles.Data;
 using ClassifyFiles.Util;
 using FzLib.Extension;
 
@@ -7,40 +19,29 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace ClassifyFiles.UI.Panel
 {
-    public class ClassesPanel : ListPanelBase
+    /// <summary>
+    /// ClassesPanel.xaml 的交互逻辑
+    /// </summary>
+    public partial class ClassesPanel : UserControlBase
     {
-        public override async Task LoadAsync(Project project)
+        public ClassesPanel()
+        {
+            DataContext = this;
+            InitializeComponent();
+        }
+        public  async Task LoadAsync(Project project)
         {
             Project = project;
             var treeClasses = await DbUtility.GetClassesAsync(Project);
             Items = new ObservableCollection<Class>(treeClasses);
         }
-        public async override Task RenameAsync(string newName)
-        {
-            SelectedItem.Name = newName;
-            await DbUtility.SaveClassAsync(SelectedItem as Class);
-            await LoadAsync(Project);
-        }
-        public async override Task DeleteAsync()
-        {
-            await DbUtility.DeleteClassAsync(SelectedItem  as Class);
-            await LoadAsync(Project);
-        }
 
-        protected async override Task AddItemAsync()
-        {
-            await DbUtility.AddClassAsync(Project);
-        }
-    }
-
-
-    public abstract class ListPanelBase : UserControlBase, INotifyPropertyChanged
-    {
         private ObservableCollection<Class> items;
         public ObservableCollection<Class> Items
         {
@@ -57,35 +58,35 @@ namespace ClassifyFiles.UI.Panel
             get => selectedItem;
             set
             {
+                if(selectedItem==value)
+                {
+                    return;
+                }
                 var oldValue = selectedItem;
                 selectedItem = value;
                 this.Notify(nameof(SelectedItem));
-                //if (value != null)
-                //{
-                    SelectedItemChanged?.Invoke(this, new SelectedItemChanged(oldValue, value));
-                }    
-        //}
+                SelectedItemChanged?.Invoke(this, new SelectedItemChanged(oldValue, value));
+            }
         }
         public Project Project { get; protected set; }
-        public abstract Task LoadAsync(Project project);
 
-        public ListPanelBase()
+        private bool allFilesButtonVisiable;
+        public bool AllFilesButtonVisiable
         {
-            DataContext = this;
-            ListBox list = new ListBox();
-            list.SetBinding(ListBox.ItemsSourceProperty, new Binding("Items"));
-            list.SetBinding(ListBox.SelectedItemProperty, new Binding("SelectedItem"));
-            list.DisplayMemberPath = "Name";
-            list.SetResourceReference(BackgroundProperty, "SystemControlBackgroundAltHighBrush");
-            Content = list;
+            get => allFilesButtonVisiable;
+            set
+            {
+                allFilesButtonVisiable = value;
+                this.Notify(nameof(AllFilesButtonVisiable));
+            }
         }
-
         public async Task AddAsync()
         {
-            await AddItemAsync();
+            await DbUtility.AddClassAsync(Project);
             await LoadAsync(Project);
         }
-        protected abstract Task AddItemAsync();
+
+
 
         public async Task DeleteSelectedAsync()
         {
@@ -95,7 +96,8 @@ namespace ClassifyFiles.UI.Panel
             }
             else
             {
-                await DeleteAsync();
+                await DbUtility.DeleteClassAsync(SelectedItem as Class);
+                await LoadAsync(Project);
             }
         }
 
@@ -111,14 +113,19 @@ namespace ClassifyFiles.UI.Panel
                 string value = await new InputDialog().ShowAsync("重命名", false, "请输入新的标题", "");
                 if (!string.IsNullOrWhiteSpace(value))
                 {
-                    await RenameAsync(value);
+                    SelectedItem.Name = value;
+                    await DbUtility.SaveClassAsync(SelectedItem as Class);
+                    await LoadAsync(Project);
                 }
             }
         }
 
-        public abstract Task RenameAsync(string newName);
-        public abstract Task DeleteAsync();
         public event EventHandler<SelectedItemChanged> SelectedItemChanged;
+
+        private void btnAllFiles_Click(object sender, RoutedEventArgs e)
+        {
+            SelectedItem = null;
+        }
     }
 
     public class SelectedItemChanged : EventArgs

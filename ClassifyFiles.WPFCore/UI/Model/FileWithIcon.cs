@@ -112,11 +112,13 @@ namespace ClassifyFiles.UI.Model
         }
         public UIFile() { }
 
-        public UIFile(File file, bool tags = false, Project project = null)
+        public UIFile(File file)
         {
             ID = file.ID;
             Name = file.Name;
             Dir = file.Dir;
+            Project = file.Project;
+            ProjectID = file.ProjectID;
             SubFiles = file.SubFiles.Select(p => new UIFile(p)).Cast<File>().ToList();
             Thumbnail = file.Thumbnail;
             if (Dir == null)
@@ -140,13 +142,9 @@ namespace ClassifyFiles.UI.Model
                     Glyph = type.Glyph;
                 }
             }
-            if (tags)
-            {
-                LoadAsync(project);
-            }
         }
 
-        public async Task LoadAsync(Project project)
+        public async Task LoadTagsAsync(Project project)
         {
             IEnumerable<Class> classes = await DbUtility.GetClassesOfFileAsync(ID);
             classes = classes.OrderBy(p => p.Name);

@@ -180,7 +180,7 @@ namespace ClassifyFiles.UI.Panel
 
             }
         }
-        public override ListPanelBase GetItemsPanel()
+        public override ClassesPanel GetItemsPanel()
         {
             return null;
         }

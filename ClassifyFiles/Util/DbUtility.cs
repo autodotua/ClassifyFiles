@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using DI = System.IO.DirectoryInfo;
@@ -28,10 +29,14 @@ namespace ClassifyFiles.Util
         }
         public static async Task<List<Project>> GetProjectsAsync()
         {
+            Debug.WriteLine("db: " + nameof(GetProjectsAsync));
+
             return await Db.Projects.ToListAsync();
         }
         public static async Task<List<Class>> GetClassesAsync(Project project)
         {
+            Debug.WriteLine("db: " + nameof(GetClassesAsync));
+
             List<Class> classes = await db.Classes
                 .Where(p => p.Project == project)
                 .Include(p => p.MatchConditions)
@@ -48,6 +53,8 @@ namespace ClassifyFiles.Util
         }
         public static async Task SaveClassAsync(Class c)
         {
+            Debug.WriteLine("db: " + nameof(SaveClassAsync));
+
             if (await Db.Classes.AnyAsync(p => p.ID == c.ID))
             {
                 Db.Entry(c).State = EntityState.Modified;
@@ -56,22 +63,29 @@ namespace ClassifyFiles.Util
         }
         public static async Task UpdateProjectAsync(Project project)
         {
+            Debug.WriteLine("db: " + nameof(UpdateProjectAsync));
+
             Db.Entry(project).State = EntityState.Modified;
             await db.SaveChangesAsync();
         }
         public static async Task DeleteProjectAsync(Project project)
         {
+            Debug.WriteLine("db: " + nameof(DeleteProjectAsync));
+
             Db.Entry(project).State = EntityState.Deleted;
             await db.SaveChangesAsync();
         }
         public static Task DeleteFilesOfProjectAsync(Project project)
         {
+            Debug.WriteLine("db: " + nameof(DeleteFilesOfProjectAsync));
+
             return Db.Database.ExecuteSqlRawAsync("delete from Files where ProjectID = " + project.ID);
             //await db.SaveChangesAsync();
         }
 
-        public static async Task<Project> AddProjectAsync()
-        {
+        public static async Task<Project> AddProjectAsync() { 
+            Debug.WriteLine("db: " + nameof(AddProjectAsync));
+        
             Project project = new Project() { Name = "未命名" };
             Db.Projects.Add(project);
             await Db.SaveChangesAsync();
@@ -79,19 +93,22 @@ namespace ClassifyFiles.Util
         }
         public static async Task<Class> AddClassAsync(Project project)
         {
+            Debug.WriteLine("db: " + nameof(AddClassAsync));
+
             Class c = new Class() { Project = project, Name = "未命名类" };
             Db.Classes.Add(c);
             await db.SaveChangesAsync();
             return c;
         }
-        public static async Task DeleteClassAsync(Class c)
-        {
+        public static async Task DeleteClassAsync(Class c) { 
+            Debug.WriteLine("db: " + nameof(DeleteClassAsync));
             Db.Entry(c).State = EntityState.Deleted;
             await db.SaveChangesAsync();
         }
 
         public static Task<List<Class>> GetClassesOfFileAsync(int fileID)
         {
+            Debug.WriteLine("db: " + nameof(GetClassesOfFileAsync));
             return Db.FileClasses
                 .Where(p => p.FileID == fileID)
                 .IncludeAll()
@@ -99,22 +116,22 @@ namespace ClassifyFiles.Util
         }
         public async static Task<List<File>> GetFilesByClassAsync(int classID)
         {
+            Debug.WriteLine("db: " + nameof(GetFilesByClassAsync));
             var files = Db.FileClasses
                 .Where(p => p.Class.ID == classID)
                 .IncludeAll()
                 .OrderBy(p => p.File.Dir)
                 .ThenBy(p => p.File.Name)
+                .Include(p => p.File.Project)
                 .Select(p => p.File);
+
             return await files.ToListAsync();
         }
         public async static Task<List<File>> GetFilesByProjectAsync(int projectID)
         {
-            var files = Db.Files.Where(p => p.Project.ID == projectID);
+            Debug.WriteLine("db: " + nameof(GetFilesByProjectAsync));
+            var files = Db.Files.Where(p => p.Project.ID == projectID).Include(p=>p.Project);
             return await files.ToListAsync();
-        }
-        public static IQueryable<File> GetFilesByProject(int projectID)
-        {
-            return Db.Files.Where(p => p.Project.ID == projectID);
         }
 
 
