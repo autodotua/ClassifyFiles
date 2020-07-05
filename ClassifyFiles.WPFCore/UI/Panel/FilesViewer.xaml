@@ -18,17 +18,28 @@
             <ContextMenu x:Key="menu" Opened="ContextMenu_Opened">
             </ContextMenu>
     </UserControl.Resources>
-    <Grid>
-        <Grid  Margin="8,4,4,4" Grid.Column="2" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
-            
-       
+        <Grid  Margin="8,4,4,4" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="4"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="4"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-
-            <Grid x:Name="grdAppBar">
+            
+            <Grid >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+                <m:AutoSuggestBox
+                        x:Name="txtSearch"
+                        PlaceholderText="搜索"
+                        TextChanged="SearchTextBox_TextChanged"
+                        QueryIcon="Find"
+                        QuerySubmitted="SearchTextBox_QuerySubmitted"
+                        SuggestionChosen="SearchTextBox_SuggestionChosen" 
+                    VerticalAlignment="Center"/>
+           <Grid x:Name="grdAppBar" Grid.Column="2" HorizontalAlignment="Right">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
@@ -63,8 +74,9 @@
                         Margin="8,0,0,0"
                         VerticalAlignment="Center" />
             </Grid>
-
-            <Grid Grid.Row="2" 
+ </Grid>
+            
+            <Grid Grid.Row="4" 
                         Visibility="Collapsed" x:Name="grdFilesArea">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -100,7 +112,7 @@
                     <StackPanel x:Name="stkPagging" Orientation="Horizontal"/>
                 </ScrollViewer>
             </Grid>
-            <Grid Grid.Row="2" x:Name="lvwFilesArea">
+            <Grid Grid.Row="4" x:Name="lvwFilesArea">
                 <Grid.RowDefinitions >
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="8"/>
@@ -141,7 +153,7 @@
                 </ListView>
             </Grid>
             <TreeView Name="treeFiles" Visibility="Collapsed"   ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
-                                          Grid.Row="2"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick" >
+                                          Grid.Row="4"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick" >
 
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate  ItemsSource="{Binding SubFiles}">
@@ -155,6 +167,4 @@
             </TreeView>
 
         </Grid>
-
-    </Grid>
 </UserControl>

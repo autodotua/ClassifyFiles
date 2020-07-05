@@ -154,5 +154,9 @@ namespace ClassifyFiles.UI.Model
 
         public ObservableCollection<Class> Classes { get; private set; }
 
+        public override string ToString()
+        {
+            return Name + (string.IsNullOrEmpty(Dir) ? "" : $" （{Dir}）");
+        }
     }
 }

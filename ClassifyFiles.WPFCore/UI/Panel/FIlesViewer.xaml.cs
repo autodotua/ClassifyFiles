@@ -17,6 +17,7 @@ using System.Diagnostics;
 using ModernWpf.Controls;
 using ClassifyFiles.UI.Component;
 using static ClassifyFiles.Util.FileClassUtility;
+using System.Collections;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -59,7 +60,7 @@ namespace ClassifyFiles.UI.Panel
         /// 供树状图使用的文件树
         /// </summary>
         public List<UIFile> FileTree => Files == null ? null : new List<UIFile>(FileUtility.GetFileTree(Files).SubFiles.Cast<UIFile>());
-     
+
         /// <summary>
         /// 供
         /// </summary>
@@ -291,22 +292,31 @@ namespace ClassifyFiles.UI.Panel
             {
                 case 1:
                     file = Files.FirstOrDefault(p => p.Dir == dir);
-                    if (file != null)
-                    {
-                        lvwFiles.SelectedItem = file;
-                        lvwFiles.ScrollIntoView(file);
-                    }
                     break;
                 case 2:
                     file = Files.FirstOrDefault(p => p.Dir == dir);
-                    if (file != null)
-                    {
-                        int index = Files.IndexOf(file);
-                        int page = (int)Math.Ceiling((double)index / pagingItemsCount);
-                        stkPagging.Children.Cast<Button>().FirstOrDefault(p => (int)p.Content == page)?.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-                        lbxGrdFiles.SelectedItem = file;
-                        lbxGrdFiles.ScrollIntoView(file);  //无效
-                    }
+                    break;
+                case 3:
+                    break;
+                default:
+                    break;
+            }
+            SelectFile(file);
+        }
+        public void SelectFile(UIFile file)
+        {
+            switch (CurrentViewType)
+            {
+                case 1:
+                    lvwFiles.SelectedItem = file;
+                    lvwFiles.ScrollIntoView(file);
+                    break;
+                case 2:
+                    int index = Files.IndexOf(file);
+                    int page = (int)Math.Ceiling((double)index / pagingItemsCount);
+                    stkPagging.Children.Cast<Button>().FirstOrDefault(p => (int)p.Content == page)?.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                    lbxGrdFiles.SelectedItem = file;
+                    lbxGrdFiles.ScrollIntoView(file);  //无效
                     break;
                 case 3:
                     break;
@@ -394,6 +404,27 @@ namespace ClassifyFiles.UI.Panel
 
         }
 
+        private void SearchTextBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                var suggestions = Files == null ? new List<UIFile>() : Files.Where(p => p.Name.Contains(sender.Text)).ToList();
+
+                sender.ItemsSource = suggestions.Count > 0 ?
+                    suggestions : new string[] { "结果为空" } as IEnumerable;
+            }
+        }
+
+        private void SearchTextBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            UIFile file = args.ChosenSuggestion as UIFile;
+            SelectFile(file);
+        }
+
+        private void SearchTextBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+
+        }
     }
 
     public class ClickTagEventArgs : EventArgs
