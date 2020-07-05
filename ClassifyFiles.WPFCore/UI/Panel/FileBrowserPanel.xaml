@@ -27,7 +27,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Expander Margin="8,4,4,0" Header="分&#13;类" ExpandDirection="Right" FocusVisualStyle="{x:Null}" IsExpanded="True">
+        <Expander Margin="8,8,0,0" Header="分&#13;类" ExpandDirection="Right" FocusVisualStyle="{x:Null}" IsExpanded="True">
             <Grid Margin="8,0,0,0" MinWidth="200" MaxWidth="400">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -35,6 +35,8 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="8"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <m:SimpleStackPanel Orientation="Horizontal" Spacing="16">
                     <TextBlock Text="{Binding Project.Name}"   VerticalAlignment="Center"  FontSize="24"/>
@@ -43,12 +45,12 @@
                       VerticalAlignment="Bottom" Text="{Binding Project.RootPath}"/>
                 </m:SimpleStackPanel>
 
-                <panel:ClassesPanel x:Name="classPanel" AllFilesButtonVisiable="True"  Grid.Row="99" SelectedItemChanged="SelectedItemChanged"/>
+                <panel:ClassesPanel x:Name="classPanel"   Grid.Row="4" SelectedClassChanged="SelectedClassChanged"/>
+
+                <Button Content="显示全部文件" 
+                x:Name="btnAllFiles" Click="btnAllFiles_Click" Grid.Row="6"  HorizontalAlignment="Stretch"/>
             </Grid>
-
         </Expander>
-
-
 
         <panel:FilesViewer ViewTypeChanged="filesViewer_ViewTypeChanged" 
                            x:Name="filesViewer" Grid.Column="2"  AllowDrop="True"

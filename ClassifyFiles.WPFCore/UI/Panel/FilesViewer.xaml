@@ -30,16 +30,19 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="8"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-                <m:AutoSuggestBox
+            <m:AutoSuggestBox
+                    Grid.Column="0"
                         x:Name="txtSearch"
-                        PlaceholderText="搜索"
+                        PlaceholderText="{Binding Files.Count, StringFormat={}文件总数：{0:}}"
                         TextChanged="SearchTextBox_TextChanged"
                         QueryIcon="Find"
                         QuerySubmitted="SearchTextBox_QuerySubmitted"
                         SuggestionChosen="SearchTextBox_SuggestionChosen" 
                     VerticalAlignment="Center"/>
-           <Grid x:Name="grdAppBar" Grid.Column="2" HorizontalAlignment="Right">
+           <Grid x:Name="grdAppBar" Grid.Column="4" HorizontalAlignment="Right">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>

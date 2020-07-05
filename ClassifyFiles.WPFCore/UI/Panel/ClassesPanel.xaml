@@ -10,20 +10,12 @@
     <UserControl.Resources>
         <ui:Bool2VisibilityConverter x:Key="b2v"/>
     </UserControl.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="4"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
 
         <ListBox Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
                  ItemsSource="{Binding Items}"
                  SelectedItem="{Binding SelectedItem}"
-                  DisplayMemberPath="Name"></ListBox>
+                  DisplayMemberPath="Name">
+            
+        </ListBox>
 
-        <Button Content="显示全部文件" Visibility="{Binding AllFilesButtonVisiable, Converter={StaticResource b2v}}"
-                x:Name="btnAllFiles" Click="btnAllFiles_Click"
-                Grid.Row="2" HorizontalAlignment="Stretch"/>
-    </Grid>
 </ui:UserControlBase>

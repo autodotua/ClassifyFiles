@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using static ClassifyFiles.Util.DbUtility;
 
@@ -40,19 +41,32 @@ namespace ClassifyFiles.Util
             return project;
         }
 
-        public async static Task ExportProjectAsync(string path, int projectID)
+        public static Task ExportProjectAsync(string path, int projectID)
         {
-            Project project = await db.Projects.Where(p => p.ID == projectID)
-               .Include(p => p.Classes).ThenInclude(p => p.MatchConditions)
-               .FirstOrDefaultAsync();
+            return Task.Run(() =>
+            {
+                Project project = db.Projects.Where(p => p.ID == projectID)
+                   .Include(p => p.Classes).ThenInclude(p => p.MatchConditions)
+                   .FirstOrDefault();
+                List<File> files = db.Files.Where(p => p.ProjectID == projectID).ToList();
+                List<FileClass> fcs = new List<FileClass>();
+                foreach (var c in project.Classes)
+                {
+                    var fcs2 = db.FileClasses
+                     .Where(p => p.Class == c)
+                     .ToList();
+                    fcs.AddRange(fcs2);
+                }
+                var newDb = new AppDbContext(path);
+                newDb.Database.EnsureDeleted();
+                newDb.Database.EnsureCreated();
 
-            var newDb = new AppDbContext(path);
-            await newDb.Database.EnsureDeletedAsync();
-            await newDb.Database.EnsureCreatedAsync();
-
-            newDb.Projects.Add(project);
-            await newDb.SaveChangesAsync();
-            await newDb.DisposeAsync();
+                newDb.Projects.Add(project);
+                newDb.Files.AddRange(files);
+                newDb.FileClasses.AddRange(fcs);
+                newDb.SaveChanges();
+                newDb.Dispose();
+            });
         }
         public static Task ExportAllAsync(string path)
         {
@@ -61,40 +75,44 @@ namespace ClassifyFiles.Util
                 System.IO.File.Copy(DbPath, path);
             });
         }
-        public async static Task<Project[]> Import(string path)
+        public async static Task<Project[]> ImportAsync(string path)
         {
             if (!System.IO.File.Exists(path))
             {
                 throw new System.IO.FileNotFoundException();
             }
-            var importDb = new AppDbContext(path);
-            List<Project> projects = new List<Project>();
-            foreach (var projectID in await importDb.Projects.Select(p => p.ID).ToListAsync())
+            List<Project> projects = null;
+            await Task.Run(() =>
             {
-                Project project = await importDb.Projects.Where(p => p.ID == projectID)
-              .Include(p => p.Classes).ThenInclude(p => p.MatchConditions)
-              .FirstAsync();
-                await Task.Run(() =>
+                var importDb = new AppDbContext(path);
+                projects = importDb.Projects
+                .Include(p => p.Classes)
+                .ThenInclude(p => p.MatchConditions)
+                .ToList();
+                foreach (var project in projects)
                 {
-                    projects.Add(project);
-                    project.ID = 0;
+                    List<File> files = importDb.Files.Where(p => p.Project == project).ToList();
+                    files.ForEach(p => p.ID = 0);
+                    List<FileClass> fcs = new List<FileClass>();
                     foreach (var c in project.Classes)
                     {
-                        foreach (var file in FileClassUtility.GetFilesByClass(c.ID))
-                        {
-                            file.ID = 0;
-                        }
+                        c.MatchConditions.ForEach(p => p.ID = 0);
+                        var fcs2 = importDb.FileClasses
+                         .Where(p => p.Class == c)
+                         .IncludeAll()
+                         .ToList();
+                        fcs.AddRange(fcs2);
                         c.ID = 0;
-                        foreach (var m in c.MatchConditions)
-                        {
-                            m.ID = 0;
-                        }
                     }
+                    fcs.ForEach(p => p.ID = 0);
+                    project.ID = 0;
                     db.Add(project);
-                });
-            }
-            await db.SaveChangesAsync();
-            await importDb.DisposeAsync();
+                    db.AddRange(files);
+                    db.AddRange(fcs);
+                }
+                 db.SaveChanges();
+                 importDb.Dispose();
+            });
             return projects.ToArray();
         }
 

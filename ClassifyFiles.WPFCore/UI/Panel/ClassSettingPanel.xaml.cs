@@ -112,7 +112,7 @@ namespace ClassifyFiles.UI.Panel
 
 
 
-        private async void classes_SelectedItemChanged_1(object sender, SelectedItemChanged e)
+        private async void classes_SelectedItemChanged_1(object sender, SelectedClassChangedEventArgs e)
         {
             var old = e.OldValue as Class;
             if (old != null)

@@ -209,7 +209,7 @@ namespace ClassifyFiles.UI
             {
                 string path = dialog.FileName;
                 Progress.Show(true);
-                var projects = await Import(path);
+                var projects = await ImportAsync(path);
                 Progress.Close();
                 await new MessageDialog().ShowAsync("导入成功", "导出");
                 projects.ForEach(p => Projects.Add(p));

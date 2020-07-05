@@ -1,33 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using ClassifyFiles.Data;
-using ClassifyFiles.Util;
 using FzLib.Extension;
-using static ClassifyFiles.Data.Project;
 using static ClassifyFiles.Util.ClassUtility;
-using static ClassifyFiles.Util.FileClassUtility;
-using static ClassifyFiles.Util.FileProjectUtilty;
-using static ClassifyFiles.Util.ProjectUtility;
-using static ClassifyFiles.Util.DbUtility;
-
-using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -41,7 +18,7 @@ namespace ClassifyFiles.UI.Panel
             DataContext = this;
             InitializeComponent();
         }
-        public  async Task LoadAsync(Project project)
+        public async Task LoadAsync(Project project)
         {
             Project = project;
             var treeClasses = await GetClassesAsync(Project);
@@ -64,35 +41,23 @@ namespace ClassifyFiles.UI.Panel
             get => selectedItem;
             set
             {
-                if(selectedItem==value)
+                if (selectedItem == value)
                 {
                     return;
                 }
                 var oldValue = selectedItem;
                 selectedItem = value;
                 this.Notify(nameof(SelectedItem));
-                SelectedItemChanged?.Invoke(this, new SelectedItemChanged(oldValue, value));
+                SelectedClassChanged?.Invoke(this, new SelectedClassChangedEventArgs(oldValue, value));
             }
         }
         public Project Project { get; protected set; }
 
-        private bool allFilesButtonVisiable;
-        public bool AllFilesButtonVisiable
-        {
-            get => allFilesButtonVisiable;
-            set
-            {
-                allFilesButtonVisiable = value;
-                this.Notify(nameof(AllFilesButtonVisiable));
-            }
-        }
         public async Task AddAsync()
         {
             await AddClassAsync(Project);
             await LoadAsync(Project);
         }
-
-
 
         public async Task DeleteSelectedAsync()
         {
@@ -107,7 +72,6 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
-
         public async Task RenameButton()
         {
             if (SelectedItem == null)
@@ -120,13 +84,13 @@ namespace ClassifyFiles.UI.Panel
                 if (!string.IsNullOrWhiteSpace(value))
                 {
                     SelectedItem.Name = value;
-                    await SaveClassAsync(SelectedItem as Class);
+                    await SaveClassAsync(SelectedItem);
                     await LoadAsync(Project);
                 }
             }
         }
 
-        public event EventHandler<SelectedItemChanged> SelectedItemChanged;
+        public event EventHandler<SelectedClassChangedEventArgs> SelectedClassChanged;
 
         private void btnAllFiles_Click(object sender, RoutedEventArgs e)
         {
@@ -134,9 +98,9 @@ namespace ClassifyFiles.UI.Panel
         }
     }
 
-    public class SelectedItemChanged : EventArgs
+    public class SelectedClassChangedEventArgs : EventArgs
     {
-        public SelectedItemChanged(Class oldValue, Class newValue)
+        public SelectedClassChangedEventArgs(Class oldValue, Class newValue)
         {
             OldValue = oldValue;
             NewValue = newValue;

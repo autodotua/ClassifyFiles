@@ -137,6 +137,7 @@ namespace ClassifyFiles.UI.Panel
             {
                 Files.Add(file);
             }
+            this.Notify(nameof(Files));
 
             GeneratePaggingButtons();
         }

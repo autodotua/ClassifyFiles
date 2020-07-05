@@ -29,7 +29,7 @@
             <ColumnDefinition Width="8"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
-        <panel:ClassesPanel x:Name="classes" SelectedItemChanged="classes_SelectedItemChanged_1"/>
+        <panel:ClassesPanel x:Name="classes" SelectedClassChanged="classes_SelectedItemChanged_1"/>
         <GroupBox  Header="匹配条件" Grid.Column="2" 
                               IsEnabled="{Binding ElementName=classes, Path=SelectedItem, Converter={StaticResource nn2b}}">
             <Grid>

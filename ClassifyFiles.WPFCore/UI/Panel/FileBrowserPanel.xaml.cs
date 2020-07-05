@@ -83,7 +83,7 @@ namespace ClassifyFiles.UI.Panel
         }
 
 
-        private async void SelectedItemChanged(object sender, SelectedItemChanged e)
+        private async void SelectedClassChanged(object sender, SelectedClassChangedEventArgs e)
         {
             Debug.WriteLine("Selected Class Changed, Project Hashcode is " + Project.GetHashCode()
             + ", Class is " + (GetItemsPanel().SelectedItem == null ? "null" : GetItemsPanel().SelectedItem.Name));
@@ -217,7 +217,19 @@ namespace ClassifyFiles.UI.Panel
 
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            SelectedItemChanged(null, null);
+            SelectedClassChanged(null, null);
+        }
+
+        private void btnAllFiles_Click(object sender, RoutedEventArgs e)
+        {
+            if(GetItemsPanel().SelectedItem==null)
+            {
+                SelectedClassChanged(null, null);
+            }
+            else
+            {
+                GetItemsPanel().SelectedItem = null;
+            }
         }
     }
 }
