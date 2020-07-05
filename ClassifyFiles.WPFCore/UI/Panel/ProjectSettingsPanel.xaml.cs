@@ -28,6 +28,10 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using FzLib.Program;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using static ClassifyFiles.Util.ClassUtility;
+using static ClassifyFiles.Util.FileClassUtility;
+using static ClassifyFiles.Util.FileProjectUtilty;
+using static ClassifyFiles.Util.ProjectUtility;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -48,9 +52,9 @@ namespace ClassifyFiles.UI.Panel
         public override async Task LoadAsync(Project project)
         {
             await base.LoadAsync(project);
-            tbkFilesCount.Text = (await DbUtility.GetFilesCountAsync(project)).ToString();
-            tbkClassesCount.Text =( await DbUtility.GetClassesCountAsync(project)).ToString();
-            tbkFileClassesCount.Text = (await DbUtility.GetFileClassesCountAsync(project)).ToString();
+            tbkFilesCount.Text = (await GetFilesCountAsync(project)).ToString();
+            tbkClassesCount.Text =( await GetClassesCountAsync(project)).ToString();
+            tbkFileClassesCount.Text = (await GetFileClassesCountAsync(project)).ToString();
         }
 
         public ExportFormat ExportFormat { get; set; }
@@ -160,7 +164,7 @@ namespace ClassifyFiles.UI.Panel
             {
                 string path = dialog.FileName;
                 GetProgress().Show(true);
-                await DbUtility.ExportProject(path, Project.ID);
+                await ExportProjectAsync(path, Project.ID);
                 GetProgress().Close();
                 await new MessageDialog().ShowAsync("导出成功", "导出");
             }
@@ -189,7 +193,7 @@ namespace ClassifyFiles.UI.Panel
         {
             flyoutDeleteFiles.Hide();
             GetProgress().Show(false);
-            await DbUtility.DeleteFilesOfProjectAsync(Project);
+            await DeleteFilesOfProjectAsync(Project);
             GetProgress().Close();
         }
     }

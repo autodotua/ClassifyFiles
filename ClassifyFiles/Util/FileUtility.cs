@@ -219,10 +219,10 @@ namespace ClassifyFiles.Util
                                          string splitter = "-",
                                          Action<File> afterExportAFile = null)
         {
-            var classes = await DbUtility.GetClassesAsync(project);
+            var classes = await ClassUtility.GetClassesAsync(project);
             foreach (var c in classes)
             {
-                var files = await DbUtility.GetFilesByClassAsync(c.ID);
+                var files = await FileClassUtility.GetFilesByClassAsync(c.ID);
                 await Task.Run(() =>
                 {
                     string folder = P.Combine(distFolder, GetValidFileName(c.Name));

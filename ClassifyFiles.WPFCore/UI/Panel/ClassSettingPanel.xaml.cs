@@ -85,7 +85,7 @@ namespace ClassifyFiles.UI.Panel
                 }
                 c.MatchConditions.Clear();
                 c.MatchConditions.AddRange(MatchConditions);
-                await DbUtility.SaveClassAsync(c);
+                await ClassUtility. SaveClassAsync(c);
             }
         }
 

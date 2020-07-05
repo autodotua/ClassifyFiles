@@ -13,16 +13,16 @@
     ShowInTaskbar="False"
     WindowStyle="ToolWindow"
     ResizeMode="NoResize"
-        Title="更新文件" Height="250" Width="600">
-    <m:SimpleStackPanel Spacing="16" Margin="8" Orientation="Vertical">
+        Title="更新文件" Height="280" Width="600">
+    <m:SimpleStackPanel Spacing="16" Margin="8" Orientation="Vertical" VerticalAlignment="Center">
         <m:SimpleStackPanel x:Name="stkSettings" Spacing="8" Orientation="Vertical">
             <CheckBox x:Name="chkResearch" IsChecked="True">重新搜索物理文件</CheckBox>
             <CheckBox x:Name="chkIncludeThumbnails" IsChecked="True" Margin="12,0" IsEnabled="{Binding IsChecked,ElementName=chkResearch}">生成缩略图</CheckBox>
             <CheckBox x:Name="chkReclassify" IsChecked="True">重新根据匹配条件进行自动分类</CheckBox>
         </m:SimpleStackPanel>
-        <m:SimpleStackPanel Spacing="8" Orientation="Vertical">
-            <TextBlock Text="{Binding Message}"/>
-            <m:ProgressBar Minimum="0" Maximum="1" Value="{Binding Percentage}"/>
+        <m:SimpleStackPanel Spacing="8" Orientation="Vertical" >
+            <TextBlock Text="{Binding Message}" TextWrapping="Wrap"/>
+            <ProgressBar Minimum="0" Maximum="1" Value="{Binding Percentage}"/>
             <Button HorizontalAlignment="Right" Click="Button_Click">开始</Button>
         </m:SimpleStackPanel>
     </m:SimpleStackPanel>

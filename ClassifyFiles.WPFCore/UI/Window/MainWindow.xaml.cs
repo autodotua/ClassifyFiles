@@ -20,6 +20,11 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using FzLib.Basic;
 using System.ComponentModel;
 using static ClassifyFiles.Data.Project;
+using static ClassifyFiles.Util.ClassUtility;
+using static ClassifyFiles.Util.FileClassUtility;
+using static ClassifyFiles.Util.FileProjectUtilty;
+using static ClassifyFiles.Util.ProjectUtility;
+using static ClassifyFiles.Util.DbUtility;
 
 namespace ClassifyFiles.UI
 {
@@ -72,13 +77,13 @@ namespace ClassifyFiles.UI
 
         public async Task DeleteSelectedProjectAsync()
         {
-            await DbUtility.DeleteProjectAsync(SelectedProject);
+            await DeleteProjectAsync(SelectedProject);
 
             Projects.Remove(SelectedProject);
-            Projects = new ObservableCollection<Project>(await DbUtility.GetProjectsAsync());
+            Projects = new ObservableCollection<Project>(await GetProjectsAsync());
             if (Projects.Count == 0)
             {
-                Projects.Add(await DbUtility.AddProjectAsync());
+                Projects.Add(await AddProjectAsync());
             }
             SelectedProject = Projects[0];
             RadioButton_Checked(btnModeView, null);
@@ -102,10 +107,10 @@ namespace ClassifyFiles.UI
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Projects = new ObservableCollection<Project>(await DbUtility.GetProjectsAsync());
+            Projects = new ObservableCollection<Project>(await GetProjectsAsync());
             if (Projects.Count == 0)
             {
-                Projects.Add(await DbUtility.AddProjectAsync());
+                Projects.Add(await AddProjectAsync());
             }
             SelectedProject = Projects[0];
 
@@ -154,7 +159,7 @@ namespace ClassifyFiles.UI
             }
             else if (MainPanel is ProjectSettingsPanel)
             {
-                await DbUtility.SaveChangesAsync();
+                await SaveChangesAsync();
             }
             switch (btn.Name)
             {
@@ -181,7 +186,7 @@ namespace ClassifyFiles.UI
 
         private async void AddProjectButton_Click(object sender, RoutedEventArgs e)
         {
-            Project project = await DbUtility.AddProjectAsync();
+            Project project = await AddProjectAsync();
             Projects.Add(project);
             SelectedProject = project;
         }
@@ -204,7 +209,7 @@ namespace ClassifyFiles.UI
             {
                 string path = dialog.FileName;
                 Progress.Show(true);
-                var projects = await DbUtility.Import(path);
+                var projects = await Import(path);
                 Progress.Close();
                 await new MessageDialog().ShowAsync("导入成功", "导出");
                 projects.ForEach(p => Projects.Add(p));
@@ -223,7 +228,7 @@ namespace ClassifyFiles.UI
             {
                 string path = dialog.FileName;
                 Progress.Show(true);
-                await DbUtility.ExportAll(path);
+                await ExportAllAsync(path);
                 Progress.Close();
                 await new MessageDialog().ShowAsync("导出成功", "导出");
             }
@@ -236,7 +241,7 @@ namespace ClassifyFiles.UI
             {
                 foreach (var project in Projects.ToArray())
                 {
-                    await DbUtility.DeleteProjectAsync(project);
+                    await DeleteProjectAsync(project);
                     Projects.Remove(project);
                 }
                 await new MessageDialog().ShowAsync("删除成功", "删除");

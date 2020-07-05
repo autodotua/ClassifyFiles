@@ -1,13 +1,10 @@
 ﻿using ClassifyFiles.Data;
 using ClassifyFiles.Util;
-using ClassifyFiles.WPFCore;
 using FzLib.Extension;
 using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using static ClassifyFiles.Util.FileClassUtility;
 
 namespace ClassifyFiles.UI
 {
@@ -99,7 +96,7 @@ namespace ClassifyFiles.UI
             Message = "正在初始化";
             try
             {
-                await DbUtility.UpdateFilesOfClassesAsync(args);
+                await UpdateFilesOfClassesAsync(args);
                 working = false;
                 Updated = true;
             }

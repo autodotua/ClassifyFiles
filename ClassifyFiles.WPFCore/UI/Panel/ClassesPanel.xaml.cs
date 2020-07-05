@@ -13,6 +13,12 @@ using System.Windows.Shapes;
 using ClassifyFiles.Data;
 using ClassifyFiles.Util;
 using FzLib.Extension;
+using static ClassifyFiles.Data.Project;
+using static ClassifyFiles.Util.ClassUtility;
+using static ClassifyFiles.Util.FileClassUtility;
+using static ClassifyFiles.Util.FileProjectUtilty;
+using static ClassifyFiles.Util.ProjectUtility;
+using static ClassifyFiles.Util.DbUtility;
 
 using System;
 using System.Collections.ObjectModel;
@@ -38,7 +44,7 @@ namespace ClassifyFiles.UI.Panel
         public  async Task LoadAsync(Project project)
         {
             Project = project;
-            var treeClasses = await DbUtility.GetClassesAsync(Project);
+            var treeClasses = await GetClassesAsync(Project);
             Items = new ObservableCollection<Class>(treeClasses);
         }
 
@@ -82,7 +88,7 @@ namespace ClassifyFiles.UI.Panel
         }
         public async Task AddAsync()
         {
-            await DbUtility.AddClassAsync(Project);
+            await AddClassAsync(Project);
             await LoadAsync(Project);
         }
 
@@ -96,7 +102,7 @@ namespace ClassifyFiles.UI.Panel
             }
             else
             {
-                await DbUtility.DeleteClassAsync(SelectedItem as Class);
+                await DeleteClassAsync(SelectedItem as Class);
                 await LoadAsync(Project);
             }
         }
@@ -114,7 +120,7 @@ namespace ClassifyFiles.UI.Panel
                 if (!string.IsNullOrWhiteSpace(value))
                 {
                     SelectedItem.Name = value;
-                    await DbUtility.SaveClassAsync(SelectedItem as Class);
+                    await SaveClassAsync(SelectedItem as Class);
                     await LoadAsync(Project);
                 }
             }

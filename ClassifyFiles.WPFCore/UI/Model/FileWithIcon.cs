@@ -10,6 +10,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using static ClassifyFiles.Data.Project;
+using static ClassifyFiles.Util.ClassUtility;
+using static ClassifyFiles.Util.FileClassUtility;
+using static ClassifyFiles.Util.FileProjectUtilty;
+using static ClassifyFiles.Util.ProjectUtility;
+using static ClassifyFiles.Util.DbUtility;
 
 namespace ClassifyFiles.UI.Model
 {
@@ -141,7 +147,7 @@ namespace ClassifyFiles.UI.Model
 
         public async Task LoadTagsAsync(Project project)
         {
-            IEnumerable<Class> classes = await DbUtility.GetClassesOfFileAsync(ID);
+            IEnumerable<Class> classes = await GetClassesOfFileAsync(ID);
             classes = classes.OrderBy(p => p.Name);
             Classes = new ObservableCollection<Class>(classes);
         }

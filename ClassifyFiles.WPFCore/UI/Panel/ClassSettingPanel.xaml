@@ -46,7 +46,7 @@
                                     <ColumnDefinition Width="88"/>
                                     <ColumnDefinition Width="8"/>
                                     <ColumnDefinition Width="164"/>
-                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="16"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="8"/>
                                     <ColumnDefinition Width="*"/>
@@ -63,7 +63,7 @@
                                           Visibility="{Binding Index, Converter={StaticResource i2v}}"
                                           ItemsSource="{panel:EnumToItemsSource {x:Type data:Logic}}"/>
                                 <ComboBox  
-                                    VerticalAlignment="Bottom" Grid.Column="2" 
+                                    VerticalAlignment="Bottom" Grid.Column="2" HorizontalAlignment="Stretch"
                                             SelectedValuePath="Value"  DisplayMemberPath="DisplayName"
                                           SelectedValue="{Binding Type}"
                                           ItemsSource="{panel:EnumToItemsSource {x:Type data:MatchType}}"/>

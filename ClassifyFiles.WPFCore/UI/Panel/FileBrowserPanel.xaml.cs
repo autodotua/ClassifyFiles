@@ -26,6 +26,10 @@ using ModernWpf.Controls;
 using ClassifyFiles.UI.Model;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using IO = System.IO;
+using static ClassifyFiles.Util.ClassUtility;
+using static ClassifyFiles.Util.FileClassUtility;
+using static ClassifyFiles.Util.FileProjectUtilty;
+using static ClassifyFiles.Util.ProjectUtility;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -63,7 +67,7 @@ namespace ClassifyFiles.UI.Panel
         {
             string newName = await new InputDialog().ShowAsync("请输入新的项目名", false, "项目名", Project.Name);
             Project.Name = newName;
-            await DbUtility.UpdateProjectAsync(Project);
+            await UpdateProjectAsync(Project);
         }
 
         private async void DeleteButton_Click(object sender, RoutedEventArgs e)
@@ -85,8 +89,8 @@ namespace ClassifyFiles.UI.Panel
             + ", Class is " + (GetItemsPanel().SelectedItem == null ? "null" : GetItemsPanel().SelectedItem.Name));
             GetProgress().Show(false);
             List<File> files = GetItemsPanel().SelectedItem == null ?
-                await DbUtility.GetFilesByProjectAsync(Project.ID)
-                : await DbUtility.GetFilesByClassAsync(GetItemsPanel().SelectedItem.ID);
+                await GetFilesByProjectAsync(Project.ID)
+                : await GetFilesByClassAsync(GetItemsPanel().SelectedItem.ID);
             await filesViewer.SetFilesAsync(files);
             GetProgress().Close();
         }
@@ -120,7 +124,7 @@ namespace ClassifyFiles.UI.Panel
             {
                 if (classPanel.SelectedItem != null)
                 {
-                    await filesViewer.SetFilesAsync(await DbUtility.GetFilesByClassAsync(classPanel.SelectedItem.ID));
+                    await filesViewer.SetFilesAsync(await GetFilesByClassAsync(classPanel.SelectedItem.ID));
                 }
             }
             GetProgress().Close();
@@ -138,7 +142,7 @@ namespace ClassifyFiles.UI.Panel
                 GetProgress().Show(true);
                 try
                 {
-                    var files = await DbUtility.AddFilesToClass(dialog.FileNames, GetItemsPanel().SelectedItem,
+                    var files = await AddFilesToClass(dialog.FileNames, GetItemsPanel().SelectedItem,
                         ConfigUtility.GetBool( ConfigKeys.IncludeThumbnailsWhenAddingFilesKey,true));
                     await filesViewer.AddFilesAsync(files);
                 }
@@ -185,7 +189,7 @@ namespace ClassifyFiles.UI.Panel
                             files.AddRange(IO.Directory.EnumerateFiles(file, "*", IO.SearchOption.AllDirectories));
                         }
                     }
-                    var newFiles = await DbUtility.AddFilesToClass(files, classPanel.SelectedItem,
+                    var newFiles = await AddFilesToClass(files, classPanel.SelectedItem,
                         ConfigUtility.GetBool(ConfigKeys.IncludeThumbnailsWhenAddingFilesKey, true));
                     await filesViewer.AddFilesAsync(newFiles);
                 }
