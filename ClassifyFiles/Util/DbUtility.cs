@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using DI = System.IO.DirectoryInfo;
 using SO = System.IO.SearchOption;
 
-
 namespace ClassifyFiles.Util
 {
     public static class DbUtility
@@ -19,7 +18,7 @@ namespace ClassifyFiles.Util
             db = new AppDbContext(DbPath);
         }
         public static string DbPath { get; private set; } = "data.db";
-        private static AppDbContext db;
+        internal static AppDbContext db;
         public static async Task<List<Project>> GetProjectsAsync()
         {
             Debug.WriteLine("db: " + nameof(GetProjectsAsync));

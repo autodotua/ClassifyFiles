@@ -1,4 +1,5 @@
-﻿using ClassifyFiles.WPFCore;
+﻿using ClassifyFiles.Util;
+using ClassifyFiles.WPFCore;
 using FzLib.Extension;
 using System.IO;
 using System.Linq;
@@ -16,45 +17,38 @@ namespace ClassifyFiles.UI
         public SettingWindow()
         {
             InitializeComponent();
-            //cbbLanguage.SelectedItem = cbbLanguage.Items.Cast<ComboBoxItem>().First(p => p.Tag.Equals(Config.Language));
-            cbbTheme.SelectedItem = cbbTheme.Items.Cast<ComboBoxItem>().First(p => p.Tag.Equals(GUIConfig.Theme.ToString()));
-            cbbTheme.SelectionChanged += cbbTheme_SelectionChanged;
 
-           
-            //this.Notify(nameof(Config));
+            int theme = ConfigUtility.GetInt(ConfigKeys.ThemeKey, 0);
+            switch (theme)
+            {
+                case 0: rbtnThemeAuto.IsChecked = true; break;
+                case -1: rbtnThemeDark.IsChecked = true; break;
+                case 1: rbtnThemeLight.IsChecked = true; break;
+                default:
+                    break;
+            }
+            if(ConfigUtility.GetBool(ConfigKeys.IncludeThumbnailsWhenAddingFilesKey,true))
+            {
+                chkIncludeThumbnailsWhenAddingFiles.IsChecked = true;
+            }
         }
 
-
-        private void cbbLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            //Config.Language = (cbbLanguage.SelectedItem as ComboBoxItem).Tag as string;
-            //App.Current.SetCulture();
-            //Config.Save();
-        }
 
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
-    
+            ConfigUtility.Set(ConfigKeys.IncludeThumbnailsWhenAddingFilesKey, chkIncludeThumbnailsWhenAddingFiles.IsChecked.Value);
         }
 
-        private void cbbTheme_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            GUIConfig.Theme = int.Parse((cbbTheme.SelectedItem as ComboBoxItem).Tag as string);
-            App.SetTheme();
-            GUIConfig.Save();
-        }
 
-        //public Config Config => Config.Instance;
-        public GUIConfig GUIConfig => GUIConfig.Instance;
-
-     
         private void WindowBase_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
         }
-
-        private void RegardOneSideParseErrorAsNotSameCheckBox_Click(object sender, RoutedEventArgs e)
+        private void rbtnThemeAuto_Click(object sender, RoutedEventArgs e)
         {
-            //Config.Save();
+            int theme = rbtnThemeAuto.IsChecked .Value?
+                0 : (rbtnThemeLight.IsChecked.Value?1:-1);
+            ConfigUtility.Set(ConfigKeys.ThemeKey, theme);
+
         }
     }
 }

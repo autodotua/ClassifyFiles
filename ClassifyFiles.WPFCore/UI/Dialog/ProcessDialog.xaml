@@ -14,7 +14,7 @@
         <Grid x:Name="grdOverlay" Background="{DynamicResource SystemControlBackgroundAltHighBrush}" Opacity="0.75"/>
         <ui:SimpleStackPanel Orientation="Vertical" Spacing="12"
                              VerticalAlignment="Center" HorizontalAlignment="Center">
-            <ui:ProgressRing
+            <ui:ProgressRing IsActive="True"
         x:Name="ring"
         Width="60"
         Height="60"/>

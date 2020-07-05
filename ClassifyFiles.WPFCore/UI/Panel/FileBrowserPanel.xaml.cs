@@ -138,7 +138,8 @@ namespace ClassifyFiles.UI.Panel
                 GetProgress().Show(true);
                 try
                 {
-                    var files = await DbUtility.AddFilesToClass(dialog.FileNames, GetItemsPanel().SelectedItem, btnIncludeThumbnails.IsChecked.Value);
+                    var files = await DbUtility.AddFilesToClass(dialog.FileNames, GetItemsPanel().SelectedItem,
+                        ConfigUtility.GetBool( ConfigKeys.IncludeThumbnailsWhenAddingFilesKey,true));
                     await filesViewer.AddFilesAsync(files);
                 }
                 catch (Exception ex)
@@ -184,7 +185,8 @@ namespace ClassifyFiles.UI.Panel
                             files.AddRange(IO.Directory.EnumerateFiles(file, "*", IO.SearchOption.AllDirectories));
                         }
                     }
-                    var newFiles = await DbUtility.AddFilesToClass(files, classPanel.SelectedItem, btnIncludeThumbnails.IsChecked.Value);
+                    var newFiles = await DbUtility.AddFilesToClass(files, classPanel.SelectedItem,
+                        ConfigUtility.GetBool(ConfigKeys.IncludeThumbnailsWhenAddingFilesKey, true));
                     await filesViewer.AddFilesAsync(newFiles);
                 }
                 catch (Exception ex)

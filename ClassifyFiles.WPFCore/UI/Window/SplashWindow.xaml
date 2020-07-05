@@ -14,6 +14,6 @@
         Height="256"
         Background="Transparent"
         Title="SplashWindow">
-    <Grid>
+    <Grid x:Name="grd" Width="256" Height="256">
     </Grid>
 </Window>

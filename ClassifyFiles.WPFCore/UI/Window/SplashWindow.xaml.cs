@@ -8,6 +8,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
@@ -19,22 +20,27 @@ namespace ClassifyFiles.UI
     public partial class SplashWindow : Window
     {
         private static SplashWindow instance = null;
-        public static void ShowScreen()
+        public static void TryShow()
         {
-            instance = new SplashWindow();
-            instance.Show();
+            if (instance == null)
+            {
+                instance = new SplashWindow();
+                instance.Show();
+            }
         }
 
-        public static void CloseScreen()
+        public static void TryClose()
         {
-            instance.Close();
+            if (instance != null)
+            {
+                instance.Close();
+            }
         }
         public SplashWindow()
         {
             InitializeComponent();
             var bytes = File.ReadAllBytes("Images/icon.png");
-            (Content as Grid).Background = new ImageBrush(ToImage(bytes));
-            //image.Source = new BitmapImage(new Uri("./icon.png", UriKind.Relative));
+            grd.Background = new ImageBrush(ToImage(bytes));
         }
         /// <summary>
         /// 将字符数组转换为<see cref="BitmapImage"/>

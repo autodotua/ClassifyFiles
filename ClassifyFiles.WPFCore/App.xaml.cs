@@ -1,4 +1,5 @@
 ﻿using ClassifyFiles.UI;
+using ClassifyFiles.Util;
 using ModernWpf;
 using System;
 using System.Collections.Generic;
@@ -21,17 +22,17 @@ namespace ClassifyFiles.WPFCore
         private async void Application_Startup(object sender, StartupEventArgs e)
         {
             Current = this;
-            SplashWindow.ShowScreen();
+            SplashWindow.TryShow();
             MainWindow win = new MainWindow();
-            win.ContentRendered += (p1, p2) => SplashWindow.CloseScreen();
+            win.Activated += (p1, p2) => SplashWindow.TryClose();
 #if (!DEBUG)
             UnhandledException.RegistAll();
 
-            FzLib.Program.Runtime.SingleInstance singleInstance = new FzLib.Program.Runtime.SingleInstance(Assembly.GetExecutingAssembly().FullName);
-            if (await singleInstance.CheckAndOpenWindow(this, this))
-            {
-                return;
-            }
+            //FzLib.Program.Runtime.SingleInstance singleInstance = new FzLib.Program.Runtime.SingleInstance(Assembly.GetExecutingAssembly().FullName);
+            //if (await singleInstance.CheckAndOpenWindow(this, this))
+            //{
+            //    return;
+            //}
 #endif
 
             //FzLib.Program.App.SetWorkingDirectoryToAppPath();
@@ -63,7 +64,7 @@ namespace ClassifyFiles.WPFCore
         {
             ElementTheme theme = ElementTheme.Default;
 
-            switch (GUIConfig.Instance.Theme)
+            switch (ConfigUtility.GetInt(ConfigKeys.ThemeKey,0))
             {
                 case 0:
                     if (AppsUseLightTheme)

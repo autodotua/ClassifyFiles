@@ -4,7 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-            
+                xmlns:m="http://schemas.modernwpf.com/2019"
  xmlns:local="clr-namespace:ClassifyFiles.UI"
         mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
@@ -17,17 +17,19 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-            <StackPanel Orientation="Vertical">
-                    <StackPanel Orientation="Vertical">
-                        <GroupBox Header="主题">
-                            <ComboBox x:Name="cbbTheme" Margin="8,0,0,0" Width="120" HorizontalAlignment="Left">
-                                <ComboBoxItem Content="自动" Tag="0"/>
-                                <ComboBoxItem Content="亮色" Tag="1"/>
-                                <ComboBoxItem Content="暗色" Tag="-1"/>
-                            </ComboBox>
-                        </GroupBox>
-                    </StackPanel>
-            </StackPanel>
+            <m:SimpleStackPanel Spacing="12" Orientation="Vertical" Margin="12">
+                <GroupBox Header="主题">
+                    <m:SimpleStackPanel Orientation="Horizontal" Spacing="12" x:Name="stkTheme">
+                        <RadioButton x:Name="rbtnThemeAuto" Content="自动" Click="rbtnThemeAuto_Click"/>
+                        <RadioButton x:Name="rbtnThemeLight"  Content="亮色"  Click="rbtnThemeAuto_Click"/>
+                        <RadioButton x:Name="rbtnThemeDark"  Content="暗色"  Click="rbtnThemeAuto_Click"/>
+                    </m:SimpleStackPanel>
+                </GroupBox>
+
+                <GroupBox Header="文件">
+                    <CheckBox Content="在添加文件时创建缩略图" x:Name="chkIncludeThumbnailsWhenAddingFiles" Click="CheckBox_Click"/>
+                </GroupBox>
+                </m:SimpleStackPanel>
         </ScrollViewer>
     </Grid>
 

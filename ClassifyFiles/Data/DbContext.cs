@@ -23,9 +23,7 @@ namespace ClassifyFiles.Data
             if (!created)
             {
                 created = true;
-                //Database.EnsureDeleted();
                 Database.EnsureCreated();
-                //InsertTestDatas();
             }
         }
 
@@ -34,6 +32,7 @@ namespace ClassifyFiles.Data
         public DbSet<Class> Classes { get; set; }
         public DbSet<FileClass> FileClasses { get; set; }
         public DbSet<Project> Projects { get; set; }
+        public DbSet<Config> Configs { get; set; }
         public DbSet<MatchCondition> MatchConditions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -76,6 +75,8 @@ namespace ClassifyFiles.Data
                 .HasForeignKey(p => p.FileID)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Config>()
+                 .HasIndex(p => p.Key);
 
         }
         private void InsertTestDatas()
