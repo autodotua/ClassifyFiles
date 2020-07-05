@@ -114,7 +114,8 @@ namespace ClassifyFiles.Util
         {
             foreach (var file in files)
             {
-                var existed = await db.FileClasses.FirstOrDefaultAsync(p => p.FileID == file.ID);
+                var existed = await db.FileClasses
+                    .FirstOrDefaultAsync(p => p.FileID == file.ID && !p.Disabled);
                 if (existed != null)
                 {
                     existed.Disabled = true;

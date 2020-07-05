@@ -26,7 +26,7 @@ namespace ClassifyFiles.WPFCore
             MainWindow win = new MainWindow();
             win.Activated += (p1, p2) => SplashWindow.TryClose();
 #if (!DEBUG)
-            UnhandledException.RegistAll();
+            //UnhandledException.RegistAll();
 
             //FzLib.Program.Runtime.SingleInstance singleInstance = new FzLib.Program.Runtime.SingleInstance(Assembly.GetExecutingAssembly().FullName);
             //if (await singleInstance.CheckAndOpenWindow(this, this))
