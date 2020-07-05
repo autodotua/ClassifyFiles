@@ -25,7 +25,7 @@ using DImg = System.Drawing.Image;
 using ModernWpf.Controls;
 using ClassifyFiles.UI.Model;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using IO =System. IO;
+using IO = System.IO;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -116,32 +116,14 @@ namespace ClassifyFiles.UI.Panel
                 return;
             }
             GetProgress().Show(true);
-            try
+            if (new UpdateFilesWindow(Project) { Owner = Window.GetWindow(this) }.ShowDialog() == true)
             {
-                await DbUtility.UpdateFilesOfClassesAsync(new UpdateFilesArgs()
-                {
-                    Classes = GetItemsPanel().Items,
-                    IncludeThumbnails = btnIncludeThumbnails.IsChecked.Value,
-                    Project = Project,
-                    RefreshClasses = true,
-                    Callback = (p, f) => Dispatcher.Invoke(() =>
-                      {
-                          GetProgress().Message = p.ToString("P") + (f == null ? "" : $"（{f.Name}）");
-                      })
-                });
                 if (classPanel.SelectedItem != null)
                 {
                     await filesViewer.SetFilesAsync(await DbUtility.GetFilesByClassAsync(classPanel.SelectedItem.ID));
                 }
             }
-            catch (Exception ex)
-            {
-                await new ErrorDialog().ShowAsync(ex, "刷新错误");
-            }
-            finally
-            {
-                GetProgress().Close();
-            }
+            GetProgress().Close();
         }
 
         private async void btnAddFile_Click(object sender, RoutedEventArgs e)

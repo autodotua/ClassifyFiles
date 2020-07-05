@@ -65,6 +65,9 @@
     <Page Update="UI\Panel\FileBrowserPanel.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="UI\Window\UpdateFilesWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
 </Project>

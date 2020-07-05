@@ -14,6 +14,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
+using FzLib.Basic;
 
 namespace ClassifyFiles.Util
 {
@@ -104,7 +105,7 @@ namespace ClassifyFiles.Util
             {
                 MatchType.InFileName => file.Name.Contains(value),
                 MatchType.InDirName => file.DirectoryName.Contains(value),
-                MatchType.WithExtension => file.Extension.ToLower().Replace(".", "") == value.ToLower(),
+                MatchType.WithExtension => IsExtensionMatched(file.Extension,value),
                 MatchType.InPath => file.FullName.Contains(value),
                 MatchType.InFileNameWithRegex => Regex.IsMatch(file.Name, value),
                 MatchType.InDirNameWithRegex => Regex.IsMatch(file.DirectoryName, value),
@@ -130,6 +131,21 @@ namespace ClassifyFiles.Util
                 return DateTime.Parse(mc.Value);
             }
 
+        }
+        private static Dictionary<string, string[]> splitedExtensions = new Dictionary<string, string[]>();
+        private static bool IsExtensionMatched(string ext,string target)
+        {
+            string[] splited = null;
+            if (!splitedExtensions.ContainsKey(target))
+            {
+                 splited = target.ToLower().Split(',', '|', ' ', '\t');
+                splitedExtensions.Add(target, splited);
+            }
+            else
+            {
+                splited = splitedExtensions[target];
+            }
+            return splited.Contains(ext.ToLower().TrimStart('.'));
         }
         public static long? GetFileSize(string value)
         {
@@ -192,7 +208,10 @@ namespace ClassifyFiles.Util
             }
             return P.Combine(rootPath, file.Dir, file.Name);
         }
-
+        public static FI GetFileInfo(this File file)
+        {
+            return new FI(file.GetAbsolutePath());
+        }
         public async static Task Export(string distFolder,
                                          Project project,
                                          ExportFormat format,

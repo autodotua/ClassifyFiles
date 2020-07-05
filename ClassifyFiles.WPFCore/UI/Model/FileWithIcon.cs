@@ -110,7 +110,7 @@ namespace ClassifyFiles.UI.Model
             LargeIconSize = DefualtIconSize;
             SmallIconSize = DefualtIconSize / 2;
             FontSize = DefualtIconSize / 3;
-            this.Notify(nameof(LargeIconSize), nameof(SmallIconSize),nameof(FontSize));
+            this.Notify(nameof(LargeIconSize), nameof(SmallIconSize), nameof(FontSize));
         }
         public UIFile() { }
         public File Raw { get; private set; }
@@ -130,15 +130,7 @@ namespace ClassifyFiles.UI.Model
             }
             else
             {
-                string ext = System.IO.Path.GetExtension(Name);
-                if (ext.Length > 1)
-                {
-                    ext = ext.Substring(1);
-                }
-                else
-                {
-
-                }
+                string ext = System.IO.Path.GetExtension(Name).ToLower().TrimStart('.');
                 FileType type = FileType.FileTypes.FirstOrDefault(p => p.Extensions.Contains(ext));
                 if (type != null)
                 {
@@ -154,7 +146,7 @@ namespace ClassifyFiles.UI.Model
             Classes = new ObservableCollection<Class>(classes);
         }
 
-        public ObservableCollection<Class> Classes { get; private set; } 
+        public ObservableCollection<Class> Classes { get; private set; }
 
     }
 }

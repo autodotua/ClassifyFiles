@@ -16,7 +16,7 @@ namespace ClassifyFiles.Util
     {
         static DbUtility()
         {
-            db=new AppDbContext(DbPath);
+            db = new AppDbContext(DbPath);
         }
         public static string DbPath { get; private set; } = "data.db";
         private static AppDbContext db;
@@ -219,9 +219,9 @@ namespace ClassifyFiles.Util
                     else
                     {
                         //如果文件已存在，就搜索一下是否存在关系，存在关系就不需要继续了
-                        if(Queryable.Any<FileClass>(DbUtility.db.FileClasses, (System.Linq.Expressions.Expression<Func<FileClass, bool>>)(p => (bool)(p.Class == c && p.File == existedFile))))
+                        if (Queryable.Any<FileClass>(DbUtility.db.FileClasses, (System.Linq.Expressions.Expression<Func<FileClass, bool>>)(p => (bool)(p.Class == c && p.File == existedFile))))
                         {
-                            continue; 
+                            continue;
                         }
                         f = existedFile;
                     }
@@ -275,74 +275,100 @@ namespace ClassifyFiles.Util
             }
             await db.SaveChangesAsync();
         }
-        public static async Task UpdateFilesOfClassesAsync(UpdateFilesArgs args)
+        public static Task UpdateFilesOfClassesAsync(UpdateFilesArgs args)
         {
-            await Task.Run((Action)(() =>
+            return Task.Run(() =>
             {
-                var files = new DI(args.Project.RootPath).EnumerateFiles("*", SO.AllDirectories).ToList();
-                HashSet<string> paths = new HashSet<string>(files.Select(p => p.FullName));
-                HashSet<File> dbFiles = new HashSet<File>(Queryable.Where<File>(DbUtility.db.Files, (System.Linq.Expressions.Expression<Func<File, bool>>)(p => (bool)(p.Project == args.Project))));
+                //dbFiles只在需要刷新物理文件时用到，但是因为有两个作用域，所以写在了外层
+                HashSet<File> dbFiles = null;//= new HashSet<File>(Queryable.Where(DbUtility.db.Files, (System.Linq.Expressions.Expression<Func<File, bool>>)(p => (bool)(p.Project == args.Project))));
 
-                //删除已不存在的文件
-                foreach (var file in dbFiles)
+                List<File> files = null;
+                if (args.Research)
                 {
-                    if (!paths.Contains(file.GetAbsolutePath()))
+                    dbFiles = new HashSet<File>(db.Files.Where(p => p.ProjectID == args.Project.ID));
+                    List<System.IO.FileInfo> diskFiles = new DI(args.Project.RootPath).EnumerateFiles("*", SO.AllDirectories).ToList();
+                    HashSet<string> paths = new HashSet<string>(diskFiles.Select(p => p.FullName));
+
+                    //删除已不存在的文件
+                    foreach (var file in dbFiles)
                     {
-                        DbUtility.db.Entry<File>(file).State = EntityState.Deleted;
+                        if (!paths.Contains(file.GetAbsolutePath()))
+                        {
+                            db.Entry<File>(file).State = EntityState.Deleted;
+                        }
                     }
+                    db.SaveChanges();
+                    files = diskFiles.Select(p => new File(p, args.Project)).ToList();
                 }
-                DbUtility.db.SaveChanges();
+                else
+                {
+                    files = db.Files.Where(p => p.ProjectID == args.Project.ID).Include(p => p.Project).ToList();
+                }
 
                 //现在数据库中该项目的所有文件应该都存在相对应的物理文件
                 int index = 0;
                 int count = files.Count;
                 foreach (var file in files)
                 {
-                    File f = new File(file, args.Project);
-                    //先判断一下数据库中是否已存在该文件
-                    if (!dbFiles.Contains(f))
+                    File f = null;// new File(file, args.Project);
+                    if (args.Research)
                     {
-                        DbUtility.db.Files.Add(f);
-                        if (args.IncludeThumbnails)
+                        //先判断一下数据库中是否已存在该文件
+                        if (!dbFiles.Contains(file))
                         {
-                            FileUtility.TryGenerateThumbnail(f);
+                            f = file;
+                            DbUtility.db.Files.Add(f);
+                            if (args.IncludeThumbnails)
+                            {
+                                FileUtility.TryGenerateThumbnail(f);
+                            }
+                        }
+                        else
+                        {
+                            //如果数据库中存在该文件，则从HashSet中提取该文件
+                            if (!dbFiles.TryGetValue(file, out File newF))
+                            {
+                                //理论上不会进来
+                                Debug.Assert(false);
+                            }
+                            f = newF;
                         }
                     }
                     else
                     {
-                        //如果数据库中存在该文件，则从HashSet中提取该文件
-                        if (!dbFiles.TryGetValue(f, out File newF))
-                        {
-                            //理论上不会进来
-                            Debug.Assert(false);
-                        }
-                        f = newF;
+                        f = file;
                     }
-
-                    if (args.RefreshClasses)
+                    if (args.Reclassify)
                     {
-                        foreach (var c in args.Classes)
+                        foreach (var c in db.Classes.Where(p => p.ProjectID == args.Project.ID).ToList())
                         {
-                            FileClass fc = DbUtility.IncludeAll(DbUtility.db.FileClasses).FirstOrDefault(p => p.Class == c && p.File == f);
-                            bool isMatched = FileUtility.IsMatched(file, c);
+                            FileClass fc = IncludeAll(db.FileClasses).FirstOrDefault(p => p.Class == c && p.File == f);
+                            bool isMatched = FileUtility.IsMatched(f.GetFileInfo(), c);
                             if (fc == null && isMatched)
                             {
                                 //如果匹配并且不存在，那么新增关系
-                                DbUtility.db.Add<FileClass>(new FileClass(c, f, false));
+                                db.Add(new FileClass(c, f, false));
                             }
                             else if (fc != null && !isMatched)
                             {
                                 //如果存在关系但不匹配，那么应该删除已存在的关系
                                 //注意，手动删除的关系并不会走到这一步
-                                DbUtility.db.Entry<FileClass>(fc).State = EntityState.Deleted;
+                                db.Entry(fc).State = EntityState.Deleted;
                             }
                             //其他情况，既不需要增加，也不需要删除
                         }
                     }
-                    args.Callback?.Invoke((++index * 1.0) / count, f);
+                    if (args.Callback != null)
+                    {
+                        if (!args.Callback((++index * 1.0) / count, f))
+                        {
+                            db.SaveChanges();
+                            return;
+                        }
+                    }
                 }
-                DbUtility.db.SaveChanges();
-            }));
+                db.SaveChanges();
+            });
         }
         public static Task<int> GetFilesCountAsync(Project project)
         {
@@ -360,10 +386,13 @@ namespace ClassifyFiles.Util
 
     public class UpdateFilesArgs
     {
+        public bool Research { get; set; }
         public Project Project { get; set; }
-        public IEnumerable<Class> Classes { get; set; }
         public bool IncludeThumbnails { get; set; }
-        public Action<double, File> Callback { get; set; }
-        public bool RefreshClasses { get; set; }
+        /// <summary>
+        /// 第一个参数是百分比（0~1），第二个参数是当前的文件，返回值为是否继续
+        /// </summary>
+        public Func<double, File, bool> Callback { get; set; }
+        public bool Reclassify { get; set; }
     }
 }
