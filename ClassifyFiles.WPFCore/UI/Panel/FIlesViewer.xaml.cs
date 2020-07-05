@@ -52,29 +52,14 @@ namespace ClassifyFiles.UI.Panel
             {
                 files = value;
                 page = 0;
-                this.Notify(nameof(Files), nameof(PagingFiles), nameof(FileTree), nameof(Dirs));
+                this.Notify(nameof(Files), nameof(PagingFiles), nameof(FileTree));
             }
         }
         /// <summary>
         /// 供树状图使用的文件树
         /// </summary>
         public List<UIFile> FileTree => Files == null ? null : new List<UIFile>(FileUtility.GetFileTree(Files).SubFiles.Cast<UIFile>());
-        public HashSet<string> Dirs
-        {
-            get
-            {
-                if (Files == null)
-                {
-                    return null;
-                }
-                HashSet<string> set = new HashSet<string>();
-                foreach (var file in Files)
-                {
-                    set.Add(file.Dir);
-                }
-                return set;
-            }
-        }
+     
         /// <summary>
         /// 供
         /// </summary>

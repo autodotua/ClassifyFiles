@@ -44,7 +44,7 @@
                 </m:SimpleStackPanel>
 
                 <panel:ClassesPanel x:Name="classPanel" AllFilesButtonVisiable="True"  Grid.Row="99" SelectedItemChanged="SelectedItemChanged"/>
-             </Grid>
+            </Grid>
 
         </Expander>
 
@@ -54,11 +54,6 @@
                            x:Name="filesViewer" Grid.Column="2"  AllowDrop="True"
              Drop="UserControl_Drop" ClickTag="filesViewer_ClickTag"/>
         <m:CommandBar  Grid.Row="2" Grid.ColumnSpan="999" DefaultLabelPosition="Right">
-            <!--<m:AppBarToggleButton  x:Name="btnIncludeThumbnails"      Label="生成缩略图">
-                <m:AppBarToggleButton.Icon>
-                    <m:FontIcon Glyph="&#xE8B9;"/>
-                </m:AppBarToggleButton.Icon>
-            </m:AppBarToggleButton>-->
             <m:AppBarButton  x:Name="btnAddFile" Icon="Add"  Label="添加文件" Click="btnAddFile_Click"
                              IsEnabled="{Binding ElementName=classPanel, Path=SelectedItem, Converter={StaticResource nn2b}}"/>
             <m:AppBarButton  x:Name="btnRefresh" Icon="Refresh"  Label="刷新" Click="RefreshButton_Click"
@@ -72,13 +67,11 @@
             <m:AppBarButton x:Name="btnLocateByDir" Icon="OpenLocal" Label="根据文件夹定位" >
                 <m:FlyoutService.Flyout>
                     <m:Flyout x:Name="flyoutJumpToDir" >
-                        <StackPanel>
-                            <ListBox Grid.Row="2" SelectionChanged="JumpToDirComboBox_SelectionChanged" ItemsSource="{Binding Dirs}" MaxHeight="600"/>
-                        </StackPanel>
+                        <ListBox Grid.Row="2" SelectionChanged="JumpToDirComboBox_SelectionChanged" ItemsSource="{Binding Dirs}" MaxHeight="600"/>
                     </m:Flyout>
                 </m:FlyoutService.Flyout>
             </m:AppBarButton>
-           
+
         </m:CommandBar>
     </Grid>
 </local:ProjectPanelBase>
