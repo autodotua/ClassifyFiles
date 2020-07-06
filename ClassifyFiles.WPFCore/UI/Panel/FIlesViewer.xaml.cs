@@ -103,7 +103,7 @@ namespace ClassifyFiles.UI.Panel
         {
             if (files == null || !files.Any())
             {
-                Files = null;
+                Files = new ObservableCollection<UIFile>();
             }
             else
             {
@@ -195,7 +195,7 @@ namespace ClassifyFiles.UI.Panel
                 File file = GetSelectedFile();
                 if (file != null)
                 {
-                    if (file.Dir == null)//是目录
+                    if (file.IsFolder)//是目录
                     {
                         return;
                     }
@@ -377,7 +377,7 @@ namespace ClassifyFiles.UI.Panel
                      GetProgress().Show(false);
                      if (chk.IsChecked == true)
                      {
-                         await AddFilesToClass(files.Select(p => p.Raw), tag);
+                         await AddFilesToClassAsync(files.Select(p => p.Raw), tag);
                          foreach (var file in files)
                          {
                              if (!file.Classes.Contains(tag))

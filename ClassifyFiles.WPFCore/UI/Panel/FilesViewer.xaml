@@ -93,17 +93,16 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate >
                             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="2">
-                                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                      >
+                                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"                                      >
                                     <DockPanel.ToolTip>
                                         <ToolTip>
                                             <m:SimpleStackPanel Spacing="8">
-                                                <TextBlock Text="{Binding Dir}"/>
-                                                <TextBlock FontWeight="Bold" Text="{Binding Name}"/>
+                                            <TextBlock Text="{Binding DisplayDir}"/>
+                                            <TextBlock FontWeight="Bold" Text="{Binding DisplayName}"/>
                                             </m:SimpleStackPanel>
                                         </ToolTip>
                                     </DockPanel.ToolTip>
-                                    <TextBlock DockPanel.Dock="Bottom" FontSize="12" Text="{Binding Path=Name, Mode=OneTime}"
+                                    <TextBlock DockPanel.Dock="Bottom" FontSize="12" Text="{Binding Path=DisplayName, Mode=OneTime}"
                                Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" Height="32" MaxWidth="{Binding LargeIconSize}"/>
                                     <component:FileIcon File="{Binding .}" UseLargeIcon="True"/>
                                 </DockPanel>
@@ -146,8 +145,8 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <component:FileIcon File="{Binding .}" Grid.RowSpan="99"/>
-                                <TextBlock Text="{Binding Name}" Grid.Column="2" Grid.Row="0"/>
-                                <TextBlock Text="{Binding Dir}" Grid.Column="2" Grid.Row="2" Opacity="0.5"/>
+                            <TextBlock Text="{Binding DisplayName}" Grid.Column="2" Grid.Row="0"/>
+                            <TextBlock Text="{Binding DisplayDir}" Grid.Column="2" Grid.Row="2" Opacity="0.5"/>
                                    <!--横向的标签列表-->
                                 <component:TagGroup Grid.Column="4" Grid.RowSpan="99" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
                             </Grid>
@@ -162,7 +161,7 @@
                     <HierarchicalDataTemplate  ItemsSource="{Binding SubFiles}">
                         <StackPanel Orientation="Horizontal">
                             <component:FileIcon File="{Binding .}"/>
-                            <TextBlock VerticalAlignment="Center" FontSize="12" Margin="12,0,0,0" Text="{Binding Name}"/>
+                        <TextBlock VerticalAlignment="Center" FontSize="12" Margin="12,0,0,0" Text="{Binding DisplayName}"/>
                             <component:TagGroup Margin="24,0,0,0" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>

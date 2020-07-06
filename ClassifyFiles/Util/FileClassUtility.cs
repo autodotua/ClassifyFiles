@@ -53,42 +53,61 @@ namespace ClassifyFiles.Util
             return fileClassQueryable.Include(p => p.File).Include(p => p.File);
         }
 
-        public async static Task<IReadOnlyList<File>> AddFilesToClass(IEnumerable<string> files, Class c, bool includeThumbnails)
+        public async static Task<IReadOnlyList<File>> AddFilesToClassAsync(UpdateFilesArgs args)
         {
             List<File> fs = new List<File>();
             //var existed = await GetFilesByProjectAsync(c.Project.ID);
             await Task.Run((Action)(() =>
             {
-                if (files.Any(p => !p.StartsWith(c.Project.RootPath)))
+                if (args.Files.Any(p => !p.StartsWith(args.Project.RootPath)))
                 {
                     throw new Exception("文件不在项目目录下");
                 }
-                foreach (var path in files)
+                int index = 0;
+                int count = args.Files.Count;
+                foreach (var path in args.Files)
                 {
-                    File f = new File(new System.IO.FileInfo(path), c.Project);
-                    File existedFile = Queryable.FirstOrDefault<File>(DbUtility.db.Files, (System.Linq.Expressions.Expression<Func<File, bool>>)(p => (bool)(p.Name == f.Name && p.Dir == f.Dir)));
+                    File f = new File(new System.IO.FileInfo(path), args.Project);
+                    File existedFile = db.Files.FirstOrDefault(p => p.Name == f.Name && p.Dir == f.Dir);
                     //文件不存在的话，需要首先新增文件
                     if (existedFile == null)
                     {
-                        if (includeThumbnails)
+                        if (args.IncludeThumbnails)
                         {
                             FileUtility.TryGenerateThumbnail(f);
                         }
-                        DbUtility.db.Files.Add(f);
+                        db.Files.Add(f);
                     }
                     else
                     {
+                        var existedFileClass = db.FileClasses.FirstOrDefault(p => p.Class == args.Class && p.File == existedFile);
                         //如果文件已存在，就搜索一下是否存在关系，存在关系就不需要继续了
-                        if (Queryable.Any<FileClass>(DbUtility.db.FileClasses, (System.Linq.Expressions.Expression<Func<FileClass, bool>>)(p => (bool)(p.Class == c && p.File == existedFile))))
+                        if (existedFileClass != null && !existedFileClass.Disabled)
                         {
-                            continue;
+                            goto next;
+                        }
+                        if (existedFileClass.Disabled)//存在但被禁用
+                        {
+                            fs.Add(existedFile);
+                            existedFileClass.Disabled = false;
+                            db.Entry(existedFileClass).State = EntityState.Modified;
+                            goto next;
                         }
                         f = existedFile;
                     }
-                    DbUtility.db.FileClasses.Add(new FileClass(c, f, true));
+                    db.FileClasses.Add(new FileClass(args.Class, f, true));
                     fs.Add(f);
+                next:
+                    if (args.Callback != null)
+                    {
+                        if (!args.Callback((++index * 1.0) / count, f))
+                        {
+                            db.SaveChanges();
+                            return;
+                        }
+                    }
                 }
-                DbUtility.db.SaveChanges();
+                db.SaveChanges();
             }));
             return fs.AsReadOnly();
 
@@ -99,7 +118,7 @@ namespace ClassifyFiles.Util
             return db.FileClasses.CountAsync(p => p.File.Project == project);
         }
 
-        public async static Task AddFilesToClass(IEnumerable<File> files, Class c)
+        public async static Task AddFilesToClassAsync(IEnumerable<File> files, Class c)
         {
             foreach (var file in files)
             {
@@ -115,7 +134,7 @@ namespace ClassifyFiles.Util
             foreach (var file in files)
             {
                 var existed = await db.FileClasses
-                    .FirstOrDefaultAsync(p => p.File == file && p.Class==c && !p.Disabled);
+                    .FirstOrDefaultAsync(p => p.File == file && p.Class == c && !p.Disabled);
                 var test = db.FileClasses.Where(p => p.FileID == file.ID).ToList();
                 if (existed != null)
                 {

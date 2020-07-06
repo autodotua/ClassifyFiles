@@ -1,10 +1,12 @@
 ﻿using ClassifyFiles.Data;
 using System;
+using System.Collections.Generic;
 
 namespace ClassifyFiles.Util
 {
     public class UpdateFilesArgs
     {
+        public IList<string> Files { get; set; }
         public bool Research { get; set; }
         public Project Project { get; set; }
         public bool IncludeThumbnails { get; set; }
@@ -13,5 +15,6 @@ namespace ClassifyFiles.Util
         /// </summary>
         public Func<double, File, bool> Callback { get; set; }
         public bool Reclassify { get; set; }
+        public Class Class { get; set; }
     }
 }

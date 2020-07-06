@@ -19,32 +19,36 @@ using static ClassifyFiles.Util.DbUtility;
 
 namespace ClassifyFiles.UI.Model
 {
-
-    public class FileType
-    {
-        static FileType()
-        {
-            FileTypes.Add(new FileType("Video", "\uE714", "mp4", "avi", "mkv", "mov", "rm", "rmvb"));
-            FileTypes.Add(new FileType("Photo", "\uEB9F", "mp4", "avi", "mkv", "mov", "rm", "rmvb"));
-            FileTypes.Add(new FileType("Audio", "\uE8D6", "mp3", "acc", "ogg", "flac", "wav"));
-            FileTypes.Add(new FileType("Program", "\uE756", "exe", "msi", "apk", "dll", "ini", "xml"));
-            FileTypes.Add(new FileType("Document", "\uE8A5", "doc", "docx", "ppt", "pptx", "xls", "xlsx", "txt", "md"));
-        }
-        public string Name { get; set; }
-        public IReadOnlyList<string> Extensions { get; }
-        public string Glyph { get; set; }
-
-        public FileType(string name, string glyph, params string[] exts)
-        {
-            Name = name;
-            Extensions = exts.ToList().AsReadOnly();
-            Glyph = glyph;
-        }
-
-        public static List<FileType> FileTypes { get; private set; } = new List<FileType>();
-    }
     public class UIFile : File
     {
+        public UIFile() { }
+        public UIFile(File file)
+        {
+            Raw = file;
+            ID = file.ID;
+            Name = file.Name;
+            Dir = file.Dir;
+            Project = file.Project;
+            ProjectID = file.ProjectID;
+            SubFiles = file.SubFiles.Select(p => new UIFile(p)).Cast<File>().ToList();
+            Thumbnail = file.Thumbnail;
+            if (IsFolder)
+            {
+                Glyph = FolderGlyph;
+            }
+            else
+            {
+                string ext = System.IO.Path.GetExtension(Name).ToLower().TrimStart('.');
+                FileType type = FileType.FileTypes.FirstOrDefault(p => p.Extensions.Contains(ext));
+                if (type != null)
+                {
+                    Glyph = type.Glyph;
+                }
+            }
+        }
+
+        public string DisplayName => IsFolder ? new System.IO.DirectoryInfo(Dir).Name : Name;
+        public string DisplayDir => IsFolder ? Dir.Substring(0, Dir.Length - DisplayName.Length) : Dir;
         public const string FileGlyph = "\uED41";
         public const string FolderGlyph = "\uED43";
         public string Glyph { get; set; } = FileGlyph;
@@ -118,32 +122,7 @@ namespace ClassifyFiles.UI.Model
             FontSize = DefualtIconSize / 3;
             this.Notify(nameof(LargeIconSize), nameof(SmallIconSize), nameof(FontSize));
         }
-        public UIFile() { }
         public File Raw { get; private set; }
-        public UIFile(File file)
-        {
-            Raw = file;
-            ID = file.ID;
-            Name = file.Name;
-            Dir = file.Dir;
-            Project = file.Project;
-            ProjectID = file.ProjectID;
-            SubFiles = file.SubFiles.Select(p => new UIFile(p)).Cast<File>().ToList();
-            Thumbnail = file.Thumbnail;
-            if (Dir == null)
-            {
-                Glyph = FolderGlyph;
-            }
-            else
-            {
-                string ext = System.IO.Path.GetExtension(Name).ToLower().TrimStart('.');
-                FileType type = FileType.FileTypes.FirstOrDefault(p => p.Extensions.Contains(ext));
-                if (type != null)
-                {
-                    Glyph = type.Glyph;
-                }
-            }
-        }
 
         public async Task LoadTagsAsync(Project project)
         {

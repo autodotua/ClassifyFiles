@@ -32,6 +32,10 @@ namespace ClassifyFiles.Util
 
         public static bool TryGenerateThumbnail(File file)
         {
+            if(file.IsFolder)
+            {
+                return false;
+            }
             string path = file.GetAbsolutePath();
             if (imgExtensions.Contains(P.GetExtension(path).ToLower().Trim('.')))
             {
@@ -174,7 +178,7 @@ namespace ClassifyFiles.Util
         public static File GetFileTree<T>(IEnumerable<T> files) where T : File, new()
         {
             Dictionary<T, Queue<string>> fileDirs = new Dictionary<T, Queue<string>>();
-            T root = new T() { Name = "根" };
+            T root = new T() { Dir = "根" };
 
             foreach (var file in files)
             {
@@ -182,14 +186,13 @@ namespace ClassifyFiles.Util
                 var current = root;
                 foreach (var dir in dirs)
                 {
-                    T sub = current.SubFiles.FirstOrDefault(p => p.Name == dir) as T;
-                    if (sub != null)
+                    if (current.SubFiles.FirstOrDefault(p => p.Dir == dir) is T sub)
                     {
-                        current = sub as T;
+                        current = sub;
                     }
                     else
                     {
-                        sub = new T() { Name = dir };
+                        sub = new T() { Dir = dir };
                         current.SubFiles.Add(sub);
                         current = sub;
                     }

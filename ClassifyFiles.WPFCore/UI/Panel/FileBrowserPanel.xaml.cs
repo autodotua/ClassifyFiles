@@ -150,22 +150,7 @@ namespace ClassifyFiles.UI.Panel
             };
             if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
             {
-                GetProgress().Show(true);
-                try
-                {
-                    var files = await AddFilesToClass(dialog.FileNames, GetItemsPanel().SelectedItem,
-                        ConfigUtility.GetBool( ConfigKeys.IncludeThumbnailsWhenAddingFilesKey,true));
-                    await filesViewer.AddFilesAsync(files);
-                }
-                catch (Exception ex)
-                {
-                    await new ErrorDialog().ShowAsync(ex, "加入文件失败");
-                }
-                finally
-                {
-                    GetProgress().Close();
-                }
-                GetProgress().Close();
+                await AddFilesAsync(dialog.FileNames.ToList());
             }
         }
 
@@ -185,33 +170,19 @@ namespace ClassifyFiles.UI.Panel
             }
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                GetProgress().Show(false);
-                try
-                {
-                    List<string> files = new List<string>();
-                    foreach (var file in (string[])e.Data.GetData(DataFormats.FileDrop))
-                    {
-                        if (IO.File.Exists(file))
-                        {
-                            files.Add(file);
-                        }
-                        else if (IO.Directory.Exists(file))
-                        {
-                            files.AddRange(IO.Directory.EnumerateFiles(file, "*", IO.SearchOption.AllDirectories));
-                        }
-                    }
-                    var newFiles = await AddFilesToClass(files, classPanel.SelectedItem,
-                        ConfigUtility.GetBool(ConfigKeys.IncludeThumbnailsWhenAddingFilesKey, true));
-                    await filesViewer.AddFilesAsync(newFiles);
-                }
-                catch (Exception ex)
-                {
-                    await new ErrorDialog().ShowAsync(ex, "加入文件失败");
-                }
-                finally
-                {
-                    GetProgress().Close();
-                }
+                var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                await AddFilesAsync(files);
+            }
+        }
+
+        private async Task AddFilesAsync(IList<string> files)
+        {
+            var dialog = new AddFilesWindow(classPanel.SelectedItem, files)
+            { Owner = Window.GetWindow(this) };
+            dialog.ShowDialog();
+            if (dialog.AddedFiles != null)
+            {
+                await filesViewer.AddFilesAsync(dialog.AddedFiles);
             }
         }
 
@@ -222,7 +193,7 @@ namespace ClassifyFiles.UI.Panel
 
         private void btnAllFiles_Click(object sender, RoutedEventArgs e)
         {
-            if(GetItemsPanel().SelectedItem==null)
+            if (GetItemsPanel().SelectedItem == null)
             {
                 SelectedClassChanged(null, null);
             }

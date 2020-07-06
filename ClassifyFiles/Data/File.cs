@@ -13,23 +13,33 @@ namespace ClassifyFiles.Data
         public File()
         {
         }
+
         public File(FileInfo file, Project project)
         {
-            Name = file.Name;
+            Project = project;
             var root = new DirectoryInfo(project.RootPath);
-            if (!file.FullName.Contains(root.FullName))
+            if (!file.FullName.StartsWith(root.FullName))
             {
                 throw new Exception("根目录路径没有被包含在文件路径中");
             }
-            Project = project;
-            //Dir = file.FullName.Replace(root.FullName, "").Replace(file.Name, "").Trim('\\');
-            Dir = file.FullName.Substring(root.FullName.Length, file.FullName.Length - file.Name.Length - root.FullName.Length - 1).Trim('\\');
+            if (file.Attributes.HasFlag(FileAttributes.Directory))
+            {
+                Dir = file.FullName.Substring(root.FullName.Length).Trim('\\');
+            }
+            else
+            {
+                Name = file.Name; 
+                Dir = file.FullName.Substring(root.FullName.Length, file.FullName.Length - file.Name.Length - root.FullName.Length - 1).Trim('\\');
+            }
+
         }
 
         [Required]
-        public string Dir { get; set; }
+        public string Dir { get; set; } = "";
         [Required]
         public string Name { get; set; } = "";
+        [NotMapped]
+        public bool IsFolder => Name == "";
         public byte[] Thumbnail { get; set; }
         [Required]
         public Project Project { get; set; }
