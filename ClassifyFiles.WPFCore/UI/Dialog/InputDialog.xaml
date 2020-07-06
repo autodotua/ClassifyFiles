@@ -22,10 +22,10 @@
         </Grid.RowDefinitions>
         <TextBox x:Name="textArea" Width="{Binding ElementName=uc, Path=ActualWidth, Converter={StaticResource minus}, ConverterParameter=20}" 
                                Grid.Row="2" TextWrapping="Wrap"   Margin="16,0,16,0"          AcceptsReturn="True"      AcceptsTab="True"
-                               VerticalScrollBarVisibility="Auto"             
+                               VerticalScrollBarVisibility="Auto"      Visibility="Collapsed"       
                          VerticalAlignment="Center" Text="{Binding InputContent}"/>
                <TextBox x:Name="textLine" Width="{Binding ElementName=uc, Path=ActualWidth, Converter={StaticResource minus}, ConverterParameter=20}" 
-                               Grid.Row="2" TextWrapping="Wrap"   Margin="16,0,16,0"
+                               Grid.Row="2" TextWrapping="Wrap" Visibility="Collapsed"  Margin="16,0,16,0"
                          VerticalAlignment="Center" Text="{Binding InputContent}"/>
             </Grid>
 

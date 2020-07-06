@@ -46,7 +46,7 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(MatchConditions));
             }
         }
-        private async void WindowBase_Loaded(object sender, RoutedEventArgs e)
+        private  void WindowBase_Loaded(object sender, RoutedEventArgs e)
         {
         }
 
@@ -54,7 +54,7 @@ namespace ClassifyFiles.UI.Panel
         {
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void RemoveMatchConditionButton_Click(object sender, RoutedEventArgs e)
         {
             MatchConditions.Remove((sender as FrameworkElement).Tag as MatchCondition);
             for (int i = 0; i < MatchConditions.Count; i++)
@@ -107,7 +107,6 @@ namespace ClassifyFiles.UI.Panel
         private void AddMatchConditionButton_Click(object sender, RoutedEventArgs e)
         {
             MatchConditions.Add(new MatchCondition() { Index = MatchConditions.Count });
-
         }
 
 
@@ -121,11 +120,11 @@ namespace ClassifyFiles.UI.Panel
             }
             if (classes.SelectedItem == null)
             {
-                MatchConditions = new ObservableCollection<MatchCondition>();
+                MatchConditions = null;
             }
             else
                 MatchConditions = new ObservableCollection<MatchCondition>
-                    ((classes.SelectedItem as Class).MatchConditions.OrderBy(p => p.Index));
+                    (classes.SelectedItem.MatchConditions.OrderBy(p => p.Index));
 
         }
     }

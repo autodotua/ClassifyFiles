@@ -110,11 +110,39 @@ namespace ClassifyFiles.Util
                     db.AddRange(files);
                     db.AddRange(fcs);
                 }
-                 db.SaveChanges();
-                 importDb.Dispose();
+                db.SaveChanges();
+                importDb.Dispose();
             });
             return projects.ToArray();
         }
 
+        public async static Task<Dictionary<CheckType, IReadOnlyList<DbModelBase>>> CheckAsync(int projectID)
+        {
+            Dictionary<CheckType, IReadOnlyList<DbModelBase>> results = new Dictionary<CheckType, IReadOnlyList<DbModelBase>>();
+            await Task.Run(() =>
+            {
+                var classes = db.Classes.Where(p => p.ProjectID == projectID).ToList();
+                foreach (var c in classes)
+                {
+                    var fcs = db.FileClasses.Where(p => p.Class == c).ToList();
+                    var duplicated = fcs.GroupBy(p => p.FileID).Where(p => p.Count() > 1).ToList();
+                }
+                var files = db.Files.Where(p => p.ProjectID == projectID).ToList();
+                foreach (var file in files)
+                {
+                    var fcs = db.FileClasses.Where(p => p.File == file).ToList();
+                    var duplicated = fcs.GroupBy(p => p.ClassID).Where(p => p.Count() > 1).ToList();
+                    if (duplicated.Count > 0)
+                    {
+
+                    }
+                }
+            });
+            return results;
+        }
+        public enum CheckType
+        {
+            DuplicatedFileClasses
+        }
     }
 }

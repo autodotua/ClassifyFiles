@@ -53,10 +53,12 @@ namespace ClassifyFiles.UI.Panel
         }
         public Project Project { get; protected set; }
 
-        public async Task AddAsync()
+        public async Task<Class> AddAsync()
         {
-            await AddClassAsync(Project);
-            await LoadAsync(Project);
+            var c= await AddClassAsync(Project);
+            Items.Add(c);
+            SelectedItem = c;
+            return c;
         }
 
         public async Task DeleteSelectedAsync()
@@ -67,8 +69,13 @@ namespace ClassifyFiles.UI.Panel
             }
             else
             {
-                await DeleteClassAsync(SelectedItem as Class);
-                await LoadAsync(Project);
+                int index = items.IndexOf(SelectedItem);
+                await DeleteClassAsync(SelectedItem);
+                Items.Remove(SelectedItem);
+                if(Items.Count>0)
+                {
+                        SelectedItem = index == 0? Items[0]:Items[index-1];
+                }
             }
         }
 
@@ -80,12 +87,11 @@ namespace ClassifyFiles.UI.Panel
             }
             else
             {
-                string value = await new InputDialog().ShowAsync("重命名", false, "请输入新的标题", "");
+                string value = await new InputDialog().ShowAsync("重命名", false, "请输入新的标题", SelectedItem.Name);
                 if (!string.IsNullOrWhiteSpace(value))
                 {
                     SelectedItem.Name = value;
                     await SaveClassAsync(SelectedItem);
-                    await LoadAsync(Project);
                 }
             }
         }

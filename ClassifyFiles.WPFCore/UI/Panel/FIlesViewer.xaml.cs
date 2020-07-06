@@ -409,7 +409,8 @@ namespace ClassifyFiles.UI.Panel
         {
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                var suggestions = Files == null ? new List<UIFile>() : Files.Where(p => p.Name.Contains(sender.Text)).ToList();
+                string txt = sender.Text.ToLower();
+                var suggestions = Files == null ? new List<UIFile>() : Files.Where(p => p.Name.ToLower().Contains(txt)).ToList();
 
                 sender.ItemsSource = suggestions.Count > 0 ?
                     suggestions : new string[] { "结果为空" } as IEnumerable;

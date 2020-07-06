@@ -53,7 +53,7 @@ namespace ClassifyFiles.UI.Panel
         {
             await base.LoadAsync(project);
             tbkFilesCount.Text = (await GetFilesCountAsync(project)).ToString();
-            tbkClassesCount.Text =( await GetClassesCountAsync(project)).ToString();
+            tbkClassesCount.Text = (await GetClassesCountAsync(project)).ToString();
             tbkFileClassesCount.Text = (await GetFileClassesCountAsync(project)).ToString();
         }
 
@@ -194,6 +194,13 @@ namespace ClassifyFiles.UI.Panel
             flyoutDeleteFiles.Hide();
             GetProgress().Show(false);
             await DeleteFilesOfProjectAsync(Project);
+            GetProgress().Close();
+        }
+
+        private async void CheckButton_Click(object sender, RoutedEventArgs e)
+        {
+            GetProgress().Show(true);
+            await CheckAsync(Project.ID);
             GetProgress().Close();
         }
     }

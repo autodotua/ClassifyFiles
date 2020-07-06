@@ -17,7 +17,7 @@ namespace ClassifyFiles.Util
         {
             //Debug.WriteLine("db: " + nameof(GetClassesOfFileAsync));
             return db.FileClasses
-                .Where(p => p.FileID == fileID)
+                .Where(p => p.FileID == fileID && !p.Disabled)
                 .IncludeAll()
                 .Select(p => p.Class).ToListAsync();
         }
@@ -115,7 +115,8 @@ namespace ClassifyFiles.Util
             foreach (var file in files)
             {
                 var existed = await db.FileClasses
-                    .FirstOrDefaultAsync(p => p.FileID == file.ID && !p.Disabled);
+                    .FirstOrDefaultAsync(p => p.File == file && p.Class==c && !p.Disabled);
+                var test = db.FileClasses.Where(p => p.FileID == file.ID).ToList();
                 if (existed != null)
                 {
                     existed.Disabled = true;

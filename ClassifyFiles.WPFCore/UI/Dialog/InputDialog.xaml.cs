@@ -1,8 +1,11 @@
 ﻿using ClassifyFiles.UI.Dialog;
 using FzLib.Extension;
-
+using System;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace ClassifyFiles.UI
 {
@@ -17,26 +20,25 @@ namespace ClassifyFiles.UI
         }
         public async Task<string> ShowAsync(string title, bool multipleLines, string hint = "", string defaultContent = "")
         {
-            Title= title;
+            Title = title;
             InputContent = defaultContent;
             this.Notify(nameof(InputContent));
-            if (multipleLines)
+            TextBox txt = multipleLines ? textArea : textLine;
+            txt.Visibility = Visibility.Visible;
+
+            Opened += (p1, p2) =>
             {
-                textLine.Visibility = Visibility.Collapsed;
-                textArea.Visibility = Visibility.Visible;
-                textArea.SelectAll();
-            }
-            else
-            {
-                textArea.Visibility = Visibility.Collapsed;
-                textLine.Visibility = Visibility.Visible;
-                textLine.SelectAll();
-            }
-            PrimaryButtonClick += (p1, p2) =>
-            {
-                Result = true;
+                Dispatcher.BeginInvoke(DispatcherPriority.Input,
+                   (Action)(() =>
+                   {
+                       txt.Focus();
+                       txt.SelectAll();
+                       Keyboard.Focus(txt);
+                   }));
+                
             };
-            await base.ShowAsync();
+            PrimaryButtonClick += (p1, p2) => Result = true;
+            await ShowAsync();
             return Result ? InputContent : "";
         }
         public string InputContent { get; set; }

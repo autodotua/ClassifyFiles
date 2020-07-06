@@ -67,6 +67,8 @@
                                 </m:Flyout>
                             </m:FlyoutService.Flyout>
                         </Button>
+                        <Button Content="查询项目数据库错误" Click="CheckButton_Click" />
+
                     </m:SimpleStackPanel>
                     <m:SimpleStackPanel Orientation="Horizontal"     Spacing="12">
                         <TextBlock>文件数量：</TextBlock>

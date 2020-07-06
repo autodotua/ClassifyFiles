@@ -11,7 +11,7 @@ namespace ClassifyFiles.UI
     /// <summary>
     /// CookieWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class UpdateFilesWindow : WindowBase
+    public partial class UpdateFilesWindow : DialogWindowBase
     {
         public UpdateFilesWindow(Project project)
         {

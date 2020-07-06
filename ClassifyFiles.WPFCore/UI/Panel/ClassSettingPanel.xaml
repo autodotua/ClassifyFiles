@@ -73,7 +73,7 @@
                                 <DatePicker VerticalAlignment="Bottom"   
                                          Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Grid.Column="6"
                                             Visibility="{Binding Type, Converter={StaticResource mt2v}, ConverterParameter=time}"/>
-                                <Button  Grid.Column="8" Click="Button_Click_1"  Tag="{Binding .}">
+                                <Button  Grid.Column="8" Click="RemoveMatchConditionButton_Click"  Tag="{Binding .}">
                                     <m:SymbolIcon Symbol="Delete"/>
                                 </Button>
                             </Grid>
