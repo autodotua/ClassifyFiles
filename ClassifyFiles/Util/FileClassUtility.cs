@@ -15,11 +15,17 @@ namespace ClassifyFiles.Util
     {
         public static Task<List<Class>> GetClassesOfFileAsync(int fileID)
         {
+            return GetClassesOfFileAsync(db, fileID);
+        }
+        public static Task<List<Class>> GetClassesOfFileAsync(AppDbContext db, int fileID)
+        {
             //Debug.WriteLine("db: " + nameof(GetClassesOfFileAsync));
             return db.FileClasses
                 .Where(p => p.FileID == fileID && !p.Disabled)
                 .IncludeAll()
-                .Select(p => p.Class).ToListAsync();
+                .OrderBy(p=>p.Class.Name)
+                .Select(p => p.Class)
+                .ToListAsync();
         }
         public async static Task<List<File>> GetFilesByClassAsync(int classID)
         {

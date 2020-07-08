@@ -67,6 +67,12 @@
                                 </m:Flyout>
                             </m:FlyoutService.Flyout>
                         </Button>
+                        <Button Click="DeleteThumbnails_Click" >
+                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                                <m:SymbolIcon Symbol="Delete" VerticalAlignment="Center"/>
+                                <TextBlock  VerticalAlignment="Center">删除所有文件的缩略图</TextBlock>
+                            </m:SimpleStackPanel>
+                        </Button>
                         <Button Content="查询项目数据库错误" Click="CheckButton_Click" />
 
                     </m:SimpleStackPanel>

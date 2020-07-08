@@ -18,7 +18,10 @@ namespace ClassifyFiles.Util
         {
             return db.SaveChangesAsync();
         }
-
+        public static Task ZipAsync()
+        {
+            return                 db.Database.ExecuteSqlRawAsync("VACUUM;");
+        }
         public static void CancelChanges()
         {
             foreach (var entry in db.ChangeTracker.Entries())

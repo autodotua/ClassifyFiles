@@ -47,10 +47,19 @@ namespace ClassifyFiles.UI
         }
         private void ThemeRButton_Click(object sender, RoutedEventArgs e)
         {
-            int theme = rbtnThemeAuto.IsChecked .Value?
-                0 : (rbtnThemeLight.IsChecked.Value?1:-1);
+            int theme = rbtnThemeAuto.IsChecked.Value ?
+                0 : (rbtnThemeLight.IsChecked.Value ? 1 : -1);
             Configs.Theme = theme;
             App.SetTheme();
+        }
+
+        private async void ZipDatabaseButton_Click(object sender, RoutedEventArgs e)
+        {
+            long rawLength = new FileInfo(DbUtility.DbPath).Length;
+            await DbUtility.ZipAsync();
+            long nowLength = new FileInfo(DbUtility.DbPath).Length;
+            await new MessageDialog().ShowAsync("压缩成功，当前数据库大小为" + FzLib.Basic.Number.ByteToFitString(nowLength)
+                + "，" + System.Environment.NewLine + "共释放" + FzLib.Basic.Number.ByteToFitString(rawLength - nowLength), "压缩成功");
         }
     }
 }

@@ -133,14 +133,22 @@ namespace ClassifyFiles.UI.Model
         }
         public File Raw { get; private set; }
 
-        public async Task LoadTagsAsync(Project project)
+        public async Task LoadTagsAsync(AppDbContext db)
         {
-            IEnumerable<Class> classes = await GetClassesOfFileAsync(ID);
-            classes = classes.OrderBy(p => p.Name);
+            IEnumerable<Class> classes = await GetClassesOfFileAsync(db,ID);
             Classes = new ObservableCollection<Class>(classes);
         }
 
-        public ObservableCollection<Class> Classes { get; private set; }
+        private ObservableCollection<Class> classes;
+        public ObservableCollection<Class> Classes
+        {
+            get => classes;
+            set
+            {
+                classes = value;
+                this.Notify(nameof(Classes));
+            }
+        }
 
         public override string ToString()
         {

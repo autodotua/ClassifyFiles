@@ -15,6 +15,8 @@ using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
 using FzLib.Basic;
+using static ClassifyFiles.Util.DbUtility;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClassifyFiles.Util
 {
@@ -32,7 +34,7 @@ namespace ClassifyFiles.Util
 
         public static bool TryGenerateThumbnail(File file)
         {
-            if(file.IsFolder)
+            if (file.IsFolder)
             {
                 return false;
             }
@@ -109,7 +111,7 @@ namespace ClassifyFiles.Util
             {
                 MatchType.InFileName => file.Name.Contains(value),
                 MatchType.InDirName => file.DirectoryName.Contains(value),
-                MatchType.WithExtension => IsExtensionMatched(file.Extension,value),
+                MatchType.WithExtension => IsExtensionMatched(file.Extension, value),
                 MatchType.InPath => file.FullName.Contains(value),
                 MatchType.InFileNameWithRegex => Regex.IsMatch(file.Name, value),
                 MatchType.InDirNameWithRegex => Regex.IsMatch(file.DirectoryName, value),
@@ -137,12 +139,12 @@ namespace ClassifyFiles.Util
 
         }
         private static Dictionary<string, string[]> splitedExtensions = new Dictionary<string, string[]>();
-        private static bool IsExtensionMatched(string ext,string target)
+        private static bool IsExtensionMatched(string ext, string target)
         {
             string[] splited = null;
             if (!splitedExtensions.ContainsKey(target))
             {
-                 splited = target.ToLower().Split(',', '|', ' ', '\t');
+                splited = target.ToLower().Split(',', '|', ' ', '\t');
                 splitedExtensions.Add(target, splited);
             }
             else
@@ -305,6 +307,29 @@ namespace ClassifyFiles.Util
                 newName = P.GetFileNameWithoutExtension(name) + $" ({++i})" + P.GetExtension(name);
             } while (F.Exists(P.Combine(dir, newName)));
             return newName;
+        }
+
+        public static async Task SaveFilesAsync(IEnumerable<File> files)
+        {
+            files.ForEach(p => db.Entry(p).State = EntityState.Modified);
+            await db.SaveChangesAsync();
+        }
+
+        public static  Task DeleteThumbnailsAsync(int projectID)
+        {
+            return Task.Run(() =>
+            {
+                var files = db.Files.Where(p => p.ProjectID == projectID).AsEnumerable();
+
+                foreach (var file in files)
+                {
+                    file.Thumbnail = null;
+                    db.Entry(file).State = EntityState.Modified;
+                }
+                 db.SaveChanges();
+                 //db.Database.ExecuteSqlRaw("VACUUM;");
+            });
+
         }
     }
     public enum ExportFormat

@@ -203,6 +203,14 @@ namespace ClassifyFiles.UI.Panel
             await CheckAsync(Project.ID);
             GetProgress().Close();
         }
+
+        private async void DeleteThumbnails_Click(object sender, RoutedEventArgs e)
+        {
+            GetProgress().Show(true);
+            await FileUtility.DeleteThumbnailsAsync(Project.ID);
+            GetProgress().Close();
+            await new MessageDialog().ShowAsync("删除成功", "删除缩略图");
+        }
     }
 }
 

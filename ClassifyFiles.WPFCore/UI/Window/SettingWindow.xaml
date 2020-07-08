@@ -29,6 +29,10 @@
                 <GroupBox Header="自动生成缩略图">
                     <CheckBox Content="在浏览时尝试为没有缩略图的对象生成缩略图" x:Name="chkAutoThumbnails" Click="CheckBox_Click"/>
                 </GroupBox>
+
+                <GroupBox Header="数据库">
+                    <Button Content="压缩数据库" Click="ZipDatabaseButton_Click"/>
+                </GroupBox>
                 </m:SimpleStackPanel>
         </ScrollViewer>
     </Grid>

@@ -71,10 +71,7 @@ namespace ClassifyFiles.UI.Panel
             get
             {
                 var files = Files == null ? null : Files.Skip(pagingItemsCount * page).Take(pagingItemsCount);
-                if (files != null)
-                {
-                }
-                AutoGenerateThumbnailsAsync(files);
+                RealtimeRefresh(files);
                 return files;
             }
         }
@@ -111,15 +108,15 @@ namespace ClassifyFiles.UI.Panel
             else
             {
                 List<UIFile> filesWithIcon = new List<UIFile>();
-                await Task.Run(async () =>
-              {
-                  foreach (var file in files)
-                  {
-                      UIFile uiFile = new UIFile(file);
-                      await uiFile.LoadTagsAsync(Project);
-                      filesWithIcon.Add(uiFile);
-                  }
-              });
+                await Task.Run(() =>
+               {
+                   foreach (var file in files)
+                   {
+                       UIFile uiFile = new UIFile(file);
+                       //await uiFile.LoadTagsAsync(Project);
+                       filesWithIcon.Add(uiFile);
+                   }
+               });
                 Files = new ObservableCollection<UIFile>(filesWithIcon);
             }
             GeneratePaggingButtons();
@@ -127,15 +124,15 @@ namespace ClassifyFiles.UI.Panel
         public async Task AddFilesAsync(IEnumerable<File> files, bool tags = true)
         {
             List<UIFile> filesWithIcon = new List<UIFile>();
-            await Task.Run(async () =>
-            {
-                foreach (var file in files)
-                {
-                    UIFile uiFile = new UIFile(file);
-                    await uiFile.LoadTagsAsync(Project);
-                    filesWithIcon.Add(uiFile);
-                }
-            });
+            await Task.Run(() =>
+           {
+               foreach (var file in files)
+               {
+                   UIFile uiFile = new UIFile(file);
+                   //await uiFile.LoadTagsAsync(Project);
+                   filesWithIcon.Add(uiFile);
+               }
+           });
             foreach (var file in filesWithIcon)
             {
                 Files.Add(file);
@@ -430,7 +427,9 @@ namespace ClassifyFiles.UI.Panel
         {
 
         }
-        ConcurrentDictionary<int, UIFile> generated = new ConcurrentDictionary<int, UIFile>();
+
+        #region 自动生成缩略图
+        private  ConcurrentDictionary<int, UIFile> generated = new ConcurrentDictionary<int, UIFile>();
         private void lvwFiles_Loaded(object sender, RoutedEventArgs e)
         {
             ScrollViewer scrollViewer = (sender as System.Windows.Controls.ListView).GetVisualChild<ScrollViewer>(); //Extension method
@@ -441,41 +440,59 @@ namespace ClassifyFiles.UI.Panel
                 {
                     scrollBar.ValueChanged += async delegate
                      {
-                         await AutoGenerateThumbnailsAsync(Files.Skip((int)scrollViewer.VerticalOffset).Take((int)scrollViewer.ViewportHeight + 5));
+                         await RealtimeRefresh(Files.Skip((int)scrollViewer.VerticalOffset).Take((int)scrollViewer.ViewportHeight + 5));
                      };
                 }
             }
 
         }
 
-        private async Task AutoGenerateThumbnailsAsync(IEnumerable<UIFile> files)
+        private Task RealtimeRefresh(IEnumerable<UIFile> files)
         {
-            if (files == null || !files.Any())
+
+            return Task.Run(async () =>
             {
-                return;
-            }
-            if (!Configs.AutoThumbnails)
-            {
-                return;
-            }
-            await Task.Run(() =>
-            {
-                Parallel.ForEach(files, file =>
+                if (files == null || !files.Any())
                 {
-                    if (!generated.ContainsKey(file.ID) && file.Thumbnail == null)
+                    return;
+                }
+                AppDbContext db = new AppDbContext(DbUtility.DbPath);
+                foreach (var file in files)
+                {
+                    await file.LoadTagsAsync(db);
+                }
+                if (Configs.AutoThumbnails)
+                {
+                    Parallel.ForEach(files, file =>
                     {
-                        generated.TryAdd(file.ID, file);
-                        FileUtility.TryGenerateThumbnail(file);
+                        if (!generated.ContainsKey(file.ID) && file.Thumbnail == null)
+                        {
+                            generated.TryAdd(file.ID, file);
+                            FileUtility.TryGenerateThumbnail(file);
+                            file.Raw.Thumbnail = file.Thumbnail;
+                        }
+                    });
+
+                    try
+                    {
+                        await FileUtility.SaveFilesAsync(files.Where(p => p.Thumbnail != null).Select(p => p.Raw));
                     }
-                });
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
             });
         }
 
-        private async void treeFiles_Expanded(object sender, RoutedEventArgs e)
+        private async void TreeItems_Expanded(object sender, RoutedEventArgs e)
         {
-            var files = ((e.OriginalSource as TreeViewItem).DataContext as UIFile).SubFiles.Where(p => !p.IsFolder).Cast<UIFile>();
-            await AutoGenerateThumbnailsAsync(files);
+            var files = ((e.OriginalSource as TreeViewItem).DataContext as UIFile)
+                .SubFiles.Where(p => !p.IsFolder).Cast<UIFile>();
+            await RealtimeRefresh(files);
         }
+
+        #endregion
     }
 
     public class ClickTagEventArgs : EventArgs

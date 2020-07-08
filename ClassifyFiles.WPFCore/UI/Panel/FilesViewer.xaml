@@ -110,10 +110,16 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </m:GridView>
-            <ScrollViewer x:Name="scrPagging" Grid.Row="2"  VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Hidden" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
-                <StackPanel x:Name="stkPagging" Orientation="Horizontal"/>
+            <ScrollViewer x:Name="scrPagging" Grid.Row="2"  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" MaxHeight="60" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                <WrapPanel x:Name="stkPagging" Orientation="Horizontal"/>
             </ScrollViewer>
         </Grid>
+        
+        
+        
+        
+        
+        
         <Grid Grid.Row="4" x:Name="lvwFilesArea">
             <Grid.RowDefinitions >
                 <RowDefinition Height="*"/>
@@ -154,7 +160,7 @@
         </Grid>
         <TreeView Name="treeFiles" Visibility="Collapsed"   ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
                                           Grid.Row="4"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
-                  TreeViewItem.Expanded="treeFiles_Expanded">
+                  TreeViewItem.Expanded="TreeItems_Expanded">
 
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate  ItemsSource="{Binding SubFiles}">
