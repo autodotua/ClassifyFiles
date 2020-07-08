@@ -18,6 +18,8 @@ using ModernWpf.Controls;
 using ClassifyFiles.UI.Component;
 using static ClassifyFiles.Util.FileClassUtility;
 using System.Collections;
+using System.Windows.Controls.Primitives;
+using System.Collections.Concurrent;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -72,6 +74,7 @@ namespace ClassifyFiles.UI.Panel
                 if (files != null)
                 {
                 }
+                AutoGenerateThumbnailsAsync(files);
                 return files;
             }
         }
@@ -426,6 +429,52 @@ namespace ClassifyFiles.UI.Panel
         private void SearchTextBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
 
+        }
+        ConcurrentDictionary<int, UIFile> generated = new ConcurrentDictionary<int, UIFile>();
+        private void lvwFiles_Loaded(object sender, RoutedEventArgs e)
+        {
+            ScrollViewer scrollViewer = (sender as System.Windows.Controls.ListView).GetVisualChild<ScrollViewer>(); //Extension method
+
+            if (scrollViewer != null)
+            {
+                if (scrollViewer.Template.FindName("PART_VerticalScrollBar", scrollViewer) is ScrollBar scrollBar)
+                {
+                    scrollBar.ValueChanged += async delegate
+                     {
+                         await AutoGenerateThumbnailsAsync(Files.Skip((int)scrollViewer.VerticalOffset).Take((int)scrollViewer.ViewportHeight + 5));
+                     };
+                }
+            }
+
+        }
+
+        private async Task AutoGenerateThumbnailsAsync(IEnumerable<UIFile> files)
+        {
+            if (files == null || !files.Any())
+            {
+                return;
+            }
+            if (!Configs.AutoThumbnails)
+            {
+                return;
+            }
+            await Task.Run(() =>
+            {
+                Parallel.ForEach(files, file =>
+                {
+                    if (!generated.ContainsKey(file.ID) && file.Thumbnail == null)
+                    {
+                        generated.TryAdd(file.ID, file);
+                        FileUtility.TryGenerateThumbnail(file);
+                    }
+                });
+            });
+        }
+
+        private async void treeFiles_Expanded(object sender, RoutedEventArgs e)
+        {
+            var files = ((e.OriginalSource as TreeViewItem).DataContext as UIFile).SubFiles.Where(p => !p.IsFolder).Cast<UIFile>();
+            await AutoGenerateThumbnailsAsync(files);
         }
     }
 

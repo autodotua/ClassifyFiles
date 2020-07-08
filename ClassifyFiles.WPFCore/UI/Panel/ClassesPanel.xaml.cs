@@ -91,7 +91,7 @@ namespace ClassifyFiles.UI.Panel
                 if (!string.IsNullOrWhiteSpace(value))
                 {
                     SelectedItem.Name = value;
-                    await SaveClassAsync(SelectedItem);
+                     await SaveClassAsync(SelectedItem);
                 }
             }
         }

@@ -68,9 +68,9 @@
                                           SelectedValue="{Binding Type}"
                                           ItemsSource="{panel:EnumToItemsSource {x:Type data:MatchType}}"/>
                                 <CheckBox Content="取反" VerticalAlignment="Bottom" IsChecked="{Binding Not}" Grid.Column="4" Margin="0,0,-12,0"/>
-                                <TextBox VerticalAlignment="Bottom" 
+                                <TextBox VerticalAlignment="Bottom"   HorizontalAlignment="Stretch"
                                          Text="{Binding Value}" Grid.Column="6" Visibility="{Binding Type, Converter={StaticResource mt2v}, ConverterParameter=text}"/>                                
-                                <DatePicker VerticalAlignment="Bottom"   
+                                <DatePicker VerticalAlignment="Bottom"    HorizontalAlignment="Stretch"
                                          Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Grid.Column="6"
                                             Visibility="{Binding Type, Converter={StaticResource mt2v}, ConverterParameter=time}"/>
                                 <Button  Grid.Column="8" Click="RemoveMatchConditionButton_Click"  Tag="{Binding .}">

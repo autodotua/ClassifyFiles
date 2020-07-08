@@ -20,14 +20,14 @@
             <m:SimpleStackPanel Spacing="12" Orientation="Vertical" Margin="12">
                 <GroupBox Header="主题">
                     <m:SimpleStackPanel Orientation="Horizontal" Spacing="12" x:Name="stkTheme">
-                        <RadioButton x:Name="rbtnThemeAuto" Content="自动" Click="rbtnThemeAuto_Click"/>
-                        <RadioButton x:Name="rbtnThemeLight"  Content="亮色"  Click="rbtnThemeAuto_Click"/>
-                        <RadioButton x:Name="rbtnThemeDark"  Content="暗色"  Click="rbtnThemeAuto_Click"/>
+                        <RadioButton x:Name="rbtnThemeAuto" Content="自动" Click="ThemeRButton_Click"/>
+                        <RadioButton x:Name="rbtnThemeLight"  Content="亮色"  Click="ThemeRButton_Click"/>
+                        <RadioButton x:Name="rbtnThemeDark"  Content="暗色"  Click="ThemeRButton_Click"/>
                     </m:SimpleStackPanel>
                 </GroupBox>
 
-                <GroupBox Header="文件">
-                    <CheckBox Content="在添加文件时创建缩略图" x:Name="chkIncludeThumbnailsWhenAddingFiles" Click="CheckBox_Click"/>
+                <GroupBox Header="自动生成缩略图">
+                    <CheckBox Content="在浏览时尝试为没有缩略图的对象生成缩略图" x:Name="chkAutoThumbnails" Click="CheckBox_Click"/>
                 </GroupBox>
                 </m:SimpleStackPanel>
         </ScrollViewer>

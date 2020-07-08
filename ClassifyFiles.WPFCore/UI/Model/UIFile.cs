@@ -44,6 +44,15 @@ namespace ClassifyFiles.UI.Model
                 {
                     Glyph = type.Glyph;
                 }
+
+                PropertyChanged +=async (p1, p2) =>
+                {
+                    if (p2.PropertyName == nameof(Thumbnail))
+                    {
+                        await Task.Delay(100);
+                        this.Notify(nameof(IconVisibility), nameof(ImageVisibility),nameof(Image));
+                    }
+                };
             }
         }
 

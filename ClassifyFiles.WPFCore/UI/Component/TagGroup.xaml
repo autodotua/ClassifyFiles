@@ -32,7 +32,7 @@
                             <DataTemplate>
                                 <Border Padding="8,4" CornerRadius="2" Background="{DynamicResource SystemAccentColorDark1Brush}">
                                     <Grid >
-                                        <TextBlock Text="{Binding Name}"/>
+                                        <TextBlock Text="{Binding Name}" Foreground="White"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

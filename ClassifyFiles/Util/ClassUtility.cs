@@ -38,16 +38,12 @@ namespace ClassifyFiles.Util
             db.Entry(c).State = EntityState.Deleted;
             await db.SaveChangesAsync();
         }
-
+        
         public static async Task SaveClassAsync(Class c)
         {
             Debug.WriteLine("db: " + nameof(SaveClassAsync));
-
-            if (await db.Classes.AnyAsync(p => p.ID == c.ID))
-            {
-                db.Entry(c).State = EntityState.Modified;
-                await db.SaveChangesAsync();
-            }
+            db.Entry(c).State = EntityState.Modified;
+            await db.SaveChangesAsync();
         }
 
         public static Task<int> GetClassesCountAsync(Project project)

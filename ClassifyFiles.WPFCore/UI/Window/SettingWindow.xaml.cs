@@ -18,7 +18,7 @@ namespace ClassifyFiles.UI
         {
             InitializeComponent();
 
-            int theme = ConfigUtility.GetInt(ConfigKeys.ThemeKey, 0);
+            int theme = Configs.Theme;
             switch (theme)
             {
                 case 0: rbtnThemeAuto.IsChecked = true; break;
@@ -27,28 +27,30 @@ namespace ClassifyFiles.UI
                 default:
                     break;
             }
-            if(ConfigUtility.GetBool(ConfigKeys.IncludeThumbnailsWhenAddingFilesKey,true))
-            {
-                chkIncludeThumbnailsWhenAddingFiles.IsChecked = true;
-            }
+            chkAutoThumbnails.IsChecked = Configs.AutoThumbnails;
+            //if(ConfigUtility.GetBool(ConfigKeys.IncludeThumbnailsWhenAddingFilesKey,true))
+            //{
+            //    chkIncludeThumbnailsWhenAddingFiles.IsChecked = true;
+            //}
         }
 
 
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
-            ConfigUtility.Set(ConfigKeys.IncludeThumbnailsWhenAddingFilesKey, chkIncludeThumbnailsWhenAddingFiles.IsChecked.Value);
+            Configs.AutoThumbnails = chkAutoThumbnails.IsChecked.Value;
+            //ConfigUtility.Set(ConfigKeys.IncludeThumbnailsWhenAddingFilesKey, chkIncludeThumbnailsWhenAddingFiles.IsChecked.Value);
         }
 
 
         private void WindowBase_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
         }
-        private void rbtnThemeAuto_Click(object sender, RoutedEventArgs e)
+        private void ThemeRButton_Click(object sender, RoutedEventArgs e)
         {
             int theme = rbtnThemeAuto.IsChecked .Value?
                 0 : (rbtnThemeLight.IsChecked.Value?1:-1);
-            ConfigUtility.Set(ConfigKeys.ThemeKey, theme);
-
+            Configs.Theme = theme;
+            App.SetTheme();
         }
     }
 }

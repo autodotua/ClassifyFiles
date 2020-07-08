@@ -54,7 +54,7 @@ DependencyProperty.Register("UseLargeIcon", typeof(bool), typeof(FileIcon), new 
 
         private void UserControlBase_Loaded(object sender, RoutedEventArgs e)
         {
-            if(UseLargeIcon)
+                 if (UseLargeIcon)
             {
                 foreach (FrameworkElement item in (Content as Grid).Children)
                 {

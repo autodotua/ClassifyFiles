@@ -13,9 +13,12 @@
 
         <ListBox Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
                  ItemsSource="{Binding Items}"
-                 SelectedItem="{Binding SelectedItem}"
-                  DisplayMemberPath="Name">
-            
+                 SelectedItem="{Binding SelectedItem}">
+        <ListBox.ItemTemplate>
+            <DataTemplate >
+                <TextBlock Text="{Binding Name}"/>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
         </ListBox>
 
 </ui:UserControlBase>

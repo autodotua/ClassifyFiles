@@ -14,18 +14,18 @@
         <ui:NotFirst2VisibilityConverter x:Key="i2v"/>
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
         <ui:IsNotNull2VisibilityConverter x:Key="nn2v"/>
-  
-            <ContextMenu x:Key="menu" Opened="ContextMenu_Opened">
-            </ContextMenu>
+
+        <ContextMenu x:Key="menu" Opened="ContextMenu_Opened">
+        </ContextMenu>
     </UserControl.Resources>
-        <Grid  Margin="8,4,4,4" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
-            <Grid.RowDefinitions>
+    <Grid  Margin="8,4,4,4" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
+        <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="4"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            
-            <Grid >
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="8"/>
@@ -42,7 +42,7 @@
                         QuerySubmitted="SearchTextBox_QuerySubmitted"
                         SuggestionChosen="SearchTextBox_SuggestionChosen" 
                     VerticalAlignment="Center"/>
-           <Grid x:Name="grdAppBar" Grid.Column="4" HorizontalAlignment="Right">
+            <Grid x:Name="grdAppBar" Grid.Column="4" HorizontalAlignment="Right">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
@@ -77,96 +77,95 @@
                         Margin="8,0,0,0"
                         VerticalAlignment="Center" />
             </Grid>
- </Grid>
-            
-            <Grid Grid.Row="4" 
+        </Grid>
+
+        <Grid Grid.Row="4" 
                         Visibility="Collapsed" x:Name="grdFilesArea">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="8"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <m:GridView     x:Name="lbxGrdFiles" ContextMenu="{StaticResource menu}"
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="8"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <m:GridView     x:Name="lbxGrdFiles" ContextMenu="{StaticResource menu}"
                       PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
                          ItemsSource="{Binding Path=PagingFiles}" >
 
-                    <ListBox.ItemTemplate>
-                        <DataTemplate >
-                            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="2">
-                                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"                                      >
-                                    <DockPanel.ToolTip>
-                                        <ToolTip>
-                                            <m:SimpleStackPanel Spacing="8">
+                <ListBox.ItemTemplate>
+                    <DataTemplate >
+                        <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="2">
+                            <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"                                      >
+                                <DockPanel.ToolTip>
+                                    <ToolTip>
+                                        <m:SimpleStackPanel Spacing="8">
                                             <TextBlock Text="{Binding DisplayDir}"/>
                                             <TextBlock FontWeight="Bold" Text="{Binding DisplayName}"/>
-                                            </m:SimpleStackPanel>
-                                        </ToolTip>
-                                    </DockPanel.ToolTip>
-                                    <TextBlock DockPanel.Dock="Bottom" FontSize="12" Text="{Binding Path=DisplayName, Mode=OneTime}"
+                                        </m:SimpleStackPanel>
+                                    </ToolTip>
+                                </DockPanel.ToolTip>
+                                <TextBlock DockPanel.Dock="Bottom" FontSize="12" Text="{Binding Path=DisplayName, Mode=OneTime}"
                                Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" Height="32" MaxWidth="{Binding LargeIconSize}"/>
-                                    <component:FileIcon File="{Binding .}" UseLargeIcon="True"/>
-                                </DockPanel>
-                            </Border>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </m:GridView>
-                <ScrollViewer x:Name="scrPagging" Grid.Row="2"  VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Hidden" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
-                    <StackPanel x:Name="stkPagging" Orientation="Horizontal"/>
-                </ScrollViewer>
-            </Grid>
-            <Grid Grid.Row="4" x:Name="lvwFilesArea">
-                <Grid.RowDefinitions >
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="8"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <ListView   ItemsSource="{Binding Files}" x:Name="lvwFiles" SelectionMode="Extended"
-                      PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"  ContextMenu="{StaticResource menu}"
-                  
-                            >
-                    <ListView.ItemContainerStyle >
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Margin="0,4,24,4"  >
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="16"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="16"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="4"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <component:FileIcon File="{Binding .}" Grid.RowSpan="99"/>
+                                <component:FileIcon File="{Binding .}" UseLargeIcon="True"/>
+                            </DockPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </m:GridView>
+            <ScrollViewer x:Name="scrPagging" Grid.Row="2"  VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Hidden" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                <StackPanel x:Name="stkPagging" Orientation="Horizontal"/>
+            </ScrollViewer>
+        </Grid>
+        <Grid Grid.Row="4" x:Name="lvwFilesArea">
+            <Grid.RowDefinitions >
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="8"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <ListView   ItemsSource="{Binding Files}" x:Name="lvwFiles" SelectionMode="Extended"
+                    Loaded="lvwFiles_Loaded"  PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"  ContextMenu="{StaticResource menu}"   >
+                <ListView.ItemContainerStyle >
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,4,24,4"  >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="4"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <component:FileIcon File="{Binding .}" Grid.RowSpan="99"/>
                             <TextBlock Text="{Binding DisplayName}" Grid.Column="2" Grid.Row="0"/>
                             <TextBlock Text="{Binding DisplayDir}" Grid.Column="2" Grid.Row="2" Opacity="0.5"/>
-                                   <!--横向的标签列表-->
-                                <component:TagGroup Grid.Column="4" Grid.RowSpan="99" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </Grid>
-            <TreeView Name="treeFiles" Visibility="Collapsed"   ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
-                                          Grid.Row="4"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick" >
-
-                <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate  ItemsSource="{Binding SubFiles}">
-                        <StackPanel Orientation="Horizontal">
-                            <component:FileIcon File="{Binding .}"/>
-                        <TextBlock VerticalAlignment="Center" FontSize="12" Margin="12,0,0,0" Text="{Binding DisplayName}"/>
-                            <component:TagGroup Margin="24,0,0,0" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
-                        </StackPanel>
-                    </HierarchicalDataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
-
+                            <!--横向的标签列表-->
+                            <component:TagGroup Grid.Column="4" Grid.RowSpan="99" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </Grid>
+        <TreeView Name="treeFiles" Visibility="Collapsed"   ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
+                                          Grid.Row="4"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
+                  TreeViewItem.Expanded="treeFiles_Expanded">
+
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate  ItemsSource="{Binding SubFiles}">
+                    <StackPanel Orientation="Horizontal">
+                        <component:FileIcon File="{Binding .}"/>
+                        <TextBlock VerticalAlignment="Center" FontSize="12" Margin="12,0,0,0" Text="{Binding DisplayName}"/>
+                        <component:TagGroup Margin="24,0,0,0" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+
+    </Grid>
 </UserControl>

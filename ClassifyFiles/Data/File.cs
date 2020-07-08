@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FzLib.Extension;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -28,7 +29,7 @@ namespace ClassifyFiles.Data
             }
             else
             {
-                Name = file.Name; 
+                Name = file.Name;
                 Dir = file.FullName.Substring(root.FullName.Length, file.FullName.Length - file.Name.Length - root.FullName.Length - 1).Trim('\\');
             }
 
@@ -40,7 +41,17 @@ namespace ClassifyFiles.Data
         public string Name { get; set; } = "";
         [NotMapped]
         public bool IsFolder => Name == "";
-        public byte[] Thumbnail { get; set; }
+        private byte[] thumbnail;
+        public byte[] Thumbnail
+        {
+            get => thumbnail;
+            set
+            {
+                thumbnail = value;
+                this.Notify(nameof(Thumbnail));
+            }
+        }
+
         [Required]
         public Project Project { get; set; }
         public int ProjectID { get; set; }

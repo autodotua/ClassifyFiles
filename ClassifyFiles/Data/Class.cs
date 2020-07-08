@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using FzLib.Extension;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -20,8 +21,18 @@ namespace ClassifyFiles.Data
     }
     public class Class : DbModelBase
     {
+        private string name = "";
         [Required]
-        public string Name { get; set; } = "";
+        public string Name
+        {
+            get => name;
+            set
+            {
+                name = value;
+                this.Notify(nameof(Name));
+            }
+        }
+        //public string Name { get; set; } = "";
         public Project Project { get; set; }
         [Required]
         public int ProjectID { get; set; }

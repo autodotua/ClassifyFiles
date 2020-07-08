@@ -64,7 +64,7 @@ namespace ClassifyFiles.WPFCore
         {
             ElementTheme theme = ElementTheme.Default;
 
-            switch (ConfigUtility.GetInt(ConfigKeys.ThemeKey,0))
+            switch (Configs.Theme)
             {
                 case 0:
                     if (AppsUseLightTheme)
@@ -83,7 +83,7 @@ namespace ClassifyFiles.WPFCore
             }
             if (element == null)
             {
-                foreach (var win in App.Current.Windows)
+                foreach (var win in Current.Windows)
                 {
                     ThemeManager.SetRequestedTheme(win as Window, theme);
 
