@@ -16,14 +16,21 @@
         <ListBox  Background="Transparent" 
                     BorderBrush="Transparent"  ItemsSource="{Binding File.Classes}" 
                      HorizontalAlignment="Right" VerticalAlignment="Center"
+                  FontSize="12"
                     VerticalContentAlignment="Center" Visibility="{Binding File.Classes, Converter={StaticResource nn2v}}">
+
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal"></StackPanel>
+                    <StackPanel Orientation="{Binding Orientation}"></StackPanel>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
+            <ListBox.Resources>
+                <Style TargetType="ScrollViewer">
+                    <Setter Property="VerticalScrollBarVisibility" Value="Hidden"></Setter>
+                    <Setter Property="CanContentScroll" Value="False"></Setter>
+                </Style>
+            </ListBox.Resources>
             <ListBox.ItemContainerStyle>
-
                 <Style TargetType="ListBoxItem">
                     <Setter Property="Focusable" Value="false"/>
                     <Setter Property="Background" Value="Transparent"/>

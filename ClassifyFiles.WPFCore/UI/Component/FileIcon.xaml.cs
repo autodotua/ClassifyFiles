@@ -2,6 +2,7 @@
 using ClassifyFiles.UI.Model;
 using ClassifyFiles.UI.Panel;
 using FzLib.Extension;
+using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -54,12 +55,20 @@ DependencyProperty.Register("UseLargeIcon", typeof(bool), typeof(FileIcon), new 
 
         private void UserControlBase_Loaded(object sender, RoutedEventArgs e)
         {
-            if (UseLargeIcon)
+            for (int i = 0; i < 2; i++)
             {
-                foreach (FrameworkElement item in (Content as Grid).Children)
+                FrameworkElement item = i == 0 ? icon : image as FrameworkElement;
+                if (UseLargeIcon)
                 {
                     item.SetBinding(WidthProperty, "File.LargeIconSize");
                     item.SetBinding(HeightProperty, "File.LargeIconSize");
+                    item.SetBinding(FontIcon.FontSizeProperty, "File.LargeFontSize");
+                }
+                else
+                {
+                    item.SetBinding(WidthProperty, "File.SmallIconSize");
+                    item.SetBinding(HeightProperty, "File.SmallIconSize");
+                    item.SetBinding(FontIcon.FontSizeProperty, "File.SmallFontSize");
                 }
             }
         }

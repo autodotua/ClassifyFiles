@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ClassifyFiles.WPFCore;
+using ModernWpf;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -39,7 +41,9 @@ namespace ClassifyFiles.UI
         public SplashWindow()
         {
             InitializeComponent();
-            var bytes = File.ReadAllBytes("Images/icon.png");
+            App.SetTheme(this);
+            var theme = ThemeManager.GetActualTheme(this);
+            byte[] bytes = File.ReadAllBytes(theme == ElementTheme.Dark? "Images/icon_dark.png":"Images/icon_light.png");
             grd.Background = new ImageBrush(ToImage(bytes));
         }
         /// <summary>

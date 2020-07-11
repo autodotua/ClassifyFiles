@@ -173,7 +173,8 @@ namespace ClassifyFiles.UI.Panel
             {
                 1 => lvwFiles.SelectedItem as UIFile,
                 2 => lbxGrdFiles.SelectedItem as UIFile,
-                3 => treeFiles.SelectedItem as UIFile,
+                3 => lbxGrdFiles.SelectedItem as UIFile,
+                4 => treeFiles.SelectedItem as UIFile,
                 _ => throw new NotImplementedException()
             };
         }
@@ -183,7 +184,8 @@ namespace ClassifyFiles.UI.Panel
             {
                 1 => lvwFiles.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
                 2 => lbxGrdFiles.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
-                3 => new List<UIFile>().AsReadOnly(),
+                3 => lbxGrdFiles.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
+                4 => new List<UIFile>().AsReadOnly(),
                 _ => throw new NotImplementedException()
             };
         }
@@ -277,12 +279,20 @@ namespace ClassifyFiles.UI.Panel
         private void ViewTypeButton_Click(object sender, RoutedEventArgs e)
         {
             int i = int.Parse((sender as FrameworkElement).Tag as string);
-            CurrentViewType = i;
             grdAppBar.Children.OfType<AppBarToggleButton>().ForEach(p => p.IsChecked = false);
             (sender as AppBarToggleButton).IsChecked = true;
             lvwFilesArea.Visibility = i == 1 ? Visibility.Visible : Visibility.Collapsed;
-            grdFilesArea.Visibility = i == 2 ? Visibility.Visible : Visibility.Collapsed;
-            treeFiles.Visibility = i == 3 ? Visibility.Visible : Visibility.Collapsed;
+            grdFilesArea.Visibility = (i == 2 || i == 3) ? Visibility.Visible : Visibility.Collapsed;
+            treeFiles.Visibility = i == 4 ? Visibility.Visible : Visibility.Collapsed;
+            if (i == 2)
+            {
+                lbxGrdFiles.ItemTemplate = FindResource("grdIconView") as DataTemplate;
+            }
+            else if (i == 3)
+            {
+                lbxGrdFiles.ItemTemplate = FindResource("grdTileView") as DataTemplate;
+            }
+            CurrentViewType = i;
             ViewTypeChanged?.Invoke(this, new EventArgs());
         }
 
@@ -295,9 +305,8 @@ namespace ClassifyFiles.UI.Panel
                     file = Files.FirstOrDefault(p => p.Dir == dir);
                     break;
                 case 2:
-                    file = Files.FirstOrDefault(p => p.Dir == dir);
-                    break;
                 case 3:
+                    file = Files.FirstOrDefault(p => p.Dir == dir);
                     break;
                 default:
                     break;
@@ -313,13 +322,12 @@ namespace ClassifyFiles.UI.Panel
                     lvwFiles.ScrollIntoView(file);
                     break;
                 case 2:
+                case 3:
                     int index = Files.IndexOf(file);
                     int page = (int)Math.Ceiling((double)index / pagingItemsCount);
                     stkPagging.Children.Cast<Button>().FirstOrDefault(p => (int)p.Content == page)?.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                     lbxGrdFiles.SelectedItem = file;
                     lbxGrdFiles.ScrollIntoView(file);  //无效
-                    break;
-                case 3:
                     break;
                 default:
                     break;
@@ -428,11 +436,11 @@ namespace ClassifyFiles.UI.Panel
 
         }
 
-        #region 自动生成缩略图
-        private  ConcurrentDictionary<int, UIFile> generated = new ConcurrentDictionary<int, UIFile>();
+        #region 自动生成缩略图、Tags
+        private ConcurrentDictionary<int, UIFile> generated = new ConcurrentDictionary<int, UIFile>();
         private void lvwFiles_Loaded(object sender, RoutedEventArgs e)
         {
-            ScrollViewer scrollViewer = (sender as System.Windows.Controls.ListView).GetVisualChild<ScrollViewer>(); //Extension method
+            ScrollViewer scrollViewer = (sender as Visual).GetVisualChild<ScrollViewer>(); //Extension method
 
             if (scrollViewer != null)
             {
@@ -440,6 +448,7 @@ namespace ClassifyFiles.UI.Panel
                 {
                     scrollBar.ValueChanged += async delegate
                      {
+                         Debug.WriteLine(scrollViewer.VerticalOffset + "  " + scrollViewer.ViewportHeight);
                          await RealtimeRefresh(Files.Skip((int)scrollViewer.VerticalOffset).Take((int)scrollViewer.ViewportHeight + 5));
                      };
                 }

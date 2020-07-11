@@ -45,6 +45,16 @@ DependencyProperty.Register("File", typeof(UIFile), typeof(TagGroup), new Proper
                 SetValue(FileProperty, value);
             }
         }
+        public static readonly DependencyProperty OrientationProperty =
+DependencyProperty.Register("Orientation", typeof(Orientation), typeof(TagGroup));
+        public Orientation Orientation
+        {
+            get =>(Orientation) GetValue(OrientationProperty) ; //file;
+            set
+            {
+                SetValue(OrientationProperty, value);
+            }
+        }
         public event MouseButtonEventHandler TagMouseDown;
     }
 }

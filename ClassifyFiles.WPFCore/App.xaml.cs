@@ -19,12 +19,11 @@ namespace ClassifyFiles.WPFCore
     public partial class App : Application
     {
         public static new App Current { get; private set; }
-        private async void Application_Startup(object sender, StartupEventArgs e)
+        private void Application_Startup(object sender, StartupEventArgs e)
         {
             Current = this;
             SplashWindow.TryShow();
             MainWindow win = new MainWindow();
-            win.Activated += (p1, p2) => SplashWindow.TryClose();
 #if (!DEBUG)
             //UnhandledException.RegistAll();
 
@@ -44,10 +43,11 @@ namespace ClassifyFiles.WPFCore
             //SetCulture();
 
             win.Show();
+            SplashWindow.TryClose();
 
         }
 
-        private void InitializeTheme()
+        private static void InitializeTheme()
         {
             var v = Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize", "AppsUseLightTheme", "1");
             if (v == null || v.ToString() == "1")
@@ -62,6 +62,7 @@ namespace ClassifyFiles.WPFCore
         }
         public static void SetTheme(FrameworkElement element = null)
         {
+            InitializeTheme();
             ElementTheme theme = ElementTheme.Default;
 
             switch (Configs.Theme)

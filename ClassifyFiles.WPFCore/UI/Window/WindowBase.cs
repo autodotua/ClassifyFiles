@@ -13,6 +13,7 @@ using System.Drawing;
 using System.Windows.Media.Imaging;
 using System.Globalization;
 using ModernWpf.Controls.Primitives;
+using ModernWpf;
 
 namespace ClassifyFiles.UI
 {
@@ -35,6 +36,7 @@ namespace ClassifyFiles.UI
         {
             DataContext = this;
             WindowHelper.SetUseModernWindowStyle(this, true);
+            ThemeManager.SetIsThemeAware(this, true);
             WPFCore.App.SetTheme(this);
            
         }

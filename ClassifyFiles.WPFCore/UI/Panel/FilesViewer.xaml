@@ -14,6 +14,48 @@
         <ui:NotFirst2VisibilityConverter x:Key="i2v"/>
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
         <ui:IsNotNull2VisibilityConverter x:Key="nn2v"/>
+        <DataTemplate x:Key="grdIconView">
+            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="2">
+                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"                                      >
+                    <DockPanel.ToolTip>
+                        <ToolTip>
+                            <m:SimpleStackPanel Spacing="8">
+                                <TextBlock Text="{Binding DisplayDir}"/>
+                                <TextBlock FontWeight="Bold" Text="{Binding DisplayName}"/>
+                            </m:SimpleStackPanel>
+                        </ToolTip>
+                    </DockPanel.ToolTip>
+                    <TextBlock DockPanel.Dock="Bottom" FontSize="12" Text="{Binding Path=DisplayName, Mode=OneTime}"
+                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" Height="32" MaxWidth="{Binding LargeIconSize}"/>
+                    <component:FileIcon File="{Binding .}" UseLargeIcon="True"/>
+                </DockPanel>
+            </Border>
+        </DataTemplate>
+        <DataTemplate x:Key="grdTileView">
+            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="4,8">
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center"  >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="144"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Column="2" Text="{Binding Path=DisplayName, Mode=OneTime}"
+                               Margin="0,8,0,0" HorizontalAlignment="Left" TextWrapping="Wrap" MaxHeight="{Binding LargeIconSize}"/>
+                    <TextBlock Grid.Column="2" Grid.Row="2" Text="{Binding DisplayDir,Mode=OneTime}"
+                               Foreground="Gray" TextWrapping="Wrap" FontSize="11" MaxHeight="{Binding SmallIconSize}"/>
+                    <component:TagGroup Grid.Column="4" File="{Binding .}" Orientation="Vertical" 
+                                        Grid.RowSpan="99" MaxHeight="{Binding LargeIconSize}" TagMouseDown="Tags_MouseDown"/>
+                    <component:FileIcon File="{Binding .}" UseLargeIcon="True" Grid.RowSpan="99" />
+                </Grid>
+            </Border>
+        </DataTemplate>
 
         <ContextMenu x:Key="menu" Opened="ContextMenu_Opened">
         </ContextMenu>
@@ -50,22 +92,30 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <m:AppBarToggleButton Grid.Column="3"  Label="列表模式"  Click="ViewTypeButton_Click" Tag="1" IsChecked="True">
+                <m:AppBarToggleButton Grid.Column="3"  Label="列表视图"  Click="ViewTypeButton_Click" Tag="1" IsChecked="True">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon
                                     FontFamily="Segoe MDL2 Assets"
                                     Glyph="&#xE8FD;" />
                     </m:AppBarToggleButton.Icon>
                 </m:AppBarToggleButton>
-                <m:AppBarToggleButton Grid.Column="4" Label="图标模式" Click="ViewTypeButton_Click" Tag="2">
+                <m:AppBarToggleButton Grid.Column="4" Label="图标视图" Click="ViewTypeButton_Click" Tag="2">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon
                                     FontFamily="Segoe MDL2 Assets"
                                     Glyph="&#xF0E2;" />
                     </m:AppBarToggleButton.Icon>
+                </m:AppBarToggleButton>  
+                <m:AppBarToggleButton Grid.Column="5" Label="平铺视图" Click="ViewTypeButton_Click" Tag="3">
+                    <m:AppBarToggleButton.Icon>
+                        <m:FontIcon
+                                    FontFamily="Segoe MDL2 Assets"
+                                    Glyph="&#xE8BC;" />
+                    </m:AppBarToggleButton.Icon>
                 </m:AppBarToggleButton>
-                <m:AppBarToggleButton Grid.Column="5"  Label="树型模式"  Click="ViewTypeButton_Click" Tag="3">
+                <m:AppBarToggleButton Grid.Column="6"  Label="树型视图"  Click="ViewTypeButton_Click" Tag="4">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon
                                     FontFamily="Segoe MDL2 Assets"
@@ -87,36 +137,12 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <m:GridView     x:Name="lbxGrdFiles" ContextMenu="{StaticResource menu}"
-                      PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
-                         ItemsSource="{Binding Path=PagingFiles}" >
-
-                <ListBox.ItemTemplate>
-                    <DataTemplate >
-                        <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="2">
-                            <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"                                      >
-                                <DockPanel.ToolTip>
-                                    <ToolTip>
-                                        <m:SimpleStackPanel Spacing="8">
-                                            <TextBlock Text="{Binding DisplayDir}"/>
-                                            <TextBlock FontWeight="Bold" Text="{Binding DisplayName}"/>
-                                        </m:SimpleStackPanel>
-                                    </ToolTip>
-                                </DockPanel.ToolTip>
-                                <TextBlock DockPanel.Dock="Bottom" FontSize="12" Text="{Binding Path=DisplayName, Mode=OneTime}"
-                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" Height="32" MaxWidth="{Binding LargeIconSize}"/>
-                                <component:FileIcon File="{Binding .}" UseLargeIcon="True"/>
-                            </DockPanel>
-                        </Border>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </m:GridView>
+                      PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick" 
+                         ItemsSource="{Binding Path=PagingFiles}" />
             <ScrollViewer x:Name="scrPagging" Grid.Row="2"  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" MaxHeight="60" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                 <WrapPanel x:Name="stkPagging" Orientation="Horizontal"/>
             </ScrollViewer>
         </Grid>
-        
-        
-        
         
         
         
@@ -127,7 +153,8 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <ListView   ItemsSource="{Binding Files}" x:Name="lvwFiles" SelectionMode="Extended"
-                    Loaded="lvwFiles_Loaded"  PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"  ContextMenu="{StaticResource menu}"   >
+                    Loaded="lvwFiles_Loaded"  PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
+                        ContextMenu="{StaticResource menu}"   >
                 <ListView.ItemContainerStyle >
                     <Style TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
