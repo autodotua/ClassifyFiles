@@ -60,7 +60,7 @@
             </Border>
         </DataTemplate>
 
-        <ContextMenu x:Key="menu" Opened="ContextMenu_Opened">
+        <ContextMenu x:Key="menu" Opened="ContextMenu_Opened"  Closed="ContextMenu_Closed">
         </ContextMenu>
 
 

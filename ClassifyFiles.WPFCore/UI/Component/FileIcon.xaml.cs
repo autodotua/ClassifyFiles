@@ -34,14 +34,22 @@ namespace ClassifyFiles.UI.Component
             DependencyProperty.Register("File", typeof(UIFile), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
         static void OnFileChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
-            (obj as FileIcon).File.Load += (obj as FileIcon).Load;
-            (obj as FileIcon).File.PropertyChanged += (p1, p2) =>
+            FileIcon fileIcon = (obj as FileIcon);
+            if (fileIcon.File.IsFolder)
             {
-                if (p2.PropertyName == nameof(UIFile.Image))
+                fileIcon.Load(null, null);
+            }
+            else
+            {
+                fileIcon.File.Load += fileIcon.Load;
+                fileIcon.File.PropertyChanged += (p1, p2) =>
                 {
-                    (obj as FileIcon).Load(p1, p2);
-                }
-            };
+                    if (p2.PropertyName == nameof(UIFile.Image))
+                    {
+                        fileIcon.Load(p1, p2);
+                    }
+                };
+            }
         }
         public UIFile File
         {
@@ -66,7 +74,7 @@ namespace ClassifyFiles.UI.Component
             Dispatcher.Invoke(() =>
             {
                 FrameworkElement item = null;
-                if (caches.ContainsKey(File.ID) && !(File.Image != null && caches[File.ID] is FontIcon))
+                if (File.IsFolder == false && caches.ContainsKey(File.ID) && !(File.Image != null && caches[File.ID] is FontIcon))
                 {
                     item = caches[File.ID];
                 }
@@ -92,7 +100,10 @@ namespace ClassifyFiles.UI.Component
                     item.HorizontalAlignment = HorizontalAlignment.Center;
                     item.VerticalAlignment = VerticalAlignment.Center;
 
-                    caches.TryAdd(File.ID, item);
+                    if (File.IsFolder == false)
+                    {
+                        caches.TryAdd(File.ID, item);
+                    }
                 }
                 if (UseLargeIcon)
                 {

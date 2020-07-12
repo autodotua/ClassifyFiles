@@ -194,7 +194,7 @@ namespace ClassifyFiles.Util
                     }
                     else
                     {
-                        sub = new T() { Dir = dir };
+                        sub = new T() { Dir = dir,Project=file.Project };
                         current.SubFiles.Add(sub);
                         current = sub;
                     }

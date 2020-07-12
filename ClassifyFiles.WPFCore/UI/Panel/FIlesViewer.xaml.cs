@@ -132,31 +132,21 @@ namespace ClassifyFiles.UI.Panel
 
         private UIFile GetSelectedFile()
         {
-            switch (FilesContent)
+            return FilesContent switch
             {
-                case ListView lvw:
-                    return lvw.SelectedItem as UIFile;
-                case TreeView t:
-                    return t.SelectedItem as UIFile;
-                default:
-                    return null;
-            }
+                ListView lvw => lvw.SelectedItem as UIFile,
+                TreeView t => t.SelectedItem as UIFile,
+                _ => null,
+            };
         }
         private IReadOnlyList<UIFile> GetSelectedFiles()
         {
-            if (FilesContent is ListView lvw)
+            return FilesContent switch
             {
-                return lvw.SelectedItems.Cast<UIFile>().ToList().AsReadOnly();
-            }
-            return new List<UIFile>().AsReadOnly();
-            //return CurrentViewType switch
-            //{
-            //    1 => lvwFiles.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
-            //    2 => grdFiles.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
-            //    3 => grdFiles.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
-            //    4 => new List<UIFile>().AsReadOnly(),
-            //    _ => throw new NotImplementedException()
-            //};
+                ListView lvw => lvw.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
+                TreeView t => new List<UIFile>() { t.SelectedItem as UIFile }.AsReadOnly(),
+                _ => null,
+            };
         }
 
         private async void lvwFiles_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -336,6 +326,7 @@ namespace ClassifyFiles.UI.Panel
 
         private void ContextMenu_Opened(object sender, RoutedEventArgs e)
         {
+
             ContextMenu menu = FindResource("menu") as ContextMenu;
             menu.Items.Clear();
             var files = GetSelectedFiles();
@@ -345,43 +336,46 @@ namespace ClassifyFiles.UI.Panel
                 menuOpenFolder.Click += OpenDirMernuItem_Click;
                 menu.Items.Add(menuOpenFolder);
             }
-            foreach (var tag in Project.Classes)
+            if (!files.Any(p=>p.IsFolder))
             {
-                CheckBox chk = new CheckBox()
+                foreach (var tag in Project.Classes)
                 {
-                    Content = tag.Name,
-                    IsChecked = (!files.Any(p => p.Classes.Contains(tag))) ? false :
-                    files.All(p => p.Classes.Contains(tag)) ? true : (bool?)null
-                };
-                chk.Click += async (p1, p2) =>
-                 {
-                     GetProgress().Show(false);
-                     if (chk.IsChecked == true)
+                    CheckBox chk = new CheckBox()
+                    {
+                        Content = tag.Name,
+                        IsChecked = (!files.Any(p => p.Classes.Contains(tag))) ? false :
+                        files.All(p => p.Classes.Contains(tag)) ? true : (bool?)null
+                    };
+                    chk.Click += async (p1, p2) =>
                      {
-                         await AddFilesToClassAsync(files.Select(p => p.Raw), tag);
-                         foreach (var file in files)
+                         GetProgress().Show(false);
+                         if (chk.IsChecked == true)
                          {
-                             if (!file.Classes.Contains(tag))
+                             await AddFilesToClassAsync(files.Select(p => p.Raw), tag);
+                             foreach (var file in files)
                              {
-                                 file.Classes.Add(tag);
+                                 if (!file.Classes.Contains(tag))
+                                 {
+                                     file.Classes.Add(tag);
+                                 }
                              }
                          }
-                     }
-                     else
-                     {
-                         await RemoveFilesFromClass(files.Select(p => p.Raw), tag);
-                         foreach (var file in files)
+                         else
                          {
-                             if (file.Classes.Contains(tag))
+                             await RemoveFilesFromClass(files.Select(p => p.Raw), tag);
+                             foreach (var file in files)
                              {
-                                 file.Classes.Remove(tag);
+                                 if (file.Classes.Contains(tag))
+                                 {
+                                     file.Classes.Remove(tag);
+                                 }
                              }
                          }
-                     }
 
-                     GetProgress().Close();
-                 };
-                menu.Items.Add(chk);
+                         GetProgress().Close();
+                     };
+                    menu.Items.Add(chk);
+                }
             }
 
         }
@@ -486,7 +480,7 @@ namespace ClassifyFiles.UI.Panel
             var files = ((e.OriginalSource as TreeViewItem).DataContext as UIFile)
                 .SubFiles.Where(p => !p.IsFolder).Cast<UIFile>();
             await RealtimeRefresh(files);
-            (e.OriginalSource as TreeViewItem).UpdateLayout ();
+            (e.OriginalSource as TreeViewItem).UpdateLayout();
         }
 
         #endregion
@@ -510,6 +504,11 @@ namespace ClassifyFiles.UI.Panel
             double percent2 = e.ViewportHeight / e.ExtentHeight;
             var files = Files.Skip((int)(count * percent1)).Take((int)(count * percent2) + 20).ToList();
             RealtimeRefresh(files);
+        }
+
+        private void ContextMenu_Closed(object sender, RoutedEventArgs e)
+        {
+            //(sender as ContextMenu).Items.Clear();
         }
     }
 
