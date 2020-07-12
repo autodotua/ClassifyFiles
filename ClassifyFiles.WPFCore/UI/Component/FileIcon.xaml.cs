@@ -4,6 +4,7 @@ using ClassifyFiles.UI.Panel;
 using FzLib.Extension;
 using ModernWpf.Controls;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -30,7 +31,7 @@ namespace ClassifyFiles.UI.Component
 
         }
         public static readonly DependencyProperty FileProperty =
-DependencyProperty.Register("File", typeof(UIFile), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
+            DependencyProperty.Register("File", typeof(UIFile), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
         static void OnFileChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
             (obj as FileIcon).File.Load += (obj as FileIcon).Load;
@@ -51,21 +52,23 @@ DependencyProperty.Register("File", typeof(UIFile), typeof(FileIcon), new Proper
             }
         }
         public static readonly DependencyProperty UseLargeIconProperty =
-DependencyProperty.Register("UseLargeIcon", typeof(bool), typeof(FileIcon));
+            DependencyProperty.Register("UseLargeIcon", typeof(bool), typeof(FileIcon));
 
         public bool UseLargeIcon
         {
             get => (bool)GetValue(UseLargeIconProperty); //UseLargeIcon;
             set => SetValue(UseLargeIconProperty, value);
         }
+
+        private static ConcurrentDictionary<int, FrameworkElement> caches = new ConcurrentDictionary<int, FrameworkElement>();
         private void Load(object sender, EventArgs e)
         {
             Dispatcher.Invoke(() =>
             {
                 FrameworkElement item = null;
-                if (File.CacheFileIcon != null)
+                if (caches.ContainsKey(File.ID) && !(File.Image != null && caches[File.ID] is FontIcon))
                 {
-                    item = File.CacheFileIcon;
+                    item = caches[File.ID];
                 }
                 else
                 {
@@ -88,8 +91,8 @@ DependencyProperty.Register("UseLargeIcon", typeof(bool), typeof(FileIcon));
                     }
                     item.HorizontalAlignment = HorizontalAlignment.Center;
                     item.VerticalAlignment = VerticalAlignment.Center;
-                 
-                    File.CacheFileIcon = item;
+
+                    caches.TryAdd(File.ID, item);
                 }
                 if (UseLargeIcon)
                 {

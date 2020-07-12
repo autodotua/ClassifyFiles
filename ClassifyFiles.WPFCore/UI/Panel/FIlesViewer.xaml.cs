@@ -439,10 +439,7 @@ namespace ClassifyFiles.UI.Panel
                     return;
                 }
                 AppDbContext db = new AppDbContext(DbUtility.DbPath);
-                foreach (var file in files)
-                {
-                    await file.LoadAsync(db);
-                }
+               
                 if (Configs.AutoThumbnails)
                 {
                     Parallel.ForEach(files, file =>
@@ -475,6 +472,10 @@ namespace ClassifyFiles.UI.Panel
                         savingFiles = false;
                     }
                 }
+                foreach (var file in files)
+                {
+                    await file.LoadAsync(db);
+                }
             });
         }
         private static bool savingFiles = false;
@@ -484,6 +485,7 @@ namespace ClassifyFiles.UI.Panel
             var files = ((e.OriginalSource as TreeViewItem).DataContext as UIFile)
                 .SubFiles.Where(p => !p.IsFolder).Cast<UIFile>();
             await RealtimeRefresh(files);
+            (e.OriginalSource as TreeViewItem).UpdateLayout ();
         }
 
         #endregion
@@ -497,7 +499,7 @@ namespace ClassifyFiles.UI.Panel
             }
             if (Files == null
                 || Files.Count == 0
-                 //||e.ExtentHeightChange>0
+                //||e.ExtentHeightChange>0
                 || e.VerticalChange == 0 && e.ViewportHeightChange == 0 && e.VerticalOffset > 0)
             {
                 return;

@@ -152,12 +152,20 @@ namespace ClassifyFiles.UI.Model
         }
         public File Raw { get; private set; }
         private bool loaded = false;
-        public async Task LoadAsync(AppDbContext db)
+        public async Task LoadAsync(AppDbContext db = null)
         {
             if (!loaded)
             {
                 loaded = true;
-                IEnumerable<Class> classes = await GetClassesOfFileAsync(db, ID);
+                IEnumerable<Class> classes = null;
+                if (db == null)
+                {
+                    classes = await GetClassesOfFileAsync(ID);
+                }
+                else
+                {
+                    classes = await GetClassesOfFileAsync(db, ID);
+                }
                 Classes = new ObservableCollection<Class>(classes);
             }
             Load?.Invoke(this, new EventArgs());
@@ -174,7 +182,6 @@ namespace ClassifyFiles.UI.Model
                 this.Notify(nameof(Classes));
             }
         }
-        public FrameworkElement CacheFileIcon { get; set; }
         public override string ToString()
         {
             return Name + (string.IsNullOrEmpty(Dir) ? "" : $" （{Dir}）");
