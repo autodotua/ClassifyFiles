@@ -5,9 +5,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ClassifyFiles.UI.Component" 
-                     mc:Ignorable="d" 
-                     xmlns:m="http://schemas.modernwpf.com/2019"
+                     mc:Ignorable="d"                 
+                     xmlns:m="http://schemas.modernwpf.com/2019"   
                      Loaded="UserControlBase_Loaded">
 
-    <ContentControl x:Name="main"/>
+    <ContentControl x:Name="main">
+        <m:ProgressRing IsActive="True"
+        x:Name="ring"
+        Width="24"
+        Height="24"/>
+    </ContentControl>
 </ui:UserControlBase>

@@ -74,7 +74,7 @@ namespace ClassifyFiles.UI.Component
                 {
                     if (File.Image == null)
                     {
-                        if (main.Content != null)
+                        if (main.Content is Image)
                         {
                             return;
                         }

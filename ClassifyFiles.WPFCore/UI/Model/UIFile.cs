@@ -139,6 +139,7 @@ namespace ClassifyFiles.UI.Model
         public double SmallFontSize { get; private set; } = 11;
         private static FontFamily font;
         public double TotalIconViewHeight => LargeIconSize + FontSize * font.LineSpacing * 2;
+        public double TotalTileViewHeight => LargeIconSize + 32;
         public double TileTitleHeight => FontSize * font.LineSpacing * 2;
         public double TileDirHeight => SmallFontSize * font.LineSpacing * 2;
 

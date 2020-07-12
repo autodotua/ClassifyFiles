@@ -439,7 +439,10 @@ namespace ClassifyFiles.UI.Panel
                     return;
                 }
                 AppDbContext db = new AppDbContext(DbUtility.DbPath);
-               
+                foreach (var file in files)
+                {
+                    await file.LoadAsync(db);
+                }
                 if (Configs.AutoThumbnails)
                 {
                     Parallel.ForEach(files, file =>
@@ -452,24 +455,22 @@ namespace ClassifyFiles.UI.Panel
                         }
                     });
 
-                    if (savingFiles)
-                    {
-                        return;
-                    }
-                    savingFiles = true;
-                    try
+                    if (!savingFiles)
                     {
                         savingFiles = true;
-                        await FileUtility.SaveFilesAsync(files.Where(p => p.Thumbnail != null).Select(p => p.Raw));
+                        try
+                        {
+                            savingFiles = true;
+                            await FileUtility.SaveFilesAsync(files.Where(p => p.Thumbnail != null).Select(p => p.Raw));
+                        }
+                        catch (Exception ex)
+                        {
 
-                    }
-                    catch (Exception ex)
-                    {
-
-                    }
-                    finally
-                    {
-                        savingFiles = false;
+                        }
+                        finally
+                        {
+                            savingFiles = false;
+                        }
                     }
                 }
                 foreach (var file in files)

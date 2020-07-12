@@ -15,6 +15,18 @@
 - 使用.Net Core 3.1 + WPF + SQLite+EFCore 开发
 - 使用WinUI风格的界面
 
+## 更新计划
+
+可以将文件从软件拖放到资源管理器
+
+显示Tags的ToggleButton
+
+显示缩略图的ToggleButton
+
+记忆上次的视图
+
+缓存图标的设置开关
+
 ## 更新日志
 
 ### 2020-05-10

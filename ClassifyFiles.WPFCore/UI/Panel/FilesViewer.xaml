@@ -16,8 +16,9 @@
         <ui:NotFirst2VisibilityConverter x:Key="i2v"/>
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
         <ui:IsNotNull2VisibilityConverter x:Key="nn2v"/>
+        
         <DataTemplate x:Key="grdIconView">
-            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="2">
+            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,8,0,2">
                 <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Width="{Binding LargIconSize}"    Height="{Binding TotalIconViewHeight}"                                >
                     <DockPanel.ToolTip>
                         <ToolTip>
@@ -35,26 +36,26 @@
         </DataTemplate>
         <DataTemplate x:Key="grdTileView">
             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="4">
-                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" >
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="{Binding TotalTileViewHeight}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="{Binding LargeIconSize}"/>
                         <ColumnDefinition Width="8"/>
                         <ColumnDefinition Width="144"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="{Binding TileTitleHeight}"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="8"/>
-                        <RowDefinition Height="{Binding TileDirHeight}"/>
-                        <RowDefinition Height="8"/>
-                        <RowDefinition Height="32"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Column="2" Text="{Binding Path=DisplayName, Mode=OneTime}"
+                    <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding Path=DisplayName, Mode=OneTime}"
                                  HorizontalAlignment="Left" TextWrapping="Wrap" />
-                    <TextBlock Grid.Column="2" Grid.Row="2" Text="{Binding DisplayDir,Mode=OneTime}"
+                    <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding DisplayDir,Mode=OneTime}"
                                Foreground="Gray" TextWrapping="Wrap" FontSize="{Binding SmallFontSize}" />
                     <component:TagGroup Grid.ColumnSpan="99" File="{Binding .}" Orientation="Horizontal" 
-                                        Grid.Row="4" TagMouseDown="Tags_MouseDown"/>
-                    <component:FileIcon File="{Binding .}" UseLargeIcon="True" Grid.RowSpan="5" />
+                                        Grid.RowSpan="99" HorizontalAlignment="Right" VerticalAlignment="Bottom" TagMouseDown="Tags_MouseDown"/>
+                    <component:FileIcon File="{Binding .}" UseLargeIcon="True" Grid.RowSpan="99" />
                 </Grid>
             </Border>
         </DataTemplate>
@@ -90,7 +91,7 @@
                 <DataTemplate>
                     <Grid Margin="0,4,24,4"  >
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="{Binding SmallIconSize}"/>
                             <ColumnDefinition Width="16"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="16"/>
