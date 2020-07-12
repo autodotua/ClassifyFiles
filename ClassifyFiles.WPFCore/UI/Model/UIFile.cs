@@ -16,13 +16,25 @@ using static ClassifyFiles.Util.FileClassUtility;
 using static ClassifyFiles.Util.FileProjectUtilty;
 using static ClassifyFiles.Util.ProjectUtility;
 using static ClassifyFiles.Util.DbUtility;
+using ClassifyFiles.WPFCore;
+using System.Windows.Media;
+using ClassifyFiles.UI.Component;
 
 namespace ClassifyFiles.UI.Model
 {
     public class UIFile : File
     {
-        public UIFile() { }
-        public UIFile(File file)
+        public UIFile()
+        {
+            if (font == null)
+            {
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    font = App.Current.MainWindow.FontFamily;
+                });
+            }
+        }
+        public UIFile(File file) : this()
         {
             Raw = file;
             ID = file.ID;
@@ -45,14 +57,13 @@ namespace ClassifyFiles.UI.Model
                     Glyph = type.Glyph;
                 }
 
-                PropertyChanged +=async (p1, p2) =>
-                {
-                    if (p2.PropertyName == nameof(Thumbnail))
-                    {
-                        await Task.Delay(100);
-                        this.Notify(nameof(IconVisibility), nameof(ImageVisibility),nameof(Image));
-                    }
-                };
+                PropertyChanged += async (p1, p2) =>
+                 {
+                     if (p2.PropertyName == nameof(Thumbnail))
+                     {
+                         this.Notify(/*nameof(IconVisibility), nameof(ImageVisibility),*/ nameof(Image));
+                     }
+                 };
             }
         }
 
@@ -94,14 +105,14 @@ namespace ClassifyFiles.UI.Model
             image.EndInit();
             return image;
         }
-        /// <summary>
-        /// 图标是否显示
-        /// </summary>
-        public Visibility IconVisibility => Image == null ? Visibility.Visible : Visibility.Collapsed;
-        /// <summary>
-        /// 缩略图是否显示
-        /// </summary>
-        public Visibility ImageVisibility => Image == null ? Visibility.Collapsed : Visibility.Visible;
+        ///// <summary>
+        ///// 图标是否显示
+        ///// </summary>
+        //public Visibility IconVisibility => Image == null ? Visibility.Visible : Visibility.Collapsed;
+        ///// <summary>
+        ///// 缩略图是否显示
+        ///// </summary>
+        //public Visibility ImageVisibility => Image == null ? Visibility.Collapsed : Visibility.Visible;
 
         private static double defualtIconSize = 60;
         /// <summary>
@@ -122,24 +133,36 @@ namespace ClassifyFiles.UI.Model
 
         public double LargeIconSize { get; private set; } = DefualtIconSize;
         public double SmallIconSize { get; private set; } = DefualtIconSize / 2;
-        public double SmallFontSize { get; private set; } = DefualtIconSize / 3;
-        public double LargeFontSize { get; private set; } = DefualtIconSize / 1.5;
+        public double SmallFontIconSize { get; private set; } = DefualtIconSize / 3;
+        public double LargeFontIconSize { get; private set; } = DefualtIconSize / 1.5;
+        public double FontSize { get; private set; } = 12;
+        public double SmallFontSize { get; private set; } = 11;
+        private static FontFamily font;
+        public double TotalIconViewHeight => LargeIconSize + FontSize * font.LineSpacing * 2;
+        public double TileTitleHeight => FontSize * font.LineSpacing * 2;
+        public double TileDirHeight => SmallFontSize * font.LineSpacing * 2;
 
         public void UpdateIconSize()
         {
             LargeIconSize = DefualtIconSize;
             SmallIconSize = DefualtIconSize / 2;
-            SmallFontSize = DefualtIconSize / 3;
-            LargeFontSize = DefualtIconSize / 1.5;
-            this.Notify(nameof(LargeIconSize), nameof(SmallIconSize), nameof(SmallFontSize),nameof(LargeFontSize));
+            SmallFontIconSize = DefualtIconSize / 3;
+            LargeFontIconSize = DefualtIconSize / 1.5;
+            this.Notify(nameof(LargeIconSize), nameof(SmallIconSize), nameof(SmallFontIconSize), nameof(LargeFontIconSize), nameof(TotalIconViewHeight));
         }
         public File Raw { get; private set; }
-
-        public async Task LoadTagsAsync(AppDbContext db)
+        private bool loaded = false;
+        public async Task LoadAsync(AppDbContext db)
         {
-            IEnumerable<Class> classes = await GetClassesOfFileAsync(db,ID);
-            Classes = new ObservableCollection<Class>(classes);
+            if (!loaded)
+            {
+                loaded = true;
+                IEnumerable<Class> classes = await GetClassesOfFileAsync(db, ID);
+                Classes = new ObservableCollection<Class>(classes);
+            }
+            Load?.Invoke(this, new EventArgs());
         }
+        public event EventHandler Load;
 
         private ObservableCollection<Class> classes;
         public ObservableCollection<Class> Classes
@@ -151,7 +174,7 @@ namespace ClassifyFiles.UI.Model
                 this.Notify(nameof(Classes));
             }
         }
-
+        public FrameworkElement CacheFileIcon { get; set; }
         public override string ToString()
         {
             return Name + (string.IsNullOrEmpty(Dir) ? "" : $" （{Dir}）");

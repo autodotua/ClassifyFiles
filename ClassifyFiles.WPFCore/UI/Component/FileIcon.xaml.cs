@@ -33,6 +33,14 @@ namespace ClassifyFiles.UI.Component
 DependencyProperty.Register("File", typeof(UIFile), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
         static void OnFileChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
+            (obj as FileIcon).File.Load += (obj as FileIcon).Load;
+            (obj as FileIcon).File.PropertyChanged += (p1, p2) =>
+            {
+                if (p2.PropertyName == nameof(UIFile.Image))
+                {
+                    (obj as FileIcon).Load(p1, p2);
+                }
+            };
         }
         public UIFile File
         {
@@ -43,34 +51,63 @@ DependencyProperty.Register("File", typeof(UIFile), typeof(FileIcon), new Proper
             }
         }
         public static readonly DependencyProperty UseLargeIconProperty =
-DependencyProperty.Register("UseLargeIcon", typeof(bool), typeof(FileIcon), new PropertyMetadata(OnUseLargeIconChanged));
-        static void OnUseLargeIconChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
-        {
-        }
+DependencyProperty.Register("UseLargeIcon", typeof(bool), typeof(FileIcon));
+
         public bool UseLargeIcon
         {
             get => (bool)GetValue(UseLargeIconProperty); //UseLargeIcon;
             set => SetValue(UseLargeIconProperty, value);
         }
-
-        private void UserControlBase_Loaded(object sender, RoutedEventArgs e)
+        private void Load(object sender, EventArgs e)
         {
-            for (int i = 0; i < 2; i++)
+            Dispatcher.Invoke(() =>
             {
-                FrameworkElement item = i == 0 ? icon : image as FrameworkElement;
+                FrameworkElement item = null;
+                if (File.CacheFileIcon != null)
+                {
+                    item = File.CacheFileIcon;
+                }
+                else
+                {
+                    if (File.Image == null)
+                    {
+                        if (main.Content != null)
+                        {
+                            return;
+                        }
+                        item = new FontIcon();
+                        item.SetBinding(FontIcon.GlyphProperty, "File.Glyph");
+                    }
+                    else
+                    {
+                        item = new Image()
+                        {
+                            Source = File.Image,
+                            Stretch = Stretch.UniformToFill
+                        };
+                    }
+                    item.HorizontalAlignment = HorizontalAlignment.Center;
+                    item.VerticalAlignment = VerticalAlignment.Center;
+                 
+                    File.CacheFileIcon = item;
+                }
                 if (UseLargeIcon)
                 {
                     item.SetBinding(WidthProperty, "File.LargeIconSize");
                     item.SetBinding(HeightProperty, "File.LargeIconSize");
-                    item.SetBinding(FontIcon.FontSizeProperty, "File.LargeFontSize");
+                    item.SetBinding(FontIcon.FontSizeProperty, "File.LargeFontIconSize");
                 }
                 else
                 {
                     item.SetBinding(WidthProperty, "File.SmallIconSize");
                     item.SetBinding(HeightProperty, "File.SmallIconSize");
-                    item.SetBinding(FontIcon.FontSizeProperty, "File.SmallFontSize");
+                    item.SetBinding(FontIcon.FontSizeProperty, "File.SmallFontIconSize");
                 }
-            }
+                main.Content = item;
+            });
+        }
+        private void UserControlBase_Loaded(object sender, RoutedEventArgs e)
+        {
         }
     }
 }

@@ -56,5 +56,11 @@ DependencyProperty.Register("Orientation", typeof(Orientation), typeof(TagGroup)
             }
         }
         public event MouseButtonEventHandler TagMouseDown;
+
+        private void ListBox_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            //防止将ScrollChanged事件传递到FileViewer的List****中
+            e.Handled = true;
+        }
     }
 }

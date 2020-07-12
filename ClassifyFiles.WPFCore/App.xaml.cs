@@ -24,6 +24,7 @@ namespace ClassifyFiles.WPFCore
             Current = this;
             SplashWindow.TryShow();
             MainWindow win = new MainWindow();
+            MainWindow = win;
 #if (!DEBUG)
             //UnhandledException.RegistAll();
 

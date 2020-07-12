@@ -20,6 +20,7 @@ using static ClassifyFiles.Util.FileClassUtility;
 using System.Collections;
 using System.Windows.Controls.Primitives;
 using System.Collections.Concurrent;
+using ListView = System.Windows.Controls.ListView;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -28,6 +29,17 @@ namespace ClassifyFiles.UI.Panel
     /// </summary>
     public partial class FilesViewer : UserControl, INotifyPropertyChanged
     {
+
+        private ItemsControl filesContent;
+        public ItemsControl FilesContent
+        {
+            get => filesContent;
+            set
+            {
+                filesContent = value;
+                this.Notify(nameof(FilesContent));
+            }
+        }
         protected ProgressDialog GetProgress()
         {
             return (Window.GetWindow(this) as MainWindow).Progress;
@@ -46,6 +58,7 @@ namespace ClassifyFiles.UI.Panel
         {
             DataContext = this;
             InitializeComponent();
+            FilesContent = FindResource("lvwFiles") as ListView;
         }
         private ObservableCollection<UIFile> files;
         public ObservableCollection<UIFile> Files
@@ -54,8 +67,7 @@ namespace ClassifyFiles.UI.Panel
             set
             {
                 files = value;
-                page = 0;
-                this.Notify(nameof(Files), nameof(PagingFiles), nameof(FileTree));
+                this.Notify(nameof(Files), nameof(FileTree));
             }
         }
         /// <summary>
@@ -63,28 +75,6 @@ namespace ClassifyFiles.UI.Panel
         /// </summary>
         public List<UIFile> FileTree => Files == null ? null : new List<UIFile>(FileUtility.GetFileTree(Files).SubFiles.Cast<UIFile>());
 
-        /// <summary>
-        /// 供
-        /// </summary>
-        public IEnumerable<UIFile> PagingFiles
-        {
-            get
-            {
-                var files = Files == null ? null : Files.Skip(pagingItemsCount * page).Take(pagingItemsCount);
-                RealtimeRefresh(files);
-                return files;
-            }
-        }
-        private int page;
-        public int Page
-        {
-            get => page;
-            set
-            {
-                page = value;
-                this.Notify(nameof(Page), nameof(PagingFiles));
-            }
-        }
         private double iconSize = 64;
         public double IconSize
         {
@@ -118,8 +108,8 @@ namespace ClassifyFiles.UI.Panel
                    }
                });
                 Files = new ObservableCollection<UIFile>(filesWithIcon);
+                await RealtimeRefresh(Files.Take(100));
             }
-            GeneratePaggingButtons();
         }
         public async Task AddFilesAsync(IEnumerable<File> files, bool tags = true)
         {
@@ -138,56 +128,35 @@ namespace ClassifyFiles.UI.Panel
                 Files.Add(file);
             }
             this.Notify(nameof(Files));
-
-            GeneratePaggingButtons();
         }
 
-
-
-        private void GeneratePaggingButtons()
-        {
-            stkPagging.Children.Clear();
-            if (Files != null && Files.Count > 0)
-            {
-                for (int i = 1; i <= Math.Ceiling((double)Files.Count / pagingItemsCount); i++)
-                {
-                    Button btn = new Button()
-                    {
-                        Content = i,
-                    };
-                    btn.Click += (p1, p2) =>
-                    {
-                        stkPagging.Children.Cast<Button>()
-                        .ForEach(p => p.Background = Brushes.Transparent);
-                        (p1 as Button).SetResourceReference(Button.BackgroundProperty, "SystemAccentColorLight3Brush");
-                        Page = (int)btn.Content - 1;
-                    };
-                    stkPagging.Children.Add(btn);
-                }
-               (stkPagging.Children[0] as Button).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            }
-        }
         private UIFile GetSelectedFile()
         {
-            return CurrentViewType switch
+            switch (FilesContent)
             {
-                1 => lvwFiles.SelectedItem as UIFile,
-                2 => lbxGrdFiles.SelectedItem as UIFile,
-                3 => lbxGrdFiles.SelectedItem as UIFile,
-                4 => treeFiles.SelectedItem as UIFile,
-                _ => throw new NotImplementedException()
-            };
+                case ListView lvw:
+                    return lvw.SelectedItem as UIFile;
+                case TreeView t:
+                    return t.SelectedItem as UIFile;
+                default:
+                    return null;
+            }
         }
         private IReadOnlyList<UIFile> GetSelectedFiles()
         {
-            return CurrentViewType switch
+            if (FilesContent is ListView lvw)
             {
-                1 => lvwFiles.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
-                2 => lbxGrdFiles.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
-                3 => lbxGrdFiles.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
-                4 => new List<UIFile>().AsReadOnly(),
-                _ => throw new NotImplementedException()
-            };
+                return lvw.SelectedItems.Cast<UIFile>().ToList().AsReadOnly();
+            }
+            return new List<UIFile>().AsReadOnly();
+            //return CurrentViewType switch
+            //{
+            //    1 => lvwFiles.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
+            //    2 => grdFiles.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
+            //    3 => grdFiles.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
+            //    4 => new List<UIFile>().AsReadOnly(),
+            //    _ => throw new NotImplementedException()
+            //};
         }
 
         private async void lvwFiles_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -224,11 +193,6 @@ namespace ClassifyFiles.UI.Panel
             {
                 await new ErrorDialog().ShowAsync(ex, "打开失败");
             }
-        }
-
-        private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            scrPagging.ScrollToHorizontalOffset(scrPagging.HorizontalOffset - e.Delta / 20);
         }
 
         private void ListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -281,18 +245,44 @@ namespace ClassifyFiles.UI.Panel
             int i = int.Parse((sender as FrameworkElement).Tag as string);
             grdAppBar.Children.OfType<AppBarToggleButton>().ForEach(p => p.IsChecked = false);
             (sender as AppBarToggleButton).IsChecked = true;
-            lvwFilesArea.Visibility = i == 1 ? Visibility.Visible : Visibility.Collapsed;
-            grdFilesArea.Visibility = (i == 2 || i == 3) ? Visibility.Visible : Visibility.Collapsed;
-            treeFiles.Visibility = i == 4 ? Visibility.Visible : Visibility.Collapsed;
-            if (i == 2)
+            ChangeViewType(i);
+        }
+
+        private void ChangeViewType(int type)
+        {
+            var selectedFile = GetSelectedFile();
+            if (type == 1)
             {
-                lbxGrdFiles.ItemTemplate = FindResource("grdIconView") as DataTemplate;
+                FilesContent = FindResource("lvwFiles") as ListView;
+                if (selectedFile != null)
+                {
+                    (FilesContent as ListView).SelectedItem = selectedFile;
+                    (FilesContent as ListView).ScrollIntoView(selectedFile);
+                }
             }
-            else if (i == 3)
+            else if (type == 2 || type == 3)
             {
-                lbxGrdFiles.ItemTemplate = FindResource("grdTileView") as DataTemplate;
+                FilesContent = FindResource("grdFiles") as ListView;
+                FilesContent.ItemTemplate = FindResource(type == 2 ? "grdIconView" : "grdTileView") as DataTemplate;
+                if (selectedFile != null)
+                {
+                    (FilesContent as ListView).SelectedItem = selectedFile;
+                    (FilesContent as ListView).ScrollIntoView(selectedFile);
+                }
+                else if (grdScrollViewer != null)
+                {
+                    grdScrollViewer.ScrollToVerticalOffset(0);
+                }
             }
-            CurrentViewType = i;
+            else if (type == 4)
+            {
+                FilesContent = FindResource("treeFiles") as TreeView;
+            }
+            if (Files != null)
+            {
+                RealtimeRefresh(Files.Take(100));
+            }
+            CurrentViewType = type;
             ViewTypeChanged?.Invoke(this, new EventArgs());
         }
 
@@ -315,32 +305,15 @@ namespace ClassifyFiles.UI.Panel
         }
         public void SelectFile(UIFile file)
         {
-            switch (CurrentViewType)
+            if (FilesContent is ListView lvw)
             {
-                case 1:
-                    lvwFiles.SelectedItem = file;
-                    lvwFiles.ScrollIntoView(file);
-                    break;
-                case 2:
-                case 3:
-                    int index = Files.IndexOf(file);
-                    int page = (int)Math.Ceiling((double)index / pagingItemsCount);
-                    stkPagging.Children.Cast<Button>().FirstOrDefault(p => (int)p.Content == page)?.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-                    lbxGrdFiles.SelectedItem = file;
-                    lbxGrdFiles.ScrollIntoView(file);  //无效
-                    break;
-                default:
-                    break;
+                lvw.SelectedItem = file;
+                lvw.ScrollIntoView(file);
             }
-
         }
         public int CurrentViewType { get; private set; } = 1;
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (lvwFiles == null)
-            {
-                return;
-            }
         }
 
         private async void Tags_MouseDown(object sender, MouseButtonEventArgs e)
@@ -458,7 +431,7 @@ namespace ClassifyFiles.UI.Panel
 
         private Task RealtimeRefresh(IEnumerable<UIFile> files)
         {
-
+            Debug.WriteLine($"refresh {files.Count()} files");
             return Task.Run(async () =>
             {
                 if (files == null || !files.Any())
@@ -468,7 +441,7 @@ namespace ClassifyFiles.UI.Panel
                 AppDbContext db = new AppDbContext(DbUtility.DbPath);
                 foreach (var file in files)
                 {
-                    await file.LoadTagsAsync(db);
+                    await file.LoadAsync(db);
                 }
                 if (Configs.AutoThumbnails)
                 {
@@ -482,17 +455,29 @@ namespace ClassifyFiles.UI.Panel
                         }
                     });
 
+                    if (savingFiles)
+                    {
+                        return;
+                    }
+                    savingFiles = true;
                     try
                     {
+                        savingFiles = true;
                         await FileUtility.SaveFilesAsync(files.Where(p => p.Thumbnail != null).Select(p => p.Raw));
+
                     }
                     catch (Exception ex)
                     {
 
                     }
+                    finally
+                    {
+                        savingFiles = false;
+                    }
                 }
             });
         }
+        private static bool savingFiles = false;
 
         private async void TreeItems_Expanded(object sender, RoutedEventArgs e)
         {
@@ -502,6 +487,27 @@ namespace ClassifyFiles.UI.Panel
         }
 
         #endregion
+        ScrollViewer grdScrollViewer = null;
+        private void lbxGrdFiles_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            Debug.WriteLine("GridView Scroll Changed");
+            if (grdScrollViewer == null)
+            {
+                grdScrollViewer = e.OriginalSource as ScrollViewer;
+            }
+            if (Files == null
+                || Files.Count == 0
+                 //||e.ExtentHeightChange>0
+                || e.VerticalChange == 0 && e.ViewportHeightChange == 0 && e.VerticalOffset > 0)
+            {
+                return;
+            }
+            int count = Files.Count;
+            double percent1 = e.VerticalOffset / e.ExtentHeight;
+            double percent2 = e.ViewportHeight / e.ExtentHeight;
+            var files = Files.Skip((int)(count * percent1)).Take((int)(count * percent2) + 20).ToList();
+            RealtimeRefresh(files);
+        }
     }
 
     public class ClickTagEventArgs : EventArgs
@@ -513,4 +519,5 @@ namespace ClassifyFiles.UI.Panel
 
         public Class Class { get; }
     }
+
 }

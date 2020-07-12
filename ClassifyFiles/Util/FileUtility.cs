@@ -308,14 +308,13 @@ namespace ClassifyFiles.Util
             } while (F.Exists(P.Combine(dir, newName)));
             return newName;
         }
-
         public static async Task SaveFilesAsync(IEnumerable<File> files)
         {
             files.ForEach(p => db.Entry(p).State = EntityState.Modified);
             await db.SaveChangesAsync();
         }
 
-        public static  Task DeleteThumbnailsAsync(int projectID)
+        public static Task DeleteThumbnailsAsync(int projectID)
         {
             return Task.Run(() =>
             {
@@ -326,8 +325,8 @@ namespace ClassifyFiles.Util
                     file.Thumbnail = null;
                     db.Entry(file).State = EntityState.Modified;
                 }
-                 db.SaveChanges();
-                 //db.Database.ExecuteSqlRaw("VACUUM;");
+                db.SaveChanges();
+                //db.Database.ExecuteSqlRaw("VACUUM;");
             });
 
         }
