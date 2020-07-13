@@ -19,7 +19,7 @@
         
         <DataTemplate x:Key="grdIconView">
             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,8,0,2">
-                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Width="{Binding LargIconSize}"    Height="{Binding TotalIconViewHeight}"                                >
+                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Width="{Binding LargeIconSize}"    Height="{Binding TotalIconViewHeight}"                                >
                     <DockPanel.ToolTip>
                         <ToolTip>
                             <m:SimpleStackPanel Spacing="8">

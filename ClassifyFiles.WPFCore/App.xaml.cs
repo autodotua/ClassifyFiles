@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,6 +22,12 @@ namespace ClassifyFiles.WPFCore
         public static new App Current { get; private set; }
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            FileUtility.ThumbnailFolderPath = "thumb";
+            if(!Directory.Exists("thumb"))
+            {
+                Directory.CreateDirectory("thumb");
+            }
+            FileUtility.FFMpegPath = "exe/ffmpeg.exe";
             Current = this;
             SplashWindow.TryShow();
             MainWindow win = new MainWindow();

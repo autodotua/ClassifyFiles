@@ -43,7 +43,7 @@ namespace ClassifyFiles.UI.Model
             Project = file.Project;
             ProjectID = file.ProjectID;
             SubFiles = file.SubFiles.Select(p => new UIFile(p)).Cast<File>().ToList();
-            Thumbnail = file.Thumbnail;
+            ThumbnailGUID = file.ThumbnailGUID;
             if (IsFolder)
             {
                 Glyph = FolderGlyph;
@@ -59,7 +59,7 @@ namespace ClassifyFiles.UI.Model
 
                 PropertyChanged += async (p1, p2) =>
                  {
-                     if (p2.PropertyName == nameof(Thumbnail))
+                     if (p2.PropertyName == nameof(ThumbnailGUID))
                      {
                          this.Notify(/*nameof(IconVisibility), nameof(ImageVisibility),*/ nameof(Image));
                      }
@@ -83,37 +83,20 @@ namespace ClassifyFiles.UI.Model
         {
             get
             {
-                if (Thumbnail == null)
+                if (string.IsNullOrEmpty(ThumbnailGUID))
                 {
                     return null;
                 }
-                return ToImage(Thumbnail);
+                try
+                {
+                    return new BitmapImage(new Uri(FileUtility.GetThumbnailPath(ThumbnailGUID), UriKind.Absolute));
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
             }
         }
-        /// <summary>
-        /// 将字符数组转换为<see cref="BitmapImage"/>
-        /// </summary>
-        /// <param name="array"></param>
-        /// <returns></returns>
-        private BitmapImage ToImage(byte[] array)
-        {
-            using var ms = new System.IO.MemoryStream(array);
-            var image = new BitmapImage();
-            image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad; // here
-            image.StreamSource = ms;
-            image.EndInit();
-            return image;
-        }
-        ///// <summary>
-        ///// 图标是否显示
-        ///// </summary>
-        //public Visibility IconVisibility => Image == null ? Visibility.Visible : Visibility.Collapsed;
-        ///// <summary>
-        ///// 缩略图是否显示
-        ///// </summary>
-        //public Visibility ImageVisibility => Image == null ? Visibility.Collapsed : Visibility.Visible;
-
         private static double defualtIconSize = 60;
         /// <summary>
         /// 默认大图标的大小

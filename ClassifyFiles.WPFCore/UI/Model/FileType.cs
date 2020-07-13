@@ -8,7 +8,7 @@ namespace ClassifyFiles.UI.Model
         static FileType()
         {
             FileTypes.Add(new FileType("Video", "\uE714", "mp4", "avi", "mkv", "mov", "rm", "rmvb"));
-            FileTypes.Add(new FileType("Photo", "\uEB9F", "mp4", "avi", "mkv", "mov", "rm", "rmvb"));
+            FileTypes.Add(new FileType("Photo", "\uEB9F", "jpeg", "jpg", "tiff", "tif", "png", "bmp","dng","raw","rw2","arw","psd"));
             FileTypes.Add(new FileType("Audio", "\uE8D6", "mp3", "acc", "ogg", "flac", "wav"));
             FileTypes.Add(new FileType("Program", "\uE756", "exe", "msi", "apk", "dll", "ini", "xml"));
             FileTypes.Add(new FileType("Document", "\uE8A5", "doc", "docx", "ppt", "pptx", "xls", "xlsx", "txt", "md"));

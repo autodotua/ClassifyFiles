@@ -17,11 +17,23 @@ using System.ComponentModel;
 using FzLib.Basic;
 using static ClassifyFiles.Util.DbUtility;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace ClassifyFiles.Util
 {
     public static class FileUtility
     {
+        private static EncoderParameters encParams;
+        private static ImageCodecInfo encoder;
+        static FileUtility()
+        {
+            encParams = new EncoderParameters(1);
+            encParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 50L);
+            encoder = ImageCodecInfo.GetImageEncoders()
+                           .First(c => c.FormatID == ImageFormat.Jpeg.Guid);
+        }
+        public static string ThumbnailFolderPath { get; set; }
+        public static string FFMpegPath { get; set; }
         public static readonly IReadOnlyList<string> imgExtensions = new List<string>() {
         "jpg",
         "jpeg",
@@ -29,6 +41,11 @@ namespace ClassifyFiles.Util
         "tif",
         "tiff",
         "bmp",
+        }.AsReadOnly();
+        public static readonly IReadOnlyList<string> videoExtensions = new List<string>() {
+        "mp4",
+        "mkv",
+        "avi",
         }.AsReadOnly();
 
 
@@ -43,22 +60,76 @@ namespace ClassifyFiles.Util
             {
                 try
                 {
-                    using Image image = Image.FromFile(path);
-
-                    using Image thumb = image.GetThumbnailImage(240, (int)(240.0 / image.Width * image.Height), () => false, IntPtr.Zero);
-                    using var ms = new System.IO.MemoryStream();
-                    thumb.Save(ms, ImageFormat.Jpeg);
-                    file.Thumbnail = ms.ToArray();
+                    file.ThumbnailGUID = CreateImageThumbnail(path);
                     return true;
                 }
                 catch (Exception ex)
                 {
+                    file.ThumbnailGUID = "";
+                    return false;
+                }
+            }
+            else if (videoExtensions.Contains(P.GetExtension(path).ToLower().Trim('.')))
+            {
+                try
+                {
+                    file.ThumbnailGUID = CreateVideoThumbnail(path);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    file.ThumbnailGUID = "";
                     return false;
                 }
             }
             return false;
 
         }
+        public static string GetThumbnailPath(string guid)
+        {
+            return P.GetFullPath(P.Combine(ThumbnailFolderPath, guid + ".jpg"));
+        }
+        private static string CreateImageThumbnail(string img)
+        {
+            using Image image = Image.FromFile(img);
+            using Image thumb = image.GetThumbnailImage(240, (int)(240.0 / image.Width * image.Height), () => false, IntPtr.Zero);
+            string guid = Guid.NewGuid().ToString();
+
+            thumb.Save(GetThumbnailPath(guid), encoder, encParams);
+            return guid;
+        }
+        private static string CreateVideoThumbnail(string video)
+        {
+            string guid = Guid.NewGuid().ToString();
+            var thumbnail = GetThumbnailPath(guid);
+            var cmd = "  -itsoffset -1  -i " + '"' + video + '"' + " -vcodec mjpeg -vframes 1 -an -f rawvideo -s 320x240 " + '"' + thumbnail + '"';
+
+            var startInfo = new ProcessStartInfo
+            {
+                WindowStyle = ProcessWindowStyle.Hidden,
+                FileName = P.GetFullPath(FFMpegPath),
+                Arguments = cmd,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                //RedirectStandardOutput = true,
+                //RedirectStandardError = true,
+            };
+            Process p = Process.Start(startInfo);
+            bool result = p.WaitForExit(20000);
+            if (!result)
+            {
+                p.Kill();
+                return null;
+            }
+            //string output = p.StandardOutput.ReadToEnd();
+            //string error = p.StandardError.ReadToEnd();
+            if(!F.Exists(thumbnail))
+            {
+                return null;
+            }
+            return guid;
+        }
+
         public static bool IsMatched(FI file, Class c)
         {
             List<List<MatchCondition>> orGroup = new List<List<MatchCondition>>();
@@ -194,7 +265,7 @@ namespace ClassifyFiles.Util
                     }
                     else
                     {
-                        sub = new T() { Dir = dir,Project=file.Project };
+                        sub = new T() { Dir = dir, Project = file.Project };
                         current.SubFiles.Add(sub);
                         current = sub;
                     }
@@ -321,8 +392,13 @@ namespace ClassifyFiles.Util
                 var files = db.Files.Where(p => p.ProjectID == projectID).AsEnumerable();
 
                 foreach (var file in files)
-                {
-                    file.Thumbnail = null;
+                { 
+                    string path = GetThumbnailPath(file.ThumbnailGUID);
+                    if (F.Exists(path))
+                    {
+                    F.Delete(path);
+                    }
+                    file.ThumbnailGUID = null;
                     db.Entry(file).State = EntityState.Modified;
                 }
                 db.SaveChanges();

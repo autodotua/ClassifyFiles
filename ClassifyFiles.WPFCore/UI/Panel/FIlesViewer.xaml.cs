@@ -137,7 +137,7 @@ namespace ClassifyFiles.UI.Panel
         {
             return FilesContent switch
             {
-                ListView lvw => lvw.SelectedItem as UIFile,
+                ListBox lvw => lvw.SelectedItem as UIFile,
                 TreeView t => t.SelectedItem as UIFile,
                 _ => null,
             };
@@ -448,29 +448,36 @@ namespace ClassifyFiles.UI.Panel
                     workingForeachState = null;
                     Debug.WriteLine("break thumbbnail");
                 }
+                void Do(UIFile file)
+                {
+                    if (!generated.ContainsKey(file.ID) && file.ThumbnailGUID == null && file.ThumbnailGUID != "")
+                    {
+                        generated.TryAdd(file.ID, file);
+                        FileUtility.TryGenerateThumbnail(file);
+                        if (file.ThumbnailGUID != null)
+                        {
+                            file.Raw.ThumbnailGUID = file.ThumbnailGUID;
+                            file.LoadAsync(db).Wait();
+                        }
+                    }
+                }
                 if (Configs.AutoThumbnails)
                 {
-                    Parallel.ForEach(files, (file, state) =>
-                    {
-                        workingForeachState = state;
-                        if (!generated.ContainsKey(file.ID) && file.Thumbnail == null)
-                        {
-                            generated.TryAdd(file.ID, file);
-                            FileUtility.TryGenerateThumbnail(file);
-                            if (file.Thumbnail != null)
-                            {
-                                file.Raw.Thumbnail = file.Thumbnail;
-                                file.LoadAsync(db).Wait();
-                            }
-                        }
-                    });
+                    Parallel.ForEach(files, new ParallelOptions() { MaxDegreeOfParallelism = Configs.RefreshThreadCount },async (file, state) =>
+                       {
+                           workingForeachState = state;
+                           await Task.Run(() =>
+                           {
+                               Do(file);
+                           });
+                       });
                     if (!savingFiles)
                     {
                         savingFiles = true;
                         try
                         {
                             savingFiles = true;
-                            await FileUtility.SaveFilesAsync(files.Where(p => p.Thumbnail != null).Select(p => p.Raw));
+                            await FileUtility.SaveFilesAsync(files.Where(p => p.ThumbnailGUID != null).Select(p => p.Raw));
                         }
                         catch (Exception ex)
                         {
@@ -527,7 +534,7 @@ namespace ClassifyFiles.UI.Panel
             //(sender as ContextMenu).Items.Clear();
         }
 
-     
+
     }
 
     public class ClickTagEventArgs : EventArgs
@@ -574,7 +581,8 @@ namespace ClassifyFiles.UI.Panel
                 var data = new DataObject(DataFormats.FileDrop, files);
                 //放置一个特殊类型，这样好让自己的程序识别，防止自己拖放到自己身上
                 data.SetData(nameof(ClassifyFiles), "");
-                DragDrop.DoDragDrop(sender as DependencyObject, data, DragDropEffects.Copy);
+                //实测支持复制和移动，不知道为什么不支持快捷方式
+                DragDrop.DoDragDrop(sender as DependencyObject, data, DragDropEffects.All);
             }
         }
 
@@ -587,8 +595,8 @@ namespace ClassifyFiles.UI.Panel
                 //当我们发现用户并不是真的要拖放，而是真的想选中某一个项时，
                 //就把该项单独选中
                 ignoredSelect = false;
-                   var mouseOverItem = list.SelectedItems.Cast<object>().FirstOrDefault(p =>
-              (list.ItemContainerGenerator.ContainerFromItem(p) as ListBoxItem).IsMouseOver);
+                var mouseOverItem = list.SelectedItems.Cast<object>().FirstOrDefault(p =>
+           (list.ItemContainerGenerator.ContainerFromItem(p) as ListBoxItem).IsMouseOver);
                 if (mouseOverItem != null)
                 {
                     list.SelectedItem = mouseOverItem;
@@ -603,7 +611,7 @@ namespace ClassifyFiles.UI.Panel
             beginPosition = e.GetPosition(null);
             //当鼠标点击列表项时，如果鼠标位置在已经被选中的项的上方，那么取消响应
             //这是由于ListView总是在拖放之前就把多选变成了单选，与拖放需求不符
-            if(e.ClickCount>1)
+            if (e.ClickCount > 1)
             {
                 return;
             }

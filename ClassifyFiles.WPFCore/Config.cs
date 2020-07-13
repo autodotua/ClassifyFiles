@@ -19,13 +19,14 @@ namespace ClassifyFiles
         private const string ThemeKey = "Theme";
 
         private const string AutoThumbnailsKey = "AutoThumbnails";
+        private const string RefreshThreadCountKey = "RefreshThreadCount";
 
         private static int? theme = null;
         public static int Theme
         {
             get
             {
-                if(theme==null)
+                if (theme == null)
                 {
                     theme = ConfigUtility.GetInt(ThemeKey, 0);
                 }
@@ -42,7 +43,7 @@ namespace ClassifyFiles
         {
             get
             {
-                if(autoThumbnails == null)
+                if (autoThumbnails == null)
                 {
                     autoThumbnails = ConfigUtility.GetBool(AutoThumbnailsKey, true);
                 }
@@ -52,6 +53,23 @@ namespace ClassifyFiles
             {
                 autoThumbnails = value;
                 ConfigUtility.Set(AutoThumbnailsKey, value);
+            }
+        }
+        private static int? refreshThreadCount = null;
+        public static int RefreshThreadCount
+        {
+            get
+            {
+                if (refreshThreadCount == null)
+                {
+                    refreshThreadCount = ConfigUtility.GetInt(RefreshThreadCountKey, 4);
+                }
+                return refreshThreadCount.Value;
+            }
+            set
+            {
+                refreshThreadCount = value;
+                ConfigUtility.Set(RefreshThreadCountKey, value);
             }
         }
     }

@@ -41,14 +41,15 @@ namespace ClassifyFiles.Data
         public string Name { get; set; } = "";
         [NotMapped]
         public bool IsFolder => Name == "";
-        private byte[] thumbnail;
-        public byte[] Thumbnail
+        private string thumbnailGUID;
+        public string ThumbnailGUID
         {
-            get => thumbnail;
+            //如果为null，则是没有获取；如果为""，则是获取失败
+            get => thumbnailGUID;
             set
             {
-                thumbnail = value;
-                this.Notify(nameof(Thumbnail));
+                thumbnailGUID = value;
+                this.Notify(nameof(ThumbnailGUID));
             }
         }
 
