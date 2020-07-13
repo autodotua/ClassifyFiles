@@ -87,13 +87,11 @@ namespace ClassifyFiles.UI.Panel
         {
             Debug.WriteLine("Selected Class Changed, Project Hashcode is " + Project.GetHashCode()
             + ", Class is " + (GetItemsPanel().SelectedItem == null ? "null" : GetItemsPanel().SelectedItem.Name));
-            GetProgress().Show(false);
             List<File> files = GetItemsPanel().SelectedItem == null ?
                 await GetFilesByProjectAsync(Project.ID)
                 : await GetFilesByClassAsync(GetItemsPanel().SelectedItem.ID);
             await filesViewer.SetFilesAsync(files);
             Dirs = filesViewer.Files == null ? null : new HashSet<string>(filesViewer.Files.Select(p => p.Dir));
-            GetProgress().Close();
         }
         public HashSet<string> dirs;
         public HashSet<string> Dirs
@@ -165,6 +163,10 @@ namespace ClassifyFiles.UI.Panel
         private async void UserControl_Drop(object sender, DragEventArgs e)
         {
             if (classPanel.SelectedItem == null)
+            {
+                return;
+            }
+            if(e.Data.GetDataPresent(nameof(ClassifyFiles)))
             {
                 return;
             }

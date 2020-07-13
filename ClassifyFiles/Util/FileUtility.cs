@@ -109,10 +109,10 @@ namespace ClassifyFiles.Util
             string value = mc.Value;
             bool? result = mc.Type switch
             {
-                MatchType.InFileName => file.Name.Contains(value),
-                MatchType.InDirName => file.DirectoryName.Contains(value),
+                MatchType.InFileName => file.Name.ToLower().Contains(value.ToLower()),
+                MatchType.InDirName => file.DirectoryName.ToLower().Contains(value.ToLower()),
                 MatchType.WithExtension => IsExtensionMatched(file.Extension, value),
-                MatchType.InPath => file.FullName.Contains(value),
+                MatchType.InPath => file.FullName.ToLower().Contains(value.ToLower()),
                 MatchType.InFileNameWithRegex => Regex.IsMatch(file.Name, value),
                 MatchType.InDirNameWithRegex => Regex.IsMatch(file.DirectoryName, value),
                 MatchType.InPathWithRegex => Regex.IsMatch(file.FullName, value),

@@ -58,7 +58,9 @@ namespace ClassifyFiles.UI.Panel
         {
             DataContext = this;
             InitializeComponent();
-            FilesContent = FindResource("lvwFiles") as ListView;
+            FilesContent = FindResource("lvwFiles") as ListBox;
+            new DragDropFilesHelper(FindResource("lvwFiles") as ListBox).Regist();
+            new DragDropFilesHelper(FindResource("grdFiles") as ListBox).Regist();
         }
         private ObservableCollection<UIFile> files;
         public ObservableCollection<UIFile> Files
@@ -108,6 +110,7 @@ namespace ClassifyFiles.UI.Panel
                    }
                });
                 Files = new ObservableCollection<UIFile>(filesWithIcon);
+                await Task.Delay(100);//不延迟大概率会一直转圈
                 await RealtimeRefresh(Files.Take(100));
             }
         }
@@ -143,9 +146,9 @@ namespace ClassifyFiles.UI.Panel
         {
             return FilesContent switch
             {
-                ListView lvw => lvw.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
+                ListBox lvw => lvw.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
                 TreeView t => new List<UIFile>() { t.SelectedItem as UIFile }.AsReadOnly(),
-                _ => null,
+                _ => new List<UIFile>().AsReadOnly(),
             };
         }
 
@@ -243,21 +246,21 @@ namespace ClassifyFiles.UI.Panel
             var selectedFile = GetSelectedFile();
             if (type == 1)
             {
-                FilesContent = FindResource("lvwFiles") as ListView;
+                FilesContent = FindResource("lvwFiles") as ListBox;
                 if (selectedFile != null)
                 {
-                    (FilesContent as ListView).SelectedItem = selectedFile;
-                    (FilesContent as ListView).ScrollIntoView(selectedFile);
+                    (FilesContent as ListBox).SelectedItem = selectedFile;
+                    (FilesContent as ListBox).ScrollIntoView(selectedFile);
                 }
             }
             else if (type == 2 || type == 3)
             {
-                FilesContent = FindResource("grdFiles") as ListView;
+                FilesContent = FindResource("grdFiles") as ListBox;
                 FilesContent.ItemTemplate = FindResource(type == 2 ? "grdIconView" : "grdTileView") as DataTemplate;
                 if (selectedFile != null)
                 {
-                    (FilesContent as ListView).SelectedItem = selectedFile;
-                    (FilesContent as ListView).ScrollIntoView(selectedFile);
+                    (FilesContent as ListBox).SelectedItem = selectedFile;
+                    (FilesContent as ListBox).ScrollIntoView(selectedFile);
                 }
                 else if (grdScrollViewer != null)
                 {
@@ -336,7 +339,7 @@ namespace ClassifyFiles.UI.Panel
                 menuOpenFolder.Click += OpenDirMernuItem_Click;
                 menu.Items.Add(menuOpenFolder);
             }
-            if (!files.Any(p=>p.IsFolder))
+            if (!files.Any(p => p.IsFolder))
             {
                 foreach (var tag in Project.Classes)
                 {
@@ -405,6 +408,7 @@ namespace ClassifyFiles.UI.Panel
 
         #region 自动生成缩略图、Tags
         private ConcurrentDictionary<int, UIFile> generated = new ConcurrentDictionary<int, UIFile>();
+
         private void lvwFiles_Loaded(object sender, RoutedEventArgs e)
         {
             ScrollViewer scrollViewer = (sender as Visual).GetVisualChild<ScrollViewer>(); //Extension method
@@ -423,6 +427,7 @@ namespace ClassifyFiles.UI.Panel
 
         }
 
+        ParallelLoopState workingForeachState = null;
         private Task RealtimeRefresh(IEnumerable<UIFile> files)
         {
             Debug.WriteLine($"refresh {files.Count()} files");
@@ -437,18 +442,28 @@ namespace ClassifyFiles.UI.Panel
                 {
                     await file.LoadAsync(db);
                 }
+                if (workingForeachState != null)
+                {
+                    workingForeachState.Stop();
+                    workingForeachState = null;
+                    Debug.WriteLine("break thumbbnail");
+                }
                 if (Configs.AutoThumbnails)
                 {
-                    Parallel.ForEach(files, file =>
+                    Parallel.ForEach(files, (file, state) =>
                     {
+                        workingForeachState = state;
                         if (!generated.ContainsKey(file.ID) && file.Thumbnail == null)
                         {
                             generated.TryAdd(file.ID, file);
                             FileUtility.TryGenerateThumbnail(file);
-                            file.Raw.Thumbnail = file.Thumbnail;
+                            if (file.Thumbnail != null)
+                            {
+                                file.Raw.Thumbnail = file.Thumbnail;
+                                file.LoadAsync(db).Wait();
+                            }
                         }
                     });
-
                     if (!savingFiles)
                     {
                         savingFiles = true;
@@ -467,10 +482,10 @@ namespace ClassifyFiles.UI.Panel
                         }
                     }
                 }
-                foreach (var file in files)
-                {
-                    await file.LoadAsync(db);
-                }
+                //foreach (var file in files)
+                //{
+                //    await file.LoadAsync(db);
+                //}
             });
         }
         private static bool savingFiles = false;
@@ -487,7 +502,6 @@ namespace ClassifyFiles.UI.Panel
         ScrollViewer grdScrollViewer = null;
         private void lbxGrdFiles_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            Debug.WriteLine("GridView Scroll Changed");
             if (grdScrollViewer == null)
             {
                 grdScrollViewer = e.OriginalSource as ScrollViewer;
@@ -502,6 +516,8 @@ namespace ClassifyFiles.UI.Panel
             int count = Files.Count;
             double percent1 = e.VerticalOffset / e.ExtentHeight;
             double percent2 = e.ViewportHeight / e.ExtentHeight;
+            //利用滚动百分比的判断。第一个百分比是画面最上方的百分比，第二个是画面长度的百分比
+            //在文件中根据两个百分比取出文件，并且预读20个。
             var files = Files.Skip((int)(count * percent1)).Take((int)(count * percent2) + 20).ToList();
             RealtimeRefresh(files);
         }
@@ -510,6 +526,8 @@ namespace ClassifyFiles.UI.Panel
         {
             //(sender as ContextMenu).Items.Clear();
         }
+
+     
     }
 
     public class ClickTagEventArgs : EventArgs
@@ -522,4 +540,81 @@ namespace ClassifyFiles.UI.Panel
         public Class Class { get; }
     }
 
+    public class DragDropFilesHelper
+    {
+        private ListBox list;
+        private bool mouseDown = false;
+        private bool set = false;
+        private Point beginPosition = default;
+
+        public DragDropFilesHelper(ListBox list)
+        {
+            this.list = list;
+        }
+        public void Regist()
+        {
+            list.PreviewMouseLeftButtonDown += List_PreviewMouseLeftButtonDown;
+            list.PreviewMouseLeftButtonUp += List_PreviewMouseLeftButtonUp;
+            list.PreviewMouseMove += List_PreviewMouseMove;
+        }
+
+        private void List_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            Point position = e.GetPosition(null);
+            double distance = Math.Sqrt(Math.Pow(position.X - beginPosition.X, 2) + Math.Pow(position.Y - beginPosition.Y, 2));
+            //如果还没有放置项，并且鼠标已经按下，并且移动距离超过了10单位
+            if (!set && mouseDown && distance > 10)
+            {
+                set = true;
+                var files = list.SelectedItems.Cast<UIFile>().Select(p => p.GetAbsolutePath()).ToArray();
+                if (files.Length == 0)
+                {
+                    return;
+                }
+                var data = new DataObject(DataFormats.FileDrop, files);
+                //放置一个特殊类型，这样好让自己的程序识别，防止自己拖放到自己身上
+                data.SetData(nameof(ClassifyFiles), "");
+                DragDrop.DoDragDrop(sender as DependencyObject, data, DragDropEffects.Copy);
+            }
+        }
+
+        private void List_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            mouseDown = false;
+            set = false;
+            if (ignoredSelect)
+            {
+                //当我们发现用户并不是真的要拖放，而是真的想选中某一个项时，
+                //就把该项单独选中
+                ignoredSelect = false;
+                   var mouseOverItem = list.SelectedItems.Cast<object>().FirstOrDefault(p =>
+              (list.ItemContainerGenerator.ContainerFromItem(p) as ListBoxItem).IsMouseOver);
+                if (mouseOverItem != null)
+                {
+                    list.SelectedItem = mouseOverItem;
+                }
+            }
+        }
+
+        bool ignoredSelect = false;
+        private void List_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            mouseDown = true;
+            beginPosition = e.GetPosition(null);
+            //当鼠标点击列表项时，如果鼠标位置在已经被选中的项的上方，那么取消响应
+            //这是由于ListView总是在拖放之前就把多选变成了单选，与拖放需求不符
+            if(e.ClickCount>1)
+            {
+                return;
+            }
+            //判断鼠标是否在已经选中的项的上方
+            var hasMouseOver = list.SelectedItems.Cast<object>().Any(p =>
+            (list.ItemContainerGenerator.ContainerFromItem(p) as ListBoxItem).IsMouseOver);
+            if (hasMouseOver)
+            {
+                ignoredSelect = true;
+                e.Handled = true;
+            }
+        }
+    }
 }

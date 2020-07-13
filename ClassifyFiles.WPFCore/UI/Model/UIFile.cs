@@ -158,7 +158,7 @@ namespace ClassifyFiles.UI.Model
             if (!loaded)
             {
                 loaded = true;
-                IEnumerable<Class> classes = null;
+                IEnumerable<Class> classes;
                 if (db == null)
                 {
                     classes = await GetClassesOfFileAsync(ID);

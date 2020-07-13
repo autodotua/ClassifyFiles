@@ -68,7 +68,7 @@
 
         <ListView   Grid.Row="4" x:Key="grdFiles" ContextMenu="{StaticResource menu}"
                       PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"  ScrollViewer.ScrollChanged="lbxGrdFiles_ScrollChanged"
-                         ItemsSource="{Binding Files}"  Loaded="lvwFiles_Loaded">
+                         ItemsSource="{Binding Files}"  Loaded="lvwFiles_Loaded" >
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <wpftk:VirtualizingWrapPanel Orientation="Vertical"/>
@@ -78,16 +78,15 @@
 
 
 
-
-        <ListView  Grid.Row="4" ItemsSource="{Binding Files}" x:Key="lvwFiles" SelectionMode="Extended"
+        <m:ListView  Grid.Row="4" ItemsSource="{Binding Files}" x:Key="lvwFiles" SelectionMode="Extended"
                     Loaded="lvwFiles_Loaded"  PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
-                        ContextMenu="{StaticResource menu}"   >
-            <ListView.ItemContainerStyle >
-                <Style TargetType="ListViewItem">
+                        ContextMenu="{StaticResource menu}"  >
+            <m:ListView.ItemContainerStyle >
+                <Style TargetType="{x:Type m:ListViewItem}">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                 </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.ItemTemplate>
+            </m:ListView.ItemContainerStyle>
+            <m:ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="0,4,24,4"  >
                         <Grid.ColumnDefinitions>
@@ -109,8 +108,8 @@
                         <component:TagGroup Grid.Column="4" Grid.RowSpan="99" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
                     </Grid>
                 </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+            </m:ListView.ItemTemplate>
+        </m:ListView>
 
         <TreeView x:Key="treeFiles"  ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
                                           Grid.Row="4"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
