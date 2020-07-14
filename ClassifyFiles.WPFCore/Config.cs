@@ -30,6 +30,8 @@ namespace ClassifyFiles
         private const string RefreshThreadCountKey = "RefreshThreadCount";
         private const string ShowExplorerIconKey = "ShowExplorerIcon";
         private const string ShowThumbnailKey = "ShowThumbnail";
+        private const string ShowClassTagsKey = "ShowClassTags";
+        private const string ShowIconViewNamesKey = "ShowIconViewNames";
 
         private static int? theme = null;
         public static int Theme
@@ -117,5 +119,41 @@ namespace ClassifyFiles
                 ConfigUtility.Set(ShowThumbnailKey, value);
             }
         }
+        
+        private static bool? showIconViewNames = null;
+        public static bool ShowIconViewNames
+        {
+            get
+            {
+                if (showIconViewNames == null)
+                {
+                    showIconViewNames = ConfigUtility.GetBool(ShowClassTagsKey, true);
+                }
+                return showIconViewNames.Value;
+            }
+            set
+            {
+                showIconViewNames = value;
+                ConfigUtility.Set(ShowClassTagsKey, value);
+            }
+        }
+        private static bool? showClassTags = null;
+        public static bool ShowClassTags
+        {
+            get
+            {
+                if (showClassTags == null)
+                {
+                    showClassTags = ConfigUtility.GetBool(ShowClassTagsKey, true);
+                }
+                return showClassTags.Value;
+            }
+            set
+            {
+                showClassTags = value;
+                ConfigUtility.Set(ShowClassTagsKey, value);
+            }
+        }
+
     }
 }

@@ -30,14 +30,14 @@ namespace ClassifyFiles.UI.Component
             InitializeComponent();
 
         }
+
         public static readonly DependencyProperty FileProperty =
             DependencyProperty.Register("File", typeof(UIFile), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
         static void OnFileChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
-            FileIcon fileIcon = (obj as FileIcon);
+            FileIcon fileIcon = obj as FileIcon;
             if (fileIcon.File.IsFolder)
             {
-                fileIcon.Load(null, null);
             }
             else
             {
@@ -68,18 +68,18 @@ namespace ClassifyFiles.UI.Component
             set => SetValue(UseLargeIconProperty, value);
         }
 
-        private static ConcurrentDictionary<int, FrameworkElement> caches = new ConcurrentDictionary<int, FrameworkElement>();
+        public static ConcurrentDictionary<int, FrameworkElement> Caches { get; } = new ConcurrentDictionary<int, FrameworkElement>();
         private void Load(object sender, EventArgs e)
         {
             Dispatcher.Invoke(() =>
             {
                 FrameworkElement item = null;
-                if (File.IsFolder == false && caches.ContainsKey(File.ID) && !(File.Image != null && caches[File.ID] is FontIcon))
+                if (File.IsFolder == false && Caches.ContainsKey(File.ID) && !(File.Image != null && Caches[File.ID] is FontIcon))
                 {
-                    item = caches[File.ID];
+                    item = Caches[File.ID];
                 }
                 else
-                {
+                { 
                     if (File.Image == null)
                     {
                         if (main.Content is Image)
@@ -102,7 +102,7 @@ namespace ClassifyFiles.UI.Component
 
                     if (File.IsFolder == false)
                     {
-                        caches.TryAdd(File.ID, item);
+                        Caches.TryAdd(File.ID, item);
                     }
                 }
                 if (UseLargeIcon)
@@ -122,6 +122,7 @@ namespace ClassifyFiles.UI.Component
         }
         private void UserControlBase_Loaded(object sender, RoutedEventArgs e)
         {
+            Load(null, null);
         }
     }
 }

@@ -35,7 +35,7 @@ namespace ClassifyFiles.UI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (int)value>0?Visibility.Visible:Visibility.Collapsed;
+            return (int)value > 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -43,11 +43,12 @@ namespace ClassifyFiles.UI
             throw new NotSupportedException();
         }
 
-    }      public class Bool2VisibilityConverter : IValueConverter
+    }
+    public class Bool2VisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return ((bool)value)?Visibility.Visible:Visibility.Collapsed;
+            return ((bool)value) ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -55,7 +56,7 @@ namespace ClassifyFiles.UI
             return ((Visibility)value) == Visibility.Visible;
         }
 
-    }   
+    }
     public class IsNotNull2BoolConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -69,12 +70,12 @@ namespace ClassifyFiles.UI
         }
 
     }
-    
+
     public class IsNotNull2VisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value != null ? Visibility.Visible:Visibility.Collapsed ;
+            return value != null ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -108,7 +109,7 @@ namespace ClassifyFiles.UI
 
         }
     }
- 
+
 
     public sealed class MethodToValueConverter : IValueConverter
     {

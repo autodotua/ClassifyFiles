@@ -8,34 +8,36 @@
                   xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
                  xmlns:m="http://schemas.modernwpf.com/2019"
-
+xmlns:app="clr-namespace:ClassifyFiles"
         xmlns:wpftk="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ui:NotFirst2VisibilityConverter x:Key="i2v"/>
+        <ui:Bool2VisibilityConverter x:Key="b2v"/>
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
         <ui:IsNotNull2VisibilityConverter x:Key="nn2v"/>
-        
         <DataTemplate x:Key="grdIconView">
-            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,8,0,2">
-                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Width="{Binding LargeIconSize}"    Height="{Binding TotalIconViewHeight}"                                >
+            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,4">
+                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"   Width="{Binding LargeIconSize}"    Height="{Binding TotalIconViewHeight}">
                     <DockPanel.ToolTip>
                         <ToolTip>
                             <m:SimpleStackPanel Spacing="8">
-                                <TextBlock Text="{Binding DisplayDir}"/>
                                 <TextBlock FontWeight="Bold" Text="{Binding DisplayName}"/>
+                                <TextBlock Text="{Binding DisplayDir}"/>
                             </m:SimpleStackPanel>
                         </ToolTip>
                     </DockPanel.ToolTip>
-                    <TextBlock DockPanel.Dock="Bottom" FontSize="{Binding FontSize}" Text="{Binding Path=DisplayName, Mode=OneTime}"
-                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" Height="32" MaxWidth="{Binding LargeIconSize}"/>
-                    <component:FileIcon File="{Binding .}" UseLargeIcon="True"/>
+                    <TextBlock DockPanel.Dock="Bottom" FontSize="{Binding FontSize}" 
+                               Visibility="{Binding  Path=ShowIconViewNames, Converter={StaticResource b2v}}" 
+                               Text="{Binding Path=DisplayName, Mode=OneTime}"
+                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" LineHeight="16" Height="32" MaxWidth="{Binding LargeIconSize}"/>
+                    <component:FileIcon UseLargeIcon="True" File="{Binding .}"  Height="{Binding LargeIconSize}" Width="{Binding LargeIconSize}"/>
                 </DockPanel>
             </Border>
         </DataTemplate>
         <DataTemplate x:Key="grdTileView">
-            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="4">
+            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,0,0,4">
                 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="{Binding TotalTileViewHeight}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="{Binding LargeIconSize}"/>
@@ -55,7 +57,7 @@
                                Foreground="Gray" TextWrapping="Wrap" FontSize="{Binding SmallFontSize}" />
                     <component:TagGroup Grid.ColumnSpan="99" File="{Binding .}" Orientation="Horizontal" 
                                         Grid.RowSpan="99" HorizontalAlignment="Right" VerticalAlignment="Bottom" TagMouseDown="Tags_MouseDown"/>
-                    <component:FileIcon File="{Binding .}" UseLargeIcon="True" Grid.RowSpan="99" />
+                    <component:FileIcon UseLargeIcon="True" File="{Binding .}" Grid.RowSpan="99" />
                 </Grid>
             </Border>
         </DataTemplate>
@@ -69,9 +71,11 @@
         <ListView   Grid.Row="4" x:Key="grdFiles" ContextMenu="{StaticResource menu}"
                       PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"  ScrollViewer.ScrollChanged="lbxGrdFiles_ScrollChanged"
                          ItemsSource="{Binding Files}"  Loaded="lvwFiles_Loaded" >
+            <ListBox.Resources>
+            </ListBox.Resources>
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <wpftk:VirtualizingWrapPanel Orientation="Vertical"/>
+                    <wpftk:VirtualizingWrapPanel Orientation="Vertical" />
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListView>
@@ -127,7 +131,7 @@
         </TreeView>
 
     </UserControl.Resources>
-    <Grid  Margin="8,4,4,4" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
+    <Grid  Margin="8,4,0,4" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="4"/>

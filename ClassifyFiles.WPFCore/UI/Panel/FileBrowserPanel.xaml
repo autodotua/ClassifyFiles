@@ -56,6 +56,26 @@
                            x:Name="filesViewer" Grid.Column="2"  AllowDrop="True"
              Drop="UserControl_Drop" ClickTag="filesViewer_ClickTag"/>
         <m:CommandBar  Grid.Row="2" Grid.ColumnSpan="999" DefaultLabelPosition="Right">
+            <m:AppBarButton Icon="View" Label="显示元素">
+                <m:FlyoutService.Flyout>
+                    <m:Flyout x:Name="flyoutDisplay" >
+                        <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
+                            <GroupBox Header="通用">
+                                <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
+                                    <m:ToggleSwitch x:Name="swtTags" Header="显示分类标签" Toggled="ToggleSwitch_Toggled" />
+                                    <m:ToggleSwitch x:Name="swtThumbs" Header="显示缩略图"  Toggled="swtThumbs_Toggled"/>
+                                    <m:ToggleSwitch x:Name="swtIcons" Header="显示资源管理器图标" Toggled="swtIcons_Toggled"/>
+                                </m:SimpleStackPanel>
+                            </GroupBox>
+                            <GroupBox Header="图标视图">
+                                <m:ToggleSwitch x:Name="swtIconViewNames" Header="显示文件名" Toggled="swtIconViewNames_Toggled"/>
+
+                            </GroupBox>
+                        </m:SimpleStackPanel>               
+                    </m:Flyout>
+                </m:FlyoutService.Flyout>
+            </m:AppBarButton>
+            <m:AppBarSeparator/>
             <m:AppBarButton  x:Name="btnAddFile" Icon="Add"  Label="添加文件" Click="btnAddFile_Click"
                              IsEnabled="{Binding ElementName=classPanel, Path=SelectedItem, Converter={StaticResource nn2b}}"/>
             <m:AppBarButton  x:Name="btnRefresh" Icon="Refresh"  Label="刷新" Click="RefreshButton_Click"

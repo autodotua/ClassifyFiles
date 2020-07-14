@@ -40,6 +40,9 @@ namespace ClassifyFiles.UI.Panel
         public FileBrowserPanel()
         {
             InitializeComponent();
+            swtTags.IsOn = Configs.ShowClassTags;
+            swtIcons.IsOn = Configs.ShowExplorerIcon;
+            swtThumbs.IsOn = Configs.ShowThumbnail;
         }
 
         public override ClassesPanel GetItemsPanel()
@@ -85,6 +88,7 @@ namespace ClassifyFiles.UI.Panel
 
         private async void SelectedClassChanged(object sender, SelectedClassChangedEventArgs e)
         {
+            GetProgress().Show(false);
             Debug.WriteLine("Selected Class Changed, Project Hashcode is " + Project.GetHashCode()
             + ", Class is " + (GetItemsPanel().SelectedItem == null ? "null" : GetItemsPanel().SelectedItem.Name));
             List<File> files = GetItemsPanel().SelectedItem == null ?
@@ -92,6 +96,7 @@ namespace ClassifyFiles.UI.Panel
                 : await GetFilesByClassAsync(GetItemsPanel().SelectedItem.ID);
             await filesViewer.SetFilesAsync(files);
             Dirs = filesViewer.Files == null ? null : new HashSet<string>(filesViewer.Files.Select(p => p.Dir));
+            GetProgress().Close();
         }
         public HashSet<string> dirs;
         public HashSet<string> Dirs
@@ -166,7 +171,7 @@ namespace ClassifyFiles.UI.Panel
             {
                 return;
             }
-            if(e.Data.GetDataPresent(nameof(ClassifyFiles)))
+            if (e.Data.GetDataPresent(nameof(ClassifyFiles)))
             {
                 return;
             }
@@ -193,16 +198,62 @@ namespace ClassifyFiles.UI.Panel
             SelectedClassChanged(null, null);
         }
 
-        private void btnAllFiles_Click(object sender, RoutedEventArgs e)
+        private async void btnAllFiles_Click(object sender, RoutedEventArgs e)
         {
             if (GetItemsPanel().SelectedItem == null)
             {
-                SelectedClassChanged(null, null);
+                await filesViewer.RefreshAsync();
             }
             else
             {
                 GetItemsPanel().SelectedItem = null;
             }
+        }
+
+        private async void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!IsLoaded)
+            {
+                return;
+            }
+            bool on = (sender as ToggleSwitch).IsOn;
+            Configs.ShowClassTags = on;
+            await filesViewer.RefreshAsync();
+        }
+
+        private async void swtThumbs_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!IsLoaded)
+            {
+                return;
+            }
+            bool on = (sender as ToggleSwitch).IsOn;
+            Configs.ShowThumbnail = on;
+            await filesViewer.RefreshAsync();
+        }
+
+        private async void swtIcons_Toggled(object sender, RoutedEventArgs e)
+        {
+
+            if (!IsLoaded)
+            {
+                return;
+            }
+            bool on = (sender as ToggleSwitch).IsOn;
+            Configs.ShowExplorerIcon = on;
+            await filesViewer.RefreshAsync();
+        }
+
+
+        private async void swtIconViewNames_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!IsLoaded)
+            {
+                return;
+            }
+            bool on = (sender as ToggleSwitch).IsOn;
+            Configs.ShowIconViewNames = on;
+            await filesViewer.RefreshAsync();
         }
     }
 }

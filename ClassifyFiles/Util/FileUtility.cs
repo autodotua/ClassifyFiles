@@ -88,27 +88,22 @@ namespace ClassifyFiles.Util
         }
         public static bool TryGenerateIcon(File file)
         {
-            if (file.IsFolder)
-            {
-                return false;
-            }
+           
             string path = file.GetAbsolutePath();
             try
             {
                 string guid = Guid.NewGuid().ToString();
                 var iconPath = GetIconPath(guid);
-                Icon icon = Icon.ExtractAssociatedIcon(path);
-                var bitmap = ShellEx.GetBitmapFromFilePath(path, ShellEx.IconSizeEnum.ExtraLargeIcon);
-              
-                //Rectangle cropRect = new Rectangle(0,0,32,32);
-                //Bitmap target = new Bitmap(cropRect.Width, cropRect.Height);
 
-                //using (Graphics g = Graphics.FromImage(target))
-                //{
-                //    g.DrawImage(bitmap, new Rectangle(0, 0, target.Width, target.Height),
-                //                     cropRect,
-                //                     GraphicsUnit.Pixel);
-                //}
+                Bitmap bitmap;
+                if (file.IsFolder)
+                {
+                    bitmap = ShellEx.GetBitmapFromFolderPath(path, ShellEx.IconSizeEnum.ExtraLargeIcon);
+                }
+                else
+                {
+                    bitmap = ShellEx.GetBitmapFromFilePath(path, ShellEx.IconSizeEnum.ExtraLargeIcon);
+                }
                 bitmap.Save(iconPath,ImageFormat.Png);
                 file.IconGUID = guid;
             }

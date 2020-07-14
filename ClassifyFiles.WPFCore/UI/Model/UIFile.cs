@@ -58,11 +58,11 @@ namespace ClassifyFiles.UI.Model
                     Glyph = type.Glyph;
                 }
 
-                PropertyChanged += async (p1, p2) =>
+                PropertyChanged += (p1, p2) =>
                  {
                      if (p2.PropertyName == nameof(ThumbnailGUID) || p2.PropertyName == nameof(IconGUID))
                      {
-                         this.Notify( nameof(Image));
+                         this.Notify(nameof(Image));
                      }
                  };
             }
@@ -70,6 +70,7 @@ namespace ClassifyFiles.UI.Model
 
         public string DisplayName => IsFolder ? new System.IO.DirectoryInfo(Dir).Name : Name;
         public string DisplayDir => IsFolder ? Dir.Substring(0, Dir.Length - DisplayName.Length) : Dir;
+        public bool ShowIconViewNames => Configs.ShowIconViewNames;
         public const string FileGlyph = "\uED41";
         public const string FolderGlyph = "\uED43";
         public string Glyph { get; set; } = FileGlyph;
@@ -84,7 +85,7 @@ namespace ClassifyFiles.UI.Model
         {
             get
             {
-                if(Configs.ShowThumbnail)
+                if (Configs.ShowThumbnail)
                 {
                     if (!string.IsNullOrEmpty(ThumbnailGUID))
                     {
@@ -97,7 +98,7 @@ namespace ClassifyFiles.UI.Model
                         }
                     }
                 }
-                if(Configs.ShowExplorerIcon)
+                if (Configs.ShowExplorerIcon)
                 {
                     if (!string.IsNullOrEmpty(IconGUID))
                     {
@@ -137,7 +138,7 @@ namespace ClassifyFiles.UI.Model
         public double FontSize { get; private set; } = 12;
         public double SmallFontSize { get; private set; } = 11;
         private static FontFamily font;
-        public double TotalIconViewHeight => LargeIconSize + FontSize * font.LineSpacing * 2;
+        public double TotalIconViewHeight => ShowIconViewNames ? LargeIconSize + 16 * 2 + 8 : LargeIconSize;
         public double TotalTileViewHeight => LargeIconSize + 32;
         public double TileTitleHeight => FontSize * font.LineSpacing * 2;
         public double TileDirHeight => SmallFontSize * font.LineSpacing * 2;

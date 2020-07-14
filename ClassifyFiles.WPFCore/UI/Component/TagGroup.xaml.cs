@@ -23,6 +23,10 @@ namespace ClassifyFiles.UI.Component
     {
         public TagGroup()
         {
+            if(!Configs.ShowClassTags)
+            {
+                return;
+            }
             InitializeComponent();
             grd.DataContext = this;
         }

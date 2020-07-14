@@ -129,7 +129,9 @@ namespace ClassifyFiles.UI.Panel
             foreach (var file in filesWithIcon)
             {
                 Files.Add(file);
+                await file.LoadAsync();
             }
+
             this.Notify(nameof(Files));
         }
 
@@ -232,6 +234,15 @@ namespace ClassifyFiles.UI.Panel
                 p.Start();
             }
         }
+
+        public async Task RefreshAsync()
+        {
+            FileIcon.Caches.Clear();
+            var files = Files;
+            Files = null;
+           await SetFilesAsync(files);
+        }
+
         public event EventHandler ViewTypeChanged;
         private void ViewTypeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -339,15 +350,16 @@ namespace ClassifyFiles.UI.Panel
                 menuOpenFolder.Click += OpenDirMernuItem_Click;
                 menu.Items.Add(menuOpenFolder);
             }
-            if (!files.Any(p => p.IsFolder))
+            if ((!files.Any(p => p.IsFolder) || CurrentViewType<4) && Project.Classes!=null)
             {
+                menu.Items.Add(new Separator());
                 foreach (var tag in Project.Classes)
                 {
                     CheckBox chk = new CheckBox()
                     {
                         Content = tag.Name,
-                        IsChecked = (!files.Any(p => p.Classes.Contains(tag))) ? false :
-                        files.All(p => p.Classes.Contains(tag)) ? true : (bool?)null
+                        IsChecked = (!files.Any(p => p.Classes.Any(q=>q.ID==tag.ID))) ? false :
+                        files.All(p => p.Classes.Any(q => q.ID == tag.ID)) ? true : (bool?)null
                     };
                     chk.Click += async (p1, p2) =>
                      {
@@ -357,7 +369,8 @@ namespace ClassifyFiles.UI.Panel
                              await AddFilesToClassAsync(files.Select(p => p.Raw), tag);
                              foreach (var file in files)
                              {
-                                 if (!file.Classes.Contains(tag))
+                                 var newC = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
+                                 if (newC==null)
                                  {
                                      file.Classes.Add(tag);
                                  }
@@ -368,9 +381,10 @@ namespace ClassifyFiles.UI.Panel
                              await RemoveFilesFromClass(files.Select(p => p.Raw), tag);
                              foreach (var file in files)
                              {
-                                 if (file.Classes.Contains(tag))
+                                 var c = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
+                                 if (c!=null)
                                  {
-                                     file.Classes.Remove(tag);
+                                     file.Classes.Remove(c);
                                  }
                              }
                          }
@@ -421,6 +435,10 @@ namespace ClassifyFiles.UI.Panel
                     scrollBar.ValueChanged += async delegate
                      {
                          Debug.WriteLine(scrollViewer.VerticalOffset + "  " + scrollViewer.ViewportHeight);
+                         if(Files==null)
+                         {
+                             return;
+                         }
                          await RealtimeRefresh(Files.Skip((int)scrollViewer.VerticalOffset).Take((int)scrollViewer.ViewportHeight + 5));
                      };
                 }
