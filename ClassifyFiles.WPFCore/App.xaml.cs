@@ -27,6 +27,8 @@ namespace ClassifyFiles.WPFCore
             {
                 Directory.CreateDirectory("thumb");
             }
+            Configs.InitializeAllValues();
+
             FileUtility.FFMpegPath = "exe/ffmpeg.exe";
             Current = this;
             SplashWindow.TryShow();

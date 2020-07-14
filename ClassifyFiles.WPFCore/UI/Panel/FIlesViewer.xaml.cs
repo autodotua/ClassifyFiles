@@ -407,7 +407,8 @@ namespace ClassifyFiles.UI.Panel
         }
 
         #region 自动生成缩略图、Tags
-        private ConcurrentDictionary<int, UIFile> generated = new ConcurrentDictionary<int, UIFile>();
+        private ConcurrentDictionary<int, UIFile> generatedThumbnails = new ConcurrentDictionary<int, UIFile>();
+        private ConcurrentDictionary<int, UIFile> generatedIcons = new ConcurrentDictionary<int, UIFile>();
 
         private void lvwFiles_Loaded(object sender, RoutedEventArgs e)
         {
@@ -450,27 +451,40 @@ namespace ClassifyFiles.UI.Panel
                 }
                 void Do(UIFile file)
                 {
-                    if (!generated.ContainsKey(file.ID) && file.ThumbnailGUID == null && file.ThumbnailGUID != "")
+                    if (Configs.ShowThumbnail)
                     {
-                        generated.TryAdd(file.ID, file);
-                        FileUtility.TryGenerateThumbnail(file);
-                        if (file.ThumbnailGUID != null)
+                        if (!generatedThumbnails.ContainsKey(file.ID) && file.ThumbnailGUID == null && file.ThumbnailGUID != "")
                         {
-                            file.Raw.ThumbnailGUID = file.ThumbnailGUID;
-                            file.LoadAsync(db).Wait();
+                            generatedThumbnails.TryAdd(file.ID, file);
+                            FileUtility.TryGenerateThumbnail(file);
+                            if (file.ThumbnailGUID != null)
+                            {
+                                file.Raw.ThumbnailGUID = file.ThumbnailGUID;
+                                file.LoadAsync(db).Wait();
+                            }
+                        }
+                    }
+                    if (Configs.ShowExplorerIcon&&(!Configs.ShowThumbnail || Configs.ShowThumbnail && string.IsNullOrEmpty(file.ThumbnailGUID)))
+                    {
+                        if (!generatedIcons.ContainsKey(file.ID) && file.IconGUID == null && file.IconGUID != "")
+                        {
+                            generatedIcons.TryAdd(file.ID, file);
+                            FileUtility.TryGenerateIcon(file);
+                            if (file.IconGUID != null)
+                            {
+                                file.Raw.IconGUID = file.IconGUID;
+                                file.LoadAsync(db).Wait();
+                            }
                         }
                     }
                 }
                 if (Configs.AutoThumbnails)
                 {
-                    Parallel.ForEach(files, new ParallelOptions() { MaxDegreeOfParallelism = Configs.RefreshThreadCount },async (file, state) =>
-                       {
-                           workingForeachState = state;
-                           await Task.Run(() =>
-                           {
-                               Do(file);
-                           });
-                       });
+                    Parallel.ForEach(files, new ParallelOptions() { MaxDegreeOfParallelism = Configs.RefreshThreadCount }, async (file, state) =>
+                        {
+                            workingForeachState = state;
+                            Do(file);
+                        });
                     if (!savingFiles)
                     {
                         savingFiles = true;
@@ -489,10 +503,6 @@ namespace ClassifyFiles.UI.Panel
                         }
                     }
                 }
-                //foreach (var file in files)
-                //{
-                //    await file.LoadAsync(db);
-                //}
             });
         }
         private static bool savingFiles = false;
@@ -617,7 +627,13 @@ namespace ClassifyFiles.UI.Panel
             }
             //判断鼠标是否在已经选中的项的上方
             var hasMouseOver = list.SelectedItems.Cast<object>().Any(p =>
-            (list.ItemContainerGenerator.ContainerFromItem(p) as ListBoxItem).IsMouseOver);
+            {
+                if (list.ItemContainerGenerator.ContainerFromItem(p) is ListBoxItem item)
+                {
+                    return item.IsMouseOver;
+                }
+                return false;
+            });
             if (hasMouseOver)
             {
                 ignoredSelect = true;

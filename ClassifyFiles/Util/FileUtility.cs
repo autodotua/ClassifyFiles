@@ -18,6 +18,7 @@ using FzLib.Basic;
 using static ClassifyFiles.Util.DbUtility;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using ClassifyFiles.Util.Shell;
 
 namespace ClassifyFiles.Util
 {
@@ -85,9 +86,47 @@ namespace ClassifyFiles.Util
             return false;
 
         }
+        public static bool TryGenerateIcon(File file)
+        {
+            if (file.IsFolder)
+            {
+                return false;
+            }
+            string path = file.GetAbsolutePath();
+            try
+            {
+                string guid = Guid.NewGuid().ToString();
+                var iconPath = GetIconPath(guid);
+                Icon icon = Icon.ExtractAssociatedIcon(path);
+                var bitmap = ShellEx.GetBitmapFromFilePath(path, ShellEx.IconSizeEnum.ExtraLargeIcon);
+              
+                //Rectangle cropRect = new Rectangle(0,0,32,32);
+                //Bitmap target = new Bitmap(cropRect.Width, cropRect.Height);
+
+                //using (Graphics g = Graphics.FromImage(target))
+                //{
+                //    g.DrawImage(bitmap, new Rectangle(0, 0, target.Width, target.Height),
+                //                     cropRect,
+                //                     GraphicsUnit.Pixel);
+                //}
+                bitmap.Save(iconPath,ImageFormat.Png);
+                file.IconGUID = guid;
+            }
+            catch (Exception ex)
+            {
+                file.IconGUID = "";
+            }
+            return false;
+
+        }
+
         public static string GetThumbnailPath(string guid)
         {
             return P.GetFullPath(P.Combine(ThumbnailFolderPath, guid + ".jpg"));
+        }
+        public static string GetIconPath(string guid)
+        {
+            return P.GetFullPath(P.Combine(ThumbnailFolderPath, guid + ".png"));
         }
         private static string CreateImageThumbnail(string img)
         {
@@ -123,7 +162,7 @@ namespace ClassifyFiles.Util
             }
             //string output = p.StandardOutput.ReadToEnd();
             //string error = p.StandardError.ReadToEnd();
-            if(!F.Exists(thumbnail))
+            if (!F.Exists(thumbnail))
             {
                 return null;
             }
@@ -392,14 +431,40 @@ namespace ClassifyFiles.Util
                 var files = db.Files.Where(p => p.ProjectID == projectID).AsEnumerable();
 
                 foreach (var file in files)
-                { 
-                    string path = GetThumbnailPath(file.ThumbnailGUID);
-                    if (F.Exists(path))
+                {
+                    if (!string.IsNullOrEmpty(file.ThumbnailGUID))
                     {
-                    F.Delete(path);
+                        string path = GetThumbnailPath(file.ThumbnailGUID);
+                        if (F.Exists(path))
+                        {
+                            try { 
+                            F.Delete(path);
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
+                        }
+                        file.ThumbnailGUID = null;
+                        db.Entry(file).State = EntityState.Modified;
                     }
-                    file.ThumbnailGUID = null;
-                    db.Entry(file).State = EntityState.Modified;
+                    if (!string.IsNullOrEmpty(file.IconGUID))
+                    {
+                        string path = GetIconPath(file.IconGUID);
+                        if (F.Exists(path))
+                        {
+                            try
+                            {
+                                F.Delete(path);
+                            }
+                            catch(Exception ex)
+                            {
+
+                            }
+                        }
+                        file.IconGUID = null;
+                        db.Entry(file).State = EntityState.Modified;
+                    }
                 }
                 db.SaveChanges();
                 //db.Database.ExecuteSqlRaw("VACUUM;");
@@ -407,6 +472,7 @@ namespace ClassifyFiles.Util
 
         }
     }
+
     public enum ExportFormat
     {
         [Description("文件名")]
@@ -416,4 +482,6 @@ namespace ClassifyFiles.Util
         [Description("树型")]
         Tree
     }
+
+
 }

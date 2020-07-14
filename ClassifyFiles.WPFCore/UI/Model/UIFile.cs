@@ -44,6 +44,7 @@ namespace ClassifyFiles.UI.Model
             ProjectID = file.ProjectID;
             SubFiles = file.SubFiles.Select(p => new UIFile(p)).Cast<File>().ToList();
             ThumbnailGUID = file.ThumbnailGUID;
+            IconGUID = file.IconGUID;
             if (IsFolder)
             {
                 Glyph = FolderGlyph;
@@ -59,9 +60,9 @@ namespace ClassifyFiles.UI.Model
 
                 PropertyChanged += async (p1, p2) =>
                  {
-                     if (p2.PropertyName == nameof(ThumbnailGUID))
+                     if (p2.PropertyName == nameof(ThumbnailGUID) || p2.PropertyName == nameof(IconGUID))
                      {
-                         this.Notify(/*nameof(IconVisibility), nameof(ImageVisibility),*/ nameof(Image));
+                         this.Notify( nameof(Image));
                      }
                  };
             }
@@ -83,18 +84,33 @@ namespace ClassifyFiles.UI.Model
         {
             get
             {
-                if (string.IsNullOrEmpty(ThumbnailGUID))
+                if(Configs.ShowThumbnail)
                 {
-                    return null;
+                    if (!string.IsNullOrEmpty(ThumbnailGUID))
+                    {
+                        try
+                        {
+                            return new BitmapImage(new Uri(FileUtility.GetThumbnailPath(ThumbnailGUID), UriKind.Absolute));
+                        }
+                        catch (Exception ex)
+                        {
+                        }
+                    }
                 }
-                try
+                if(Configs.ShowExplorerIcon)
                 {
-                    return new BitmapImage(new Uri(FileUtility.GetThumbnailPath(ThumbnailGUID), UriKind.Absolute));
+                    if (!string.IsNullOrEmpty(IconGUID))
+                    {
+                        try
+                        {
+                            return new BitmapImage(new Uri(FileUtility.GetIconPath(IconGUID), UriKind.Absolute));
+                        }
+                        catch (Exception ex)
+                        {
+                        }
+                    }
                 }
-                catch (Exception ex)
-                {
-                    return null;
-                }
+                return null;
             }
         }
         private static double defualtIconSize = 60;

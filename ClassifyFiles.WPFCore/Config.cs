@@ -13,6 +13,14 @@ namespace ClassifyFiles
 {
     public static class Configs
     {
+        public static void InitializeAllValues()
+        {
+            var a = Theme;
+            var b = AutoThumbnails;
+            var c = ShowExplorerIcon;
+            var d = showThumbnail;
+            var e = RefreshThreadCount;
+        }
         /// <summary>
         /// 两色暗色主题。1为亮色，-1为暗色，0为跟随系统
         /// </summary>
@@ -20,6 +28,8 @@ namespace ClassifyFiles
 
         private const string AutoThumbnailsKey = "AutoThumbnails";
         private const string RefreshThreadCountKey = "RefreshThreadCount";
+        private const string ShowExplorerIconKey = "ShowExplorerIcon";
+        private const string ShowThumbnailKey = "ShowThumbnail";
 
         private static int? theme = null;
         public static int Theme
@@ -70,6 +80,41 @@ namespace ClassifyFiles
             {
                 refreshThreadCount = value;
                 ConfigUtility.Set(RefreshThreadCountKey, value);
+            }
+        }
+        private static bool? showExplorerIcon = null;
+        public static bool ShowExplorerIcon
+        {
+            get
+            {
+                if (showExplorerIcon == null)
+                {
+                    showExplorerIcon = ConfigUtility.GetBool(ShowExplorerIconKey, true);
+                }
+                return showExplorerIcon.Value;
+            }
+            set
+            {
+                showExplorerIcon = value;
+                ConfigUtility.Set(ShowExplorerIconKey, value);
+            }
+        }
+
+        private static bool? showThumbnail = null;
+        public static bool ShowThumbnail
+        {
+            get
+            {
+                if (showThumbnail == null)
+                {
+                    showThumbnail = ConfigUtility.GetBool(ShowThumbnailKey, true);
+                }
+                return showThumbnail.Value;
+            }
+            set
+            {
+                showThumbnail = value;
+                ConfigUtility.Set(ShowThumbnailKey, value);
             }
         }
     }
