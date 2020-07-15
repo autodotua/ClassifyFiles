@@ -18,8 +18,9 @@ xmlns:app="clr-namespace:ClassifyFiles"
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
         <ui:IsNotNull2VisibilityConverter x:Key="nn2v"/>
         <DataTemplate x:Key="grdIconView">
-            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,4">
-                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"   Width="{Binding LargeIconSize}"    Height="{Binding TotalIconViewHeight}">
+            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,8">
+                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  
+                           Width="{Binding LargeIconSize}"    Height="{Binding TotalIconViewHeight}">
                     <DockPanel.ToolTip>
                         <ToolTip>
                             <m:SimpleStackPanel Spacing="8">
@@ -94,22 +95,27 @@ xmlns:app="clr-namespace:ClassifyFiles"
                 <DataTemplate>
                     <Grid Margin="0,4,24,4"  >
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="{Binding Size.SmallIconSize}"/>
+                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="16"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="16"/>
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="4"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="0"/>
+                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <component:FileIcon File="{Binding .}" Grid.RowSpan="99"/>
-                        <TextBlock Text="{Binding Display.DisplayName}" Grid.Column="2" Grid.Row="0"/>
-                        <TextBlock Text="{Binding Display.DisplayDir}" Grid.Column="2" Grid.Row="2" Opacity="0.5"/>
+                        <component:FileIcon File="{Binding .}" Grid.RowSpan="99" Width="{Binding Size.SmallIconSize}"/>
+                        <TextBlock Text="{Binding Display.DisplayName}" Grid.Column="2" Grid.ColumnSpan="3" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding Display.Length}"  Grid.Column="2" Grid.Row="2" Width="108"
+                                   Foreground="{ DynamicResource SystemControlBackgroundBaseMediumHighBrush}"/>
+                        <TextBlock Text="{Binding Display.DisplayDir}" Grid.Column="4" Grid.Row="2" 
+                                   Foreground="{ DynamicResource SystemControlBackgroundBaseMediumBrush}"/>
                         <!--横向的标签列表-->
-                        <component:TagGroup Grid.Column="4" Grid.RowSpan="99" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
+                        <component:TagGroup Grid.Column="99" Grid.RowSpan="99" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
                     </Grid>
                 </DataTemplate>
             </m:ListView.ItemTemplate>
@@ -122,7 +128,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate  ItemsSource="{Binding SubUIFiles}">
                     <StackPanel Orientation="Horizontal">
-                        <component:FileIcon File="{Binding .}"/>
+                        <component:FileIcon UseLargeIcon="False" File="{Binding .}"/>
                         <TextBlock VerticalAlignment="Center" FontSize="12" Margin="12,0,0,0" Text="{Binding Display.DisplayName}"/>
                         <component:TagGroup Margin="24,0,0,0" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
                     </StackPanel>
@@ -166,7 +172,6 @@ xmlns:app="clr-namespace:ClassifyFiles"
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <m:AppBarToggleButton Grid.Column="3"  Label="列表视图"  Click="ViewTypeButton_Click" Tag="1" IsChecked="True">
-
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon
                                     FontFamily="Segoe MDL2 Assets"

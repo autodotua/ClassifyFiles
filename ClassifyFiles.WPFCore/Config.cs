@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using IOPath = System.IO.Path;
+using static ClassifyFiles.Util. ConfigUtility;
 
 namespace ClassifyFiles
 {
@@ -21,17 +22,6 @@ namespace ClassifyFiles
             var d = showThumbnail;
             var e = RefreshThreadCount;
         }
-        /// <summary>
-        /// 两色暗色主题。1为亮色，-1为暗色，0为跟随系统
-        /// </summary>
-        private const string ThemeKey = "Theme";
-
-        private const string AutoThumbnailsKey = "AutoThumbnails";
-        private const string RefreshThreadCountKey = "RefreshThreadCount";
-        private const string ShowExplorerIconKey = "ShowExplorerIcon";
-        private const string ShowThumbnailKey = "ShowThumbnail";
-        private const string ShowClassTagsKey = "ShowClassTags";
-        private const string ShowIconViewNamesKey = "ShowIconViewNames";
 
         private static int? theme = null;
         public static int Theme
@@ -40,120 +30,93 @@ namespace ClassifyFiles
             {
                 if (theme == null)
                 {
-                    theme = ConfigUtility.GetInt(ThemeKey, 0);
+                    theme = ConfigUtility.GetInt(nameof(Theme), 0);
                 }
                 return theme.Value;
             }
             set
             {
                 theme = value;
-                ConfigUtility.Set(ThemeKey, value);
+                ConfigUtility.Set(nameof(Theme), value);
             }
         }
         private static bool? autoThumbnails = null;
         public static bool AutoThumbnails
         {
-            get
-            {
-                if (autoThumbnails == null)
-                {
-                    autoThumbnails = ConfigUtility.GetBool(AutoThumbnailsKey, true);
-                }
-                return autoThumbnails.Value;
-            }
-            set
-            {
-                autoThumbnails = value;
-                ConfigUtility.Set(AutoThumbnailsKey, value);
-            }
+            get => Get(ref autoThumbnails, GetBool, true, nameof(AutoThumbnails));
+            set => Set(ref autoThumbnails, value, nameof(AutoThumbnails));
         }
         private static int? refreshThreadCount = null;
         public static int RefreshThreadCount
         {
-            get
-            {
-                if (refreshThreadCount == null)
-                {
-                    refreshThreadCount = ConfigUtility.GetInt(RefreshThreadCountKey, 4);
-                }
-                return refreshThreadCount.Value;
-            }
-            set
-            {
-                refreshThreadCount = value;
-                ConfigUtility.Set(RefreshThreadCountKey, value);
-            }
+            get => Get(ref refreshThreadCount, GetInt, 4, nameof(RefreshThreadCount));
+            set => Set(ref refreshThreadCount, value, nameof(RefreshThreadCount));
         }
         private static bool? showExplorerIcon = null;
         public static bool ShowExplorerIcon
         {
-            get
-            {
-                if (showExplorerIcon == null)
-                {
-                    showExplorerIcon = ConfigUtility.GetBool(ShowExplorerIconKey, true);
-                }
-                return showExplorerIcon.Value;
-            }
-            set
-            {
-                showExplorerIcon = value;
-                ConfigUtility.Set(ShowExplorerIconKey, value);
-            }
+            get => Get(ref showExplorerIcon, GetBool, false, nameof(ShowExplorerIcon));
+            set => Set(ref showExplorerIcon, value, nameof(ShowExplorerIcon));
         }
 
         private static bool? showThumbnail = null;
         public static bool ShowThumbnail
         {
-            get
-            {
-                if (showThumbnail == null)
-                {
-                    showThumbnail = ConfigUtility.GetBool(ShowThumbnailKey, true);
-                }
-                return showThumbnail.Value;
-            }
-            set
-            {
-                showThumbnail = value;
-                ConfigUtility.Set(ShowThumbnailKey, value);
-            }
+            get => Get(ref showThumbnail, GetBool, true, nameof(ShowThumbnail));
+            set => Set(ref showThumbnail, value, nameof(ShowThumbnail));
         }
-        
+
         private static bool? showIconViewNames = null;
         public static bool ShowIconViewNames
         {
-            get
-            {
-                if (showIconViewNames == null)
-                {
-                    showIconViewNames = ConfigUtility.GetBool(ShowClassTagsKey, true);
-                }
-                return showIconViewNames.Value;
-            }
-            set
-            {
-                showIconViewNames = value;
-                ConfigUtility.Set(ShowClassTagsKey, value);
-            }
+            get => Get(ref showIconViewNames, GetBool, true, nameof(ShowIconViewNames));
+            set => Set(ref showIconViewNames, value, nameof(ShowIconViewNames));
         }
         private static bool? showClassTags = null;
         public static bool ShowClassTags
         {
-            get
-            {
-                if (showClassTags == null)
-                {
-                    showClassTags = ConfigUtility.GetBool(ShowClassTagsKey, true);
-                }
-                return showClassTags.Value;
-            }
-            set
-            {
-                showClassTags = value;
-                ConfigUtility.Set(ShowClassTagsKey, value);
-            }
+            get => Get(ref showClassTags, GetBool, true, nameof(ShowClassTags));
+            set => Set(ref showClassTags, value, nameof(ShowClassTags));
+        }
+        private static int? lastProjectID = null;
+        public static int LastProjectID
+        {
+            get => Get(ref lastProjectID, GetInt, 1, nameof(LastProjectID));
+            set => Set(ref lastProjectID, value, nameof(LastProjectID));
+        }     
+        private static int? lastClassID = null;
+
+
+        public static int LastClassID
+        {
+            get => Get(ref lastClassID, GetInt, 1, nameof(LastClassID));
+            set => Set(ref lastClassID, value, nameof(LastClassID));
+        }        
+        private static int? lastViewType = null;
+
+
+        public static int LastViewType
+        {
+            get => Get(ref lastViewType, GetInt, 1, nameof(LastViewType));
+            set => Set(ref lastViewType, value, nameof(LastViewType));
         }
 
+        public static event PropertyChangedEventHandler PropertyChanged;
+
+        private static T Get<T>(ref T? field,Func<string,T,T> dbGet,T defultValue,string key) where T : struct
+        {
+            if (field == null)
+            {
+                field = dbGet(key, defultValue);
+            }
+            return field.Value;
+        }
+
+        private static void Set<T>(ref T? field, T value,string key) where T : struct
+        {
+            field = value;
+            ConfigUtility.Set(key, value);
+            PropertyChanged?.Invoke(null, new PropertyChangedEventArgs(key));
+        }
     }
 }

@@ -61,6 +61,13 @@ namespace ClassifyFiles.UI.Panel
             FilesContent = FindResource("lvwFiles") as ListBox;
             new DragDropFilesHelper(FindResource("lvwFiles") as ListBox).Regist();
             new DragDropFilesHelper(FindResource("grdFiles") as ListBox).Regist();
+            var btn = grdAppBar.Children.OfType<AppBarToggleButton>()
+                .FirstOrDefault(p => int.Parse(p.Tag as string) == Configs.LastViewType);
+            if(btn!=null)
+            {
+                ViewTypeButton_Click(btn, new RoutedEventArgs());
+            }
+
         }
         private ObservableCollection<UIFile> files;
         public ObservableCollection<UIFile> Files
@@ -107,7 +114,6 @@ namespace ClassifyFiles.UI.Panel
                    foreach (var file in files)
                    {
                        UIFile uiFile = new UIFile(file);
-                       //await uiFile.LoadTagsAsync(Project);
                        filesWithIcon.Add(uiFile);
                    }
                });
@@ -261,10 +267,11 @@ namespace ClassifyFiles.UI.Panel
         public event EventHandler ViewTypeChanged;
         private void ViewTypeButton_Click(object sender, RoutedEventArgs e)
         {
-            int i = int.Parse((sender as FrameworkElement).Tag as string);
+            int type = int.Parse((sender as FrameworkElement).Tag as string);
             grdAppBar.Children.OfType<AppBarToggleButton>().ForEach(p => p.IsChecked = false);
             (sender as AppBarToggleButton).IsChecked = true;
-            ChangeViewType(i);
+            CurrentViewType = type;
+                ChangeViewType(type);
         }
 
         private void ChangeViewType(int type)
@@ -301,7 +308,7 @@ namespace ClassifyFiles.UI.Panel
             {
                 RealtimeRefresh(Files.Take(100));
             }
-            CurrentViewType = type;
+            Configs.LastViewType = CurrentViewType;
             ViewTypeChanged?.Invoke(this, new EventArgs());
         }
 

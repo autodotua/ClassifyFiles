@@ -11,6 +11,9 @@
     xmlns:m="http://schemas.modernwpf.com/2019"
     WindowStartupLocation="CenterScreen"
         Title="文件分类浏览器" Height="600" Width="1200" x:Name="win">
+    <local:WindowBase.Resources>
+        <local:IsNotNull2BoolConverter x:Key="nn2b"/>
+    </local:WindowBase.Resources> 
     <Grid x:Name="outGrd" >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -27,38 +30,21 @@
             <m:TabControlHelper.TabStripFooter>
                 <m:SimpleStackPanel HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
                     <m:CommandBar DefaultLabelPosition="Right" x:Name="cmdBarPanel" Background="Transparent">
-                        <m:AppBarToggleButton x:Name="btnModeView"  Background="Transparent"  Grid.Column="0"  Icon="View"  Label="浏览" Checked="RadioButton_Checked" IsChecked="True"/>
-                        <m:AppBarToggleButton x:Name="btnModeClasses" Background="Transparent" Grid.Column="0" Icon="List"  Label="分类" Checked="RadioButton_Checked"/>
-                        <m:AppBarToggleButton x:Name="btnModeProjectSettings"  Background="Transparent" Grid.Column="0" Icon="Setting"  Label="项目设置" Checked="RadioButton_Checked"/>
-
+                        <m:AppBarToggleButton IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}"
+                                              x:Name="btnModeView"  Background="Transparent"  Grid.Column="0"  Icon="View"  Label="浏览" 
+                                              Checked="RadioButton_Checked" IsChecked="True"/>
+                        <m:AppBarToggleButton IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}"
+                                              x:Name="btnModeClasses" Background="Transparent" Grid.Column="0" Icon="List"  Label="分类"
+                                              Checked="RadioButton_Checked"/>
+                        <m:AppBarToggleButton IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}"
+                                              x:Name="btnModeProjectSettings"  Background="Transparent" Grid.Column="0"  Label="项目设置"
+                                              Checked="RadioButton_Checked">
+                            <m:AppBarToggleButton.Icon>
+                                <m:FontIcon Glyph="&#xF259;"/>
+                            </m:AppBarToggleButton.Icon>
+                        </m:AppBarToggleButton>
+                        <m:AppBarButton Icon="Setting" Label="设置" LabelPosition="Collapsed" Click="SettingMenuItem_Click" />
                     </m:CommandBar>
-                    <m:DropDownButton  Background="Transparent">
-                        <m:SymbolIcon Symbol="Setting"/>
-                        <m:DropDownButton.Flyout>
-                            <m:CommandBarFlyout Placement="Bottom">
-                                <m:CommandBarFlyout.SecondaryCommands>
-                                    <m:AppBarButton Icon="Setting" Label="设置"  Click="SettingMenuItem_Click" />
-                                    <m:AppBarButton Label="关于"  Click="AboutMenu_Click" >
-                                        <m:AppBarButton.Icon>
-                                            <m:FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xECAA;"/>
-                                        </m:AppBarButton.Icon>
-                                    </m:AppBarButton>  
-                                    <m:AppBarButton Label="导入"  Click="ImportMenu_Click" >
-                                        <m:AppBarButton.Icon>
-                                            <m:FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE8B5;"/>
-                                        </m:AppBarButton.Icon>
-                                    </m:AppBarButton>
-                                    <m:AppBarButton Label="导出"  Click="ExportMenu_Click" >
-                                        <m:AppBarButton.Icon>
-                                            <m:FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEDE1;"/>
-                                        </m:AppBarButton.Icon>
-                                    </m:AppBarButton>
-                                    <m:AppBarButton Icon="Delete" Label="删除所有项目"  Click="DeleteAllMenu_Click" />
-
-                                </m:CommandBarFlyout.SecondaryCommands>
-                            </m:CommandBarFlyout>
-                        </m:DropDownButton.Flyout>
-                    </m:DropDownButton>
                 </m:SimpleStackPanel>
             </m:TabControlHelper.TabStripFooter>
             <TabControl.ItemTemplate>
@@ -73,7 +59,7 @@
             </TabControl.ContentTemplate>
         </TabControl>
    
-        <ContentControl Content="{Binding MainPanel}" Grid.Row="2"/>
+        <ContentControl Content="{Binding MainPanel}" Grid.Row="2" IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}"/>
 
         <local:ProgressDialog x:Name="Progress" Grid.RowSpan="999" Grid.ColumnSpan="999"/>
     </Grid>

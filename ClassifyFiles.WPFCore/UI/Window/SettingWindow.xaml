@@ -31,10 +31,31 @@
                 </GroupBox>
 
                 <GroupBox Header="数据库">
-                    <Button Content="压缩数据库" Click="ZipDatabaseButton_Click"/>
+                    <m:SimpleStackPanel Spacing="12" Orientation="Horizontal">
+                        <Button Background="Red" Foreground="White"   >
+                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                                <m:SymbolIcon Symbol="Delete" VerticalAlignment="Center"/>
+                                <TextBlock  VerticalAlignment="Center">删除所有数据库</TextBlock>
+                            </m:SimpleStackPanel>
+                            <m:FlyoutService.Flyout>
+                                <m:Flyout x:Name="flyoutDeleteProjects">
+                                    <m:SimpleStackPanel Spacing="8">
+                                        <TextBlock>即将删除所有项目。这不会删除硬盘中的物理文件。</TextBlock>
+                                        <Button Content="确定" Click="DeleteProjects_Click" />
+                                    </m:SimpleStackPanel>
+                                </m:Flyout>
+                            </m:FlyoutService.Flyout>
+                        </Button>
+                        <Button Content="压缩数据库" Click="ZipDatabaseButton_Click"/>
+                        <Button Content="导入" Click="ImportMenu_Click"/>
+                        <Button Content="导出" Click="ExportMenu_Click"/>
+
+                    </m:SimpleStackPanel>
                 </GroupBox>
                 </m:SimpleStackPanel>
         </ScrollViewer>
+        <local:ProgressDialog x:Name="Progress" Margin="-12" Grid.RowSpan="999" Grid.ColumnSpan="999"/>
+
     </Grid>
 
 </local:WindowBase>

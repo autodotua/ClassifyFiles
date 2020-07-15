@@ -9,10 +9,5 @@
                      xmlns:m="http://schemas.modernwpf.com/2019"   
                      Loaded="UserControlBase_Loaded">
 
-    <ContentControl x:Name="main">
-        <!--<m:ProgressRing IsActive="True"
-        x:Name="ring"
-        Width="24"
-        Height="24"/>-->
-    </ContentControl>
+    <ContentControl x:Name="main"/>
 </ui:UserControlBase>

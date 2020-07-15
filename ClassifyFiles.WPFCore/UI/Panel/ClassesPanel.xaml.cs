@@ -5,6 +5,7 @@ using FzLib.Extension;
 using static ClassifyFiles.Util.ClassUtility;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -21,8 +22,12 @@ namespace ClassifyFiles.UI.Panel
         public async Task LoadAsync(Project project)
         {
             Project = project;
-            var treeClasses = await GetClassesAsync(Project);
-            Items = new ObservableCollection<Class>(treeClasses);
+            var classes = await GetClassesAsync(Project);
+            Items = new ObservableCollection<Class>(classes);
+            if(Items.Any(p=>p.ID== Configs.LastClassID))
+            {
+                SelectedItem = items.First(p => p.ID == Configs.LastClassID);
+            }
         }
 
         private ObservableCollection<Class> items;
@@ -48,6 +53,10 @@ namespace ClassifyFiles.UI.Panel
                 var oldValue = selectedItem;
                 selectedItem = value;
                 this.Notify(nameof(SelectedItem));
+                if(value!=null)
+                {
+                    Configs.LastClassID = value.ID;
+                }
                 SelectedClassChanged?.Invoke(this, new SelectedClassChangedEventArgs(oldValue, value));
             }
         }

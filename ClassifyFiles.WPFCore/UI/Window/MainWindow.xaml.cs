@@ -58,6 +58,10 @@ namespace ClassifyFiles.UI
                 if (value != null)
                 {
                     value.PropertyChanged += Project_PropertyChanged;
+                    if(value.ID!= Configs.LastProjectID)
+                    {
+                        Configs.LastProjectID = value.ID;
+                    }
                 }
                 LoadProjectAsync();
             }
@@ -69,9 +73,9 @@ namespace ClassifyFiles.UI
 
         public MainWindow()
         {
-            InitializeComponent(); 
-            
-          
+            InitializeComponent();
+
+
         }
 
 
@@ -96,7 +100,7 @@ namespace ClassifyFiles.UI
                 Progress.Show(false);
                 try
                 {
-                    MainPanel =Activator.CreateInstance(MainPanel.GetType()) as ILoadable;
+                    MainPanel = Activator.CreateInstance(MainPanel.GetType()) as ILoadable;
                     await MainPanel.LoadAsync(SelectedProject);
                 }
                 catch (Exception ex)
@@ -112,8 +116,14 @@ namespace ClassifyFiles.UI
             {
                 Projects.Add(await AddProjectAsync());
             }
-            SelectedProject = Projects[0];
-
+            if (Projects.Any(p => p.ID == Configs.LastProjectID))
+            {
+                SelectedProject = Projects.First(p => p.ID == Configs.LastProjectID);
+            }
+            else
+            {
+                SelectedProject = Projects[0];
+            }
         }
 
         public ILoadable mainPanel = new FileBrowserPanel();
@@ -135,7 +145,7 @@ namespace ClassifyFiles.UI
 
         private void SettingMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            SettingWindow win = new SettingWindow() { Owner = this };
+            SettingWindow win = new SettingWindow(Projects) { Owner = this };
             win.ShowDialog();
         }
 
@@ -149,7 +159,7 @@ namespace ClassifyFiles.UI
             }
             ToggleButton btn = sender as ToggleButton;
             var a = cmdBarPanel.Content;
-            foreach (var t in cmdBarPanel.PrimaryCommands)
+            foreach (var t in cmdBarPanel.PrimaryCommands.OfType<ToggleButton>())
             {
                 (t as ToggleButton).IsChecked = btn == t;
             }
@@ -179,73 +189,11 @@ namespace ClassifyFiles.UI
             await LoadProjectAsync();
         }
 
-        private void SettingMenu_Click(object sender, RoutedEventArgs e)
-        {
-            new SettingWindow() { Owner = this }.ShowDialog();
-        }
-
         private async void AddProjectButton_Click(object sender, RoutedEventArgs e)
         {
             Project project = await AddProjectAsync();
             Projects.Add(project);
             SelectedProject = project;
-        }
-
-
-        private void AboutMenu_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private async void ImportMenu_Click(object sender, RoutedEventArgs e)
-        {
-            CommonOpenFileDialog dialog = new CommonOpenFileDialog()
-            {
-                Title = "请选择导入的文件",
-            };
-            dialog.Filters.Add(new CommonFileDialogFilter("SQLite数据库", "db"));
-            dialog.Filters.Add(new CommonFileDialogFilter("所有文件", "*"));
-            if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
-            {
-                string path = dialog.FileName;
-                Progress.Show(true);
-                var projects = await ImportAsync(path);
-                Progress.Close();
-                await new MessageDialog().ShowAsync("导入成功", "导出");
-                projects.ForEach(p => Projects.Add(p));
-            }
-        }
-
-        private async void ExportMenu_Click(object sender, RoutedEventArgs e)
-        {
-            CommonSaveFileDialog dialog = new CommonSaveFileDialog()
-            {
-                Title = "请选择导出的位置",
-                DefaultFileName = "文件分类"
-            };
-            dialog.Filters.Add(new CommonFileDialogFilter("SQLite数据库", "db"));
-            if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
-            {
-                string path = dialog.FileName;
-                Progress.Show(true);
-                await ExportAllAsync(path);
-                Progress.Close();
-                await new MessageDialog().ShowAsync("导出成功", "导出");
-            }
-
-        }
-
-        private async void DeleteAllMenu_Click(object sender, RoutedEventArgs e)
-        {
-            if (await new ConfirmDialog().ShowAsync("真的要删除所有项目吗？", "删除"))
-            {
-                foreach (var project in Projects.ToArray())
-                {
-                    await DeleteProjectAsync(project);
-                    Projects.Remove(project);
-                }
-                await new MessageDialog().ShowAsync("删除成功", "删除");
-            }
         }
     }
 }

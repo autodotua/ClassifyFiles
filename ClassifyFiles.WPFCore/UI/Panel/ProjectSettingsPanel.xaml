@@ -19,12 +19,6 @@
             <GroupBox Header="项目名">
                 <TextBox Text="{Binding Project.Name}"   VerticalAlignment="Center"  FontSize="24"/>
             </GroupBox>
-            <!--<GroupBox Header="分类方式">
-                <m:SimpleStackPanel Spacing="12" Orientation="Horizontal">
-                    <RadioButton x:Name="rbtnTypeFileProps" Checked="rbtnTypeFileProps_Checked">文件属性</RadioButton>
-                    <RadioButton x:Name="rbtnTypeTag" Checked="rbtnTypeFileProps_Checked">标签</RadioButton>
-                </m:SimpleStackPanel>         
-            </GroupBox>-->
             <GroupBox Header="项目根目录">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -61,7 +55,7 @@
                             <m:FlyoutService.Flyout>
                                 <m:Flyout x:Name="flyoutDeleteFiles">
                                     <m:SimpleStackPanel Spacing="8">
-                                        <TextBlock>即将删除项目中的文件。这部删除硬盘中的物理文件。</TextBlock>
+                                        <TextBlock>即将删除项目中的文件。这不会删除硬盘中的物理文件。</TextBlock>
                                         <Button Content="确定" Click="DeleteFiles_Click" />
                                     </m:SimpleStackPanel>
                                 </m:Flyout>
