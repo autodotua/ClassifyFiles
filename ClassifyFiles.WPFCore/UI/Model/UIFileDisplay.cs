@@ -43,6 +43,10 @@ namespace ClassifyFiles.UI.Model
         {
             get
             {
+                if(File.IsFolder)
+                {
+                    return "文件夹";
+                }
                 if (length == null)
                 {
                     try

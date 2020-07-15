@@ -37,6 +37,8 @@ xmlns:app="clr-namespace:ClassifyFiles"
                 </DockPanel>
             </Border>
         </DataTemplate>
+        
+        
         <DataTemplate x:Key="grdTileView">
             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,0,0,4">
                 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="{Binding Size.TotalTileViewHeight}">
@@ -62,6 +64,34 @@ xmlns:app="clr-namespace:ClassifyFiles"
                 </Grid>
             </Border>
         </DataTemplate>
+        <HierarchicalDataTemplate  ItemsSource="{Binding SubUIFiles}"   x:Key="listDataTemplate">
+
+            <Grid Margin="0,4,24,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="0"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <component:FileIcon File="{Binding .}" Grid.RowSpan="99" Width="{Binding Size.SmallIconSize}"/>
+                <TextBlock Text="{Binding Display.DisplayName}" Grid.Column="2" Grid.ColumnSpan="3" FontWeight="Bold"/>
+                <TextBlock Text="{Binding Display.Length}"  Grid.Column="2" Grid.Row="2" Width="108"
+                                   Foreground="{ DynamicResource SystemControlBackgroundBaseMediumHighBrush}"/>
+                <TextBlock Text="{Binding Display.DisplayDir}" Grid.Column="4" Grid.Row="2" 
+                                   Foreground="{ DynamicResource SystemControlBackgroundBaseMediumBrush}"/>
+                <!--横向的标签列表-->
+                <component:TagGroup Grid.Column="99" Grid.RowSpan="99" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
+            </Grid>
+        </HierarchicalDataTemplate>
+
 
         <ContextMenu x:Key="menu" Opened="ContextMenu_Opened"  Closed="ContextMenu_Closed">
         </ContextMenu>
@@ -85,56 +115,17 @@ xmlns:app="clr-namespace:ClassifyFiles"
 
         <m:ListView  Grid.Row="4" ItemsSource="{Binding Files}" x:Key="lvwFiles" SelectionMode="Extended"
                     Loaded="lvwFiles_Loaded"  PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
-                        ContextMenu="{StaticResource menu}"  >
+                        ContextMenu="{StaticResource menu}"  ItemTemplate="{StaticResource listDataTemplate}">
             <m:ListView.ItemContainerStyle >
                 <Style TargetType="{x:Type m:ListViewItem}">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                 </Style>
             </m:ListView.ItemContainerStyle>
-            <m:ListView.ItemTemplate>
-                <DataTemplate>
-                    <Grid Margin="0,4,24,4"  >
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="16"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="16"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="16"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="0"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <component:FileIcon File="{Binding .}" Grid.RowSpan="99" Width="{Binding Size.SmallIconSize}"/>
-                        <TextBlock Text="{Binding Display.DisplayName}" Grid.Column="2" Grid.ColumnSpan="3" FontWeight="Bold"/>
-                        <TextBlock Text="{Binding Display.Length}"  Grid.Column="2" Grid.Row="2" Width="108"
-                                   Foreground="{ DynamicResource SystemControlBackgroundBaseMediumHighBrush}"/>
-                        <TextBlock Text="{Binding Display.DisplayDir}" Grid.Column="4" Grid.Row="2" 
-                                   Foreground="{ DynamicResource SystemControlBackgroundBaseMediumBrush}"/>
-                        <!--横向的标签列表-->
-                        <component:TagGroup Grid.Column="99" Grid.RowSpan="99" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
-                    </Grid>
-                </DataTemplate>
-            </m:ListView.ItemTemplate>
         </m:ListView>
 
         <TreeView x:Key="treeFiles"  ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
                                           Grid.Row="4"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
-                  TreeViewItem.Expanded="TreeItems_Expanded">
-
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate  ItemsSource="{Binding SubUIFiles}">
-                    <StackPanel Orientation="Horizontal">
-                        <component:FileIcon UseLargeIcon="False" File="{Binding .}"/>
-                        <TextBlock VerticalAlignment="Center" FontSize="12" Margin="12,0,0,0" Text="{Binding Display.DisplayName}"/>
-                        <component:TagGroup Margin="24,0,0,0" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
+                  TreeViewItem.Expanded="TreeItems_Expanded" ItemTemplate="{StaticResource listDataTemplate}"/>
 
     </UserControl.Resources>
     <Grid  Margin="8,4,0,4" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
