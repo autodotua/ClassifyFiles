@@ -75,7 +75,9 @@ namespace ClassifyFiles.UI.Panel
         /// <summary>
         /// 供树状图使用的文件树
         /// </summary>
-        public List<UIFile> FileTree => Files == null ? null : new List<UIFile>(FileUtility.GetFileTree(Files).SubFiles.Cast<UIFile>());
+        public List<UIFile> FileTree => Files == null ? null : new List<UIFile>(
+            FileUtility.GetFileTree<UIFile>(Project, Files,p=>new UIFile(p),p=>p.File.Dir,p=>p.SubUIFiles)
+            .SubUIFiles);
 
         private double iconSize = 64;
         public double IconSize
@@ -91,7 +93,7 @@ namespace ClassifyFiles.UI.Panel
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public async Task SetFilesAsync(IEnumerable<File> files, bool tags = true)
+        public async Task SetFilesAsync(IEnumerable<File> files)
         {
             if (files == null || !files.Any())
             {
@@ -110,6 +112,19 @@ namespace ClassifyFiles.UI.Panel
                    }
                });
                 Files = new ObservableCollection<UIFile>(filesWithIcon);
+                await Task.Delay(100);//不延迟大概率会一直转圈
+                await RealtimeRefresh(Files.Take(100));
+            }
+        }
+        public async Task SetFilesAsync(IEnumerable<UIFile> files)
+        {
+            if (files == null || !files.Any())
+            {
+                Files = new ObservableCollection<UIFile>();
+            }
+            else
+            {
+                Files = new ObservableCollection<UIFile>(files);
                 await Task.Delay(100);//不延迟大概率会一直转圈
                 await RealtimeRefresh(Files.Take(100));
             }
@@ -158,7 +173,7 @@ namespace ClassifyFiles.UI.Panel
         {
             try
             {
-                File file = GetSelectedFile();
+                File file = GetSelectedFile()?.File;
                 if (file != null)
                 {
                     if (file.IsFolder)//是目录
@@ -195,8 +210,8 @@ namespace ClassifyFiles.UI.Panel
 
             if (Keyboard.IsKeyDown(Key.LeftCtrl))
             {
-                UIFile.DefualtIconSize += e.Delta / 30;
-                Files.ForEach(p => p.UpdateIconSize());
+                UIFileSize.DefualtIconSize += e.Delta / 30;
+                Files.ForEach(p => p.Size.UpdateIconSize());
                 e.Handled = true;
             }
         }
@@ -228,7 +243,7 @@ namespace ClassifyFiles.UI.Panel
                 p.StartInfo = new ProcessStartInfo()
                 {
                     FileName = "explorer.exe",
-                    Arguments = $"/select, \"{GetSelectedFile().GetAbsolutePath(false)}\"",
+                    Arguments = $"/select, \"{GetSelectedFile().File.GetAbsolutePath(false)}\"",
                     UseShellExecute = true
                 };
                 p.Start();
@@ -296,11 +311,11 @@ namespace ClassifyFiles.UI.Panel
             switch (CurrentViewType)
             {
                 case 1:
-                    file = Files.FirstOrDefault(p => p.Dir == dir);
+                    file = Files.FirstOrDefault(p => p.File.Dir == dir);
                     break;
                 case 2:
                 case 3:
-                    file = Files.FirstOrDefault(p => p.Dir == dir);
+                    file = Files.FirstOrDefault(p => p.File.Dir == dir);
                     break;
                 default:
                     break;
@@ -331,7 +346,7 @@ namespace ClassifyFiles.UI.Panel
             {
                 TagGroup tg = sender as TagGroup;
 
-                await RemoveFilesFromClass(new File[] { tg.File.Raw }, c);
+                await RemoveFilesFromClass(new File[] { tg.File.File }, c);
                 tg.File.Classes.Remove(c);
             }
             e.Handled = true;
@@ -350,7 +365,7 @@ namespace ClassifyFiles.UI.Panel
                 menuOpenFolder.Click += OpenDirMernuItem_Click;
                 menu.Items.Add(menuOpenFolder);
             }
-            if ((!files.Any(p => p.IsFolder) || CurrentViewType<4) && Project.Classes!=null)
+            if ((!files.Any(p => p.File.IsFolder) || CurrentViewType<4) && Project.Classes!=null)
             {
                 menu.Items.Add(new Separator());
                 foreach (var tag in Project.Classes)
@@ -366,7 +381,7 @@ namespace ClassifyFiles.UI.Panel
                          GetProgress().Show(false);
                          if (chk.IsChecked == true)
                          {
-                             await AddFilesToClassAsync(files.Select(p => p.Raw), tag);
+                             await AddFilesToClassAsync(files.Select(p => p.File), tag);
                              foreach (var file in files)
                              {
                                  var newC = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
@@ -378,7 +393,7 @@ namespace ClassifyFiles.UI.Panel
                          }
                          else
                          {
-                             await RemoveFilesFromClass(files.Select(p => p.Raw), tag);
+                             await RemoveFilesFromClass(files.Select(p => p.File), tag);
                              foreach (var file in files)
                              {
                                  var c = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
@@ -402,7 +417,7 @@ namespace ClassifyFiles.UI.Panel
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
                 string txt = sender.Text.ToLower();
-                var suggestions = Files == null ? new List<UIFile>() : Files.Where(p => p.Name.ToLower().Contains(txt)).ToList();
+                var suggestions = Files == null ? new List<UIFile>() : Files.Where(p => p.File.Name.ToLower().Contains(txt)).ToList();
 
                 sender.ItemsSource = suggestions.Count > 0 ?
                     suggestions : new string[] { "结果为空" } as IEnumerable;
@@ -471,26 +486,24 @@ namespace ClassifyFiles.UI.Panel
                 {
                     if (Configs.ShowThumbnail)
                     {
-                        if (!generatedThumbnails.ContainsKey(file.ID) && file.ThumbnailGUID == null && file.ThumbnailGUID != "")
+                        if (!generatedThumbnails.ContainsKey(file.File.ID) && file.File.ThumbnailGUID == null && file.File.ThumbnailGUID != "")
                         {
-                            generatedThumbnails.TryAdd(file.ID, file);
-                            FileUtility.TryGenerateThumbnail(file);
-                            if (file.ThumbnailGUID != null)
+                            generatedThumbnails.TryAdd(file.File.ID, file);
+                            FileUtility.TryGenerateThumbnail(file.File);
+                            if (file.File.ThumbnailGUID != null)
                             {
-                                file.Raw.ThumbnailGUID = file.ThumbnailGUID;
                                 file.LoadAsync(db).Wait();
                             }
                         }
                     }
-                    if (Configs.ShowExplorerIcon&&(!Configs.ShowThumbnail || Configs.ShowThumbnail && string.IsNullOrEmpty(file.ThumbnailGUID)))
+                    if (Configs.ShowExplorerIcon&&(!Configs.ShowThumbnail || Configs.ShowThumbnail && string.IsNullOrEmpty(file.File.ThumbnailGUID)))
                     {
-                        if (!generatedIcons.ContainsKey(file.ID) && file.IconGUID == null && file.IconGUID != "")
+                        if (!generatedIcons.ContainsKey(file.File.ID) && file.File.IconGUID == null && file.File.IconGUID != "")
                         {
-                            generatedIcons.TryAdd(file.ID, file);
-                            FileUtility.TryGenerateIcon(file);
-                            if (file.IconGUID != null)
+                            generatedIcons.TryAdd(file.File.ID, file);
+                            FileUtility.TryGenerateIcon(file.File);
+                            if (file.File.IconGUID != null)
                             {
-                                file.Raw.IconGUID = file.IconGUID;
                                 file.LoadAsync(db).Wait();
                             }
                         }
@@ -509,7 +522,7 @@ namespace ClassifyFiles.UI.Panel
                         try
                         {
                             savingFiles = true;
-                            await FileUtility.SaveFilesAsync(files.Where(p => p.ThumbnailGUID != null).Select(p => p.Raw));
+                            await FileUtility.SaveFilesAsync(files.Where(p => p.File.ThumbnailGUID != null).Select(p => p.File));
                         }
                         catch (Exception ex)
                         {
@@ -528,7 +541,7 @@ namespace ClassifyFiles.UI.Panel
         private async void TreeItems_Expanded(object sender, RoutedEventArgs e)
         {
             var files = ((e.OriginalSource as TreeViewItem).DataContext as UIFile)
-                .SubFiles.Where(p => !p.IsFolder).Cast<UIFile>();
+                .SubUIFiles.Where(p => !p.File.IsFolder);
             await RealtimeRefresh(files);
             (e.OriginalSource as TreeViewItem).UpdateLayout();
         }
@@ -601,7 +614,7 @@ namespace ClassifyFiles.UI.Panel
             if (!set && mouseDown && distance > 10)
             {
                 set = true;
-                var files = list.SelectedItems.Cast<UIFile>().Select(p => p.GetAbsolutePath()).ToArray();
+                var files = list.SelectedItems.Cast<UIFile>().Select(p => p.File.GetAbsolutePath()).ToArray();
                 if (files.Length == 0)
                 {
                     return;

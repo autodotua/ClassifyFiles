@@ -95,7 +95,7 @@ namespace ClassifyFiles.UI.Panel
                 await GetFilesByProjectAsync(Project.ID)
                 : await GetFilesByClassAsync(GetItemsPanel().SelectedItem.ID);
             await filesViewer.SetFilesAsync(files);
-            Dirs = filesViewer.Files == null ? null : new HashSet<string>(filesViewer.Files.Select(p => p.Dir));
+            Dirs = filesViewer.Files == null ? null : new HashSet<string>(filesViewer.Files.Select(p => p.File.Dir));
             GetProgress().Close();
         }
         public HashSet<string> dirs;

@@ -19,79 +19,118 @@ using static ClassifyFiles.Util.DbUtility;
 using ClassifyFiles.WPFCore;
 using System.Windows.Media;
 using ClassifyFiles.UI.Component;
+using System.ComponentModel;
 
 namespace ClassifyFiles.UI.Model
 {
-    public class UIFile : File
+    public class UIFile : INotifyPropertyChanged
     {
         public UIFile()
         {
-            if (font == null)
-            {
-                App.Current.Dispatcher.Invoke(() =>
-                {
-                    font = App.Current.MainWindow.FontFamily;
-                });
-            }
+
         }
         public UIFile(File file) : this()
         {
-            Raw = file;
-            ID = file.ID;
-            Name = file.Name;
-            Dir = file.Dir;
-            Project = file.Project;
-            ProjectID = file.ProjectID;
-            SubFiles = file.SubFiles.Select(p => new UIFile(p)).Cast<File>().ToList();
-            ThumbnailGUID = file.ThumbnailGUID;
-            IconGUID = file.IconGUID;
-            if (IsFolder)
+            File = file;
+            SubUIFiles = file.SubFiles.Select(p => new UIFile(p)).ToList();
+            Display = new UIFileDisplay(file);
+            Size = new UIFileSize();
+
+        }
+        public List<UIFile> SubUIFiles { get; private set; } = new List<UIFile>();
+
+
+        public File File { get; private set; }
+        private bool loaded = false;
+        public UIFileSize Size { get; set; }
+        public UIFileDisplay Display { get; set; }
+        public async Task LoadAsync(AppDbContext db = null)
+        {
+            if (!loaded)
+            {
+                loaded = true;
+                IEnumerable<Class> classes;
+                if (db == null)
+                {
+                    classes = await GetClassesOfFileAsync(File.ID);
+                }
+                else
+                {
+                    classes = await GetClassesOfFileAsync(db, File.ID);
+                }
+                Classes = new ObservableCollection<Class>(classes);
+            }
+            Load?.Invoke(this, new EventArgs());
+        }
+        public event EventHandler Load;
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private ObservableCollection<Class> classes;
+        public ObservableCollection<Class> Classes
+        {
+            get => classes;
+            set
+            {
+                classes = value;
+                this.Notify(nameof(Classes));
+            }
+        }
+        public override string ToString()
+        {
+            return File.Name + (string.IsNullOrEmpty(File.Dir) ? "" : $" （{File.Dir}）");
+        }
+    }
+
+    public class UIFileDisplay:INotifyPropertyChanged
+    {
+        public UIFileDisplay(File file)
+        {
+            File = file;
+
+            if (file.IsFolder)
             {
                 Glyph = FolderGlyph;
             }
             else
             {
-                string ext = System.IO.Path.GetExtension(Name).ToLower().TrimStart('.');
+                string ext = System.IO.Path.GetExtension(file.Name).ToLower().TrimStart('.');
                 FileType type = FileType.FileTypes.FirstOrDefault(p => p.Extensions.Contains(ext));
                 if (type != null)
                 {
                     Glyph = type.Glyph;
                 }
 
-                PropertyChanged += (p1, p2) =>
-                 {
-                     if (p2.PropertyName == nameof(ThumbnailGUID) || p2.PropertyName == nameof(IconGUID))
-                     {
-                         this.Notify(nameof(Image));
-                     }
-                 };
+                file.PropertyChanged += (p1, p2) =>
+                {
+                    if (p2.PropertyName == nameof(file.ThumbnailGUID) || p2.PropertyName == nameof(file.IconGUID))
+                    {
+                        this.Notify(nameof(Image));
+                    }
+                };
             }
         }
-
-        public string DisplayName => IsFolder ? new System.IO.DirectoryInfo(Dir).Name : Name;
-        public string DisplayDir => IsFolder ? Dir.Substring(0, Dir.Length - DisplayName.Length) : Dir;
+        public File File { get; private set; }
+        public string DisplayName => File.IsFolder ? new System.IO.DirectoryInfo(File.Dir).Name : File.Name;
+        public string DisplayDir => File.IsFolder ? File.Dir.Substring(0, File.Dir.Length - DisplayName.Length) : File.Dir;
         public bool ShowIconViewNames => Configs.ShowIconViewNames;
         public const string FileGlyph = "\uED41";
         public const string FolderGlyph = "\uED43";
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public string Glyph { get; set; } = FileGlyph;
-        /// <summary>
-        /// 无缩略图时的图标样式
-        /// </summary>
         public Symbol Symbol { get; set; } = Symbol.OpenFile;
-        /// <summary>
-        /// 缩略图
-        /// </summary>
         public BitmapImage Image
         {
             get
             {
                 if (Configs.ShowThumbnail)
                 {
-                    if (!string.IsNullOrEmpty(ThumbnailGUID))
+                    if (!string.IsNullOrEmpty(File.ThumbnailGUID))
                     {
                         try
                         {
-                            return new BitmapImage(new Uri(FileUtility.GetThumbnailPath(ThumbnailGUID), UriKind.Absolute));
+                            return new BitmapImage(new Uri(FileUtility.GetThumbnailPath(File.ThumbnailGUID), UriKind.Absolute));
                         }
                         catch (Exception ex)
                         {
@@ -100,11 +139,11 @@ namespace ClassifyFiles.UI.Model
                 }
                 if (Configs.ShowExplorerIcon)
                 {
-                    if (!string.IsNullOrEmpty(IconGUID))
+                    if (!string.IsNullOrEmpty(File.IconGUID))
                     {
                         try
                         {
-                            return new BitmapImage(new Uri(FileUtility.GetIconPath(IconGUID), UriKind.Absolute));
+                            return new BitmapImage(new Uri(FileUtility.GetIconPath(File.IconGUID), UriKind.Absolute));
                         }
                         catch (Exception ex)
                         {
@@ -112,6 +151,19 @@ namespace ClassifyFiles.UI.Model
                     }
                 }
                 return null;
+            }
+        }
+    }
+    public class UIFileSize : INotifyPropertyChanged
+    {
+        public UIFileSize()
+        {
+            if (font == null)
+            {
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    font = App.Current.MainWindow.FontFamily;
+                });
             }
         }
         private static double defualtIconSize = 60;
@@ -138,7 +190,10 @@ namespace ClassifyFiles.UI.Model
         public double FontSize { get; private set; } = 12;
         public double SmallFontSize { get; private set; } = 11;
         private static FontFamily font;
-        public double TotalIconViewHeight => ShowIconViewNames ? LargeIconSize + 16 * 2 + 8 : LargeIconSize;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public double TotalIconViewHeight => Configs.ShowIconViewNames ? LargeIconSize + 16 * 2 + 8 : LargeIconSize;
         public double TotalTileViewHeight => LargeIconSize + 32;
         public double TileTitleHeight => FontSize * font.LineSpacing * 2;
         public double TileDirHeight => SmallFontSize * font.LineSpacing * 2;
@@ -150,42 +205,6 @@ namespace ClassifyFiles.UI.Model
             SmallFontIconSize = DefualtIconSize / 3;
             LargeFontIconSize = DefualtIconSize / 1.5;
             this.Notify(nameof(LargeIconSize), nameof(SmallIconSize), nameof(SmallFontIconSize), nameof(LargeFontIconSize), nameof(TotalIconViewHeight));
-        }
-        public File Raw { get; private set; }
-        private bool loaded = false;
-        public async Task LoadAsync(AppDbContext db = null)
-        {
-            if (!loaded)
-            {
-                loaded = true;
-                IEnumerable<Class> classes;
-                if (db == null)
-                {
-                    classes = await GetClassesOfFileAsync(ID);
-                }
-                else
-                {
-                    classes = await GetClassesOfFileAsync(db, ID);
-                }
-                Classes = new ObservableCollection<Class>(classes);
-            }
-            Load?.Invoke(this, new EventArgs());
-        }
-        public event EventHandler Load;
-
-        private ObservableCollection<Class> classes;
-        public ObservableCollection<Class> Classes
-        {
-            get => classes;
-            set
-            {
-                classes = value;
-                this.Notify(nameof(Classes));
-            }
-        }
-        public override string ToString()
-        {
-            return Name + (string.IsNullOrEmpty(Dir) ? "" : $" （{Dir}）");
         }
     }
 }

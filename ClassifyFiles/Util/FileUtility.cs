@@ -282,10 +282,10 @@ namespace ClassifyFiles.Util
             }
             return null;
         }
-        public static File GetFileTree<T>(IEnumerable<T> files) where T : File, new()
+        public static File GetFileTree(IEnumerable<File> files) 
         {
-            Dictionary<T, Queue<string>> fileDirs = new Dictionary<T, Queue<string>>();
-            T root = new T() { Dir = "根" };
+            Dictionary<File, Queue<string>> fileDirs = new Dictionary<File, Queue<string>>();
+            File root = new File() { Dir = "根",Project=files.First().Project };
 
             foreach (var file in files)
             {
@@ -293,18 +293,50 @@ namespace ClassifyFiles.Util
                 var current = root;
                 foreach (var dir in dirs)
                 {
-                    if (current.SubFiles.FirstOrDefault(p => p.Dir == dir) is T sub)
+                    if (current.SubFiles.FirstOrDefault(p => p.Dir == dir) is File sub)
                     {
                         current = sub;
                     }
                     else
                     {
-                        sub = new T() { Dir = dir, Project = file.Project };
+                        sub = new File() { Dir = dir, Project = file.Project };
                         current.SubFiles.Add(sub);
                         current = sub;
                     }
                 }
                 current.SubFiles.Add(file);
+            }
+            return root;
+        }
+
+        public static T GetFileTree<T>(Project project,
+        IEnumerable<T> files,
+        Func<File, T> getNewItem,
+        Func<T, string> getDir,
+        Func<T, IList<T>> getSubFiles
+        ) where T : class
+        {
+            Dictionary<T, Queue<string>> fileDirs = new Dictionary<T, Queue<string>>();
+            T root = getNewItem(new File() { Dir = "根目录", Project = project });
+
+            foreach (var file in files)
+            {
+                var dirs = getDir(file).Split('/', '\\');
+                var current = root;
+                foreach (var dir in dirs)
+                {
+                    if (getSubFiles(current).FirstOrDefault(p => getDir(p) == dir) is T sub)
+                    {
+                        current = sub;
+                    }
+                    else
+                    {
+                        sub = getNewItem(new File() { Dir = dir, Project = project });
+                        getSubFiles(current).Add(sub);
+                        current = sub;
+                    }
+                }
+                getSubFiles(current).Add(file);
             }
             return root;
         }

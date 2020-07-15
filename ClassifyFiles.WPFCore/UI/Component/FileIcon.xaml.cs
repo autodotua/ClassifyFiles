@@ -36,15 +36,15 @@ namespace ClassifyFiles.UI.Component
         static void OnFileChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
             FileIcon fileIcon = obj as FileIcon;
-            if (fileIcon.File.IsFolder)
+            if (fileIcon.File.File.IsFolder)
             {
             }
             else
             {
                 fileIcon.File.Load += fileIcon.Load;
-                fileIcon.File.PropertyChanged += (p1, p2) =>
+                fileIcon.File.Display.PropertyChanged += (p1, p2) =>
                 {
-                    if (p2.PropertyName == nameof(UIFile.Image))
+                    if (p2.PropertyName == nameof(UIFileDisplay.Image))
                     {
                         fileIcon.Load(p1, p2);
                     }
@@ -74,48 +74,49 @@ namespace ClassifyFiles.UI.Component
             Dispatcher.Invoke(() =>
             {
                 FrameworkElement item = null;
-                if (File.IsFolder == false && Caches.ContainsKey(File.ID) && !(File.Image != null && Caches[File.ID] is FontIcon))
+                if (File.File.IsFolder == false
+                && Caches.ContainsKey(File.File.ID)
+                && !(File.Display.Image != null && Caches[File.File.ID] is FontIcon))
                 {
-                    item = Caches[File.ID];
+                    item = Caches[File.File.ID];
                 }
                 else
-                { 
-                    if (File.Image == null)
+                {
+                    if (File.Display.Image == null)
                     {
                         if (main.Content is Image)
                         {
                             return;
                         }
-                        item = new FontIcon();
-                        item.SetBinding(FontIcon.GlyphProperty, "File.Glyph");
+                        item = new FontIcon() { Glyph = File.Display.Glyph };
                     }
                     else
                     {
                         item = new Image()
                         {
-                            Source = File.Image,
+                            Source = File.Display.Image,
                             Stretch = Stretch.UniformToFill
                         };
                     }
                     item.HorizontalAlignment = HorizontalAlignment.Center;
                     item.VerticalAlignment = VerticalAlignment.Center;
 
-                    if (File.IsFolder == false)
+                    if (File.File.IsFolder == false)
                     {
-                        Caches.TryAdd(File.ID, item);
+                        Caches.TryAdd(File.File.ID, item);
                     }
                 }
                 if (UseLargeIcon)
                 {
-                    item.SetBinding(WidthProperty, "File.LargeIconSize");
-                    item.SetBinding(HeightProperty, "File.LargeIconSize");
-                    item.SetBinding(FontIcon.FontSizeProperty, "File.LargeFontIconSize");
+                    item.SetBinding(WidthProperty, "File.Size.LargeIconSize");
+                    item.SetBinding(HeightProperty, "File.Size.LargeIconSize");
+                    item.SetBinding(FontIcon.FontSizeProperty, "File.Size.LargeFontIconSize");
                 }
                 else
                 {
-                    item.SetBinding(WidthProperty, "File.SmallIconSize");
-                    item.SetBinding(HeightProperty, "File.SmallIconSize");
-                    item.SetBinding(FontIcon.FontSizeProperty, "File.SmallFontIconSize");
+                    item.SetBinding(WidthProperty, "File.Size.SmallIconSize");
+                    item.SetBinding(HeightProperty, "File.Size.SmallIconSize");
+                    item.SetBinding(FontIcon.FontSizeProperty, "File.Size.SmallFontIconSize");
                 }
                 main.Content = item;
             });

@@ -23,24 +23,24 @@ xmlns:app="clr-namespace:ClassifyFiles"
                     <DockPanel.ToolTip>
                         <ToolTip>
                             <m:SimpleStackPanel Spacing="8">
-                                <TextBlock FontWeight="Bold" Text="{Binding DisplayName}"/>
-                                <TextBlock Text="{Binding DisplayDir}"/>
+                                <TextBlock FontWeight="Bold" Text="{Binding Display.DisplayName}"/>
+                                <TextBlock Text="{Binding Display.DisplayDir}"/>
                             </m:SimpleStackPanel>
                         </ToolTip>
                     </DockPanel.ToolTip>
-                    <TextBlock DockPanel.Dock="Bottom" FontSize="{Binding FontSize}" 
-                               Visibility="{Binding  Path=ShowIconViewNames, Converter={StaticResource b2v}}" 
-                               Text="{Binding Path=DisplayName, Mode=OneTime}"
-                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" LineHeight="16" Height="32" MaxWidth="{Binding LargeIconSize}"/>
-                    <component:FileIcon UseLargeIcon="True" File="{Binding .}"  Height="{Binding LargeIconSize}" Width="{Binding LargeIconSize}"/>
+                    <TextBlock DockPanel.Dock="Bottom" FontSize="{Binding Size.FontSize}" 
+                               Visibility="{Binding  Path=Display.ShowIconViewNames, Converter={StaticResource b2v}}" 
+                               Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
+                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" LineHeight="16" Height="32" MaxWidth="{Binding Size.LargeIconSize}"/>
+                    <component:FileIcon UseLargeIcon="True" File="{Binding .}"  Height="{Binding Size.LargeIconSize}" Width="{Binding Size.LargeIconSize}"/>
                 </DockPanel>
             </Border>
         </DataTemplate>
         <DataTemplate x:Key="grdTileView">
             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,0,0,4">
-                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="{Binding TotalTileViewHeight}">
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="{Binding Size.TotalTileViewHeight}">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{Binding LargeIconSize}"/>
+                        <ColumnDefinition Width="{Binding Size.LargeIconSize}"/>
                         <ColumnDefinition Width="8"/>
                         <ColumnDefinition Width="144"/>
                     </Grid.ColumnDefinitions>
@@ -51,10 +51,10 @@ xmlns:app="clr-namespace:ClassifyFiles"
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding Path=DisplayName, Mode=OneTime}"
+                    <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
                                  HorizontalAlignment="Left" TextWrapping="Wrap" />
-                    <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding DisplayDir,Mode=OneTime}"
-                               Foreground="Gray" TextWrapping="Wrap" FontSize="{Binding SmallFontSize}" />
+                    <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding Display.DisplayDir,Mode=OneTime}"
+                               Foreground="Gray" TextWrapping="Wrap" FontSize="{Binding Size.SmallFontSize}" />
                     <component:TagGroup Grid.ColumnSpan="99" File="{Binding .}" Orientation="Horizontal" 
                                         Grid.RowSpan="99" HorizontalAlignment="Right" VerticalAlignment="Bottom" TagMouseDown="Tags_MouseDown"/>
                     <component:FileIcon UseLargeIcon="True" File="{Binding .}" Grid.RowSpan="99" />
@@ -94,7 +94,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
                 <DataTemplate>
                     <Grid Margin="0,4,24,4"  >
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="{Binding SmallIconSize}"/>
+                            <ColumnDefinition Width="{Binding Size.SmallIconSize}"/>
                             <ColumnDefinition Width="16"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="16"/>
@@ -106,8 +106,8 @@ xmlns:app="clr-namespace:ClassifyFiles"
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <component:FileIcon File="{Binding .}" Grid.RowSpan="99"/>
-                        <TextBlock Text="{Binding DisplayName}" Grid.Column="2" Grid.Row="0"/>
-                        <TextBlock Text="{Binding DisplayDir}" Grid.Column="2" Grid.Row="2" Opacity="0.5"/>
+                        <TextBlock Text="{Binding Display.DisplayName}" Grid.Column="2" Grid.Row="0"/>
+                        <TextBlock Text="{Binding Display.DisplayDir}" Grid.Column="2" Grid.Row="2" Opacity="0.5"/>
                         <!--横向的标签列表-->
                         <component:TagGroup Grid.Column="4" Grid.RowSpan="99" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
                     </Grid>
@@ -120,10 +120,10 @@ xmlns:app="clr-namespace:ClassifyFiles"
                   TreeViewItem.Expanded="TreeItems_Expanded">
 
             <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate  ItemsSource="{Binding SubFiles}">
+                <HierarchicalDataTemplate  ItemsSource="{Binding SubUIFiles}">
                     <StackPanel Orientation="Horizontal">
                         <component:FileIcon File="{Binding .}"/>
-                        <TextBlock VerticalAlignment="Center" FontSize="12" Margin="12,0,0,0" Text="{Binding DisplayName}"/>
+                        <TextBlock VerticalAlignment="Center" FontSize="12" Margin="12,0,0,0" Text="{Binding Display.DisplayName}"/>
                         <component:TagGroup Margin="24,0,0,0" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
