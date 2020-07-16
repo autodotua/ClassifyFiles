@@ -153,6 +153,14 @@ namespace ClassifyFiles.Util
             if (!result)
             {
                 p.Kill();
+                try
+                {
+                    F.Delete(thumbnail);
+                }
+                catch
+                {
+
+                }
                 return null;
             }
             //string output = p.StandardOutput.ReadToEnd();

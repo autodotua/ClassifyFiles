@@ -6,9 +6,17 @@
 
 ## 截图
 
-![image](https://github.com/autodotua/ClassifyFiles/blob/master/Image/MainWindow_Light.png)
+![image](https://github.com/autodotua/ClassifyFiles/blob/master/Image/Screenshot_1.png)
 
-![image](https://github.com/autodotua/ClassifyFiles/blob/master/Image/MainWindow_Dark.png)
+![image](https://github.com/autodotua/ClassifyFiles/blob/master/Image/Screenshot_2.png)
+
+![image](https://github.com/autodotua/ClassifyFiles/blob/master/Image/Screenshot_3.png)
+
+![image](https://github.com/autodotua/ClassifyFiles/blob/master/Image/Screenshot_4.png)
+
+![image](https://github.com/autodotua/ClassifyFiles/blob/master/Image/Screenshot_5.png)
+
+![image](https://github.com/autodotua/ClassifyFiles/blob/master/Image/Screenshot_6.png)
 
 ## 特性
 
@@ -17,9 +25,7 @@
 
 ## 更新计划和待解决BUG
 
-缓存图标的设置开关
-
-拖动滚动条的时候，两次会有一次触发拖放文件事件
+树状图好像用资源管理器图标时有问题
 
 ## 更新日志
 
@@ -263,3 +269,5 @@
 新增了全局错误捕捉（暂无GUI提示）
 
 在进行耗时操作（转圈圈）时，将无法关闭窗体
+
+支持了调整最大线程数
