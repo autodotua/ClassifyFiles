@@ -9,7 +9,7 @@
         mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Closing="WindowBase_Closing"
-        Title="设置" Height="450" Width="600">
+        Title="设置" Height="450" Width="800">
     <Grid Margin="4">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -27,7 +27,26 @@
                 </GroupBox>
 
                 <GroupBox Header="自动生成缩略图">
-                    <CheckBox Content="在浏览时尝试为没有缩略图的对象生成缩略图" x:Name="chkAutoThumbnails" Click="CheckBox_Click"/>
+                    <m:SimpleStackPanel  Orientation="Vertical" Spacing="12">
+                        <CheckBox Content="在浏览时尝试为没有缩略图的对象生成缩略图" x:Name="chkAutoThumbnails" Click="CheckBox_Click"/>
+                        <TextBlock Foreground="{ DynamicResource SystemControlBackgroundBaseMediumBrush}"
+                                   >开启该选项后，在浏览时，若文件没有缩略图，则会自动生成缩略图。</TextBlock>
+                        <TextBlock Foreground="{ DynamicResource SystemControlBackgroundBaseMediumBrush}"
+                                   >这能够提升部分体验，但是会降低一些运行速度，增加卡顿。</TextBlock>
+                        <m:SimpleStackPanel  Orientation="Horizontal" Spacing="6">
+                            <TextBlock VerticalAlignment="Center">最大并行线程：</TextBlock>
+                            <m:NumberBox x:Name="numThread" Minimum="1" Maximum="12" ValueChanged="numThread_ValueChanged" VerticalAlignment="Center" Width="128"/>
+                            <TextBlock VerticalAlignment="Center"
+                                       Foreground="{ DynamicResource SystemControlBackgroundBaseMediumBrush}">
+                                <Run>CPU核心数：</Run>
+                                <Run Text="{Binding ProcessorCount, Mode=OneTime}"/>
+                            </TextBlock>
+                        </m:SimpleStackPanel>
+                        <TextBlock Foreground="{ DynamicResource SystemControlBackgroundBaseMediumBrush}"
+                                   >同时获取缩略图的线程数。当该值较小时，获取缩略图的速度会比较慢。若该值过大，则界面将会卡顿严重。</TextBlock>
+                        <TextBlock Foreground="{ DynamicResource SystemControlBackgroundBaseMediumBrush}"
+                                   >最大线程数不宜超过CPU的核心（线程）数。</TextBlock>
+                    </m:SimpleStackPanel>
                 </GroupBox>
 
                 <GroupBox Header="数据库">

@@ -1,21 +1,13 @@
-﻿using ClassifyFiles.Util;
+﻿using ClassifyFiles.Data;
+using ClassifyFiles.Util;
 using ClassifyFiles.WPFCore;
-using FzLib.Extension;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using static ClassifyFiles.Data.Project;
-using static ClassifyFiles.Util.ClassUtility;
-using static ClassifyFiles.Util.FileClassUtility;
-using static ClassifyFiles.Util.FileProjectUtilty;
-using static ClassifyFiles.Util.ProjectUtility;
-using static ClassifyFiles.Util.DbUtility;
-using System.Collections.ObjectModel;
-using ClassifyFiles.Data;
 using FzLib.Basic;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using System;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Windows;
+using static ClassifyFiles.Util.ProjectUtility;
 
 namespace ClassifyFiles.UI
 {
@@ -40,13 +32,11 @@ namespace ClassifyFiles.UI
                     break;
             }
             chkAutoThumbnails.IsChecked = Configs.AutoThumbnails;
+            numThread.Value = Configs.RefreshThreadCount;
             Projects = projects;
-            //if(ConfigUtility.GetBool(ConfigKeys.IncludeThumbnailsWhenAddingFilesKey,true))
-            //{
-            //    chkIncludeThumbnailsWhenAddingFiles.IsChecked = true;
-            //}
         }
 
+        public int ProcessorCount => Environment.ProcessorCount;
 
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
@@ -126,6 +116,12 @@ namespace ClassifyFiles.UI
                 await new MessageDialog().ShowAsync("导出成功", "导出");
             }
 
+        }
+
+        private void numThread_ValueChanged(ModernWpf.Controls.NumberBox sender, ModernWpf.Controls.NumberBoxValueChangedEventArgs args)
+        {
+            Configs.RefreshThreadCount = (int)numThread.Value;
+            numThread.Value = (int)numThread.Value;
         }
     }
 }
