@@ -22,6 +22,9 @@ namespace ClassifyFiles.WPFCore
         public static new App Current { get; private set; }
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            FzLib.Program.Runtime.UnhandledException.RegistAll();
+            FzLib.Program.Runtime.UnhandledException.UnhandledExceptionCatched += UnhandledException_UnhandledExceptionCatched;
+
             FileUtility.ThumbnailFolderPath = "thumb";
             if(!Directory.Exists("thumb"))
             {
@@ -55,6 +58,14 @@ namespace ClassifyFiles.WPFCore
             win.Show();
             SplashWindow.TryClose();
 
+        }
+
+        private void UnhandledException_UnhandledExceptionCatched(object sender, FzLib.Program.Runtime.UnhandledExceptionEventArgs e)
+        {
+            if(e.Exception.Source.StartsWith("Microsoft.EntityFrameworkCore"))
+            {
+
+            }
         }
 
         private static void InitializeTheme()

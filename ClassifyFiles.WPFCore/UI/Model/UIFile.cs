@@ -15,10 +15,11 @@ using static ClassifyFiles.Util.ProjectUtility;
 using static ClassifyFiles.Util.DbUtility;
 using ClassifyFiles.UI.Component;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace ClassifyFiles.UI.Model
 {
-    public class UIFile : INotifyPropertyChanged
+    public class UIFile:INotifyPropertyChanged
     {
         public UIFile()
         {
@@ -55,12 +56,12 @@ namespace ClassifyFiles.UI.Model
                 }
                 Classes = new ObservableCollection<Class>(classes);
             }
-            Load?.Invoke(this, new EventArgs());
         }
-        public event EventHandler Load;
-        public event PropertyChangedEventHandler PropertyChanged;
 
         private ObservableCollection<Class> classes;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public ObservableCollection<Class> Classes
         {
             get => classes;

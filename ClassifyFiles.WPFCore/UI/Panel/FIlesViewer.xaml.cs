@@ -119,7 +119,7 @@ namespace ClassifyFiles.UI.Panel
                });
                 Files = new ObservableCollection<UIFile>(filesWithIcon);
                 await Task.Delay(100);//不延迟大概率会一直转圈
-                await RealtimeRefresh(Files.Take(100));
+                //await RealtimeRefresh(Files.Take(100));
             }
         }
         public async Task SetFilesAsync(IEnumerable<UIFile> files)
@@ -132,7 +132,7 @@ namespace ClassifyFiles.UI.Panel
             {
                 Files = new ObservableCollection<UIFile>(files);
                 await Task.Delay(100);//不延迟大概率会一直转圈
-                await RealtimeRefresh(Files.Take(100));
+                //await RealtimeRefresh(Files.Take(100));
             }
         }
         public async Task AddFilesAsync(IEnumerable<File> files, bool tags = true)
@@ -295,10 +295,6 @@ namespace ClassifyFiles.UI.Panel
                     (FilesContent as ListBox).SelectedItem = selectedFile;
                     (FilesContent as ListBox).ScrollIntoView(selectedFile);
                 }
-                else if (grdScrollViewer != null)
-                {
-                    grdScrollViewer.ScrollToVerticalOffset(0);
-                }
             }
             else if (type == 4)
             {
@@ -306,7 +302,7 @@ namespace ClassifyFiles.UI.Panel
             }
             if (Files != null)
             {
-                RealtimeRefresh(Files.Take(100));
+                //RealtimeRefresh(Files.Take(100));
             }
             Configs.LastViewType = CurrentViewType;
             ViewTypeChanged?.Invoke(this, new EventArgs());
@@ -442,141 +438,6 @@ namespace ClassifyFiles.UI.Panel
 
         }
 
-        #region 自动生成缩略图、Tags
-        private ConcurrentDictionary<int, UIFile> generatedThumbnails = new ConcurrentDictionary<int, UIFile>();
-        private ConcurrentDictionary<int, UIFile> generatedIcons = new ConcurrentDictionary<int, UIFile>();
-
-        private void lvwFiles_Loaded(object sender, RoutedEventArgs e)
-        {
-            ScrollViewer scrollViewer = (sender as Visual).GetVisualChild<ScrollViewer>(); //Extension method
-
-            if (scrollViewer != null)
-            {
-                if (scrollViewer.Template.FindName("PART_VerticalScrollBar", scrollViewer) is ScrollBar scrollBar)
-                {
-                    scrollBar.ValueChanged += async delegate
-                     {
-                         Debug.WriteLine(scrollViewer.VerticalOffset + "  " + scrollViewer.ViewportHeight);
-                         if(Files==null)
-                         {
-                             return;
-                         }
-                         await RealtimeRefresh(Files.Skip((int)scrollViewer.VerticalOffset).Take((int)scrollViewer.ViewportHeight + 5));
-                     };
-                }
-            }
-
-        }
-
-        ParallelLoopState workingForeachState = null;
-        private Task RealtimeRefresh(IEnumerable<UIFile> files)
-        {
-            Debug.WriteLine($"refresh {files.Count()} files");
-            return Task.Run(async () =>
-            {
-                if (files == null || !files.Any())
-                {
-                    return;
-                }
-                AppDbContext db = new AppDbContext(DbUtility.DbPath);
-                foreach (var file in files)
-                {
-                    await file.LoadAsync(db);
-                }
-                if (workingForeachState != null)
-                {
-                    workingForeachState.Stop();
-                    workingForeachState = null;
-                    Debug.WriteLine("break thumbbnail");
-                }
-                void Do(UIFile file)
-                {
-                    if (Configs.ShowThumbnail)
-                    {
-                        if (!generatedThumbnails.ContainsKey(file.File.ID) && file.File.ThumbnailGUID == null && file.File.ThumbnailGUID != "")
-                        {
-                            generatedThumbnails.TryAdd(file.File.ID, file);
-                            FileUtility.TryGenerateThumbnail(file.File);
-                            if (file.File.ThumbnailGUID != null)
-                            {
-                                file.LoadAsync(db).Wait();
-                            }
-                        }
-                    }
-                    if (Configs.ShowExplorerIcon&&(!Configs.ShowThumbnail || Configs.ShowThumbnail && string.IsNullOrEmpty(file.File.ThumbnailGUID)))
-                    {
-                        if (!generatedIcons.ContainsKey(file.File.ID) && file.File.IconGUID == null && file.File.IconGUID != "")
-                        {
-                            generatedIcons.TryAdd(file.File.ID, file);
-                            FileUtility.TryGenerateIcon(file.File);
-                            if (file.File.IconGUID != null)
-                            {
-                                file.LoadAsync(db).Wait();
-                            }
-                        }
-                    }
-                }
-                if (Configs.AutoThumbnails)
-                {
-                    Parallel.ForEach(files, new ParallelOptions() { MaxDegreeOfParallelism = Configs.RefreshThreadCount }, async (file, state) =>
-                        {
-                            workingForeachState = state;
-                            Do(file);
-                        });
-                    if (!savingFiles)
-                    {
-                        savingFiles = true;
-                        try
-                        {
-                            savingFiles = true;
-                            await FileUtility.SaveFilesAsync(files.Where(p => p.File.ThumbnailGUID != null).Select(p => p.File));
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
-                        finally
-                        {
-                            savingFiles = false;
-                        }
-                    }
-                }
-            });
-        }
-        private static bool savingFiles = false;
-
-        private async void TreeItems_Expanded(object sender, RoutedEventArgs e)
-        {
-            var files = ((e.OriginalSource as TreeViewItem).DataContext as UIFile)
-                .SubUIFiles.Where(p => !p.File.IsFolder);
-            await RealtimeRefresh(files);
-            (e.OriginalSource as TreeViewItem).UpdateLayout();
-        }
-
-        #endregion
-        ScrollViewer grdScrollViewer = null;
-        private void lbxGrdFiles_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-            if (grdScrollViewer == null)
-            {
-                grdScrollViewer = e.OriginalSource as ScrollViewer;
-            }
-            if (Files == null
-                || Files.Count == 0
-                //||e.ExtentHeightChange>0
-                || e.VerticalChange == 0 && e.ViewportHeightChange == 0 && e.VerticalOffset > 0)
-            {
-                return;
-            }
-            int count = Files.Count;
-            double percent1 = e.VerticalOffset / e.ExtentHeight;
-            double percent2 = e.ViewportHeight / e.ExtentHeight;
-            //利用滚动百分比的判断。第一个百分比是画面最上方的百分比，第二个是画面长度的百分比
-            //在文件中根据两个百分比取出文件，并且预读20个。
-            var files = Files.Skip((int)(count * percent1)).Take((int)(count * percent2) + 20).ToList();
-            RealtimeRefresh(files);
-        }
-
         private void ContextMenu_Closed(object sender, RoutedEventArgs e)
         {
             //(sender as ContextMenu).Items.Clear();
@@ -615,6 +476,10 @@ namespace ClassifyFiles.UI.Panel
 
         private void List_PreviewMouseMove(object sender, MouseEventArgs e)
         {
+            if(!(e.OriginalSource is Image))
+            {
+                return;
+            }
             Point position = e.GetPosition(null);
             double distance = Math.Sqrt(Math.Pow(position.X - beginPosition.X, 2) + Math.Pow(position.Y - beginPosition.Y, 2));
             //如果还没有放置项，并且鼠标已经按下，并且移动距离超过了10单位

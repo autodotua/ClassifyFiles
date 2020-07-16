@@ -450,6 +450,7 @@ namespace ClassifyFiles.Util
             files.ForEach(p => db.Entry(p).State = EntityState.Modified);
             await db.SaveChangesAsync();
         }
+      
 
         public static Task DeleteThumbnailsAsync(int projectID)
         {

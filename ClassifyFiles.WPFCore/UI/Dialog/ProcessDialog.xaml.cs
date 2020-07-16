@@ -1,5 +1,6 @@
 ﻿using FzLib.Extension;
 using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media.Animation;
 
@@ -14,6 +15,17 @@ namespace ClassifyFiles.UI
         {
             InitializeComponent();
         }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            if (!canClose)
+            {
+                e.Cancel = true;
+            }
+        }
+
+        bool canClose = true;
+
         private string message;
         public string Message
         {
@@ -26,6 +38,7 @@ namespace ClassifyFiles.UI
         }
         public void Show(bool overlay)
         {
+            canClose = false;
             Message = "";
             grdOverlay.Opacity = overlay ? 0.75 : 0;
             ring.IsActive = true;
@@ -37,6 +50,7 @@ namespace ClassifyFiles.UI
 
         public void Close()
         {
+            canClose = true;
             ring.IsActive = false;
             DoubleAnimation ani = new DoubleAnimation(0, TimeSpan.FromSeconds(0.2));
             ani.Completed += (p1, p2) =>
@@ -47,6 +61,10 @@ namespace ClassifyFiles.UI
 
         }
 
+        private void UserControlBase_Loaded(object sender, RoutedEventArgs e)
+        {
+            Window.GetWindow(this).Closing += Window_Closing;
+        }
     }
 
 

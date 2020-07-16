@@ -17,6 +17,10 @@ namespace ClassifyFiles.Util
         public static Task SaveChangesAsync()
         {
             return db.SaveChangesAsync();
+        }  
+        public static void SaveChanges()
+        {
+             db.SaveChanges();
         }
         public static Task ZipAsync()
         {
@@ -38,6 +42,11 @@ namespace ClassifyFiles.Util
                         break;
                 }
             }
+        }
+
+        public static void SetObjectModified(object obj)
+        {
+            db.Entry(obj).State = EntityState.Modified;
         }
     }
 }

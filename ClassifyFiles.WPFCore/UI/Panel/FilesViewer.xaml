@@ -20,7 +20,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
         <DataTemplate x:Key="grdIconView">
             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,8">
                 <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  
-                           Width="{Binding LargeIconSize}"    Height="{Binding TotalIconViewHeight}">
+                           Width="{Binding Size.LargeIconSize}"    Height="{Binding Size.TotalIconViewHeight}">
                     <DockPanel.ToolTip>
                         <ToolTip>
                             <m:SimpleStackPanel Spacing="8">
@@ -100,8 +100,8 @@ xmlns:app="clr-namespace:ClassifyFiles"
 
 
         <ListView   Grid.Row="4" x:Key="grdFiles" ContextMenu="{StaticResource menu}"
-                      PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"  ScrollViewer.ScrollChanged="lbxGrdFiles_ScrollChanged"
-                         ItemsSource="{Binding Files}"  Loaded="lvwFiles_Loaded" >
+                      PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"  
+                         ItemsSource="{Binding Files}"  >
             <ListBox.Resources>
             </ListBox.Resources>
             <ListBox.ItemsPanel>
@@ -114,7 +114,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
 
 
         <m:ListView  Grid.Row="4" ItemsSource="{Binding Files}" x:Key="lvwFiles" SelectionMode="Extended"
-                    Loaded="lvwFiles_Loaded"  PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
+                    PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
                         ContextMenu="{StaticResource menu}"  ItemTemplate="{StaticResource listDataTemplate}">
             <m:ListView.ItemContainerStyle >
                 <Style TargetType="{x:Type m:ListViewItem}">
@@ -125,7 +125,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
 
         <TreeView x:Key="treeFiles"  ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
                                           Grid.Row="4"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
-                  TreeViewItem.Expanded="TreeItems_Expanded" ItemTemplate="{StaticResource listDataTemplate}"/>
+                   ItemTemplate="{StaticResource listDataTemplate}"/>
 
     </UserControl.Resources>
     <Grid  Margin="8,4,0,4" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
