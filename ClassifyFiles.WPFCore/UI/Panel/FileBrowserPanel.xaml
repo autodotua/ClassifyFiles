@@ -56,22 +56,53 @@
                            x:Name="filesViewer" Grid.Column="2"  AllowDrop="True"
              Drop="UserControl_Drop" ClickTag="filesViewer_ClickTag"/>
         <m:CommandBar  Grid.Row="2" Grid.ColumnSpan="999" DefaultLabelPosition="Right">
-            <m:AppBarButton Icon="View" Label="显示元素">
+        
+            <m:AppBarButton Icon="View" Label="显示">
                 <m:FlyoutService.Flyout>
                     <m:Flyout x:Name="flyoutDisplay" >
-                        <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
-                            <GroupBox Header="通用">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="8"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="8"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="8"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <GroupBox Header="通用" Grid.RowSpan="3">
                                 <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
                                     <m:ToggleSwitch x:Name="swtTags" Header="显示分类标签" Toggled="ToggleSwitch_Toggled" />
                                     <m:ToggleSwitch x:Name="swtThumbs" Header="显示缩略图"  Toggled="swtThumbs_Toggled"/>
                                     <m:ToggleSwitch x:Name="swtIcons" Header="显示资源管理器图标" Toggled="swtIcons_Toggled"/>
                                 </m:SimpleStackPanel>
                             </GroupBox>
-                            <GroupBox Header="图标视图">
+                            <GroupBox Header="图标视图" Grid.Column="2">
                                 <m:ToggleSwitch x:Name="swtIconViewNames" Header="显示文件名" Toggled="swtIconViewNames_Toggled"/>
+                            </GroupBox>
+                            <GroupBox Header="平铺视图" Grid.Column="2" Grid.Row="2">
+                                <m:ToggleSwitch x:Name="swtShowTilePath" Header="显示文件夹路径" Toggled="showTilePath_Toggled"/>
+                            </GroupBox>
+                            <GroupBox Header="缩放" Grid.Row="4" Grid.ColumnSpan="99">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="8"/>
+                                        <ColumnDefinition Width="48"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="2" x:Name="tbkIconSize" VerticalAlignment="Center"/>
+                                    <Slider Orientation="Horizontal" Minimum="32"  VerticalAlignment="Center"
+                                            SmallChange="1" LargeChange="10" Interval="1" Maximum="256" 
+                                            PreviewMouseDoubleClick="sldIconSize_PreviewMouseDoubleClick" IsMoveToPointEnabled="True"
+                                        x:Name="sldIconSize" ValueChanged="sldIconSize_ValueChanged"/>
+                                    
+                                </Grid>
 
                             </GroupBox>
-                        </m:SimpleStackPanel>               
+                        </Grid>
                     </m:Flyout>
                 </m:FlyoutService.Flyout>
             </m:AppBarButton>
@@ -83,7 +114,6 @@
             <m:AppBarButton x:Name="btn"  IsCompact="False"  Label="更新文件" Click="ClassifyButton_Click">
                 <m:AppBarButton.Icon>
                     <m:FontIcon Glyph="&#xE72C;&#xEA37;"/>
-
                 </m:AppBarButton.Icon>
             </m:AppBarButton>
             <m:AppBarButton x:Name="btnLocateByDir" Icon="OpenLocal" Label="根据文件夹定位" >

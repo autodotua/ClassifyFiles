@@ -17,7 +17,7 @@ namespace ClassifyFiles.UI.Model
                 });
             }
         }
-        private static double defualtIconSize = 60;
+        private static double defualtIconSize = Configs.IconSize;
         /// <summary>
         /// 默认大图标的大小
         /// </summary>
@@ -26,7 +26,7 @@ namespace ClassifyFiles.UI.Model
             get => defualtIconSize;
             set
             {
-                if (value < 16 || value > 200)
+                if (value < 32 || value > 256)
                 {
                     return;
                 }

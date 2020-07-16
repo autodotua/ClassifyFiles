@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using IOPath = System.IO.Path;
-using static ClassifyFiles.Util. ConfigUtility;
+using static ClassifyFiles.Util.ConfigUtility;
 
 namespace ClassifyFiles
 {
@@ -83,7 +83,7 @@ namespace ClassifyFiles
         {
             get => Get(ref lastProjectID, GetInt, 1, nameof(LastProjectID));
             set => Set(ref lastProjectID, value, nameof(LastProjectID));
-        }     
+        }
         private static int? lastClassID = null;
 
 
@@ -91,7 +91,7 @@ namespace ClassifyFiles
         {
             get => Get(ref lastClassID, GetInt, 1, nameof(LastClassID));
             set => Set(ref lastClassID, value, nameof(LastClassID));
-        }        
+        }
         private static int? lastViewType = null;
 
 
@@ -100,10 +100,23 @@ namespace ClassifyFiles
             get => Get(ref lastViewType, GetInt, 1, nameof(LastViewType));
             set => Set(ref lastViewType, value, nameof(LastViewType));
         }
+        private static double? iconSize = null;
+        public static double IconSize
+        {
+            get => Get(ref iconSize, GetDouble, 64d, nameof(IconSize));
+            set => Set(ref iconSize, value, nameof(IconSize));
+        }
+
+        private static bool? showTilePath = null;
+        public static bool ShowTilePath
+        {
+            get => Get(ref showTilePath, GetBool, true, nameof(ShowTilePath));
+            set => Set(ref showTilePath, value, nameof(ShowTilePath));
+        }
 
         public static event PropertyChangedEventHandler PropertyChanged;
 
-        private static T Get<T>(ref T? field,Func<string,T,T> dbGet,T defultValue,string key) where T : struct
+        private static T Get<T>(ref T? field, Func<string, T, T> dbGet, T defultValue, string key) where T : struct
         {
             if (field == null)
             {
@@ -112,7 +125,7 @@ namespace ClassifyFiles
             return field.Value;
         }
 
-        private static void Set<T>(ref T? field, T value,string key) where T : struct
+        private static void Set<T>(ref T? field, T value, string key) where T : struct
         {
             field = value;
             ConfigUtility.Set(key, value);

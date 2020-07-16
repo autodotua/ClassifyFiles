@@ -17,10 +17,11 @@ xmlns:app="clr-namespace:ClassifyFiles"
         <ui:Bool2VisibilityConverter x:Key="b2v"/>
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
         <ui:IsNotNull2VisibilityConverter x:Key="nn2v"/>
+        
+        
         <DataTemplate x:Key="grdIconView">
             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,8">
-                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  
-                           Width="{Binding Size.LargeIconSize}"    Height="{Binding Size.TotalIconViewHeight}">
+                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  >
                     <DockPanel.ToolTip>
                         <ToolTip>
                             <m:SimpleStackPanel Spacing="8">
@@ -57,7 +58,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
                     <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
                                  HorizontalAlignment="Left" TextWrapping="Wrap" />
                     <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding Display.DisplayDir,Mode=OneTime}"
-                               Foreground="Gray" TextWrapping="Wrap" FontSize="{Binding Size.SmallFontSize}" />
+                               Foreground="Gray" TextWrapping="Wrap" FontSize="{Binding Size.SmallFontSize}"  Visibility="{Binding Display.ShowTileViewPaths, Converter={StaticResource b2v}}"/>
                     <component:TagGroup Grid.ColumnSpan="99" File="{Binding .}" Orientation="Horizontal" 
                                         Grid.RowSpan="99" HorizontalAlignment="Right" VerticalAlignment="Bottom" TagMouseDown="Tags_MouseDown"/>
                     <component:FileIcon UseLargeIcon="True" File="{Binding .}" Grid.RowSpan="99" />

@@ -43,6 +43,8 @@ namespace ClassifyFiles.UI.Panel
             swtTags.IsOn = Configs.ShowClassTags;
             swtIcons.IsOn = Configs.ShowExplorerIcon;
             swtThumbs.IsOn = Configs.ShowThumbnail;
+            swtShowTilePath.IsOn = Configs.ShowTilePath;
+            sldIconSize.Value = Configs.IconSize;
         }
 
         public override ClassesPanel GetItemsPanel()
@@ -254,6 +256,35 @@ namespace ClassifyFiles.UI.Panel
             bool on = (sender as ToggleSwitch).IsOn;
             Configs.ShowIconViewNames = on;
             await filesViewer.RefreshAsync();
+        }
+
+        private async void showTilePath_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!IsLoaded)
+            {
+                return;
+            }
+            bool on = (sender as ToggleSwitch).IsOn;
+            Configs.ShowTilePath = on;
+            await filesViewer.RefreshAsync();
+        }
+
+        private void sldIconSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            double value = (sender as Slider).Value;
+            tbkIconSize.Text = ((int)(value / 64 * 100)).ToString() + "%";
+            if (!IsLoaded)
+            {
+                return;
+            }
+            Configs.IconSize = value;
+            UIFileSize.DefualtIconSize = value;
+            filesViewer.Files.ForEach(p => p.Size.UpdateIconSize());
+        }
+
+        private void sldIconSize_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            sldIconSize.Value = 64;
         }
     }
 }
