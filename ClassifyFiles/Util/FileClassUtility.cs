@@ -82,6 +82,10 @@ namespace ClassifyFiles.Util
                         {
                             FileUtility.TryGenerateThumbnail(f);
                         }
+                        if(args.IncludeExplorerIcons)
+                        {
+                            FileUtility.TryGenerateExplorerIcon(f);
+                        }
                         db.Files.Add(f);
                     }
                     else
@@ -192,11 +196,7 @@ namespace ClassifyFiles.Util
                         if (!dbFiles.Contains(file))
                         {
                             f = file;
-                            DbUtility.db.Files.Add(f);
-                            if (args.IncludeThumbnails)
-                            {
-                                FileUtility.TryGenerateThumbnail(f);
-                            }
+                            db.Files.Add(f);
                         }
                         else
                         {
@@ -207,6 +207,14 @@ namespace ClassifyFiles.Util
                                 Debug.Assert(false);
                             }
                             f = newF;
+                        }
+                        if (args.IncludeThumbnails)
+                        {
+                            FileUtility.TryGenerateThumbnail(f);
+                        }
+                        if (args.IncludeExplorerIcons)
+                        {
+                            FileUtility.TryGenerateExplorerIcon(f);
                         }
                     }
                     else

@@ -258,7 +258,7 @@ namespace ClassifyFiles.UI.Panel
 
         public async Task RefreshAsync()
         {
-            FileIcon.Caches.Clear();
+            FileIcon.ClearCaches();
             var files = Files;
             Files = null;
            await SetFilesAsync(files);

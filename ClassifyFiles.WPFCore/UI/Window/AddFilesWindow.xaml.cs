@@ -118,6 +118,7 @@ namespace ClassifyFiles.UI
                 Class = Class,
                 Files = files,
                 IncludeThumbnails = chkIncludeThumbnails.IsChecked.Value,
+                IncludeExplorerIcons= chkIncludeExplorerIcons.IsChecked.Value,
                 Callback = Callback
             };
             working = true;

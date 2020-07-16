@@ -8,11 +8,12 @@
  xmlns:local="clr-namespace:ClassifyFiles.UI"
         mc:Ignorable="d"
     Closing="WindowBase_Closing"
-        Title="更新文件" Height="280" Width="600">
+        Title="更新文件" Height="320" Width="600">
     <m:SimpleStackPanel Spacing="16" Margin="8" Orientation="Vertical" >
         <m:SimpleStackPanel x:Name="stkSettings" Spacing="8" Orientation="Vertical">
             <CheckBox x:Name="chkResearch" IsChecked="True">重新搜索物理文件</CheckBox>
             <CheckBox x:Name="chkIncludeThumbnails" IsChecked="False" Margin="12,0" IsEnabled="{Binding IsChecked,ElementName=chkResearch}">生成缩略图</CheckBox>
+            <CheckBox x:Name="chkIncludeExplorerIcons" IsChecked="False" Margin="12,0" IsEnabled="{Binding IsChecked,ElementName=chkResearch}">生成资源管理器图标</CheckBox>
             <CheckBox x:Name="chkReclassify" IsChecked="True">重新根据匹配条件进行自动分类</CheckBox>
         </m:SimpleStackPanel>
         <m:SimpleStackPanel Spacing="8" Orientation="Vertical" >

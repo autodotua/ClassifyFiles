@@ -90,6 +90,7 @@ namespace ClassifyFiles.UI
                 Research = chkResearch.IsChecked.Value,
                 Reclassify = chkReclassify.IsChecked.Value,
                 IncludeThumbnails = chkIncludeThumbnails.IsChecked.Value,
+                IncludeExplorerIcons = chkIncludeExplorerIcons.IsChecked.Value,
                 Callback = Callback
             };
             working = true;

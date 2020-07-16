@@ -12,6 +12,7 @@
     <m:SimpleStackPanel Spacing="16" Margin="8" Orientation="Vertical" VerticalAlignment="Center">
         <m:SimpleStackPanel x:Name="stkSettings" Spacing="8" Orientation="Vertical">
             <CheckBox x:Name="chkIncludeThumbnails" IsChecked="True" >生成缩略图</CheckBox>
+            <CheckBox x:Name="chkIncludeExplorerIcons" IsChecked="True" >生成资源管理器图标</CheckBox>
             <TextBlock>对于文件夹：</TextBlock>
             <RadioButton x:Name="rbtnFolderAsFile" IsChecked="True" Margin="12,0">作为一个文件项</RadioButton>
             <RadioButton x:Name="rbtnFolderIgnore" Margin="12,0">忽略</RadioButton>

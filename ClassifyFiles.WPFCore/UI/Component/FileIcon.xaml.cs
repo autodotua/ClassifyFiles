@@ -57,44 +57,67 @@ namespace ClassifyFiles.UI.Component
             set => SetValue(UseLargeIconProperty, value);
         }
 
-        public static ConcurrentDictionary<int, FrameworkElement> Caches { get; } = new ConcurrentDictionary<int, FrameworkElement>();
+        private static ConcurrentDictionary<int, FrameworkElement> caches = new ConcurrentDictionary<int, FrameworkElement>();
+        private static ConcurrentDictionary<int, UIFile> generatedThumbnails = new ConcurrentDictionary<int, UIFile>();
+        private static ConcurrentDictionary<int, UIFile> generatedIcons = new ConcurrentDictionary<int, UIFile>();
+        public static void ClearCaches()
+        {
+            caches.Clear();
+            generatedIcons.Clear();
+            generatedThumbnails.Clear();
+        }
+        private static string folderIconPath = null;
         private bool Load()
         {
 
             FrameworkElement item;
-            if (File.File.IsFolder == false
-            && Caches.ContainsKey(File.File.ID)
-            && !(File.Display.Image != null && Caches[File.File.ID] is FontIcon))
+            if (File.File.IsFolder && Configs.ShowExplorerIcon)
             {
-                item = Caches[File.File.ID];
+                if (folderIconPath == null)
+                {
+                    var bitmap = FileUtility.GetFolderExplorerIcon();
+                    string tempFileName = System.IO.Path.GetTempFileName() + ".png";
+                    bitmap.Save(tempFileName);
+                    folderIconPath = tempFileName;
+                }
+
+                item = new Image() { Source = new BitmapImage(new Uri(folderIconPath, UriKind.Absolute)) };
             }
             else
             {
-                if (File.Display.Image == null)
+                if (File.File.IsFolder == false
+                && caches.ContainsKey(File.File.ID)
+                && !(File.Display.Image != null && caches[File.File.ID] is FontIcon))
                 {
-                    if (main.Content is Image)
-                    {
-                        return true;
-                    }
-                    item = new FontIcon() { Glyph = File.Display.Glyph };
+                    item = caches[File.File.ID];
                 }
                 else
                 {
-                    item = new Image()
+                    if (File.Display.Image == null)
                     {
-                        Source = File.Display.Image,
-                        Stretch = Stretch.UniformToFill
-                    };
-                }
-                item.HorizontalAlignment = HorizontalAlignment.Center;
-                item.VerticalAlignment = VerticalAlignment.Center;
+                        if (main.Content is Image)
+                        {
+                            return true;
+                        }
+                        item = new FontIcon() { Glyph = File.Display.Glyph };
+                    }
+                    else
+                    {
+                        item = new Image()
+                        {
+                            Source = File.Display.Image,
+                            Stretch = Stretch.UniformToFill
+                        };
+                    }
+                    item.HorizontalAlignment = HorizontalAlignment.Center;
+                    item.VerticalAlignment = VerticalAlignment.Center;
 
-                if (File.File.IsFolder == false)
-                {
-                    Caches.TryAdd(File.File.ID, item);
+                    if (File.File.IsFolder == false)
+                    {
+                        caches.TryAdd(File.File.ID, item);
+                    }
                 }
             }
-
             main.Content = item;
             return item is Image;
         }
@@ -123,8 +146,6 @@ namespace ClassifyFiles.UI.Component
         }
         private static TaskQueue tasks = new TaskQueue();
 
-        private static ConcurrentDictionary<int, UIFile> generatedThumbnails = new ConcurrentDictionary<int, UIFile>();
-        private static ConcurrentDictionary<int, UIFile> generatedIcons = new ConcurrentDictionary<int, UIFile>();
 
 
         private async Task<bool> RefreshIcon()
@@ -151,7 +172,7 @@ namespace ClassifyFiles.UI.Component
                    if (!generatedIcons.ContainsKey(file.File.ID) && file.File.IconGUID == null && file.File.IconGUID != "")
                    {
                        generatedIcons.TryAdd(file.File.ID, file);
-                       if (FileUtility.TryGenerateIcon(file.File))
+                       if (FileUtility.TryGenerateExplorerIcon(file.File))
                        {
                            result = true;
                            DbUtility.SetObjectModified(file.File);
@@ -193,7 +214,7 @@ namespace ClassifyFiles.UI.Component
                             {
                                 t2().Wait();
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
 
                             }

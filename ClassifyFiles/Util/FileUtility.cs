@@ -86,7 +86,12 @@ namespace ClassifyFiles.Util
             return false;
 
         }
-        public static bool TryGenerateIcon(File file)
+        public static Bitmap GetFolderExplorerIcon()
+        {
+            Bitmap bitmap = ShellEx.GetBitmapFromFolderPath("C:\\Windows", ShellEx.IconSizeEnum.ExtraLargeIcon);
+            return bitmap;
+        }
+        public static bool TryGenerateExplorerIcon(File file)
         {
            
             string path = file.GetAbsolutePath();

@@ -32,6 +32,7 @@ using static ClassifyFiles.Util.ClassUtility;
 using static ClassifyFiles.Util.FileClassUtility;
 using static ClassifyFiles.Util.FileProjectUtilty;
 using static ClassifyFiles.Util.ProjectUtility;
+using ClassifyFiles.UI.Component;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -208,6 +209,7 @@ namespace ClassifyFiles.UI.Panel
         {
             GetProgress().Show(true);
             await FileUtility.DeleteThumbnailsAsync(Project.ID);
+            FileIcon.ClearCaches();
             GetProgress().Close();
             await new MessageDialog().ShowAsync("删除成功", "删除缩略图");
         }
