@@ -27,7 +27,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Expander Margin="8,8,0,0" Header="分&#13;类" ExpandDirection="Right" FocusVisualStyle="{x:Null}" IsExpanded="True">
+        <Expander Margin="8,8,0,0" Header="" ExpandDirection="Right" FocusVisualStyle="{x:Null}" IsExpanded="True">
             <Grid Margin="8,0,0,0" MinWidth="200" MaxWidth="400">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>

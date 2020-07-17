@@ -63,12 +63,6 @@ namespace ClassifyFiles.UI.Panel
             await base.LoadAsync(project);
 
         }
-        private ProgressDialog GetProgress()
-        {
-            return (Window.GetWindow(this) as MainWindow).Progress;
-        }
-
-
         private async void RenameProjectButton_Click(object sender, RoutedEventArgs e)
         {
             string newName = await new InputDialog().ShowAsync("请输入新的项目名", false, "项目名", Project.Name);

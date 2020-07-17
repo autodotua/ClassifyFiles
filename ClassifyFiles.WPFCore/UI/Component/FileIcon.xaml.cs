@@ -105,6 +105,14 @@ namespace ClassifyFiles.UI.Component
                 && !(File.Display.Image != null && caches[File.File.ID] is FontIcon))
                 {
                     item = caches[File.File.ID];
+                    if(item is Image image)
+                    {
+                        BindingSize(image);
+                    }
+                    else if(item is FontIcon icon)
+                    {
+                        BindingSize(icon);
+                    }
                 }
                 else
                 {
@@ -115,6 +123,7 @@ namespace ClassifyFiles.UI.Component
                             return true;
                         }
                         item = new FontIcon() { Glyph = File.Display.Glyph };
+                        BindingSize(item as FontIcon);
                     }
                     else
                     {
@@ -126,6 +135,7 @@ namespace ClassifyFiles.UI.Component
                         {
                             (item as Image).Stretch = Stretch.UniformToFill;
                         }
+                        BindingSize(item as Image);
                     }
                     item.HorizontalAlignment = HorizontalAlignment.Center;
                     item.VerticalAlignment = VerticalAlignment.Center;
@@ -140,38 +150,53 @@ namespace ClassifyFiles.UI.Component
             return item is Image;
         }
 
-        private async void UserControlBase_Loaded(object sender, RoutedEventArgs e)
+        MagnificationConverter mc = new MagnificationConverter();
+        private void BindingSize(Image image)
         {
             if (Scale == 1)
             {
-                main.SetBinding(WidthProperty, "File.Size.IconSize");
-
+                image.SetBinding(WidthProperty, "File.Size.IconSize");
                 if (Square)
                 {
-                    main.SetBinding(HeightProperty, "File.Size.IconSize");
+                    image.SetBinding(HeightProperty, "File.Size.IconSize");
                 }
-                main.SetBinding(FontIcon.FontSizeProperty, "File.Size.FontIconSize");
+
             }
             else if (Scale < 0)
             {
-                main.Width = -Scale;
+                image.Width = -Scale;
                 if (Square)
                 {
-                    main.Height = -Scale;
+                    image.Height = -Scale;
                 }
-                main.FontSize = -Scale * 0.8;
             }
             else
             {
-                MagnificationConverter mc = new MagnificationConverter();
-                main.SetBinding(WidthProperty, new Binding("File.Size.IconSize") { Converter = mc, ConverterParameter = Scale });
-
+                image.SetBinding(WidthProperty, new Binding("File.Size.IconSize") { Converter = mc, ConverterParameter = Scale });
                 if (Square)
                 {
-                    main.SetBinding(HeightProperty, new Binding("File.Size.IconSize") { Converter = mc, ConverterParameter = Scale });
+                    image.SetBinding(HeightProperty, new Binding("File.Size.IconSize") { Converter = mc, ConverterParameter = Scale });
                 }
-                main.SetBinding(FontIcon.FontSizeProperty, new Binding("File.Size.FontIconSize") { Converter = mc, ConverterParameter = Scale });
             }
+        }
+        private void BindingSize(FontIcon icon)
+        {
+            if (Scale == 1)
+            {
+                icon.SetBinding(FontIcon.FontSizeProperty, "File.Size.FontIconSize");
+            }
+            else if (Scale < 0)
+            {
+                icon.FontSize = -Scale * 0.8;
+            }
+            else
+            {
+                icon.SetBinding(FontIcon.FontSizeProperty, new Binding("File.Size.FontIconSize") { Converter = mc, ConverterParameter = Scale });
+            }
+        }
+        private async void UserControlBase_Loaded(object sender, RoutedEventArgs e)
+        {
+
             await File.LoadAsync();
             if (!Load())
             {

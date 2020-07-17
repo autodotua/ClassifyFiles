@@ -188,15 +188,21 @@ namespace ClassifyFiles.UI.Panel
                 File file = GetSelectedFile()?.File;
                 if (file != null)
                 {
-                    if (file.IsFolder)//是目录
+                    if (file.IsFolder && CurrentViewType==4)//是目录
                     {
                         return;
                     }
                     string path = file.GetAbsolutePath();
 
-                    if (!System.IO.File.Exists(path))
+                    if (!file.IsFolder && !System.IO.File.Exists(path))
                     {
                         await new ErrorDialog().ShowAsync("文件不存在", "打开失败");
+                        e.Handled = true;
+                        return;
+                    }
+                    else if(file.IsFolder && !System.IO.Directory.Exists(path))
+                    {
+                        await new ErrorDialog().ShowAsync("文件夹不存在", "打开失败");
                         e.Handled = true;
                         return;
                     }
@@ -421,7 +427,8 @@ namespace ClassifyFiles.UI.Panel
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
                 string txt = sender.Text.ToLower();
-                var suggestions = Files == null ? new List<UIFile>() : Files.Where(p => p.File.Name.ToLower().Contains(txt)).ToList();
+                var suggestions = Files == null ? new List<UIFile>() :
+                    Files.Where(p =>(p.File.IsFolder?p.File.Dir: p.File.Name).ToLower().Contains(txt)).ToList();
 
                 sender.ItemsSource = suggestions.Count > 0 ?
                     suggestions : new string[] { "结果为空" } as IEnumerable;

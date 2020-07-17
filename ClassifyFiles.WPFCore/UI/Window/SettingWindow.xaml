@@ -54,7 +54,7 @@
                         <Button Background="Red" Foreground="White"   >
                             <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
                                 <m:SymbolIcon Symbol="Delete" VerticalAlignment="Center"/>
-                                <TextBlock  VerticalAlignment="Center">删除所有数据库</TextBlock>
+                                <TextBlock  VerticalAlignment="Center">删除所有项目</TextBlock>
                             </m:SimpleStackPanel>
                             <m:FlyoutService.Flyout>
                                 <m:Flyout x:Name="flyoutDeleteProjects">

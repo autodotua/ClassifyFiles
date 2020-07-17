@@ -15,7 +15,6 @@
     <Grid x:Name="grd">
         <ListBox  Background="Transparent" 
                     BorderBrush="Transparent"  ItemsSource="{Binding File.Classes}" 
-                     HorizontalAlignment="Right" VerticalAlignment="Center"
                   FontSize="12"
                   ScrollViewer.ScrollChanged="ListBox_ScrollChanged"
                     VerticalContentAlignment="Center" Visibility="{Binding File.Classes, Converter={StaticResource nn2v}}">
