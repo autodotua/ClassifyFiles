@@ -9,6 +9,7 @@
     mc:Ignorable="d"
     Closing="Window_Closing"
     xmlns:m="http://schemas.modernwpf.com/2019"
+    m:ScrollViewerHelper.AutoHideScrollBars="True"
     WindowStartupLocation="CenterScreen"
         Title="文件分类浏览器" Height="600" Width="1200" x:Name="win">
     <local:WindowBase.Resources>

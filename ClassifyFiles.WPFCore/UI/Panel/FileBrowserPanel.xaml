@@ -23,7 +23,7 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="8"/>
+            <RowDefinition Height="0"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
@@ -48,7 +48,7 @@
                 <panel:ClassesPanel x:Name="classPanel"   Grid.Row="4" SelectedClassChanged="SelectedClassChanged"/>
 
                 <Button Content="显示全部文件" 
-                x:Name="btnAllFiles" Click="btnAllFiles_Click" Grid.Row="6"  HorizontalAlignment="Stretch"/>
+                x:Name="btnAllFiles" Click="btnAllFiles_Click" Margin="0,8" Grid.Row="6"  HorizontalAlignment="Stretch"/>
             </Grid>
         </Expander>
 

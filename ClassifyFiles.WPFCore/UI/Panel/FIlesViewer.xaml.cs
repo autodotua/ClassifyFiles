@@ -21,6 +21,7 @@ using System.Collections;
 using System.Windows.Controls.Primitives;
 using System.Collections.Concurrent;
 using ListView = System.Windows.Controls.ListView;
+using System.Collections.Specialized;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -188,7 +189,7 @@ namespace ClassifyFiles.UI.Panel
                 File file = GetSelectedFile()?.File;
                 if (file != null)
                 {
-                    if (file.IsFolder && CurrentViewType==4)//是目录
+                    if (file.IsFolder && CurrentViewType == 4)//是目录
                     {
                         return;
                     }
@@ -200,7 +201,7 @@ namespace ClassifyFiles.UI.Panel
                         e.Handled = true;
                         return;
                     }
-                    else if(file.IsFolder && !System.IO.Directory.Exists(path))
+                    else if (file.IsFolder && !System.IO.Directory.Exists(path))
                     {
                         await new ErrorDialog().ShowAsync("文件夹不存在", "打开失败");
                         e.Handled = true;
@@ -374,17 +375,37 @@ namespace ClassifyFiles.UI.Panel
                 MenuItem menuOpenFolder = new MenuItem() { Header = "打开目录" };
                 menuOpenFolder.Click += OpenDirMernuItem_Click;
                 menu.Items.Add(menuOpenFolder);
+
             }
+            MenuItem menuCopy = new MenuItem() { Header = "复制" };
+            menuCopy.Click += MenuCopy_Click; ;
+            menu.Items.Add(menuCopy);
             if ((!files.Any(p => p.File.IsFolder) || CurrentViewType != 4) && Project.Classes != null)
             {
                 menu.Items.Add(new Separator());
+
                 foreach (var tag in Project.Classes)
                 {
+                    bool? isChecked = null;
+                    if (!files.Any(p => p.Classes == null))
+                    {
+                        if (files.Any(p => p.Classes.Any(q => q.ID == tag.ID)))
+                        {
+                            if (files.All(p => p.Classes.Any(q => q.ID == tag.ID)))
+                            {
+                                isChecked = true;
+                            }
+                            //这里else  isChecked = null;
+                        }
+                        else
+                        {
+                            isChecked = false;
+                        }
+                    }
                     CheckBox chk = new CheckBox()
                     {
                         Content = tag.Name,
-                        IsChecked = (!files.Any(p => p.Classes.Any(q => q.ID == tag.ID))) ? false :
-                        files.All(p => p.Classes.Any(q => q.ID == tag.ID)) ? true : (bool?)null
+                        IsChecked = isChecked
                     };
                     chk.Click += async (p1, p2) =>
                      {
@@ -422,13 +443,28 @@ namespace ClassifyFiles.UI.Panel
 
         }
 
+        private void MenuCopy_Click(object sender, RoutedEventArgs e)
+        {
+            var files = new StringCollection();
+            if (CurrentViewType != 4)
+            {
+                files.AddRange(GetSelectedFiles().Select(p => p.File.GetAbsolutePath()).ToArray());
+            }
+            else
+            {
+                files.Add(GetSelectedFile().File.GetAbsolutePath());
+
+            }
+            Clipboard.SetFileDropList(files);
+        }
+
         private void SearchTextBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
                 string txt = sender.Text.ToLower();
                 var suggestions = Files == null ? new List<UIFile>() :
-                    Files.Where(p =>(p.File.IsFolder?p.File.Dir: p.File.Name).ToLower().Contains(txt)).ToList();
+                    Files.Where(p => (p.File.IsFolder ? p.File.Dir : p.File.Name).ToLower().Contains(txt)).ToList();
 
                 sender.ItemsSource = suggestions.Count > 0 ?
                     suggestions : new string[] { "结果为空" } as IEnumerable;
@@ -484,15 +520,16 @@ namespace ClassifyFiles.UI.Panel
 
         private void List_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (!(e.OriginalSource is Image))
-            {
-                return;
-            }
+        
             Point position = e.GetPosition(null);
             double distance = Math.Sqrt(Math.Pow(position.X - beginPosition.X, 2) + Math.Pow(position.Y - beginPosition.Y, 2));
             //如果还没有放置项，并且鼠标已经按下，并且移动距离超过了10单位
             if (!set && mouseDown && distance > 10)
             {
+                if (e.OriginalSource is Thumb|| e.OriginalSource is RepeatButton)
+                {
+                    return;
+                }
                 set = true;
                 var files = list.SelectedItems.Cast<UIFile>().Select(p => p.File.GetAbsolutePath()).ToArray();
                 if (files.Length == 0)
@@ -516,11 +553,15 @@ namespace ClassifyFiles.UI.Panel
                 //当我们发现用户并不是真的要拖放，而是真的想选中某一个项时，
                 //就把该项单独选中
                 ignoredSelect = false;
-                var mouseOverItem = list.SelectedItems.Cast<object>().FirstOrDefault(p =>
-           (list.ItemContainerGenerator.ContainerFromItem(p) as ListBoxItem).IsMouseOver);
-                if (mouseOverItem != null)
-                {
-                    list.SelectedItem = mouseOverItem;
+
+                if (!list.SelectedItems.Cast<object>().Any(p => list.ItemContainerGenerator.ContainerFromItem(p) == null))
+                    {
+                    var mouseOverItem = list.SelectedItems.Cast<object>().FirstOrDefault(p =>
+               (list.ItemContainerGenerator.ContainerFromItem(p) as ListBoxItem).IsMouseOver);
+                    if (mouseOverItem != null)
+                    {
+                        list.SelectedItem = mouseOverItem;
+                    }
                 }
             }
         }
