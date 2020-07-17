@@ -7,7 +7,6 @@ using ModernWpf.Controls;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -35,12 +34,15 @@ namespace ClassifyFiles.UI.Component
         {
             InitializeComponent();
         }
-
+        public bool EnableCache { get; set; } = true;
+        public bool Square { get; set; } = true;
         public static readonly DependencyProperty FileProperty =
             DependencyProperty.Register("File", typeof(UIFile), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
         static void OnFileChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
         }
+
+
         public UIFile File
         {
             get => GetValue(FileProperty) as UIFile; //file;
@@ -50,7 +52,7 @@ namespace ClassifyFiles.UI.Component
             }
         }
         public static readonly DependencyProperty ScaleProperty =
-            DependencyProperty.Register("Scale", typeof(double), typeof(FileIcon),new PropertyMetadata(1.0));
+            DependencyProperty.Register("Scale", typeof(double), typeof(FileIcon), new PropertyMetadata(1.0));
 
         public double Scale
         {
@@ -59,15 +61,26 @@ namespace ClassifyFiles.UI.Component
         }
 
         private static ConcurrentDictionary<int, FrameworkElement> caches = new ConcurrentDictionary<int, FrameworkElement>();
-        private static ConcurrentDictionary<int, UIFile> generatedThumbnails = new ConcurrentDictionary<int, UIFile>();
-        private static ConcurrentDictionary<int, UIFile> generatedIcons = new ConcurrentDictionary<int, UIFile>();
         public static void ClearCaches()
         {
             caches.Clear();
-            generatedIcons.Clear();
-            generatedThumbnails.Clear();
+            RealtimeIcon.ClearCahces();
         }
         private static string folderIconPath = null;
+        public async Task<bool> RefreshIcon()
+        {
+            UIFile file = null;
+            Dispatcher.Invoke(() =>
+            {
+                file = File;
+            });
+            bool result = await RealtimeIcon.RefreshIcon(file);
+            Dispatcher.Invoke(() =>
+            {
+                Load();
+            });
+            return result;
+        }
         private bool Load()
         {
 
@@ -87,6 +100,7 @@ namespace ClassifyFiles.UI.Component
             else
             {
                 if (File.File.IsFolder == false
+                    && EnableCache
                 && caches.ContainsKey(File.File.ID)
                 && !(File.Display.Image != null && caches[File.File.ID] is FontIcon))
                 {
@@ -107,13 +121,16 @@ namespace ClassifyFiles.UI.Component
                         item = new Image()
                         {
                             Source = File.Display.Image,
-                            Stretch = Stretch.UniformToFill
                         };
+                        if (Square)
+                        {
+                            (item as Image).Stretch = Stretch.UniformToFill;
+                        }
                     }
                     item.HorizontalAlignment = HorizontalAlignment.Center;
                     item.VerticalAlignment = VerticalAlignment.Center;
 
-                    if (File.File.IsFolder == false)
+                    if (File.File.IsFolder == false && EnableCache)
                     {
                         caches.TryAdd(File.File.ID, item);
                     }
@@ -122,26 +139,37 @@ namespace ClassifyFiles.UI.Component
             main.Content = item;
             return item is Image;
         }
-      
+
         private async void UserControlBase_Loaded(object sender, RoutedEventArgs e)
         {
-            if(Scale==1)
+            if (Scale == 1)
             {
                 main.SetBinding(WidthProperty, "File.Size.IconSize");
-                main.SetBinding(HeightProperty, "File.Size.IconSize");
+
+                if (Square)
+                {
+                    main.SetBinding(HeightProperty, "File.Size.IconSize");
+                }
                 main.SetBinding(FontIcon.FontSizeProperty, "File.Size.FontIconSize");
-            } 
-            else if(Scale<0)
+            }
+            else if (Scale < 0)
             {
                 main.Width = -Scale;
-                main.Height = -Scale;
-                main.FontSize = -Scale*0.8;
+                if (Square)
+                {
+                    main.Height = -Scale;
+                }
+                main.FontSize = -Scale * 0.8;
             }
             else
             {
                 MagnificationConverter mc = new MagnificationConverter();
-                main.SetBinding(WidthProperty, new Binding("File.Size.IconSize") { Converter = mc, ConverterParameter = Scale  });
-                main.SetBinding(HeightProperty, new Binding("File.Size.IconSize") { Converter = mc, ConverterParameter = Scale });
+                main.SetBinding(WidthProperty, new Binding("File.Size.IconSize") { Converter = mc, ConverterParameter = Scale });
+
+                if (Square)
+                {
+                    main.SetBinding(HeightProperty, new Binding("File.Size.IconSize") { Converter = mc, ConverterParameter = Scale });
+                }
                 main.SetBinding(FontIcon.FontSizeProperty, new Binding("File.Size.FontIconSize") { Converter = mc, ConverterParameter = Scale });
             }
             await File.LoadAsync();
@@ -149,130 +177,14 @@ namespace ClassifyFiles.UI.Component
             {
                 if (Configs.AutoThumbnails)
                 {
-                    tasks.Enqueue(RefreshIcon);
+                    Tasks.Enqueue(RefreshIcon);
                 }
             }
         }
-        private static TaskQueue tasks = new TaskQueue();
 
-        private async Task<bool> RefreshIcon()
-        {
-            UIFile file = null;
-            Dispatcher.Invoke(() => file = File);
-            bool result = false;
-            await Task.Run(() =>
-           {
-               if (Configs.ShowThumbnail)
-               {
-                   if (!generatedThumbnails.ContainsKey(file.File.ID) && string.IsNullOrEmpty(file.File.ThumbnailGUID) /* file.File.ThumbnailGUID == null && file.File.ThumbnailGUID != ""*/)
-                   {
-                       generatedThumbnails.TryAdd(file.File.ID, file);
-                       if (FileUtility.TryGenerateThumbnail(file.File))
-                       {
-                           result = true;
-                           DbUtility.SetObjectModified(file.File);
-                       }
-                   }
-               }
-               if (Configs.ShowExplorerIcon && (!Configs.ShowThumbnail || Configs.ShowThumbnail && string.IsNullOrEmpty(file.File.ThumbnailGUID)))
-               {
-                   if (!generatedIcons.ContainsKey(file.File.ID) && file.File.IconGUID == null && file.File.IconGUID != "")
-                   {
-                       generatedIcons.TryAdd(file.File.ID, file);
-                       if (FileUtility.TryGenerateExplorerIcon(file.File))
-                       {
-                           result = true;
-                           DbUtility.SetObjectModified(file.File);
-                       }
-                   }
-               }
-           });
-            Dispatcher.Invoke(() =>
-            {
-                Load();
-            });
-            return result;
+        public static TaskQueue Tasks { get; private set; } = new TaskQueue();
 
-        }
-    }
-  
-    public class TaskQueue
-    {
-        ConcurrentQueue<Func<Task>> tasks = new ConcurrentQueue<Func<Task>>();
-        bool isExcuting = false;
 
-        public async void Enqueue(Func<Task> t)
-        {
-            tasks.Enqueue(t);
-            if (!isExcuting)
-            {
-                isExcuting = true;
-                await t();
-                while (tasks.Count > 0)
-                {
-                    Debug.WriteLine("Task count is " + tasks.Count);
-                    var currentTasks = tasks.ToArray();
-                    tasks.Clear();
-                    await Task.Run(() =>
-                    {
-                        ParallelOptions opt = new ParallelOptions() { MaxDegreeOfParallelism = Configs.RefreshThreadCount };
-                        Parallel.ForEach(currentTasks, opt, t2 =>
-                        {
-                            try
-                            {
-                                t2().Wait();
-                            }
-                            catch (Exception ex)
-                            {
-
-                            }
-                        });
-                    });
-                    try
-                    {
-                        await DbUtility.SaveChangesAsync();
-                    }
-                    catch (Exception ex)
-                    {
-
-                    }
-                    //Debug.WriteLine("Task count is " + tasks.Count);
-                    //List<Task> tempTasks = new List<Task>(Configs.RefreshThreadCount);
-                    //for (int i = 0; i < Configs.RefreshThreadCount && tasks.Count > 0; i++)
-                    //{
-                    //    if (tasks.TryDequeue(out Func<Task> t2))
-                    //    {
-                    //        tempTasks.Add(t2());
-                    //        //await t2();
-                    //    }
-                    //}
-                    //try
-                    //{
-                    //    await Task.WhenAll(tempTasks);
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    try
-                    //    {
-                    //        foreach (var t2 in tempTasks)
-                    //        {
-                    //            await t2;
-                    //        }
-                    //    }
-                    //    catch
-                    //    {
-
-                    //    }
-                    //}
-                }
-                isExcuting = false;
-
-            }
-            else
-            {
-                tasks.Enqueue(t);
-            }
-        }
     }
 
 }

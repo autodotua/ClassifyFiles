@@ -29,6 +29,27 @@ namespace ClassifyFiles.UI.Panel
     /// </summary>
     public partial class FilesViewer : UserControl, INotifyPropertyChanged
     {
+        public FilesViewer()
+        {
+            DataContext = this;
+            InitializeComponent();
+            new DragDropFilesHelper(FindResource("lvwFiles") as ListBox).Regist();
+            new DragDropFilesHelper(FindResource("grdFiles") as ListBox).Regist();
+            new DragDropFilesHelper(FindResource("lvwDetailFiles") as ListBox).Regist();
+            var btn = grdAppBar.Children.OfType<AppBarToggleButton>()
+                .FirstOrDefault(p => int.Parse(p.Tag as string) == Configs.LastViewType);
+            if (btn != null)
+            {
+                ViewTypeButton_Click(btn, new RoutedEventArgs());
+            }
+
+            FileIcon.Tasks.ProcessStatusChanged += TaskQueue_ProcessStatusChanged;
+        }
+
+        private void TaskQueue_ProcessStatusChanged(object sender, ProcessStatusChangedEventArgs e)
+        {
+            progress.IsActive = e.IsRunning;
+        }
 
         private ItemsControl filesContent;
         public ItemsControl FilesContent
@@ -53,21 +74,6 @@ namespace ClassifyFiles.UI.Panel
                 project = value;
                 this.Notify(nameof(Project));
             }
-        }
-        public FilesViewer()
-        {
-            DataContext = this;
-            InitializeComponent();
-            new DragDropFilesHelper(FindResource("lvwFiles") as ListBox).Regist();
-            new DragDropFilesHelper(FindResource("grdFiles") as ListBox).Regist();
-            new DragDropFilesHelper(FindResource("lvwDetailFiles") as ListBox).Regist();
-            var btn = grdAppBar.Children.OfType<AppBarToggleButton>()
-                .FirstOrDefault(p => int.Parse(p.Tag as string) == Configs.LastViewType);
-            if (btn != null)
-            {
-                ViewTypeButton_Click(btn, new RoutedEventArgs());
-            }
-
         }
         private ObservableCollection<UIFile> files;
         public ObservableCollection<UIFile> Files

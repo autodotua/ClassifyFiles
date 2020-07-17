@@ -56,7 +56,6 @@
                            x:Name="filesViewer" Grid.Column="2"  AllowDrop="True"
              Drop="UserControl_Drop" ClickTag="filesViewer_ClickTag"/>
         <m:CommandBar  Grid.Row="2" Grid.ColumnSpan="999" DefaultLabelPosition="Right">
-        
             <m:AppBarButton Icon="View" Label="显示">
                 <m:FlyoutService.Flyout>
                     <m:Flyout x:Name="flyoutDisplay" >

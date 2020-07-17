@@ -91,7 +91,7 @@ namespace ClassifyFiles.UI.Panel
 
         private async void SelectedClassChanged(object sender, SelectedClassChangedEventArgs e)
         {
-            GetProgress().Show(false);
+            GetProgress().Show(true);
             Debug.WriteLine("Selected Class Changed, Project Hashcode is " + Project.GetHashCode()
             + ", Class is " + (GetItemsPanel().SelectedItem == null ? "null" : GetItemsPanel().SelectedItem.Name));
             List<File> files = GetItemsPanel().SelectedItem == null ?

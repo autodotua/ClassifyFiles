@@ -35,8 +35,16 @@ namespace ClassifyFiles.UI.Model
         }
         public List<UIFile> SubUIFiles { get; private set; } = new List<UIFile>();
 
-
-        public File File { get; private set; }
+        private File file;
+        public File File
+        {
+            get => file;
+            set
+            {
+                file = value;
+                this.Notify(nameof(File));
+            }
+        }
         private bool loaded = false;
         public UIFileSize Size { get; set; }
         public UIFileDisplay Display { get; set; }
@@ -74,6 +82,15 @@ namespace ClassifyFiles.UI.Model
         public override string ToString()
         {
             return File.Name + (string.IsNullOrEmpty(File.Dir) ? "" : $" （{File.Dir}）");
+        }
+
+        public override bool Equals(object obj)
+        {
+            if(obj is UIFile file)
+            {
+                return file.File.Equals(File);
+            }
+            return false;
         }
     }
 }

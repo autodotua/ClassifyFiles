@@ -24,17 +24,18 @@ xmlns:app="clr-namespace:ClassifyFiles"
         <ContextMenu x:Key="menu" Opened="ContextMenu_Opened"  Closed="ContextMenu_Closed">
         </ContextMenu>
 
+        <ToolTip x:Key="toolTip">
+            <m:SimpleStackPanel Spacing="8">
+                <component:FileIcon EnableCache="False" Square="False" File="{Binding .,Mode=OneTime}" Scale="-144"/>
+                <TextBlock FontWeight="Bold" Text="{Binding Display.DisplayName}"/>
+                <TextBlock Text="{Binding Display.DisplayDir}"/>
+            </m:SimpleStackPanel>
+        </ToolTip>
+
+        <!--图标视图模板-->
         <DataTemplate x:Key="grdIconView">
             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,8">
-                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  >
-                    <DockPanel.ToolTip>
-                        <ToolTip>
-                            <m:SimpleStackPanel Spacing="8">
-                                <TextBlock FontWeight="Bold" Text="{Binding Display.DisplayName}"/>
-                                <TextBlock Text="{Binding Display.DisplayDir}"/>
-                            </m:SimpleStackPanel>
-                        </ToolTip>
-                    </DockPanel.ToolTip>
+                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  ToolTip="{StaticResource toolTip}">
                     <TextBlock DockPanel.Dock="Bottom" FontSize="{Binding Size.FontSize}" 
                                Visibility="{Binding  Path=Display.ShowIconViewNames, Converter={StaticResource b2v}}" 
                                Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
@@ -47,10 +48,10 @@ xmlns:app="clr-namespace:ClassifyFiles"
             </Border>
         </DataTemplate>
         
-        
+        <!--平铺视图模板-->
         <DataTemplate x:Key="grdTileView">
             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,0,0,4">
-                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="{Binding Size.TotalTileViewHeight}">
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" ToolTip="{StaticResource toolTip}" Height="{Binding Size.TotalTileViewHeight}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="8"/>
@@ -69,13 +70,16 @@ xmlns:app="clr-namespace:ClassifyFiles"
                                Foreground="Gray" TextWrapping="Wrap" FontSize="{Binding Size.SmallFontSize}"  Visibility="{Binding Display.ShowTileViewPaths, Converter={StaticResource b2v}}"/>
                     <component:TagGroup Grid.ColumnSpan="99" File="{Binding .}" Orientation="Horizontal" 
                                         Grid.RowSpan="99" HorizontalAlignment="Right" VerticalAlignment="Bottom" TagMouseDown="Tags_MouseDown"/>
-                    <component:FileIcon Scale="2.0" File="{Binding .}" Grid.RowSpan="99" />
+                    <component:FileIcon Scale="2.0" File="{Binding .}" Grid.RowSpan="99" 
+                                        Height="{Binding Size.IconSize, Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" 
+                                        Width="{Binding Size.IconSize, Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"/>
                 </Grid>
             </Border>
         </DataTemplate>
 
+        <!--列表和树状视图模板-->
         <HierarchicalDataTemplate  ItemsSource="{Binding SubUIFiles}"   x:Key="listDataTemplate">
-            <Grid Margin="0,4,24,4">
+            <Grid Margin="0,4,24,4"  ToolTip="{StaticResource toolTip}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="16"/>
@@ -101,6 +105,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
             </Grid>
         </HierarchicalDataTemplate>
 
+        <!--图标和平铺视图-->
         <ListView  x:Key="grdFiles" ContextMenu="{StaticResource menu}"
                       PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"  
                          ItemsSource="{Binding Files}"  >
@@ -111,6 +116,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
             </ListBox.ItemsPanel>
         </ListView>
 
+        <!--列表视图-->
         <m:ListView ItemsSource="{Binding Files}" x:Key="lvwFiles" SelectionMode="Extended"
                     PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
                         ContextMenu="{StaticResource menu}"  ItemTemplate="{StaticResource listDataTemplate}">
@@ -121,28 +127,18 @@ xmlns:app="clr-namespace:ClassifyFiles"
             </m:ListView.ItemContainerStyle>
         </m:ListView>
 
+        <!--树状图-->
         <TreeView x:Key="treeFiles"  ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
                                           Grid.Row="4"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
                    ItemTemplate="{StaticResource listDataTemplate}"/>
         
+        <!--详细信息视图-->
         <ListView ItemsSource="{Binding Files}" x:Key="lvwDetailFiles" SelectionMode="Extended"
                     PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
                         ContextMenu="{StaticResource menu}"  Style="{StaticResource {x:Static GridView.GridViewStyleKey}}">
-      
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Static GridView.GridViewItemContainerStyleKey}}">
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
-                    <Setter Property="ToolTip">
-                        <Setter.Value>
-                            <ToolTip>
-                                <m:SimpleStackPanel Spacing="8">
-                                    <component:FileIcon File="{Binding .}" Scale="-144"/>
-                                    <TextBlock FontWeight="Bold" Text="{Binding Display.DisplayName}"/>
-                                    <TextBlock Text="{Binding Display.DisplayDir}"/>
-                                </m:SimpleStackPanel>
-                            </ToolTip>
-                        </Setter.Value>
-                    </Setter>
                 </Style>
             </ListView.ItemContainerStyle>
           
@@ -151,15 +147,27 @@ xmlns:app="clr-namespace:ClassifyFiles"
                     <GridViewColumn Header="" Width="32">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Grid>
-                                    <component:FileIcon File="{Binding .}" Scale="-18"/>
+                                <Grid ToolTip="{StaticResource toolTip}">
+                                    <component:FileIcon File="{Binding .}" Scale="-24"/>
                                 </Grid>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="文件名" DisplayMemberBinding="{Binding Display.DisplayName}"/>
-                    <GridViewColumn Header="文件夹路径" DisplayMemberBinding="{Binding Display.DisplayDir}"/>
-                    <GridViewColumn Header="分类">
+                    <GridViewColumn Header="文件名" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock ToolTip="{StaticResource toolTip}" Text="{Binding Display.DisplayName}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="文件夹路径" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock ToolTip="{StaticResource toolTip}" Text="{Binding Display.DisplayDir}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="分类" Width="144">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <component:TagGroup File="{Binding .}"/>
@@ -188,6 +196,8 @@ xmlns:app="clr-namespace:ClassifyFiles"
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="8"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <m:AutoSuggestBox
                     Grid.Column="0"
@@ -198,7 +208,8 @@ xmlns:app="clr-namespace:ClassifyFiles"
                         QuerySubmitted="SearchTextBox_QuerySubmitted"
                         SuggestionChosen="SearchTextBox_SuggestionChosen" 
                     VerticalAlignment="Center"/>
-            <Grid x:Name="grdAppBar" Grid.Column="4" HorizontalAlignment="Right">
+            <m:ProgressRing Grid.Column="4" x:Name="progress"/>
+            <Grid x:Name="grdAppBar" Grid.Column="99" HorizontalAlignment="Right">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
