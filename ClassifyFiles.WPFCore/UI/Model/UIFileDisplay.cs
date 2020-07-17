@@ -14,7 +14,7 @@ namespace ClassifyFiles.UI.Model
         public UIFileDisplay(File file)
         {
             File = file;
-
+            FileInfo = new System.IO.FileInfo(file.GetAbsolutePath());
             if (file.IsFolder)
             {
                 Glyph = FolderGlyph;
@@ -38,6 +38,7 @@ namespace ClassifyFiles.UI.Model
             }
         }
         public File File { get; private set; }
+        public System.IO.FileInfo FileInfo { get; private set; }
         public long? length = null;
         public string Length
         {
@@ -51,7 +52,7 @@ namespace ClassifyFiles.UI.Model
                 {
                     try
                     {
-                        length = new System.IO.FileInfo(File.GetAbsolutePath()).Length;
+                        length = FileInfo.Length;
                     }
                     catch
                     {

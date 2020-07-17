@@ -9,16 +9,21 @@
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
                  xmlns:m="http://schemas.modernwpf.com/2019"
 xmlns:app="clr-namespace:ClassifyFiles"
+             
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
         xmlns:wpftk="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+        <ui:MagnificationConverter x:Key="mc"/>
         <ui:NotFirst2VisibilityConverter x:Key="i2v"/>
         <ui:Bool2VisibilityConverter x:Key="b2v"/>
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
         <ui:IsNotNull2VisibilityConverter x:Key="nn2v"/>
-        
-        
+        <sys:Double x:Key="two">2.0</sys:Double>
+        <ContextMenu x:Key="menu" Opened="ContextMenu_Opened"  Closed="ContextMenu_Closed">
+        </ContextMenu>
+
         <DataTemplate x:Key="grdIconView">
             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,8">
                 <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  >
@@ -33,8 +38,11 @@ xmlns:app="clr-namespace:ClassifyFiles"
                     <TextBlock DockPanel.Dock="Bottom" FontSize="{Binding Size.FontSize}" 
                                Visibility="{Binding  Path=Display.ShowIconViewNames, Converter={StaticResource b2v}}" 
                                Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
-                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" LineHeight="16" Height="32" MaxWidth="{Binding Size.LargeIconSize}"/>
-                    <component:FileIcon UseLargeIcon="True" File="{Binding .}"  Height="{Binding Size.LargeIconSize}" Width="{Binding Size.LargeIconSize}"/>
+                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" LineHeight="16" Height="32" 
+                               MaxWidth="{Binding Size.IconSize, Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"/>
+                    <component:FileIcon Scale="2.0" File="{Binding .}"  
+                                        Height="{Binding Size.IconSize, Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" 
+                                        Width="{Binding Size.IconSize, Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"/>
                 </DockPanel>
             </Border>
         </DataTemplate>
@@ -44,7 +52,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,0,0,4">
                 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="{Binding Size.TotalTileViewHeight}">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{Binding Size.LargeIconSize}"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="8"/>
                         <ColumnDefinition Width="144"/>
                     </Grid.ColumnDefinitions>
@@ -61,12 +69,12 @@ xmlns:app="clr-namespace:ClassifyFiles"
                                Foreground="Gray" TextWrapping="Wrap" FontSize="{Binding Size.SmallFontSize}"  Visibility="{Binding Display.ShowTileViewPaths, Converter={StaticResource b2v}}"/>
                     <component:TagGroup Grid.ColumnSpan="99" File="{Binding .}" Orientation="Horizontal" 
                                         Grid.RowSpan="99" HorizontalAlignment="Right" VerticalAlignment="Bottom" TagMouseDown="Tags_MouseDown"/>
-                    <component:FileIcon UseLargeIcon="True" File="{Binding .}" Grid.RowSpan="99" />
+                    <component:FileIcon Scale="2.0" File="{Binding .}" Grid.RowSpan="99" />
                 </Grid>
             </Border>
         </DataTemplate>
-        <HierarchicalDataTemplate  ItemsSource="{Binding SubUIFiles}"   x:Key="listDataTemplate">
 
+        <HierarchicalDataTemplate  ItemsSource="{Binding SubUIFiles}"   x:Key="listDataTemplate">
             <Grid Margin="0,4,24,4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -82,7 +90,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
                     <RowDefinition Height="0"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <component:FileIcon File="{Binding .}" Grid.RowSpan="99" Width="{Binding Size.SmallIconSize}"/>
+                <component:FileIcon File="{Binding .}" Grid.RowSpan="99" />
                 <TextBlock Text="{Binding Display.DisplayName}" Grid.Column="2" Grid.ColumnSpan="3" FontWeight="Bold"/>
                 <TextBlock Text="{Binding Display.Length}"  Grid.Column="2" Grid.Row="2" Width="108"
                                    Foreground="{ DynamicResource SystemControlBackgroundBaseMediumHighBrush}"/>
@@ -93,18 +101,9 @@ xmlns:app="clr-namespace:ClassifyFiles"
             </Grid>
         </HierarchicalDataTemplate>
 
-
-        <ContextMenu x:Key="menu" Opened="ContextMenu_Opened"  Closed="ContextMenu_Closed">
-        </ContextMenu>
-
-
-
-
-        <ListView   Grid.Row="4" x:Key="grdFiles" ContextMenu="{StaticResource menu}"
+        <ListView  x:Key="grdFiles" ContextMenu="{StaticResource menu}"
                       PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"  
                          ItemsSource="{Binding Files}"  >
-            <ListBox.Resources>
-            </ListBox.Resources>
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <wpftk:VirtualizingWrapPanel Orientation="Vertical" />
@@ -112,9 +111,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
             </ListBox.ItemsPanel>
         </ListView>
 
-
-
-        <m:ListView  Grid.Row="4" ItemsSource="{Binding Files}" x:Key="lvwFiles" SelectionMode="Extended"
+        <m:ListView ItemsSource="{Binding Files}" x:Key="lvwFiles" SelectionMode="Extended"
                     PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
                         ContextMenu="{StaticResource menu}"  ItemTemplate="{StaticResource listDataTemplate}">
             <m:ListView.ItemContainerStyle >
@@ -127,6 +124,54 @@ xmlns:app="clr-namespace:ClassifyFiles"
         <TreeView x:Key="treeFiles"  ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
                                           Grid.Row="4"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
                    ItemTemplate="{StaticResource listDataTemplate}"/>
+        
+        <ListView ItemsSource="{Binding Files}" x:Key="lvwDetailFiles" SelectionMode="Extended"
+                    PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
+                        ContextMenu="{StaticResource menu}"  Style="{StaticResource {x:Static GridView.GridViewStyleKey}}">
+      
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Static GridView.GridViewItemContainerStyleKey}}">
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="ToolTip">
+                        <Setter.Value>
+                            <ToolTip>
+                                <m:SimpleStackPanel Spacing="8">
+                                    <component:FileIcon File="{Binding .}" Scale="-144"/>
+                                    <TextBlock FontWeight="Bold" Text="{Binding Display.DisplayName}"/>
+                                    <TextBlock Text="{Binding Display.DisplayDir}"/>
+                                </m:SimpleStackPanel>
+                            </ToolTip>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListView.ItemContainerStyle>
+          
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="" Width="32">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <component:FileIcon File="{Binding .}" Scale="-18"/>
+                                </Grid>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="文件名" DisplayMemberBinding="{Binding Display.DisplayName}"/>
+                    <GridViewColumn Header="文件夹路径" DisplayMemberBinding="{Binding Display.DisplayDir}"/>
+                    <GridViewColumn Header="分类">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <component:TagGroup File="{Binding .}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="大小" DisplayMemberBinding="{Binding Display.Length}"/>
+                    <GridViewColumn Header="修改时间" DisplayMemberBinding="{Binding Display.FileInfo.LastWriteTime}"/>
+                    <GridViewColumn Header="创建时间" DisplayMemberBinding="{Binding Display.FileInfo.CreationTime}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
 
     </UserControl.Resources>
     <Grid  Margin="8,4,0,4" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
@@ -162,33 +207,31 @@ xmlns:app="clr-namespace:ClassifyFiles"
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <m:AppBarToggleButton Grid.Column="3"  Label="列表视图"  Click="ViewTypeButton_Click" Tag="1" IsChecked="True">
+                <m:AppBarToggleButton Grid.Column="3"  Label="列表"  Click="ViewTypeButton_Click" Tag="1" >
                     <m:AppBarToggleButton.Icon>
-                        <m:FontIcon
-                                    FontFamily="Segoe MDL2 Assets"
-                                    Glyph="&#xE8FD;" />
+                        <m:FontIcon Glyph="&#xF168;" />
                     </m:AppBarToggleButton.Icon>
                 </m:AppBarToggleButton>
-                <m:AppBarToggleButton Grid.Column="4" Label="图标视图" Click="ViewTypeButton_Click" Tag="2">
+                <m:AppBarToggleButton Grid.Column="4" Label="图标" Click="ViewTypeButton_Click" Tag="2">
                     <m:AppBarToggleButton.Icon>
-                        <m:FontIcon
-                                    FontFamily="Segoe MDL2 Assets"
-                                    Glyph="&#xF0E2;" />
+                        <m:FontIcon Glyph="&#xF0E2;" />
                     </m:AppBarToggleButton.Icon>
                 </m:AppBarToggleButton>  
-                <m:AppBarToggleButton Grid.Column="5" Label="平铺视图" Click="ViewTypeButton_Click" Tag="3">
+                <m:AppBarToggleButton Grid.Column="5" Label="平铺" Click="ViewTypeButton_Click" Tag="3">
                     <m:AppBarToggleButton.Icon>
-                        <m:FontIcon
-                                    FontFamily="Segoe MDL2 Assets"
-                                    Glyph="&#xE8BC;" />
+                        <m:FontIcon    Glyph="&#xE8BC;" />
                     </m:AppBarToggleButton.Icon>
                 </m:AppBarToggleButton>
-                <m:AppBarToggleButton Grid.Column="6"  Label="树型视图"  Click="ViewTypeButton_Click" Tag="4">
+                <m:AppBarToggleButton Grid.Column="6"  Label="树型"  Click="ViewTypeButton_Click" Tag="4">
                     <m:AppBarToggleButton.Icon>
-                        <m:FontIcon
-                                    FontFamily="Segoe MDL2 Assets"
-                                    Glyph="&#xED25;" />
+                        <m:FontIcon Glyph="&#xED25;" />
+                    </m:AppBarToggleButton.Icon>
+                </m:AppBarToggleButton>     
+                <m:AppBarToggleButton Grid.Column="7"  Label="详细信息"  Click="ViewTypeButton_Click" Tag="5">
+                    <m:AppBarToggleButton.Icon>
+                        <m:FontIcon Glyph="&#xE8FD;" />
                     </m:AppBarToggleButton.Icon>
                 </m:AppBarToggleButton>
                 <TextBlock

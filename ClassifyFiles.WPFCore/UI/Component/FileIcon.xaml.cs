@@ -8,6 +8,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -48,13 +49,13 @@ namespace ClassifyFiles.UI.Component
                 SetValue(FileProperty, value);
             }
         }
-        public static readonly DependencyProperty UseLargeIconProperty =
-            DependencyProperty.Register("UseLargeIcon", typeof(bool), typeof(FileIcon));
+        public static readonly DependencyProperty ScaleProperty =
+            DependencyProperty.Register("Scale", typeof(double), typeof(FileIcon),new PropertyMetadata(1.0));
 
-        public bool UseLargeIcon
+        public double Scale
         {
-            get => (bool)GetValue(UseLargeIconProperty); //UseLargeIcon;
-            set => SetValue(UseLargeIconProperty, value);
+            get => (double)GetValue(ScaleProperty); //UseLargeIcon;
+            set => SetValue(ScaleProperty, value);
         }
 
         private static ConcurrentDictionary<int, FrameworkElement> caches = new ConcurrentDictionary<int, FrameworkElement>();
@@ -121,19 +122,27 @@ namespace ClassifyFiles.UI.Component
             main.Content = item;
             return item is Image;
         }
+      
         private async void UserControlBase_Loaded(object sender, RoutedEventArgs e)
         {
-            if (UseLargeIcon)
+            if(Scale==1)
             {
-                main.SetBinding(WidthProperty, "File.Size.LargeIconSize");
-                main.SetBinding(HeightProperty, "File.Size.LargeIconSize");
-                main.SetBinding(FontIcon.FontSizeProperty, "File.Size.LargeFontIconSize");
+                main.SetBinding(WidthProperty, "File.Size.IconSize");
+                main.SetBinding(HeightProperty, "File.Size.IconSize");
+                main.SetBinding(FontIcon.FontSizeProperty, "File.Size.FontIconSize");
+            } 
+            else if(Scale<0)
+            {
+                main.Width = -Scale;
+                main.Height = -Scale;
+                main.FontSize = -Scale*0.8;
             }
             else
             {
-                main.SetBinding(WidthProperty, "File.Size.SmallIconSize");
-                main.SetBinding(HeightProperty, "File.Size.SmallIconSize");
-                main.SetBinding(FontIcon.FontSizeProperty, "File.Size.SmallFontIconSize");
+                MagnificationConverter mc = new MagnificationConverter();
+                main.SetBinding(WidthProperty, new Binding("File.Size.IconSize") { Converter = mc, ConverterParameter = Scale  });
+                main.SetBinding(HeightProperty, new Binding("File.Size.IconSize") { Converter = mc, ConverterParameter = Scale });
+                main.SetBinding(FontIcon.FontSizeProperty, new Binding("File.Size.FontIconSize") { Converter = mc, ConverterParameter = Scale });
             }
             await File.LoadAsync();
             if (!Load())
@@ -145,8 +154,6 @@ namespace ClassifyFiles.UI.Component
             }
         }
         private static TaskQueue tasks = new TaskQueue();
-
-
 
         private async Task<bool> RefreshIcon()
         {
@@ -188,6 +195,7 @@ namespace ClassifyFiles.UI.Component
 
         }
     }
+  
     public class TaskQueue
     {
         ConcurrentQueue<Func<Task>> tasks = new ConcurrentQueue<Func<Task>>();

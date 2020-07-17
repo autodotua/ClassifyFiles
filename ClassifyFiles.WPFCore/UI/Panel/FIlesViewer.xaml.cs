@@ -58,12 +58,12 @@ namespace ClassifyFiles.UI.Panel
         {
             DataContext = this;
             InitializeComponent();
-            FilesContent = FindResource("lvwFiles") as ListBox;
             new DragDropFilesHelper(FindResource("lvwFiles") as ListBox).Regist();
             new DragDropFilesHelper(FindResource("grdFiles") as ListBox).Regist();
+            new DragDropFilesHelper(FindResource("lvwDetailFiles") as ListBox).Regist();
             var btn = grdAppBar.Children.OfType<AppBarToggleButton>()
                 .FirstOrDefault(p => int.Parse(p.Tag as string) == Configs.LastViewType);
-            if(btn!=null)
+            if (btn != null)
             {
                 ViewTypeButton_Click(btn, new RoutedEventArgs());
             }
@@ -83,7 +83,7 @@ namespace ClassifyFiles.UI.Panel
         /// 供树状图使用的文件树
         /// </summary>
         public List<UIFile> FileTree => Files == null ? null : new List<UIFile>(
-            FileUtility.GetFileTree<UIFile>(Project, Files,p=>new UIFile(p),p=>p.File.Dir,p=>p.SubUIFiles)
+            FileUtility.GetFileTree<UIFile>(Project, Files, p => new UIFile(p), p => p.File.Dir, p => p.SubUIFiles)
             .SubUIFiles);
 
         private double iconSize = 64;
@@ -214,7 +214,7 @@ namespace ClassifyFiles.UI.Panel
         private void ListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
 
-            if (Keyboard.IsKeyDown(Key.LeftCtrl))
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) && CurrentViewType != 5)
             {
                 UIFileSize.DefualtIconSize += e.Delta / 30;
                 Files.ForEach(p => p.Size.UpdateIconSize());
@@ -261,7 +261,7 @@ namespace ClassifyFiles.UI.Panel
             FileIcon.ClearCaches();
             var files = Files;
             Files = null;
-           await SetFilesAsync(files);
+            await SetFilesAsync(files);
         }
 
         public event EventHandler ViewTypeChanged;
@@ -271,7 +271,7 @@ namespace ClassifyFiles.UI.Panel
             grdAppBar.Children.OfType<AppBarToggleButton>().ForEach(p => p.IsChecked = false);
             (sender as AppBarToggleButton).IsChecked = true;
             CurrentViewType = type;
-                ChangeViewType(type);
+            ChangeViewType(type);
         }
 
         private void ChangeViewType(int type)
@@ -280,29 +280,25 @@ namespace ClassifyFiles.UI.Panel
             if (type == 1)
             {
                 FilesContent = FindResource("lvwFiles") as ListBox;
-                if (selectedFile != null)
-                {
-                    (FilesContent as ListBox).SelectedItem = selectedFile;
-                    (FilesContent as ListBox).ScrollIntoView(selectedFile);
-                }
+
             }
             else if (type == 2 || type == 3)
             {
                 FilesContent = FindResource("grdFiles") as ListBox;
                 FilesContent.ItemTemplate = FindResource(type == 2 ? "grdIconView" : "grdTileView") as DataTemplate;
-                if (selectedFile != null)
-                {
-                    (FilesContent as ListBox).SelectedItem = selectedFile;
-                    (FilesContent as ListBox).ScrollIntoView(selectedFile);
-                }
             }
             else if (type == 4)
             {
                 FilesContent = FindResource("treeFiles") as TreeView;
             }
-            if (Files != null)
+            else if (type == 5)
             {
-                //RealtimeRefresh(Files.Take(100));
+                FilesContent = FindResource("lvwDetailFiles") as ListView;
+            }
+            if (selectedFile != null && FilesContent is ListBox list)
+            {
+                list.SelectedItem = selectedFile;
+                list.ScrollIntoView(selectedFile);
             }
             Configs.LastViewType = CurrentViewType;
             ViewTypeChanged?.Invoke(this, new EventArgs());
@@ -314,10 +310,9 @@ namespace ClassifyFiles.UI.Panel
             switch (CurrentViewType)
             {
                 case 1:
-                    file = Files.FirstOrDefault(p => p.File.Dir == dir);
-                    break;
                 case 2:
                 case 3:
+                case 5:
                     file = Files.FirstOrDefault(p => p.File.Dir == dir);
                     break;
                 default:
@@ -368,7 +363,7 @@ namespace ClassifyFiles.UI.Panel
                 menuOpenFolder.Click += OpenDirMernuItem_Click;
                 menu.Items.Add(menuOpenFolder);
             }
-            if ((!files.Any(p => p.File.IsFolder) || CurrentViewType<4) && Project.Classes!=null)
+            if ((!files.Any(p => p.File.IsFolder) || CurrentViewType != 4) && Project.Classes != null)
             {
                 menu.Items.Add(new Separator());
                 foreach (var tag in Project.Classes)
@@ -376,7 +371,7 @@ namespace ClassifyFiles.UI.Panel
                     CheckBox chk = new CheckBox()
                     {
                         Content = tag.Name,
-                        IsChecked = (!files.Any(p => p.Classes.Any(q=>q.ID==tag.ID))) ? false :
+                        IsChecked = (!files.Any(p => p.Classes.Any(q => q.ID == tag.ID))) ? false :
                         files.All(p => p.Classes.Any(q => q.ID == tag.ID)) ? true : (bool?)null
                     };
                     chk.Click += async (p1, p2) =>
@@ -388,7 +383,7 @@ namespace ClassifyFiles.UI.Panel
                              foreach (var file in files)
                              {
                                  var newC = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
-                                 if (newC==null)
+                                 if (newC == null)
                                  {
                                      file.Classes.Add(tag);
                                  }
@@ -400,7 +395,7 @@ namespace ClassifyFiles.UI.Panel
                              foreach (var file in files)
                              {
                                  var c = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
-                                 if (c!=null)
+                                 if (c != null)
                                  {
                                      file.Classes.Remove(c);
                                  }
@@ -476,7 +471,7 @@ namespace ClassifyFiles.UI.Panel
 
         private void List_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if(!(e.OriginalSource is Image))
+            if (!(e.OriginalSource is Image))
             {
                 return;
             }

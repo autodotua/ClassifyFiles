@@ -44,6 +44,7 @@ namespace ClassifyFiles.UI.Panel
             swtIcons.IsOn = Configs.ShowExplorerIcon;
             swtThumbs.IsOn = Configs.ShowThumbnail;
             swtShowTilePath.IsOn = Configs.ShowTilePath;
+            swtIconViewNames.IsOn = Configs.ShowIconViewNames;
             sldIconSize.Value = Configs.IconSize;
         }
 
@@ -272,7 +273,7 @@ namespace ClassifyFiles.UI.Panel
         private void sldIconSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             double value = (sender as Slider).Value;
-            tbkIconSize.Text = ((int)(value / 64 * 100)).ToString() + "%";
+            tbkIconSize.Text = ((int)(value / 32 * 100)).ToString() + "%";
             if (!IsLoaded)
             {
                 return;
@@ -284,7 +285,7 @@ namespace ClassifyFiles.UI.Panel
 
         private void sldIconSize_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            sldIconSize.Value = 64;
+            sldIconSize.Value = 32;
         }
     }
 }

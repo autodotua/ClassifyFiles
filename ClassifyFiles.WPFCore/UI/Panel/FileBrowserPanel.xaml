@@ -94,7 +94,7 @@
                                         <ColumnDefinition Width="48"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column="2" x:Name="tbkIconSize" VerticalAlignment="Center"/>
-                                    <Slider Orientation="Horizontal" Minimum="32"  VerticalAlignment="Center"
+                                    <Slider Orientation="Horizontal" Minimum="16"  VerticalAlignment="Center"
                                             SmallChange="1" LargeChange="10" Interval="1" Maximum="256" 
                                             PreviewMouseDoubleClick="sldIconSize_PreviewMouseDoubleClick" IsMoveToPointEnabled="True"
                                         x:Name="sldIconSize" ValueChanged="sldIconSize_ValueChanged"/>

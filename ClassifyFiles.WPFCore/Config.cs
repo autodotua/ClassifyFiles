@@ -103,7 +103,7 @@ namespace ClassifyFiles
         private static double? iconSize = null;
         public static double IconSize
         {
-            get => Get(ref iconSize, GetDouble, 64d, nameof(IconSize));
+            get => Get(ref iconSize, GetDouble, 32d, nameof(IconSize));
             set => Set(ref iconSize, value, nameof(IconSize));
         }
 

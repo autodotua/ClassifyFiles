@@ -19,14 +19,14 @@ namespace ClassifyFiles.UI.Model
         }
         private static double defualtIconSize = Configs.IconSize;
         /// <summary>
-        /// 默认大图标的大小
+        /// 默认图标的大小
         /// </summary>
         public static double DefualtIconSize
         {
             get => defualtIconSize;
             set
             {
-                if (value < 32 || value > 256)
+                if (value < 16 || value > 256)
                 {
                     return;
                 }
@@ -34,28 +34,24 @@ namespace ClassifyFiles.UI.Model
             }
         }
 
-        public double LargeIconSize { get; private set; } = DefualtIconSize;
-        public double SmallIconSize { get; private set; } = DefualtIconSize / 2;
-        public double SmallFontIconSize { get; private set; } = DefualtIconSize / 3;
-        public double LargeFontIconSize { get; private set; } = DefualtIconSize / 1.5;
+        public double IconSize { get; private set; } = DefualtIconSize;
+        public double FontIconSize { get; private set; } = DefualtIconSize / 1.5;
         public double FontSize { get; private set; } = 12;
         public double SmallFontSize { get; private set; } = 11;
         private static FontFamily font;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public double TotalIconViewHeight => Configs.ShowIconViewNames ? LargeIconSize + 16 * 2 + 8 : LargeIconSize;
-        public double TotalTileViewHeight => LargeIconSize + 32;
+        public double TotalIconViewHeight => Configs.ShowIconViewNames ? IconSize*2 + 16 * 2 + 8 : IconSize * 2;
+        public double TotalTileViewHeight => IconSize * 2 + 32;
         public double TileTitleHeight => FontSize * font.LineSpacing * 2;
         public double TileDirHeight => SmallFontSize * font.LineSpacing * 2;
 
         public void UpdateIconSize()
         {
-            LargeIconSize = DefualtIconSize;
-            SmallIconSize = DefualtIconSize / 2;
-            SmallFontIconSize = DefualtIconSize / 3;
-            LargeFontIconSize = DefualtIconSize / 1.5;
-            this.Notify(nameof(LargeIconSize), nameof(SmallIconSize), nameof(SmallFontIconSize), nameof(LargeFontIconSize), nameof(TotalIconViewHeight));
+            IconSize = DefualtIconSize ;
+            FontIconSize = DefualtIconSize / 1.5;
+            this.Notify(nameof(IconSize), nameof(FontIconSize),nameof(TotalIconViewHeight),nameof(TotalTileViewHeight));
         }
     }
 }
