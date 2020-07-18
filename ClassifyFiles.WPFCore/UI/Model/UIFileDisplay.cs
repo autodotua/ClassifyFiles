@@ -44,7 +44,7 @@ namespace ClassifyFiles.UI.Model
         {
             get
             {
-                if(File.IsFolder)
+                if (File.IsFolder)
                 {
                     return "文件夹";
                 }
@@ -59,14 +59,29 @@ namespace ClassifyFiles.UI.Model
                         length = -1;
                     }
                 }
-                if(length==-1)
+                if (length == -1)
                 {
                     return "未知";
                 }
                 return FzLib.Basic.Number.ByteToFitString(length.Value);
             }
         }
-        public string DisplayName => File.IsFolder ? new System.IO.DirectoryInfo(File.Dir).Name : File.Name;
+        public string DisplayName
+        {
+            get
+            {
+                if (File.IsFolder)
+                {
+                    return new System.IO.DirectoryInfo(File.Dir).Name;
+                }
+
+                if (Configs.ShowFileExtension)
+                {
+                    return File.Name;
+                }
+                return System.IO.Path.GetFileNameWithoutExtension(File.Name);
+            }
+        }
         public string DisplayDir => File.IsFolder ? File.Dir.Substring(0, File.Dir.Length - DisplayName.Length) : File.Dir;
         public bool ShowIconViewNames => Configs.ShowIconViewNames;
         public bool ShowTileViewPaths => Configs.ShowTilePath;

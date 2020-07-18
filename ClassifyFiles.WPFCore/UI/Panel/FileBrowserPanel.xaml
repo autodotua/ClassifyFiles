@@ -54,11 +54,26 @@
 
         <panel:FilesViewer ViewTypeChanged="filesViewer_ViewTypeChanged" 
                            x:Name="filesViewer" Grid.Column="2"  AllowDrop="True"
-             Drop="UserControl_Drop" ClickTag="filesViewer_ClickTag"/>
+             Drop="UserControl_Drop" ClickTag="filesViewer_ClickTag" PreviewMouseWheel="filesViewer_PreviewMouseWheel"/>
         <m:CommandBar  Grid.Row="2" Grid.ColumnSpan="999" DefaultLabelPosition="Right">
-            <m:AppBarButton Icon="View" Label="显示">
+            <m:AppBarButton Icon="Sort" Label="排序">
                 <m:FlyoutService.Flyout>
-                    <m:Flyout x:Name="flyoutDisplay" >
+                    <m:MenuFlyout x:Name="menuSort" >
+                        <m:RadioMenuItem Header="默认（按目录）" IsCheckable="True" IsChecked="True" Checked="RadioMenuItem_Checked"/>
+                        <m:RadioMenuItem Header="文件名（升序）" IsCheckable="True" Checked="RadioMenuItem_Checked"/>
+                        <m:RadioMenuItem Header="文件名（升序）" IsCheckable="True" Checked="RadioMenuItem_Checked"/>
+                        <m:RadioMenuItem Header="大小（从大到小）" IsCheckable="True" Checked="RadioMenuItem_Checked"/>
+                        <m:RadioMenuItem Header="大小（从小到大）" IsCheckable="True" Checked="RadioMenuItem_Checked"/>
+                        <m:RadioMenuItem Header="修改时间（从早到晚）" IsCheckable="True" Checked="RadioMenuItem_Checked"/>
+                        <m:RadioMenuItem Header="修改时间（从晚到早）" IsCheckable="True" Checked="RadioMenuItem_Checked"/>
+                        <m:RadioMenuItem Header="类型（升序）" IsCheckable="True" Checked="RadioMenuItem_Checked"/>
+                        <m:RadioMenuItem Header="类型（升序）" IsCheckable="True" Checked="RadioMenuItem_Checked"/>
+                    </m:MenuFlyout>
+                </m:FlyoutService.Flyout>
+            </m:AppBarButton>
+            <m:AppBarButton Icon="View" Label="显示" >
+                <m:FlyoutService.Flyout>
+                    <m:Flyout x:Name="flyoutDisplay"  >
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -74,16 +89,18 @@
                             </Grid.RowDefinitions>
                             <GroupBox Header="通用" Grid.RowSpan="3">
                                 <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
-                                    <m:ToggleSwitch x:Name="swtTags" Header="显示分类标签" Toggled="ToggleSwitch_Toggled" />
-                                    <m:ToggleSwitch x:Name="swtThumbs" Header="显示缩略图"  Toggled="swtThumbs_Toggled"/>
-                                    <m:ToggleSwitch x:Name="swtIcons" Header="显示资源管理器图标" Toggled="swtIcons_Toggled"/>
+                                    <m:ToggleSwitch x:Name="swtTags" Header="显示分类标签" IsOn="{Binding ShowClassTags}" />
+                                    <m:ToggleSwitch x:Name="swtThumbs" Header="显示缩略图"  IsOn="{Binding ShowThumbnail}"/>
+                                    <m:ToggleSwitch x:Name="swtIcons" Header="显示资源管理器图标" IsOn="{Binding ShowExplorerIcon}"/>
+                                    <m:ToggleSwitch x:Name="swtGroup" Header="按目录进行分组" IsOn="{Binding GroupByDir}"/>
+                                    <m:ToggleSwitch  Header="显示文件扩展名" IsOn="{Binding ShowFileExtension}"/>
                                 </m:SimpleStackPanel>
                             </GroupBox>
                             <GroupBox Header="图标视图" Grid.Column="2">
-                                <m:ToggleSwitch x:Name="swtIconViewNames" Header="显示文件名" Toggled="swtIconViewNames_Toggled"/>
+                                <m:ToggleSwitch x:Name="swtIconViewNames" Header="显示文件名" IsOn="{Binding ShowIconViewNames}"/>
                             </GroupBox>
                             <GroupBox Header="平铺视图" Grid.Column="2" Grid.Row="2">
-                                <m:ToggleSwitch x:Name="swtShowTilePath" Header="显示文件夹路径" Toggled="showTilePath_Toggled"/>
+                                <m:ToggleSwitch x:Name="swtShowTilePath" Header="显示文件夹路径" IsOn="{Binding ShowTilePath}"/>
                             </GroupBox>
                             <GroupBox Header="缩放" Grid.Row="4" Grid.ColumnSpan="99">
                                 <Grid>
@@ -92,14 +109,13 @@
                                         <ColumnDefinition Width="8"/>
                                         <ColumnDefinition Width="48"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="2" x:Name="tbkIconSize" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" x:Name="tbkIconSize" Text="{Binding IconSizeString}" VerticalAlignment="Center"/>
                                     <Slider Orientation="Horizontal" Minimum="16"  VerticalAlignment="Center"
-                                            SmallChange="1" LargeChange="10" Interval="1" Maximum="256" 
+                                            SmallChange="1" LargeChange="10" Interval="1" Maximum="256" Value="{Binding IconSize}"
                                             PreviewMouseDoubleClick="sldIconSize_PreviewMouseDoubleClick" IsMoveToPointEnabled="True"
-                                        x:Name="sldIconSize" ValueChanged="sldIconSize_ValueChanged"/>
-                                    
-                                </Grid>
+                                        x:Name="sldIconSize" />
 
+                                </Grid>
                             </GroupBox>
                         </Grid>
                     </m:Flyout>

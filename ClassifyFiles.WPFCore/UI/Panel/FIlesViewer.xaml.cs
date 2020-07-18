@@ -22,6 +22,7 @@ using System.Windows.Controls.Primitives;
 using System.Collections.Concurrent;
 using ListView = System.Windows.Controls.ListView;
 using System.Collections.Specialized;
+using System.Windows.Data;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -34,6 +35,7 @@ namespace ClassifyFiles.UI.Panel
         {
             DataContext = this;
             InitializeComponent();
+            SetGroupEnable(Configs.GroupByDir);
             new DragDropFilesHelper(FindResource("lvwFiles") as ListBox).Regist();
             new DragDropFilesHelper(FindResource("grdFiles") as ListBox).Regist();
             new DragDropFilesHelper(FindResource("lvwDetailFiles") as ListBox).Regist();
@@ -230,6 +232,7 @@ namespace ClassifyFiles.UI.Panel
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && CurrentViewType != 5)
             {
                 UIFileSize.DefualtIconSize += e.Delta / 30;
+                Configs.IconSize = UIFileSize.DefualtIconSize;
                 Files.ForEach(p => p.Size.UpdateIconSize());
                 e.Handled = true;
             }
@@ -287,6 +290,22 @@ namespace ClassifyFiles.UI.Panel
             ChangeViewType(type);
         }
 
+        public void SetGroupEnable(bool enable)
+        {
+            foreach (var list in Resources.Values.OfType<ListBox>())
+            {
+                if (enable)
+                {
+
+                    list.SetBinding(ListBox.ItemsSourceProperty, new Binding() { Source = FindResource("listDetailItemsSource") as CollectionViewSource });
+                }
+                else
+                {
+                    list.SetBinding(ListBox.ItemsSourceProperty, nameof(Files));
+                }
+            }
+        }
+
         private void ChangeViewType(int type)
         {
             var selectedFile = GetSelectedFile();
@@ -335,7 +354,12 @@ namespace ClassifyFiles.UI.Panel
         }
         public void SelectFile(UIFile file)
         {
-            if (FilesContent is ListView lvw)
+            if (FilesContent is ListBox lbx)
+            {
+                lbx.SelectedItem = file;
+                lbx.ScrollIntoView(file);
+            }
+            else if(filesContent is ModernWpf.Controls.ListView lvw)
             {
                 lvw.SelectedItem = file;
                 lvw.ScrollIntoView(file);
@@ -370,6 +394,11 @@ namespace ClassifyFiles.UI.Panel
             ContextMenu menu = FindResource("menu") as ContextMenu;
             menu.Items.Clear();
             var files = GetSelectedFiles();
+            if(files==null || files.Count==0)
+            {
+                menu.IsOpen = false;
+                return;
+            }
             if (files.Count == 1)
             {
                 MenuItem menuOpenFolder = new MenuItem() { Header = "打开目录" };
@@ -484,9 +513,7 @@ namespace ClassifyFiles.UI.Panel
 
         private void ContextMenu_Closed(object sender, RoutedEventArgs e)
         {
-            //(sender as ContextMenu).Items.Clear();
         }
-
 
     }
 
@@ -520,13 +547,13 @@ namespace ClassifyFiles.UI.Panel
 
         private void List_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-        
+
             Point position = e.GetPosition(null);
             double distance = Math.Sqrt(Math.Pow(position.X - beginPosition.X, 2) + Math.Pow(position.Y - beginPosition.Y, 2));
             //如果还没有放置项，并且鼠标已经按下，并且移动距离超过了10单位
             if (!set && mouseDown && distance > 10)
             {
-                if (e.OriginalSource is Thumb|| e.OriginalSource is RepeatButton)
+                if (e.OriginalSource is Thumb || e.OriginalSource is RepeatButton)
                 {
                     return;
                 }
@@ -555,7 +582,7 @@ namespace ClassifyFiles.UI.Panel
                 ignoredSelect = false;
 
                 if (!list.SelectedItems.Cast<object>().Any(p => list.ItemContainerGenerator.ContainerFromItem(p) == null))
-                    {
+                {
                     var mouseOverItem = list.SelectedItems.Cast<object>().FirstOrDefault(p =>
                (list.ItemContainerGenerator.ContainerFromItem(p) as ListBoxItem).IsMouseOver);
                     if (mouseOverItem != null)

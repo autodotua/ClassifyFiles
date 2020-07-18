@@ -7,12 +7,8 @@ namespace ClassifyFiles.Util
 {
     public static class DbUtility
     {
-        static DbUtility()
-        {
-            db = new AppDbContext(DbPath);
-        }
         public static string DbPath { get; private set; } = "data.db";
-        internal static AppDbContext db;
+        internal static AppDbContext db = new AppDbContext(DbPath);
 
         public static Task SaveChangesAsync()
         {

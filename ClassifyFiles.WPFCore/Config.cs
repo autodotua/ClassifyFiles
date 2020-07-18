@@ -113,6 +113,18 @@ namespace ClassifyFiles
             get => Get(ref showTilePath, GetBool, true, nameof(ShowTilePath));
             set => Set(ref showTilePath, value, nameof(ShowTilePath));
         }
+        private static bool? groupByDir = null;
+        public static bool GroupByDir
+        {
+            get => Get(ref groupByDir, GetBool, true, nameof(GroupByDir));
+            set => Set(ref groupByDir, value, nameof(GroupByDir));
+        }     
+        private static bool? showFileExtension = null;
+        public static bool ShowFileExtension
+        {
+            get => Get(ref showFileExtension, GetBool, true, nameof(ShowFileExtension));
+            set => Set(ref showFileExtension, value, nameof(ShowFileExtension));
+        }
 
         public static event PropertyChangedEventHandler PropertyChanged;
 

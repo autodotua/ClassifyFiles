@@ -40,12 +40,12 @@ namespace ClassifyFiles.UI.Panel
         public FileBrowserPanel()
         {
             InitializeComponent();
-            swtTags.IsOn = Configs.ShowClassTags;
-            swtIcons.IsOn = Configs.ShowExplorerIcon;
-            swtThumbs.IsOn = Configs.ShowThumbnail;
-            swtShowTilePath.IsOn = Configs.ShowTilePath;
-            swtIconViewNames.IsOn = Configs.ShowIconViewNames;
-            sldIconSize.Value = Configs.IconSize;
+            //swtTags.IsOn = Configs.ShowClassTags;
+            //swtIcons.IsOn = Configs.ShowExplorerIcon;
+            //swtThumbs.IsOn = Configs.ShowThumbnail;
+            //swtShowTilePath.IsOn = Configs.ShowTilePath;
+            //swtIconViewNames.IsOn = Configs.ShowIconViewNames;
+            //sldIconSize.Value = Configs.IconSize;
         }
 
         public override ClassesPanel GetItemsPanel()
@@ -107,14 +107,15 @@ namespace ClassifyFiles.UI.Panel
         }
 
 
-        private void JumpToDirComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void JumpToDirComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             string dir = e.AddedItems.Count == 0 ? null : e.AddedItems.Cast<string>().First();
             if (dir != null)
             {
                 filesViewer.SelectFileByDir(dir);
-                (sender as ListBox).SelectedItem = null;
+                await Task.Delay(250);
                 flyoutJumpToDir.Hide();// = false;
+                (sender as ListBox).SelectedItem = null;
             }
         }
 
@@ -206,80 +207,89 @@ namespace ClassifyFiles.UI.Panel
                 GetItemsPanel().SelectedItem = null;
             }
         }
-
-        private async void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+        public bool ShowClassTags
         {
-            if (!IsLoaded)
+            get => Configs.ShowClassTags;
+            set => SetSwitchValueASync(value, on => Configs.ShowClassTags = on);
+        }
+        public bool ShowThumbnail
+        {
+            get => Configs.ShowThumbnail;
+            set => SetSwitchValueASync(value, on => Configs.ShowThumbnail = on);
+        }
+        public bool ShowExplorerIcon
+        {
+            get => Configs.ShowExplorerIcon;
+            set => SetSwitchValueASync(value, on => Configs.ShowExplorerIcon = on);
+        }
+        public bool ShowIconViewNames
+        {
+            get => Configs.ShowIconViewNames;
+            set => SetSwitchValueASync(value, on => Configs.ShowIconViewNames = on);
+        }
+        public bool ShowTilePath
+        {
+            get => Configs.ShowTilePath;
+            set => SetSwitchValueASync(value, on => Configs.ShowTilePath = on);
+        }       public bool ShowFileExtension
+        {
+            get => Configs.ShowFileExtension;
+            set => SetSwitchValueASync(value, on => Configs.ShowFileExtension = on);
+        }    
+        public bool GroupByDir
+        {
+            get => Configs.GroupByDir;
+            set
             {
-                return;
+                Configs.GroupByDir = value;
+                filesViewer.SetGroupEnable(value);
             }
-            bool on = (sender as ToggleSwitch).IsOn;
-            Configs.ShowClassTags = on;
+        }
+
+        private async void SetSwitchValueASync(bool value, Action<bool> set)
+        {
+            set(value);
             await filesViewer.RefreshAsync();
         }
 
-        private async void swtThumbs_Toggled(object sender, RoutedEventArgs e)
+        public double IconSize
         {
-            if (!IsLoaded)
+            get => Configs.IconSize;
+            set
             {
-                return;
+                tbkIconSize.Text = ((int)(value / 32 * 100)).ToString() + "%";
+                if (!IsLoaded)
+                {
+                    return;
+                }
+                Configs.IconSize = value;
+                UIFileSize.DefualtIconSize = value;
+                filesViewer.Files.ForEach(p => p.Size.UpdateIconSize());
+                this.Notify(nameof(IconSize), nameof(IconSizeString));
             }
-            bool on = (sender as ToggleSwitch).IsOn;
-            Configs.ShowThumbnail = on;
-            await filesViewer.RefreshAsync();
         }
+        public string IconSizeString=> ((int)(IconSize / 32 * 100)).ToString() + "%";
 
-        private async void swtIcons_Toggled(object sender, RoutedEventArgs e)
-        {
-
-            if (!IsLoaded)
-            {
-                return;
-            }
-            bool on = (sender as ToggleSwitch).IsOn;
-            Configs.ShowExplorerIcon = on;
-            await filesViewer.RefreshAsync();
-        }
-
-
-        private async void swtIconViewNames_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (!IsLoaded)
-            {
-                return;
-            }
-            bool on = (sender as ToggleSwitch).IsOn;
-            Configs.ShowIconViewNames = on;
-            await filesViewer.RefreshAsync();
-        }
-
-        private async void showTilePath_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (!IsLoaded)
-            {
-                return;
-            }
-            bool on = (sender as ToggleSwitch).IsOn;
-            Configs.ShowTilePath = on;
-            await filesViewer.RefreshAsync();
-        }
-
-        private void sldIconSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            double value = (sender as Slider).Value;
-            tbkIconSize.Text = ((int)(value / 32 * 100)).ToString() + "%";
-            if (!IsLoaded)
-            {
-                return;
-            }
-            Configs.IconSize = value;
-            UIFileSize.DefualtIconSize = value;
-            filesViewer.Files.ForEach(p => p.Size.UpdateIconSize());
-        }
 
         private void sldIconSize_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             sldIconSize.Value = 32;
+        }
+
+        private void filesViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if(Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            {
+                this.Notify(nameof(IconSize), nameof(IconSizeString));
+            }
+        }
+
+        private void RadioMenuItem_Checked(object sender, RoutedEventArgs e)
+        {
+            if(!IsLoaded)
+            {
+                return;
+            }
         }
     }
 }

@@ -23,6 +23,38 @@ xmlns:app="clr-namespace:ClassifyFiles"
         <sys:Double x:Key="two">2.0</sys:Double>
         <ContextMenu x:Key="menu" Opened="ContextMenu_Opened"  Closed="ContextMenu_Closed">
         </ContextMenu>
+        <Style x:Key="groupStyle" TargetType="{x:Type GroupItem}">
+            <Setter Property="Margin" Value="0,8,0,4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type GroupItem}">
+                        <Expander IsExpanded="True" BorderBrush="Gray" 
+                          BorderThickness="0,1,0,0">
+                            <Expander.Header>
+                                <DockPanel>
+                                    <TextBlock FontWeight="Bold" Text="{Binding Path=Name}" 
+                                 Margin="8,04,0,0" />
+                                    <TextBlock FontWeight="Bold"  Margin="16,4,0,8">
+                                        <Run  Text="{Binding Path=ItemCount, Mode=OneWay}"/>
+                                        <Run>个文件</Run>
+                                    </TextBlock>
+                                </DockPanel>
+                            </Expander.Header>
+                            <Expander.Content>
+                                <ItemsPresenter />
+                            </Expander.Content>
+                        </Expander>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <CollectionViewSource x:Key='listDetailItemsSource' 
+                      Source="{Binding Files}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="File.Dir" />
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
 
         <ToolTip x:Key="toolTip"  Placement="Right" Padding="8" BorderThickness="0">
             <m:SimpleStackPanel Spacing="8"   Orientation="Vertical">
@@ -144,40 +176,61 @@ xmlns:app="clr-namespace:ClassifyFiles"
         <!--图标和平铺视图-->
         <ListView  x:Key="grdFiles" ContextMenu="{StaticResource menu}"
                       PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"  
-                         ItemsSource="{Binding Files}"  >
+                         ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
+                    VirtualizingPanel.IsVirtualizing='True'
+                     VirtualizingPanel.IsVirtualizingWhenGrouping='True'
+                     VirtualizingPanel.ScrollUnit='Pixel'  >
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <wpftk:VirtualizingWrapPanel Orientation="Vertical" />
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
+            <ListView.GroupStyle>
+                <GroupStyle ContainerStyle="{StaticResource groupStyle}"/>
+            </ListView.GroupStyle>
         </ListView>
 
         <!--列表视图-->
-        <m:ListView ItemsSource="{Binding Files}" x:Key="lvwFiles" SelectionMode="Extended"
+        <m:ListView ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}" 
+                    x:Key="lvwFiles" SelectionMode="Extended"
                     PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
-                        ContextMenu="{StaticResource menu}"  ItemTemplate="{StaticResource listDataTemplate}">
+                        ContextMenu="{StaticResource menu}"
+                    ItemTemplate="{StaticResource listDataTemplate}"
+                                        VirtualizingPanel.IsVirtualizing='True'
+                     VirtualizingPanel.IsVirtualizingWhenGrouping='True'
+                     VirtualizingPanel.ScrollUnit='Pixel'  >
             <m:ListView.ItemContainerStyle >
                 <Style TargetType="{x:Type m:ListViewItem}">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                 </Style>
             </m:ListView.ItemContainerStyle>
+            <m:ListView.GroupStyle>
+                <GroupStyle ContainerStyle="{StaticResource groupStyle}"/>
+            </m:ListView.GroupStyle>
         </m:ListView>
 
         <!--树状图-->
         <TreeView x:Key="treeFiles"  ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
                                           Grid.Row="4"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
                    ItemTemplate="{StaticResource listDataTemplate}"/>
-        
+
+
+    
         <!--详细信息视图-->
-        <ListView ItemsSource="{Binding Files}" x:Key="lvwDetailFiles" SelectionMode="Extended"
-                    PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick" 
-                        ContextMenu="{StaticResource menu}"  Style="{StaticResource {x:Static GridView.GridViewStyleKey}}">
+        <ListView x:Key="lvwDetailFiles" SelectionMode="Extended" ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
+                    PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"        
+                     VirtualizingPanel.IsVirtualizing='True'
+                     VirtualizingPanel.IsVirtualizingWhenGrouping='True'
+                     VirtualizingPanel.ScrollUnit='Pixel'  
+                  ContextMenu="{StaticResource menu}"  Style="{StaticResource {x:Static GridView.GridViewStyleKey}}">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Static GridView.GridViewItemContainerStyleKey}}">
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
                 </Style>
             </ListView.ItemContainerStyle>
-          
+            <ListView.GroupStyle>
+                <GroupStyle ContainerStyle="{StaticResource groupStyle}"/>
+            </ListView.GroupStyle>
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="" Width="36">
@@ -289,5 +342,6 @@ xmlns:app="clr-namespace:ClassifyFiles"
         </Grid>
 
         <ContentControl Grid.Row="4" Content="{Binding FilesContent}" />
+
     </Grid>
 </UserControl>
