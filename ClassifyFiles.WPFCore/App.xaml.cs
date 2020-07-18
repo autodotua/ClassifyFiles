@@ -78,22 +78,29 @@ namespace ClassifyFiles.WPFCore
 
                 await Dispatcher.Invoke(async () =>
             {
-                Window win = new Window()
+                try
                 {
-                    AllowsTransparency = true,
-                    WindowStyle = WindowStyle.None,
-                    ShowInTaskbar = false,
-                    Title = "错误",
-                    Topmost = true,
-                    Background = Brushes.Transparent,
-                    WindowStartupLocation = WindowStartupLocation.CenterScreen
-                };
-                WindowHelper.SetUseModernWindowStyle(win, true);
-                ThemeManager.SetIsThemeAware(win, true);
-                SetTheme(win);
-                win.Show();
-                await new MessageDialog().ShowAsync(e.Exception.ToString(), "程序发生错误");
-                win.Close();
+                    //Window win = new Window()
+                    //{
+                    //    AllowsTransparency = true,
+                    //    WindowStyle = WindowStyle.None,
+                    //    ShowInTaskbar = false,
+                    //    Title = "错误",
+                    //    Topmost = true,
+                    //    Background = Brushes.Transparent,
+                    //    WindowStartupLocation = WindowStartupLocation.CenterScreen
+                    //};
+                    //WindowHelper.SetUseModernWindowStyle(win, true);
+                    //ThemeManager.SetIsThemeAware(win, true);
+                    //SetTheme(win);
+                    //win.Show();
+                    await new ErrorDialog().ShowAsync(e.Exception, "程序发生错误");
+                    //win.Close();
+                }
+                catch
+                {
+                    
+                }
             });
             }
         }

@@ -15,42 +15,46 @@
     <UserControl.Resources>
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
     </UserControl.Resources>
-    <Grid >
+    <Grid x:Name="grdMain">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" MaxWidth="600" />
             <ColumnDefinition Width="8"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="0"/>
+            <RowDefinition Height="4"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" 
+                      VerticalAlignment="Stretch" Background="Transparent" PreviewMouseUp="grdSplitter_PreviewMouseDown"
+                      x:Name="grdSplitter" PreviewMouseMove="grdSplitter_PreviewMouseMove"/>
+        <Label Grid.Column="1" Content="⁞" Foreground="White" VerticalAlignment="Center" 
+               Opacity="0.5" FontSize="26" FontWeight="Bold" IsHitTestVisible="False"/>
+        <Grid Margin="8,0,0,0"  x:Name="grdLeft" Width="200" HorizontalAlignment="Left">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="4"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="8"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="8"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <m:SimpleStackPanel Orientation="Horizontal" Spacing="16">
+                <!--<TextBlock Text="{Binding Project.Name}"   VerticalAlignment="Center"  FontSize="24"/>-->
 
-        <Expander Margin="8,8,0,0" Header="" ExpandDirection="Right" FocusVisualStyle="{x:Null}" IsExpanded="True">
-            <Grid Margin="8,0,0,0" MinWidth="200" MaxWidth="400">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="4"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="8"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="8"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <m:SimpleStackPanel Orientation="Horizontal" Spacing="16">
-                    <TextBlock Text="{Binding Project.Name}"   VerticalAlignment="Center"  FontSize="24"/>
+                <!--<TextBlock Grid.Column="2"
+                      VerticalAlignment="Bottom" Text="{Binding Project.RootPath}"/>-->
+            </m:SimpleStackPanel>
 
-                    <TextBlock Grid.Column="2"
-                      VerticalAlignment="Bottom" Text="{Binding Project.RootPath}"/>
-                </m:SimpleStackPanel>
+            <panel:ClassesPanel x:Name="classPanel"   Grid.Row="4" SelectedClassChanged="SelectedClassChanged"/>
 
-                <panel:ClassesPanel x:Name="classPanel"   Grid.Row="4" SelectedClassChanged="SelectedClassChanged"/>
+            <Button Content="显示全部文件" Background="{StaticResource SystemControlBackgroundChromeBlackHighBrush}"
+                x:Name="btnAllFiles" Click="btnAllFiles_Click" Margin="0,8" Padding="10,8" Grid.Row="6"
+                    HorizontalContentAlignment="Left"  HorizontalAlignment="Stretch"/>
+        </Grid>
 
-                <Button Content="显示全部文件" 
-                x:Name="btnAllFiles" Click="btnAllFiles_Click" Margin="0,8" Grid.Row="6"  HorizontalAlignment="Stretch"/>
-            </Grid>
-        </Expander>
 
         <panel:FilesViewer ViewTypeChanged="filesViewer_ViewTypeChanged" 
                            x:Name="filesViewer" Grid.Column="2"  AllowDrop="True"
@@ -122,8 +126,10 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="8"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="8"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <GroupBox Header="通用" Grid.RowSpan="3">
+                            <GroupBox Header="通用" Grid.RowSpan="5">
                                 <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
                                     <m:ToggleSwitch x:Name="swtTags" Header="显示分类标签" IsOn="{Binding ShowClassTags}" />
                                     <m:ToggleSwitch x:Name="swtThumbs" Header="显示缩略图"  IsOn="{Binding ShowThumbnail}"/>
@@ -138,7 +144,15 @@
                             <GroupBox Header="平铺视图" Grid.Column="2" Grid.Row="2">
                                 <m:ToggleSwitch x:Name="swtShowTilePath" Header="显示文件夹路径" IsOn="{Binding ShowTilePath}"/>
                             </GroupBox>
-                            <GroupBox Header="缩放" Grid.Row="4" Grid.ColumnSpan="99">
+                            <GroupBox Header="提示" Grid.Column="2" Grid.Row="4">
+                                <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
+                                    <m:ToggleSwitch x:Name="swtShowToolTip" Header="显示提示" IsOn="{Binding ShowToolTip}"/>
+                                    <m:ToggleSwitch  Header="在提示中显示图片" IsOn="{Binding ShowToolTipImage}"
+                                                     IsEnabled="{Binding ElementName=swtShowToolTip, Path=IsOn}"/>
+                                    <!--上面这行不知道为什么，无效-->
+                                </m:SimpleStackPanel>
+                            </GroupBox>
+                            <GroupBox Header="缩放" Grid.Row="99" Grid.ColumnSpan="99">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>

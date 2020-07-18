@@ -133,8 +133,19 @@ namespace ClassifyFiles
             get => Get(ref showFileExtension, GetBool, true, nameof(ShowFileExtension));
             set => Set(ref showFileExtension, value, nameof(ShowFileExtension));
         }
+        private static bool? showToolTip = null;
+        public static bool ShowToolTip
+        {
+            get => Get(ref showToolTip, GetBool, true, nameof(ShowToolTip));
+            set => Set(ref showToolTip, value, nameof(ShowToolTip));
+        }
+        private static bool? showToolTipImage = null;
+        public static bool ShowToolTipImage
+        {
+            get => Get(ref showToolTipImage, GetBool, true, nameof(ShowToolTipImage));
+            set => Set(ref showToolTipImage, value, nameof(ShowToolTipImage));
+        }
 
-        public static event PropertyChangedEventHandler PropertyChanged;
 
         private static T Get<T>(ref T? field, Func<string, T, T> dbGet, T defultValue, string key) where T : struct
         {
@@ -149,7 +160,8 @@ namespace ClassifyFiles
         {
             field = value;
             ConfigUtility.Set(key, value);
-            PropertyChanged?.Invoke(null, new PropertyChangedEventArgs(key));
+            StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(key));
         }
+        public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
     }
 }

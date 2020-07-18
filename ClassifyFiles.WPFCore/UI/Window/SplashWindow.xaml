@@ -15,5 +15,6 @@
         Background="Transparent"
         Title="SplashWindow">
     <Grid x:Name="grd" Width="256" Height="256">
+        <Image Source="{Binding Image}"/>
     </Grid>
 </Window>

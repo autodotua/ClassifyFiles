@@ -7,6 +7,7 @@
              mc:Ignorable="d" 
                   xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
+    xmlns:root="clr-namespace:ClassifyFiles"
                  xmlns:m="http://schemas.modernwpf.com/2019"
 xmlns:app="clr-namespace:ClassifyFiles"
              
@@ -21,8 +22,12 @@ xmlns:app="clr-namespace:ClassifyFiles"
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
         <ui:IsNotNull2VisibilityConverter x:Key="nn2v"/>
         <sys:Double x:Key="two">2.0</sys:Double>
+        
+        <!--公用的右键菜单-->
         <ContextMenu x:Key="menu" Opened="ContextMenu_Opened"  Closed="ContextMenu_Closed">
         </ContextMenu>
+        
+        <!--分组项的样式-->
         <Style x:Key="groupStyle" TargetType="{x:Type GroupItem}">
             <Setter Property="Margin" Value="0,8,0,4"/>
             <Setter Property="Template">
@@ -34,7 +39,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
                                 <DockPanel>
                                     <TextBlock FontWeight="Bold" Text="{Binding Path=Name}" 
                                  Margin="8,04,0,0" />
-                                    <TextBlock FontWeight="Bold"  Margin="16,4,0,8">
+                                    <TextBlock   Margin="16,4,0,8">
                                         <Run  Text="{Binding Path=ItemCount, Mode=OneWay}"/>
                                         <Run>个文件</Run>
                                     </TextBlock>
@@ -49,6 +54,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
             </Setter>
         </Style>
 
+        <!--带分组的数据源-->
         <CollectionViewSource x:Key='listDetailItemsSource' 
                       Source="{Binding Files}">
             <CollectionViewSource.GroupDescriptions>
@@ -56,12 +62,13 @@ xmlns:app="clr-namespace:ClassifyFiles"
             </CollectionViewSource.GroupDescriptions>
         </CollectionViewSource>
 
-        <ToolTip x:Key="toolTip"  Placement="Right" Padding="8" BorderThickness="0">
+        <!--提示框-->
+        <ToolTip x:Key="toolTip"  Placement="Right" Padding="8" BorderThickness="0" Visibility="{Binding Path=(root:Configs.ShowToolTip),Mode=OneWay,Converter={StaticResource b2v}}">
             <m:SimpleStackPanel Spacing="8"   Orientation="Vertical">
                 <TextBlock Grid.Column="2" Grid.Row="0"     
                         Style="{StaticResource BaseTextBlockStyle}" TextWrapping="Wrap"  HorizontalAlignment="Center" Text="{Binding Display.DisplayName}"/>
 
-                <component:FileIcon EnableCache="False" Square="False"
+                <component:FileIcon EnableCache="False" Square="False" Visibility="{Binding Path=(root:Configs.ShowToolTipImage),Mode=OneWay,Converter={StaticResource b2v}}"
                                     File="{Binding .,Mode=OneTime}" Scale="-360"/>
                 <Grid Margin="8">
                     <Grid.ColumnDefinitions>

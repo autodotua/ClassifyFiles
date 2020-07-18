@@ -17,14 +17,13 @@
     </local:WindowBase.Resources> 
     <Grid x:Name="outGrd" >
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="4"/>
+            <RowDefinition Height="48"/>
+            <RowDefinition Height="0"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <TabControl x:Name="tab" ItemsSource="{Binding Projects}"
-                    SelectedItem="{Binding SelectedProject}" Margin="0,0,0,-21.5"
-                    MinHeight="64">
+                    SelectedItem="{Binding SelectedProject}" Grid.RowSpan="99">
             <m:TabControlHelper.TabStripHeader>
                 <m:AppBarButton Grid.Column="0" LabelPosition="Collapsed" IsCompact="True" Icon="Add"  Click="AddProjectButton_Click"/>
             </m:TabControlHelper.TabStripHeader>

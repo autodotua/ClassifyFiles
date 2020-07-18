@@ -1,27 +1,24 @@
 ﻿using ClassifyFiles.WPFCore;
+using FzLib.Extension;
 using ModernWpf;
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace ClassifyFiles.UI
 {
     /// <summary>
     /// SplashWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class SplashWindow : Window
+    public partial class SplashWindow : Window,INotifyPropertyChanged
     {
         private static SplashWindow instance = null;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public static void TryShow()
         {
             if (instance == null)
@@ -38,28 +35,17 @@ namespace ClassifyFiles.UI
                 instance.Close();
             }
         }
+
+        public Uri image = null;
+        public Uri Image => image;
         public SplashWindow()
         {
-            InitializeComponent();
+            DataContext = this;
             App.SetTheme(this);
-            var theme = ThemeManager.GetActualTheme(this);
-            byte[] bytes = File.ReadAllBytes(theme == ElementTheme.Dark? "Images/icon_dark.png":"Images/icon_light.png");
-            grd.Background = new ImageBrush(ToImage(bytes));
-        }
-        /// <summary>
-        /// 将字符数组转换为<see cref="BitmapImage"/>
-        /// </summary>
-        /// <param name="array"></param>
-        /// <returns></returns>
-        private BitmapImage ToImage(byte[] array)
-        {
-            using var ms = new System.IO.MemoryStream(array);
-            var image = new BitmapImage();
-            image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad; // here
-            image.StreamSource = ms;
-            image.EndInit();
-            return image;
+            InitializeComponent();
+            var theme = ThemeManager.GetActualTheme(this); 
+            image=new Uri(theme == ElementTheme.Dark ? "../../Images/icon_dark.png" : "../../Images/icon_light.png", UriKind.Relative);
+            this.Notify(nameof(Image));
         }
     }
 }

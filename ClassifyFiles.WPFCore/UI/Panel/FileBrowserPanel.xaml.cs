@@ -30,6 +30,7 @@ using static ClassifyFiles.Util.ClassUtility;
 using static ClassifyFiles.Util.FileClassUtility;
 using static ClassifyFiles.Util.FileProjectUtilty;
 using static ClassifyFiles.Util.ProjectUtility;
+using System.Windows.Media.Animation;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -40,21 +41,18 @@ namespace ClassifyFiles.UI.Panel
         public FileBrowserPanel()
         {
             InitializeComponent();
-            //swtTags.IsOn = Configs.ShowClassTags;
-            //swtIcons.IsOn = Configs.ShowExplorerIcon;
-            //swtThumbs.IsOn = Configs.ShowThumbnail;
-            //swtShowTilePath.IsOn = Configs.ShowTilePath;
-            //swtIconViewNames.IsOn = Configs.ShowIconViewNames;
-            //sldIconSize.Value = Configs.IconSize;
+            new ClickEventHelper(grdSplitter).Click += GridSplitter_Click;
             foreach (MenuItem item in menuSort.Items)
             {
-                if((int)item.Tag==Configs.SortType)
+                if ((int)item.Tag == Configs.SortType)
                 {
                     item.IsChecked = true;
                     break;
                 }
             }
         }
+
+
 
         public override ClassesPanel GetItemsPanel()
         {
@@ -219,32 +217,66 @@ namespace ClassifyFiles.UI.Panel
         public bool ShowClassTags
         {
             get => Configs.ShowClassTags;
-            set => SetSwitchValueASync(value, on => Configs.ShowClassTags = on);
+            set
+            {
+                Configs.ShowClassTags = value;
+                filesViewer.RefreshAsync();
+            }
         }
         public bool ShowThumbnail
         {
             get => Configs.ShowThumbnail;
-            set => SetSwitchValueASync(value, on => Configs.ShowThumbnail = on);
+            set
+            {
+                Configs.ShowThumbnail = value;
+                filesViewer.RefreshAsync();
+            }
         }
         public bool ShowExplorerIcon
         {
             get => Configs.ShowExplorerIcon;
-            set => SetSwitchValueASync(value, on => Configs.ShowExplorerIcon = on);
+            set
+            {
+                Configs.ShowExplorerIcon = value;
+                filesViewer.RefreshAsync();
+            }
         }
         public bool ShowIconViewNames
         {
             get => Configs.ShowIconViewNames;
-            set => SetSwitchValueASync(value, on => Configs.ShowIconViewNames = on);
+            set
+            {
+                Configs.ShowIconViewNames = value;
+                filesViewer.RefreshAsync();
+            }
         }
         public bool ShowTilePath
         {
             get => Configs.ShowTilePath;
-            set => SetSwitchValueASync(value, on => Configs.ShowTilePath = on);
+            set
+            {
+                Configs.ShowTilePath = value;
+                filesViewer.RefreshAsync();
+            }
         }
         public bool ShowFileExtension
         {
             get => Configs.ShowFileExtension;
-            set => SetSwitchValueASync(value, on => Configs.ShowFileExtension = on);
+            set
+            {
+                Configs.ShowFileExtension = value;
+                filesViewer.RefreshAsync();
+            }
+        }
+        public bool ShowToolTip
+        {
+            get => Configs.ShowToolTip;
+            set => Configs.ShowToolTip = value;
+        }
+        public bool ShowToolTipImage
+        {
+            get => Configs.ShowToolTipImage;
+            set => Configs.ShowToolTipImage = value;
         }
         bool isSettingSortChecked = false;
         public bool GroupByDir
@@ -263,12 +295,6 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(GroupByDir));
                 filesViewer.SetGroupEnable(value);
             }
-        }
-
-        private async void SetSwitchValueASync(bool value, Action<bool> set)
-        {
-            set(value);
-            await filesViewer.RefreshAsync();
         }
 
         public double IconSize
@@ -319,5 +345,91 @@ namespace ClassifyFiles.UI.Panel
             //GroupByDir = false;
             GetProgress().Close();
         }
+
+        bool isAnimating = false;
+        private void GridSplitter_Click(object sender, EventArgs e)
+        {
+            if (isAnimating)
+            {
+                return;
+            }
+            isAnimating = true;
+            (sender as FrameworkElement).IsEnabled = false;
+
+            double to = grdLeft.Width == 0 ? 200 : 0;
+            StartAnimation(to);
+        }
+
+        private void StartAnimation( double to)
+        {
+            DoubleAnimation ani = new DoubleAnimation(to, TimeSpan.FromSeconds(0.5))
+            {
+                EasingFunction = new CubicEase() { EasingMode = EasingMode.EaseInOut },
+                FillBehavior = FillBehavior.Stop
+            };
+            ani.Completed += (p1, p2) =>
+            {
+                isAnimating = false;
+                grdSplitter.IsEnabled = true;
+                grdLeft.Width = to;
+                grdMain.ColumnDefinitions[0] .Width= GridLength.Auto;
+            };
+            grdLeft.BeginAnimation(WidthProperty, ani);
+        }
+
+        private void grdSplitter_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+           
+        }
+
+        private void grdSplitter_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var cd = grdMain.ColumnDefinitions[0];
+            if (cd.Width.IsAbsolute)
+            {
+                StartAnimation(cd.Width.Value-8);
+            }
+        }
+    }
+
+    public class ClickEventHelper
+    {
+        private DateTime downTime;
+        public Point downPosition;
+        private FrameworkElement downSender;
+
+        public ClickEventHelper(FrameworkElement element)
+        {
+            element.PreviewMouseDown += MouseDown;
+            element.PreviewMouseUp += MouseUp;
+        }
+
+        private void MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                downPosition = e.GetPosition(null);
+                downSender = sender as FrameworkElement;
+                downTime = DateTime.Now;
+            }
+        }
+
+        private void MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            var newPosition = e.GetPosition(null);
+            double distance = Math.Sqrt(Math.Pow(newPosition.X - downPosition.X, 2) + Math.Pow(newPosition.Y - downPosition.Y, 2));
+            if (distance < 5 &&
+                e.LeftButton == MouseButtonState.Released &&
+                sender == downSender)
+            {
+                TimeSpan timeSinceDown = DateTime.Now - this.downTime;
+                if (timeSinceDown.TotalMilliseconds < 500)
+                {
+                    Click?.Invoke(downSender, new EventArgs());
+                }
+            }
+        }
+
+        public event EventHandler Click;
     }
 }
