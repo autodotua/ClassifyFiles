@@ -56,7 +56,7 @@
                            x:Name="filesViewer" Grid.Column="2"  AllowDrop="True"
              Drop="UserControl_Drop" ClickTag="filesViewer_ClickTag" PreviewMouseWheel="filesViewer_PreviewMouseWheel"/>
         <m:CommandBar  Grid.Row="2" Grid.ColumnSpan="999" DefaultLabelPosition="Right">
-            <m:AppBarButton Icon="Sort" Label="排序">
+            <m:AppBarButton x:Name="btnSort" Icon="Sort" Label="排序">
                 <m:FlyoutService.Flyout>
                     <m:MenuFlyout x:Name="menuSort" >
                         <m:RadioMenuItem x:Name="menuSortDefault" Header="默认（按目录）" IsCheckable="True" IsChecked="True" Checked="RadioMenuItem_Checked">
@@ -157,6 +157,14 @@
                     </m:Flyout>
                 </m:FlyoutService.Flyout>
             </m:AppBarButton>
+            <m:AppBarButton x:Name="btnLocateByDir" Icon="OpenLocal" Label="根据文件夹定位" >
+                <m:FlyoutService.Flyout>
+                    <m:Flyout x:Name="flyoutJumpToDir" >
+                        <ListBox Grid.Row="2" SelectionChanged="JumpToDirComboBox_SelectionChanged" ItemsSource="{Binding Dirs}" MaxHeight="600"/>
+                    </m:Flyout>
+                </m:FlyoutService.Flyout>
+            </m:AppBarButton>
+
             <m:AppBarSeparator/>
             <m:AppBarButton  x:Name="btnAddFile" Icon="Add"  Label="添加文件" Click="btnAddFile_Click"
                              IsEnabled="{Binding ElementName=classPanel, Path=SelectedItem, Converter={StaticResource nn2b}}"/>
@@ -167,14 +175,7 @@
                     <m:FontIcon Glyph="&#xE72C;&#xEA37;"/>
                 </m:AppBarButton.Icon>
             </m:AppBarButton>
-            <m:AppBarButton x:Name="btnLocateByDir" Icon="OpenLocal" Label="根据文件夹定位" >
-                <m:FlyoutService.Flyout>
-                    <m:Flyout x:Name="flyoutJumpToDir" >
-                        <ListBox Grid.Row="2" SelectionChanged="JumpToDirComboBox_SelectionChanged" ItemsSource="{Binding Dirs}" MaxHeight="600"/>
-                    </m:Flyout>
-                </m:FlyoutService.Flyout>
-            </m:AppBarButton>
-
+ 
         </m:CommandBar>
     </Grid>
 </local:ProjectPanelBase>

@@ -130,6 +130,7 @@ namespace ClassifyFiles.UI.Panel
         private void filesViewer_ViewTypeChanged(object sender, EventArgs e)
         {
             btnLocateByDir.IsEnabled = filesViewer.CurrentFileView != FileView.Tree;
+            btnSort.IsEnabled = filesViewer.CurrentFileView != FileView.Tree;
         }
 
         private async void ClassifyButton_Click(object sender, RoutedEventArgs e)

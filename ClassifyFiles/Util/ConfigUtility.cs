@@ -1,7 +1,6 @@
 ﻿using ClassifyFiles.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using System.Threading.Tasks;
 using static ClassifyFiles.Util.DbUtility;
 
 namespace ClassifyFiles.Util
@@ -38,6 +37,10 @@ namespace ClassifyFiles.Util
             Config config = db.Configs.FirstOrDefault(p => p.Key == key);
             if (config != null)
             {
+                if(config.ToString()==value.ToString())
+                {
+                    return;
+                }
                 config.Value = value.ToString();
                 db.Entry(config).State = EntityState.Modified;
             }

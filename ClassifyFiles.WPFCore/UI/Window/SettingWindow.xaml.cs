@@ -12,7 +12,7 @@ using static ClassifyFiles.Util.ProjectUtility;
 namespace ClassifyFiles.UI
 {
     /// <summary>
-    /// CookieWindow.xaml 的交互逻辑
+    /// LogsWindow.xaml 的交互逻辑
     /// </summary>
     public partial class SettingWindow : WindowBase
     {
@@ -122,6 +122,11 @@ namespace ClassifyFiles.UI
         {
             Configs.RefreshThreadCount = (int)numThread.Value;
             numThread.Value = (int)numThread.Value;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            new LogsWindow().Show();
         }
     }
 }

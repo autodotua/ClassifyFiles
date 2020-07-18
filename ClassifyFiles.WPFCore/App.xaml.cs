@@ -1,6 +1,7 @@
 ﻿using ClassifyFiles.UI;
 using ClassifyFiles.Util;
 using ModernWpf;
+using ModernWpf.Controls.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace ClassifyFiles.WPFCore
 {
@@ -26,7 +28,7 @@ namespace ClassifyFiles.WPFCore
             FzLib.Program.Runtime.UnhandledException.UnhandledExceptionCatched += UnhandledException_UnhandledExceptionCatched;
 
             FileUtility.ThumbnailFolderPath = "thumb";
-            if(!Directory.Exists("thumb"))
+            if (!Directory.Exists("thumb"))
             {
                 Directory.CreateDirectory("thumb");
             }
@@ -60,11 +62,39 @@ namespace ClassifyFiles.WPFCore
 
         }
 
-        private void UnhandledException_UnhandledExceptionCatched(object sender, FzLib.Program.Runtime.UnhandledExceptionEventArgs e)
+        private async void UnhandledException_UnhandledExceptionCatched(object sender, FzLib.Program.Runtime.UnhandledExceptionEventArgs e)
         {
-            if(e.Exception.Source.StartsWith("Microsoft.EntityFrameworkCore"))
+
+            try
+            {
+                await LogUtility.AddLogAsync(e.Exception.ToString());
+            }
+            catch (Exception ex)
             {
 
+            }
+            if (!e.Exception.Source.StartsWith("Microsoft.EntityFrameworkCore"))
+            {
+
+                await Dispatcher.Invoke(async () =>
+            {
+                Window win = new Window()
+                {
+                    AllowsTransparency = true,
+                    WindowStyle = WindowStyle.None,
+                    ShowInTaskbar = false,
+                    Title = "错误",
+                    Topmost = true,
+                    Background = Brushes.Transparent,
+                    WindowStartupLocation = WindowStartupLocation.CenterScreen
+                };
+                WindowHelper.SetUseModernWindowStyle(win, true);
+                ThemeManager.SetIsThemeAware(win, true);
+                SetTheme(win);
+                win.Show();
+                await new MessageDialog().ShowAsync(e.Exception.ToString(), "程序发生错误");
+                win.Close();
+            });
             }
         }
 

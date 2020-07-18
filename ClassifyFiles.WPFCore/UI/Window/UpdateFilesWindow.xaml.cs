@@ -9,7 +9,7 @@ using static ClassifyFiles.Util.FileClassUtility;
 namespace ClassifyFiles.UI
 {
     /// <summary>
-    /// CookieWindow.xaml 的交互逻辑
+    /// LogsWindow.xaml 的交互逻辑
     /// </summary>
     public partial class UpdateFilesWindow : DialogWindowBase
     {
