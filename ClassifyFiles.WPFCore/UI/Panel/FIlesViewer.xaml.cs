@@ -23,6 +23,7 @@ using System.Collections.Concurrent;
 using ListView = System.Windows.Controls.ListView;
 using System.Collections.Specialized;
 using System.Windows.Data;
+using FI = System.IO.FileInfo;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -130,6 +131,10 @@ namespace ClassifyFiles.UI.Panel
                 await Task.Delay(100);//不延迟大概率会一直转圈
                 //await RealtimeRefresh(Files.Take(100));
             }
+            if(Configs.SortType!=0)
+            {
+                await SortAsync((SortType)Configs.SortType);
+            }
         }
         public async Task SetFilesAsync(IEnumerable<UIFile> files)
         {
@@ -191,7 +196,7 @@ namespace ClassifyFiles.UI.Panel
                 File file = GetSelectedFile()?.File;
                 if (file != null)
                 {
-                    if (file.IsFolder && CurrentViewType == 4)//是目录
+                    if (file.IsFolder && CurrentFileView == FileView.Tree)//是目录
                     {
                         return;
                     }
@@ -229,7 +234,7 @@ namespace ClassifyFiles.UI.Panel
         private void ListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
 
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) && CurrentViewType != 5)
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) && CurrentFileView != FileView.Detail)
             {
                 UIFileSize.DefualtIconSize += e.Delta / 30;
                 Configs.IconSize = UIFileSize.DefualtIconSize;
@@ -286,8 +291,8 @@ namespace ClassifyFiles.UI.Panel
             int type = int.Parse((sender as FrameworkElement).Tag as string);
             grdAppBar.Children.OfType<AppBarToggleButton>().ForEach(p => p.IsChecked = false);
             (sender as AppBarToggleButton).IsChecked = true;
-            CurrentViewType = type;
-            ChangeViewType(type);
+            CurrentFileView = (FileView)type;
+            RefreshFileView();
         }
 
         public void SetGroupEnable(bool enable)
@@ -296,7 +301,6 @@ namespace ClassifyFiles.UI.Panel
             {
                 if (enable)
                 {
-
                     list.SetBinding(ListBox.ItemsSourceProperty, new Binding() { Source = FindResource("listDetailItemsSource") as CollectionViewSource });
                 }
                 else
@@ -306,24 +310,24 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
-        private void ChangeViewType(int type)
+        private void RefreshFileView()
         {
             var selectedFile = GetSelectedFile();
-            if (type == 1)
+            if (CurrentFileView == FileView.List)
             {
                 FilesContent = FindResource("lvwFiles") as ListBox;
 
             }
-            else if (type == 2 || type == 3)
+            else if (CurrentFileView == FileView.Icon || CurrentFileView == FileView.Tile)
             {
                 FilesContent = FindResource("grdFiles") as ListBox;
-                FilesContent.ItemTemplate = FindResource(type == 2 ? "grdIconView" : "grdTileView") as DataTemplate;
+                FilesContent.ItemTemplate = FindResource(CurrentFileView == FileView.Icon ? "grdIconView" : "grdTileView") as DataTemplate;
             }
-            else if (type == 4)
+            else if (CurrentFileView == FileView.Tree)
             {
                 FilesContent = FindResource("treeFiles") as TreeView;
             }
-            else if (type == 5)
+            else if (CurrentFileView == FileView.Detail)
             {
                 FilesContent = FindResource("lvwDetailFiles") as ListView;
             }
@@ -332,19 +336,19 @@ namespace ClassifyFiles.UI.Panel
                 list.SelectedItem = selectedFile;
                 list.ScrollIntoView(selectedFile);
             }
-            Configs.LastViewType = CurrentViewType;
+            Configs.LastViewType = (int)CurrentFileView;
             ViewTypeChanged?.Invoke(this, new EventArgs());
         }
 
         public void SelectFileByDir(string dir)
         {
             UIFile file = null;
-            switch (CurrentViewType)
+            switch (CurrentFileView)
             {
-                case 1:
-                case 2:
-                case 3:
-                case 5:
+                case FileView.List:
+                case FileView.Icon:
+                case FileView.Tile:
+                case FileView.Detail:
                     file = Files.FirstOrDefault(p => p.File.Dir == dir);
                     break;
                 default:
@@ -359,13 +363,13 @@ namespace ClassifyFiles.UI.Panel
                 lbx.SelectedItem = file;
                 lbx.ScrollIntoView(file);
             }
-            else if(filesContent is ModernWpf.Controls.ListView lvw)
+            else if (filesContent is ModernWpf.Controls.ListView lvw)
             {
                 lvw.SelectedItem = file;
                 lvw.ScrollIntoView(file);
             }
         }
-        public int CurrentViewType { get; private set; } = 1;
+        public FileView CurrentFileView { get; private set; } = FileView.List;
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
         }
@@ -394,7 +398,7 @@ namespace ClassifyFiles.UI.Panel
             ContextMenu menu = FindResource("menu") as ContextMenu;
             menu.Items.Clear();
             var files = GetSelectedFiles();
-            if(files==null || files.Count==0)
+            if (files == null || files.Count == 0)
             {
                 menu.IsOpen = false;
                 return;
@@ -409,7 +413,7 @@ namespace ClassifyFiles.UI.Panel
             MenuItem menuCopy = new MenuItem() { Header = "复制" };
             menuCopy.Click += MenuCopy_Click; ;
             menu.Items.Add(menuCopy);
-            if ((!files.Any(p => p.File.IsFolder) || CurrentViewType != 4) && Project.Classes != null)
+            if ((!files.Any(p => p.File.IsFolder) || CurrentFileView != FileView.Tree) && Project.Classes != null)
             {
                 menu.Items.Add(new Separator());
 
@@ -475,7 +479,7 @@ namespace ClassifyFiles.UI.Panel
         private void MenuCopy_Click(object sender, RoutedEventArgs e)
         {
             var files = new StringCollection();
-            if (CurrentViewType != 4)
+            if (CurrentFileView != FileView.Tree)
             {
                 files.AddRange(GetSelectedFiles().Select(p => p.File.GetAbsolutePath()).ToArray());
             }
@@ -514,7 +518,89 @@ namespace ClassifyFiles.UI.Panel
         private void ContextMenu_Closed(object sender, RoutedEventArgs e)
         {
         }
+        public async Task SortAsync(SortType type)
+        {
+            IEnumerable<UIFile> files = null;
+            await Task.Run(() =>
+            {
+                switch (type)
+                {
+                    case SortType.Default:
+                        files = Files
+                            .OrderBy(p => p.File.Dir)
+                            .ThenBy(p => p.File.Name);
+                        break;
+                    case SortType.NameUp:
+                        files = Files
+                            .OrderBy(p => p.File.Name)
+                            .ThenBy(p => p.File.Dir);
+                        break;
+                    case SortType.NameDown:
+                        files = Files
+                           .OrderByDescending(p => p.File.Name)
+                           .ThenByDescending(p => p.File.Dir);
+                        break;
+                    case SortType.LengthUp:
+                        files = Files
+                          .OrderBy(p => GetFileInfoValue(p, nameof(FI.Length)))
+                          .ThenBy(p => p.File.Name)
+                          .ThenBy(p => p.File.Dir);
+                        break;
+                    case SortType.LengthDown:
+                        files = Files
+                          .OrderByDescending(p => GetFileInfoValue(p,nameof(FI.Length)))
+                          .ThenByDescending(p => p.File.Name)
+                          .ThenByDescending(p => p.File.Dir);
+                        break;
+                    case SortType.LastWriteTimeUp:
+                        files = Files
+                          .OrderBy(p => GetFileInfoValue(p, nameof(FI.LastWriteTime)))
+                          .ThenBy(p => p.File.Name)
+                          .ThenBy(p => p.File.Dir);
+                        break;
+                    case SortType.LastWriteTimeDown:
+                        files = Files
+                          .OrderByDescending(p => GetFileInfoValue(p, nameof(FI.LastWriteTime)))
+                          .ThenByDescending(p => p.File.Name)
+                          .ThenByDescending(p => p.File.Dir);
+                        break;
+                    case SortType.CreationTimeUp:
+                        files = Files
+                          .OrderBy(p => GetFileInfoValue(p, nameof(FI.CreationTime)))
+                          .ThenBy(p => p.File.Name)
+                          .ThenBy(p => p.File.Dir);
+                        break;
+                    case SortType.CreationTimeDown:
+                        files = Files
+                          .OrderByDescending(p => GetFileInfoValue(p, nameof(FI.CreationTime)))
+                          .ThenByDescending(p => p.File.Name)
+                          .ThenByDescending(p => p.File.Dir);
+                        break;
+                }
+                files = files.ToArray();
+            });
+            Files = new ObservableCollection<UIFile>(files);
+            SetGroupEnable(false);
+            //this.Notify(nameof(Files));
 
+            long GetFileInfoValue(UIFile file, string name)
+            {
+                try
+                {
+                    return name switch
+                    {
+                        nameof(FI.Length) => file.FileInfo.Length,
+                        nameof(FI.LastWriteTime) => file.FileInfo.LastWriteTime.Ticks,
+                        nameof(FI.CreationTime) => file.FileInfo.CreationTime.Ticks,
+                        _ => throw new NotImplementedException(),
+                    };
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
+        }
     }
 
     public class ClickTagEventArgs : EventArgs
@@ -619,5 +705,28 @@ namespace ClassifyFiles.UI.Panel
                 e.Handled = true;
             }
         }
+
     }
+
+    public enum FileView
+    {
+        List = 1,
+        Icon = 2,
+        Tile = 3,
+        Tree = 4,
+        Detail = 5
+    }
+    public enum SortType
+    {
+        Default=0,
+        NameUp=1,
+        NameDown = 2,
+        LengthUp = 3,
+        LengthDown = 4,
+        LastWriteTimeUp = 5,
+        LastWriteTimeDown = 6,
+        CreationTimeUp = 7,
+        CreationTimeDown = 8,
+    }
+
 }

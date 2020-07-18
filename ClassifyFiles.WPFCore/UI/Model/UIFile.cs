@@ -16,6 +16,7 @@ using static ClassifyFiles.Util.DbUtility;
 using ClassifyFiles.UI.Component;
 using System.ComponentModel;
 using System.Diagnostics;
+using ClassifyFiles.Util;
 
 namespace ClassifyFiles.UI.Model
 {
@@ -28,6 +29,7 @@ namespace ClassifyFiles.UI.Model
         public UIFile(File file) : this()
         {
             File = file;
+            FileInfo = file.GetFileInfo();
             SubUIFiles = file.SubFiles.Select(p => new UIFile(p)).ToList();
             Display = new UIFileDisplay(file);
             Size = new UIFileSize();
@@ -48,6 +50,7 @@ namespace ClassifyFiles.UI.Model
         private bool loaded = false;
         public UIFileSize Size { get; set; }
         public UIFileDisplay Display { get; set; }
+        public System.IO.FileInfo FileInfo { get; private set; }
         public async Task LoadAsync(AppDbContext db = null)
         {
             if (!loaded)

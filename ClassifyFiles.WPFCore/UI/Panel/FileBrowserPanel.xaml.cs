@@ -46,6 +46,14 @@ namespace ClassifyFiles.UI.Panel
             //swtShowTilePath.IsOn = Configs.ShowTilePath;
             //swtIconViewNames.IsOn = Configs.ShowIconViewNames;
             //sldIconSize.Value = Configs.IconSize;
+            foreach (MenuItem item in menuSort.Items)
+            {
+                if((int)item.Tag==Configs.SortType)
+                {
+                    item.IsChecked = true;
+                    break;
+                }
+            }
         }
 
         public override ClassesPanel GetItemsPanel()
@@ -121,7 +129,7 @@ namespace ClassifyFiles.UI.Panel
 
         private void filesViewer_ViewTypeChanged(object sender, EventArgs e)
         {
-            btnLocateByDir.IsEnabled = filesViewer.CurrentViewType != 3;
+            btnLocateByDir.IsEnabled = filesViewer.CurrentFileView != FileView.Tree;
         }
 
         private async void ClassifyButton_Click(object sender, RoutedEventArgs e)
@@ -231,17 +239,27 @@ namespace ClassifyFiles.UI.Panel
         {
             get => Configs.ShowTilePath;
             set => SetSwitchValueASync(value, on => Configs.ShowTilePath = on);
-        }       public bool ShowFileExtension
+        }
+        public bool ShowFileExtension
         {
             get => Configs.ShowFileExtension;
             set => SetSwitchValueASync(value, on => Configs.ShowFileExtension = on);
-        }    
+        }
+        bool isSettingSortChecked = false;
         public bool GroupByDir
         {
             get => Configs.GroupByDir;
             set
             {
                 Configs.GroupByDir = value;
+                if (value)
+                {
+                    Configs.SortType = 0;
+                    isSettingSortChecked = true;
+                    menuSortDefault.IsChecked = true;
+                    isSettingSortChecked = false;
+                }
+                this.Notify(nameof(GroupByDir));
                 filesViewer.SetGroupEnable(value);
             }
         }
@@ -268,7 +286,7 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(IconSize), nameof(IconSizeString));
             }
         }
-        public string IconSizeString=> ((int)(IconSize / 32 * 100)).ToString() + "%";
+        public string IconSizeString => ((int)(IconSize / 32 * 100)).ToString() + "%";
 
 
         private void sldIconSize_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -278,18 +296,27 @@ namespace ClassifyFiles.UI.Panel
 
         private void filesViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if(Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
             {
                 this.Notify(nameof(IconSize), nameof(IconSizeString));
             }
         }
 
-        private void RadioMenuItem_Checked(object sender, RoutedEventArgs e)
+        private async void RadioMenuItem_Checked(object sender, RoutedEventArgs e)
         {
-            if(!IsLoaded)
+            if (!IsLoaded || isSettingSortChecked)
             {
                 return;
             }
+            GetProgress().Show(true);
+            SortType type = (SortType)(sender as FrameworkElement).Tag;
+            await filesViewer.SortAsync(type);
+            Configs.SortType = (int)type;
+            Configs.GroupByDir = false;
+
+            this.Notify(nameof(GroupByDir));
+            //GroupByDir = false;
+            GetProgress().Close();
         }
     }
 }

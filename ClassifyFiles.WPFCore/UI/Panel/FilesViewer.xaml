@@ -93,8 +93,8 @@ xmlns:app="clr-namespace:ClassifyFiles"
                     <TextBlock  Grid.Column="2" Grid.Row="2"  Text="{Binding Display.DisplayDir}"/>
                     <TextBlock  Grid.Column="2" Grid.Row="4"  Text="{Binding Display.Length}"/>
                     <component:TagGroup  Grid.Column="2" Grid.Row="6"  File="{Binding .}"/>
-                    <TextBlock  Grid.Column="2" Grid.Row="8"  Text="{Binding Display.FileInfo.LastWriteTime}"/>
-                    <TextBlock  Grid.Column="2" Grid.Row="10"  Text="{Binding Display.FileInfo.CreationTime}"/>
+                    <TextBlock  Grid.Column="2" Grid.Row="8"  Text="{Binding FileInfo.LastWriteTime}"/>
+                    <TextBlock  Grid.Column="2" Grid.Row="10"  Text="{Binding FileInfo.CreationTime}"/>
 
                 </Grid>
             </m:SimpleStackPanel>
@@ -147,7 +147,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
 
         <!--列表和树状视图模板-->
         <HierarchicalDataTemplate  ItemsSource="{Binding SubUIFiles}"   x:Key="listDataTemplate">
-            <Grid Margin="0,4,24,4"  ToolTip="{StaticResource toolTip}">
+            <Grid Margin="0,4,24,4"  ToolTip="{StaticResource toolTip}"  >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="{Binding Size.IconSize}"/>
                     <ColumnDefinition Width="16"/>
@@ -158,15 +158,17 @@ xmlns:app="clr-namespace:ClassifyFiles"
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="4"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="0"/>
+                    <RowDefinition Height="4"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="4"/>
                 </Grid.RowDefinitions>
-                <component:FileIcon File="{Binding .}" Grid.RowSpan="99" />
-                <TextBlock Text="{Binding Display.DisplayName}" Grid.Column="2" Grid.ColumnSpan="3" FontWeight="Bold"/>
-                <TextBlock Text="{Binding Display.Length}"  Grid.Column="2" Grid.Row="2" Width="108"
+                <component:FileIcon File="{Binding .}" Grid.RowSpan="99" Width="{Binding Size.IconSize}" Height="{Binding Size.IconSize}"/>
+                <TextBlock Text="{Binding Display.DisplayName}" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" FontWeight="Bold"/>
+                <TextBlock Text="{Binding Display.Length}"  Grid.Column="2" Grid.Row="3" Width="108"
                                    Foreground="{ DynamicResource SystemControlBackgroundBaseMediumHighBrush}"/>
-                <TextBlock Text="{Binding Display.DisplayDir}" Grid.Column="4" Grid.Row="2" 
+                <TextBlock Text="{Binding Display.DisplayDir}" Grid.Column="4" Grid.Row="3" 
                                    Foreground="{ DynamicResource SystemControlBackgroundBaseMediumBrush}"/>
                 <!--横向的标签列表-->
                 <component:TagGroup Grid.Column="99" Grid.RowSpan="99" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
@@ -264,8 +266,8 @@ xmlns:app="clr-namespace:ClassifyFiles"
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Header="大小" DisplayMemberBinding="{Binding Display.Length}"/>
-                    <GridViewColumn Header="修改时间" DisplayMemberBinding="{Binding Display.FileInfo.LastWriteTime}"/>
-                    <GridViewColumn Header="创建时间" DisplayMemberBinding="{Binding Display.FileInfo.CreationTime}"/>
+                    <GridViewColumn Header="修改时间" DisplayMemberBinding="{Binding FileInfo.LastWriteTime}"/>
+                    <GridViewColumn Header="创建时间" DisplayMemberBinding="{Binding FileInfo.CreationTime}"/>
                 </GridView>
             </ListView.View>
         </ListView>

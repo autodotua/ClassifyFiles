@@ -100,6 +100,14 @@ namespace ClassifyFiles
             get => Get(ref lastViewType, GetInt, 1, nameof(LastViewType));
             set => Set(ref lastViewType, value, nameof(LastViewType));
         }
+
+        private static int? sortType = null;
+
+        public static int SortType
+        {
+            get => Get(ref sortType, GetInt, 0, nameof(SortType));
+            set => Set(ref sortType, value, nameof(SortType));
+        }
         private static double? iconSize = null;
         public static double IconSize
         {
@@ -118,7 +126,7 @@ namespace ClassifyFiles
         {
             get => Get(ref groupByDir, GetBool, true, nameof(GroupByDir));
             set => Set(ref groupByDir, value, nameof(GroupByDir));
-        }     
+        }
         private static bool? showFileExtension = null;
         public static bool ShowFileExtension
         {

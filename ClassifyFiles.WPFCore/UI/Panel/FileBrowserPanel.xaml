@@ -59,15 +59,51 @@
             <m:AppBarButton Icon="Sort" Label="排序">
                 <m:FlyoutService.Flyout>
                     <m:MenuFlyout x:Name="menuSort" >
-                        <m:RadioMenuItem Header="默认（按目录）" IsCheckable="True" IsChecked="True" Checked="RadioMenuItem_Checked"/>
-                        <m:RadioMenuItem Header="文件名（升序）" IsCheckable="True" Checked="RadioMenuItem_Checked"/>
-                        <m:RadioMenuItem Header="文件名（升序）" IsCheckable="True" Checked="RadioMenuItem_Checked"/>
-                        <m:RadioMenuItem Header="大小（从大到小）" IsCheckable="True" Checked="RadioMenuItem_Checked"/>
-                        <m:RadioMenuItem Header="大小（从小到大）" IsCheckable="True" Checked="RadioMenuItem_Checked"/>
-                        <m:RadioMenuItem Header="修改时间（从早到晚）" IsCheckable="True" Checked="RadioMenuItem_Checked"/>
-                        <m:RadioMenuItem Header="修改时间（从晚到早）" IsCheckable="True" Checked="RadioMenuItem_Checked"/>
-                        <m:RadioMenuItem Header="类型（升序）" IsCheckable="True" Checked="RadioMenuItem_Checked"/>
-                        <m:RadioMenuItem Header="类型（升序）" IsCheckable="True" Checked="RadioMenuItem_Checked"/>
+                        <m:RadioMenuItem x:Name="menuSortDefault" Header="默认（按目录）" IsCheckable="True" IsChecked="True" Checked="RadioMenuItem_Checked">
+                            <m:RadioMenuItem.Tag>
+                                <local:SortType>Default</local:SortType>
+                            </m:RadioMenuItem.Tag>
+                        </m:RadioMenuItem>
+                        <m:RadioMenuItem Header="文件名（升序）" IsCheckable="True" Checked="RadioMenuItem_Checked">
+                            <m:RadioMenuItem.Tag>
+                                <local:SortType>NameUp</local:SortType>
+                            </m:RadioMenuItem.Tag>
+                        </m:RadioMenuItem>
+                        <m:RadioMenuItem Header="文件名（降序）" IsCheckable="True" Checked="RadioMenuItem_Checked">
+                            <m:RadioMenuItem.Tag>
+                                <local:SortType>NameDown</local:SortType>
+                            </m:RadioMenuItem.Tag>
+                        </m:RadioMenuItem>
+                        <m:RadioMenuItem Header="大小（从小到大）" IsCheckable="True" Checked="RadioMenuItem_Checked">
+                            <m:RadioMenuItem.Tag>
+                                <local:SortType>LengthUp</local:SortType>
+                            </m:RadioMenuItem.Tag>
+                        </m:RadioMenuItem>
+                        <m:RadioMenuItem Header="大小（从小到小）" IsCheckable="True" Checked="RadioMenuItem_Checked">
+                            <m:RadioMenuItem.Tag>
+                                <local:SortType>LengthDown</local:SortType>
+                            </m:RadioMenuItem.Tag>
+                        </m:RadioMenuItem>
+                        <m:RadioMenuItem Header="修改时间（从早到晚）" IsCheckable="True" Checked="RadioMenuItem_Checked">
+                            <m:RadioMenuItem.Tag>
+                                <local:SortType>LastWriteTimeUp</local:SortType>
+                            </m:RadioMenuItem.Tag>
+                        </m:RadioMenuItem>
+                        <m:RadioMenuItem Header="修改时间（从晚到早）" IsCheckable="True" Checked="RadioMenuItem_Checked">
+                            <m:RadioMenuItem.Tag>
+                                <local:SortType>LastWriteTimeDown</local:SortType>
+                            </m:RadioMenuItem.Tag>
+                        </m:RadioMenuItem>
+                        <m:RadioMenuItem Header="创建时间（从早到晚）" IsCheckable="True" Checked="RadioMenuItem_Checked">
+                            <m:RadioMenuItem.Tag>
+                                <local:SortType>CreationTimeUp</local:SortType>
+                            </m:RadioMenuItem.Tag>
+                        </m:RadioMenuItem>
+                        <m:RadioMenuItem Header="创建时间（从晚到早）" IsCheckable="True" Checked="RadioMenuItem_Checked">
+                            <m:RadioMenuItem.Tag>
+                                <local:SortType>CreationTimeDown</local:SortType>
+                            </m:RadioMenuItem.Tag>
+                        </m:RadioMenuItem>
                     </m:MenuFlyout>
                 </m:FlyoutService.Flyout>
             </m:AppBarButton>
