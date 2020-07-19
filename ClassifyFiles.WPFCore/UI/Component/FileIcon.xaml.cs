@@ -33,12 +33,9 @@ namespace ClassifyFiles.UI.Component
         public FileIcon()
         {
             InitializeComponent();
-            UIFileSize.StaticPropertyChanged += (p1, p2) =>
-            {
-                this.Notify(nameof(IconSize));
-            };
         }
         public bool EnableCache { get; set; } = true;
+        public bool DisplayRawImage { get; set; } = false;
         public bool Square { get; set; } = true;
         public static readonly DependencyProperty FileProperty =
             DependencyProperty.Register("File", typeof(UIFile), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
@@ -87,8 +84,17 @@ namespace ClassifyFiles.UI.Component
         }
         private bool Load()
         {
-
             FrameworkElement item;
+            if(DisplayRawImage)
+            {
+                var rawImage = File.Display.RawImage;
+                item = new Image()
+                {
+                    Source = rawImage ?? File.Display.Image,
+                };
+                main.Content = item;
+                return true;
+            }
             if (File.File.IsFolder && Configs.ShowExplorerIcon)
             {
                 if (folderIconPath == null)
@@ -109,14 +115,6 @@ namespace ClassifyFiles.UI.Component
                 && !(File.Display.Image != null && caches[File.File.ID] is FontIcon))
                 {
                     item = caches[File.File.ID];
-                    if (item is Image image)
-                    {
-                        BindingSize(image);
-                    }
-                    else if (item is FontIcon icon)
-                    {
-                        BindingSize(icon);
-                    }
                 }
                 else
                 {
@@ -127,7 +125,6 @@ namespace ClassifyFiles.UI.Component
                             return true;
                         }
                         item = new FontIcon() { Glyph = File.Display.Glyph };
-                        BindingSize(item as FontIcon);
                     }
                     else
                     {
@@ -135,11 +132,6 @@ namespace ClassifyFiles.UI.Component
                         {
                             Source = File.Display.Image,
                         };
-                        if (Square)
-                        {
-                            (item as Image).Stretch = Stretch.UniformToFill;
-                        }
-                        BindingSize(item as Image);
                     }
                     item.HorizontalAlignment = HorizontalAlignment.Center;
                     item.VerticalAlignment = VerticalAlignment.Center;
@@ -154,52 +146,40 @@ namespace ClassifyFiles.UI.Component
             return item is Image;
         }
 
-        MagnificationConverter mc = new MagnificationConverter();
-        private void BindingSize(Image image)
-        {
-            if (Scale == 1)
-            {
-                image.SetBinding(WidthProperty, "IconSize");
-                if (Square)
-                {
-                    image.SetBinding(HeightProperty, "IconSize");
-                }
 
-            }
-            else if (Scale < 0)
+        private void BindingSize()
+        {
+            //由于静态属性的绑定实在是感觉有问题，反正是单向绑定，那就手动使用初值设置+接受事件进行修改就好了
+            if (Scale < 0)
             {
-                image.Width = -Scale;
+                view.Width = -Scale;
                 if (Square)
                 {
-                    image.Height = -Scale;
+                    view.Height = -Scale;
                 }
             }
             else
             {
-                image.SetBinding(WidthProperty, new Binding("IconSize") { Converter = mc, ConverterParameter = Scale });
+
+                Set();
+                Configs.StaticPropertyChanged += (p1, p2) =>
+                {
+                    if (p2.PropertyName == nameof(Configs.IconSize))
+                    {
+                        Set();
+                    }
+                };
+            }
+           void Set()
+            {
+                view.Width = Configs.IconSize * Scale;
                 if (Square)
                 {
-                    image.SetBinding(HeightProperty, new Binding("IconSize") { Converter = mc, ConverterParameter = Scale });
+                    view.Height = Configs.IconSize * Scale;
                 }
             }
         }
-        private void BindingSize(FontIcon icon)
-        {
-            if (Scale == 1)
-            {
-                icon.SetBinding(FontIcon.FontSizeProperty, new Binding("IconSize") { Converter = mc, ConverterParameter = 0.8 });
-            }
-            else if (Scale < 0)
-            {
-                icon.FontSize = -Scale * 0.8;
-            }
-            else
-            {
-                icon.SetBinding(FontIcon.FontSizeProperty, new Binding("IconSize") { Converter = mc, ConverterParameter = Scale * 0.8 });
-            }
-        }
-
-        public double IconSize => UIFileSize.DefaultIconSize;
+       
         private async void UserControlBase_Loaded(object sender, RoutedEventArgs e)
         {
 
@@ -211,6 +191,7 @@ namespace ClassifyFiles.UI.Component
                     Tasks.Enqueue(RefreshIcon);
                 }
             }
+            BindingSize();
         }
 
         public static TaskQueue Tasks { get; private set; } = new TaskQueue();

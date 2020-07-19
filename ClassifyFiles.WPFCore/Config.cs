@@ -112,7 +112,14 @@ namespace ClassifyFiles
         public static double IconSize
         {
             get => Get(ref iconSize, GetDouble, 32d, nameof(IconSize));
-            set => Set(ref iconSize, value, nameof(IconSize));
+            set
+            {
+                if(value < 16 || value > 256)
+                {
+                    return;
+                }
+                Set(ref iconSize, value, nameof(IconSize));
+            }
         }
 
         private static bool? showTilePath = null;

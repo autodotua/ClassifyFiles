@@ -9,6 +9,8 @@
                      mc:Ignorable="d"                 
                      xmlns:m="http://schemas.modernwpf.com/2019"   
                      Loaded="UserControlBase_Loaded">
+    <Viewbox x:Name="view">
 
-    <ContentControl x:Name="main"/>
+        <ContentControl x:Name="main"/>
+    </Viewbox>
 </ui:UserControlBase>

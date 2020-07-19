@@ -207,11 +207,11 @@ namespace ClassifyFiles.UI.Panel
             SelectedClassChanged(null, null);
         }
 
-        private async void btnAllFiles_Click(object sender, RoutedEventArgs e)
+        private  void btnAllFiles_Click(object sender, RoutedEventArgs e)
         {
             if (GetItemsPanel().SelectedItem == null)
             {
-                await filesViewer.RefreshAsync();
+                 filesViewer.Refresh();
             }
             else
             {
@@ -224,7 +224,7 @@ namespace ClassifyFiles.UI.Panel
             set
             {
                 Configs.ShowClassTags = value;
-                filesViewer.RefreshAsync();
+                filesViewer.Refresh();
             }
         }
         public bool ShowThumbnail
@@ -233,7 +233,7 @@ namespace ClassifyFiles.UI.Panel
             set
             {
                 Configs.ShowThumbnail = value;
-                filesViewer.RefreshAsync();
+                filesViewer.Refresh();
             }
         }
         public bool ShowExplorerIcon
@@ -242,7 +242,7 @@ namespace ClassifyFiles.UI.Panel
             set
             {
                 Configs.ShowExplorerIcon = value;
-                filesViewer.RefreshAsync();
+                filesViewer.Refresh();
             }
         }
         public bool ShowIconViewNames
@@ -251,7 +251,7 @@ namespace ClassifyFiles.UI.Panel
             set
             {
                 Configs.ShowIconViewNames = value;
-                filesViewer.RefreshAsync();
+                filesViewer.Refresh();
             }
         }
         public bool ShowTilePath
@@ -260,7 +260,7 @@ namespace ClassifyFiles.UI.Panel
             set
             {
                 Configs.ShowTilePath = value;
-                filesViewer.RefreshAsync();
+                filesViewer.Refresh();
             }
         }
         public bool ShowFileExtension
@@ -269,7 +269,7 @@ namespace ClassifyFiles.UI.Panel
             set
             {
                 Configs.ShowFileExtension = value;
-                filesViewer.RefreshAsync();
+                filesViewer.Refresh();
             }
         }
         public bool ShowToolTip
@@ -312,8 +312,6 @@ namespace ClassifyFiles.UI.Panel
                     return;
                 }
                 Configs.IconSize = value;
-                UIFileSize.DefaultIconSize = value;
-                //filesViewer.Files.ForEach(p => p.Size.UpdateIconSize());
                 this.Notify(nameof(IconSize), nameof(IconSizeString));
             }
         }

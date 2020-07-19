@@ -138,19 +138,7 @@ namespace ClassifyFiles.UI.Panel
                 await SortAsync((SortType)Configs.SortType);
             }
         }
-        public async Task SetFilesAsync(IEnumerable<UIFile> files)
-        {
-            if (files == null || !files.Any())
-            {
-                Files = new ObservableCollection<UIFile>();
-            }
-            else
-            {
-                Files = new ObservableCollection<UIFile>(files);
-                await Task.Delay(100);//不延迟大概率会一直转圈
-                //await RealtimeRefresh(Files.Take(100));
-            }
-        }
+
         public async Task AddFilesAsync(IEnumerable<File> files, bool tags = true)
         {
             List<UIFile> filesWithIcon = new List<UIFile>();
@@ -191,8 +179,16 @@ namespace ClassifyFiles.UI.Panel
             };
         }
 
-        private async void lvwFiles_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private async void Viewer_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            var parent = VisualTreeHelper.GetParent(e.OriginalSource as DependencyObject);
+            if (parent is System.Windows.Controls.Primitives.RepeatButton
+                || parent is System.Windows.Controls.Primitives.Thumb)
+            {
+                //由于双击滚动条也会触发该事件，因此需要判断该事件是不是从滚动条发出来的。
+                //没有很好的方法来判断是不是滚动条
+                return;
+            }
             try
             {
                 File file = GetSelectedFile()?.File;
@@ -238,9 +234,7 @@ namespace ClassifyFiles.UI.Panel
 
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && CurrentFileView != FileView.Detail)
             {
-                UIFileSize.DefaultIconSize += e.Delta / 30;
-                Configs.IconSize = UIFileSize.DefaultIconSize;
-                //Files.ForEach(p => p.Size.UpdateIconSize());
+                Configs.IconSize += e.Delta / 30;
                 e.Handled = true;
             }
         }
@@ -279,12 +273,19 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
-        public async Task RefreshAsync()
+        public  void Refresh()
         {
             FileIcon.ClearCaches();
             var files = Files;
-            Files = null;
-            await SetFilesAsync(files);
+            Files = null; 
+            if (files == null || !files.Any())
+            {
+                Files = new ObservableCollection<UIFile>();
+            }
+            else
+            {
+                Files = new ObservableCollection<UIFile>(files);
+            }
         }
 
         public event EventHandler ViewTypeChanged;

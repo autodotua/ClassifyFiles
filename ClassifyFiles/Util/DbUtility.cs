@@ -1,6 +1,7 @@
 ﻿using ClassifyFiles.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using System;
 using System.Threading.Tasks;
 
 namespace ClassifyFiles.Util
@@ -9,18 +10,36 @@ namespace ClassifyFiles.Util
     {
         public static string DbPath { get; private set; } = "data.db";
         internal static AppDbContext db = new AppDbContext(DbPath);
-
-        public static Task SaveChangesAsync()
+        const string dbReplacedMessage = "由于保存出错，数据库上下文被替换，更改已丢失";
+        public async static Task SaveChangesAsync()
         {
-            return db.SaveChangesAsync();
-        }  
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                db = new AppDbContext(DbPath);
+                LogUtility.AddLogAsync(dbReplacedMessage + Environment.NewLine + ex.ToString());
+                System.Diagnostics.Debug.WriteLine(dbReplacedMessage);
+            }
+        }
         public static void SaveChanges()
         {
-             db.SaveChanges();
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                db = new AppDbContext(DbPath);
+                LogUtility.AddLogAsync(dbReplacedMessage + Environment.NewLine + ex.ToString());
+                System.Diagnostics.Debug.WriteLine(dbReplacedMessage);
+            }
         }
         public static Task ZipAsync()
         {
-            return                 db.Database.ExecuteSqlRawAsync("VACUUM;");
+            return db.Database.ExecuteSqlRawAsync("VACUUM;");
         }
         public static void CancelChanges()
         {

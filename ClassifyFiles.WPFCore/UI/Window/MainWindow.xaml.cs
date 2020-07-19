@@ -58,7 +58,7 @@ namespace ClassifyFiles.UI
                 if (value != null)
                 {
                     value.PropertyChanged += Project_PropertyChanged;
-                    if(value.ID!= Configs.LastProjectID)
+                    if (value.ID != Configs.LastProjectID)
                     {
                         Configs.LastProjectID = value.ID;
                     }
@@ -74,7 +74,12 @@ namespace ClassifyFiles.UI
         public MainWindow()
         {
             InitializeComponent();
-
+            var width = SystemParameters.WorkArea.Width;
+            var height = SystemParameters.WorkArea.Height;
+            Width = width * 0.8;
+            Height = height * 0.8;
+            //Left = width * .1;
+            //Top = height * .1;
 
         }
 

@@ -50,7 +50,7 @@ namespace ClassifyFiles.Util
                 db.Configs.Add(config);
             }
 
-            db.SaveChanges();
+            SaveChanges();
 
         }
     }

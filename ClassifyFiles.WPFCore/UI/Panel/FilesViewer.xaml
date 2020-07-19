@@ -69,7 +69,8 @@ xmlns:app="clr-namespace:ClassifyFiles"
                 <TextBlock Grid.Column="2" Grid.Row="0"     
                         Style="{StaticResource BaseTextBlockStyle}" TextWrapping="Wrap"  HorizontalAlignment="Center" Text="{Binding Display.DisplayName}"/>
 
-                <component:FileIcon EnableCache="False" Square="False" Visibility="{Binding Path=(root:Configs.ShowToolTipImage),Mode=OneWay,Converter={StaticResource b2v}}"
+                <component:FileIcon DisplayRawImage="True"  
+                                    EnableCache="False" Square="False" Visibility="{Binding Path=(root:Configs.ShowToolTipImage),Mode=OneWay,Converter={StaticResource b2v}}"
                                     File="{Binding .,Mode=OneTime}" Scale="-360"/>
                 <Grid Margin="8">
                     <Grid.ColumnDefinitions>
@@ -110,55 +111,54 @@ xmlns:app="clr-namespace:ClassifyFiles"
 
         <!--图标视图模板-->
         <DataTemplate x:Key="grdIconView">
-            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,8" >
-                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  ToolTip="{StaticResource toolTip}">
-                    <TextBlock DockPanel.Dock="Bottom" 
+            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,8"  MinWidth="64" >
+                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  ToolTip="{StaticResource toolTip}"
+                           Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}">
+                    <TextBlock DockPanel.Dock="Bottom"  
                                Visibility="{Binding  Path=Display.ShowIconViewNames, Converter={StaticResource b2v}}" 
                                Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
                                Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" LineHeight="16" Height="36" 
-                               MaxWidth="{Binding Path=(uim:UIFileSize.DefaultIconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}"/>
-                    <component:FileIcon Scale="2.0" File="{Binding .}"  
-                                        Height="{Binding Path=(uim:UIFileSize.DefaultIconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" 
-                                        Width="{Binding Path=(uim:UIFileSize.DefaultIconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"/>
+                               MaxWidth="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}"/>
+                    <component:FileIcon Scale="2.0" File="{Binding .}"   
+                                        Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" 
+                                        Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"/>
                 </DockPanel>
             </Border>
         </DataTemplate>
         
         <!--平铺视图模板-->
         <DataTemplate x:Key="grdTileView">
-            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,0,0,4">
-                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" 
+            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" 
                       ToolTip="{StaticResource toolTip}"
-                      Height="{Binding Path=(uim:UIFileSize.DefaultIconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}" >
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{Binding Path=(uim:UIFileSize.DefaultIconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"/>
-                        <ColumnDefinition Width="8"/>
-                        <ColumnDefinition Width="144"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="8"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
+                      Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="144"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
                                  HorizontalAlignment="Left" TextWrapping="Wrap" />
-                    <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding Display.DisplayDir,Mode=OneTime}"
+                <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding Display.DisplayDir,Mode=OneTime}"
                                Foreground="Gray" TextWrapping="Wrap" Style="{StaticResource CaptionTextBlockStyle}"
                                Visibility="{Binding Display.ShowTileViewPaths, Converter={StaticResource b2v}}"/>
-                    <component:TagGroup Grid.ColumnSpan="99" File="{Binding .}" Orientation="Horizontal" 
+                <component:TagGroup Grid.ColumnSpan="99" File="{Binding .}" Orientation="Horizontal" 
                                         Grid.RowSpan="99" HorizontalAlignment="Right" VerticalAlignment="Bottom" TagMouseDown="Tags_MouseDown"/>
-                    <component:FileIcon Scale="2.0" File="{Binding .}" Grid.RowSpan="99" />
-                </Grid>
-            </Border>
+                <component:FileIcon Scale="2.0"  File="{Binding .}" Grid.RowSpan="99" />
+            </Grid>
         </DataTemplate>
 
         <!--列表和树状视图模板-->
         <HierarchicalDataTemplate  ItemsSource="{Binding SubUIFiles}"   x:Key="listDataTemplate">
             <Grid Margin="0,4,24,4"  ToolTip="{StaticResource toolTip}"  >
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{Binding Path=(uim:UIFileSize.DefaultIconSize)}"/>
+                    <ColumnDefinition Width="{Binding Path=(root:Configs.IconSize)}"/>
                     <ColumnDefinition Width="16"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="16"/>
@@ -186,14 +186,16 @@ xmlns:app="clr-namespace:ClassifyFiles"
 
         <!--图标和平铺视图-->
         <ListView  x:Key="grdFiles" ContextMenu="{StaticResource menu}"
-                      PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"  
+                      PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"  
                          ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
                     VirtualizingPanel.IsVirtualizing='True'
                      VirtualizingPanel.IsVirtualizingWhenGrouping='True'
-                     VirtualizingPanel.ScrollUnit='Pixel'  >
+                     VirtualizingPanel.ScrollUnit='Pixel' >
+
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <wpftk:VirtualizingWrapPanel Orientation="Vertical" Margin="0,0,16,0"/>
+                    <wpftk:VirtualizingWrapPanel  SpacingMode="Uniform"  
+                                                  Orientation="Vertical" Margin="0,0,16,0"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
             <ListView.GroupStyle>
@@ -204,7 +206,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
         <!--列表视图-->
         <m:ListView ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}" 
                     x:Key="lvwFiles" SelectionMode="Extended"
-                    PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
+                    PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
                         ContextMenu="{StaticResource menu}"
                     ItemTemplate="{StaticResource listDataTemplate}"
                                         VirtualizingPanel.IsVirtualizing='True'
@@ -222,14 +224,14 @@ xmlns:app="clr-namespace:ClassifyFiles"
 
         <!--树状图-->
         <TreeView x:Key="treeFiles"  ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
-                                          Grid.Row="4"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"
+                                          Grid.Row="4"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
                    ItemTemplate="{StaticResource listDataTemplate}"/>
 
 
     
         <!--详细信息视图-->
         <ListView x:Key="lvwDetailFiles" SelectionMode="Extended" ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
-                    PreviewMouseDoubleClick="lvwFiles_PreviewMouseDoubleClick"        
+                    PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"        
                      VirtualizingPanel.IsVirtualizing='True'
                      VirtualizingPanel.IsVirtualizingWhenGrouping='True'
                      VirtualizingPanel.ScrollUnit='Pixel'  

@@ -90,6 +90,23 @@ namespace ClassifyFiles.UI.Model
 
         public string Glyph { get; set; } = FileGlyph;
         public Symbol Symbol { get; set; } = Symbol.OpenFile;
+
+        public BitmapImage RawImage
+        {
+            get
+            {
+                try
+                {
+                    var bitmapImage = new BitmapImage(new Uri(File.GetAbsolutePath(), UriKind.Absolute));
+                    return bitmapImage;
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+        }
+
         public BitmapImage Image
         {
             get
