@@ -1,7 +1,7 @@
 # 文件分类浏览器
 
 ![image](Image/DotNetCore.svg)
-![image](Image/Csharp.svg)
+![image](Image/CSharp.svg)
 ![image](Image/WPF.svg)
 
 ## 介绍
