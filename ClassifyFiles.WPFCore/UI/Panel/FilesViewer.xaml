@@ -10,7 +10,7 @@
     xmlns:root="clr-namespace:ClassifyFiles"
                  xmlns:m="http://schemas.modernwpf.com/2019"
 xmlns:app="clr-namespace:ClassifyFiles"
-             
+             xmlns:uim="clr-namespace:ClassifyFiles.UI.Model"
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
         xmlns:wpftk="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
 
@@ -22,6 +22,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
         <ui:IsNotNull2VisibilityConverter x:Key="nn2v"/>
         <sys:Double x:Key="two">2.0</sys:Double>
+        <sys:Double x:Key="twoFive">2.5</sys:Double>
         
         <!--公用的右键菜单-->
         <ContextMenu x:Key="menu" Opened="ContextMenu_Opened"  Closed="ContextMenu_Closed">
@@ -109,16 +110,16 @@ xmlns:app="clr-namespace:ClassifyFiles"
 
         <!--图标视图模板-->
         <DataTemplate x:Key="grdIconView">
-            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,8">
+            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,8" >
                 <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  ToolTip="{StaticResource toolTip}">
-                    <TextBlock DockPanel.Dock="Bottom" FontSize="{Binding Size.FontSize}" 
+                    <TextBlock DockPanel.Dock="Bottom" 
                                Visibility="{Binding  Path=Display.ShowIconViewNames, Converter={StaticResource b2v}}" 
                                Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
-                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" LineHeight="16" Height="32" 
-                               MaxWidth="{Binding Size.IconSize, Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"/>
+                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" LineHeight="16" Height="36" 
+                               MaxWidth="{Binding Path=(uim:UIFileSize.DefaultIconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}"/>
                     <component:FileIcon Scale="2.0" File="{Binding .}"  
-                                        Height="{Binding Size.IconSize, Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" 
-                                        Width="{Binding Size.IconSize, Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"/>
+                                        Height="{Binding Path=(uim:UIFileSize.DefaultIconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" 
+                                        Width="{Binding Path=(uim:UIFileSize.DefaultIconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"/>
                 </DockPanel>
             </Border>
         </DataTemplate>
@@ -126,9 +127,11 @@ xmlns:app="clr-namespace:ClassifyFiles"
         <!--平铺视图模板-->
         <DataTemplate x:Key="grdTileView">
             <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,0,0,4">
-                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" ToolTip="{StaticResource toolTip}" Height="{Binding Size.TotalTileViewHeight}">
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" 
+                      ToolTip="{StaticResource toolTip}"
+                      Height="{Binding Path=(uim:UIFileSize.DefaultIconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}" >
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="{Binding Path=(uim:UIFileSize.DefaultIconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"/>
                         <ColumnDefinition Width="8"/>
                         <ColumnDefinition Width="144"/>
                     </Grid.ColumnDefinitions>
@@ -142,12 +145,11 @@ xmlns:app="clr-namespace:ClassifyFiles"
                     <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
                                  HorizontalAlignment="Left" TextWrapping="Wrap" />
                     <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding Display.DisplayDir,Mode=OneTime}"
-                               Foreground="Gray" TextWrapping="Wrap" FontSize="{Binding Size.SmallFontSize}"  Visibility="{Binding Display.ShowTileViewPaths, Converter={StaticResource b2v}}"/>
+                               Foreground="Gray" TextWrapping="Wrap" Style="{StaticResource CaptionTextBlockStyle}"
+                               Visibility="{Binding Display.ShowTileViewPaths, Converter={StaticResource b2v}}"/>
                     <component:TagGroup Grid.ColumnSpan="99" File="{Binding .}" Orientation="Horizontal" 
                                         Grid.RowSpan="99" HorizontalAlignment="Right" VerticalAlignment="Bottom" TagMouseDown="Tags_MouseDown"/>
-                    <component:FileIcon Scale="2.0" File="{Binding .}" Grid.RowSpan="99" 
-                                        Height="{Binding Size.IconSize, Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" 
-                                        Width="{Binding Size.IconSize, Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"/>
+                    <component:FileIcon Scale="2.0" File="{Binding .}" Grid.RowSpan="99" />
                 </Grid>
             </Border>
         </DataTemplate>
@@ -156,7 +158,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
         <HierarchicalDataTemplate  ItemsSource="{Binding SubUIFiles}"   x:Key="listDataTemplate">
             <Grid Margin="0,4,24,4"  ToolTip="{StaticResource toolTip}"  >
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{Binding Size.IconSize}"/>
+                    <ColumnDefinition Width="{Binding Path=(uim:UIFileSize.DefaultIconSize)}"/>
                     <ColumnDefinition Width="16"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="16"/>
@@ -171,7 +173,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="4"/>
                 </Grid.RowDefinitions>
-                <component:FileIcon File="{Binding .}" Grid.RowSpan="99" Width="{Binding Size.IconSize}" Height="{Binding Size.IconSize}"/>
+                <component:FileIcon File="{Binding .}" Grid.RowSpan="99" />
                 <TextBlock Text="{Binding Display.DisplayName}" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" FontWeight="Bold"/>
                 <TextBlock Text="{Binding Display.Length}"  Grid.Column="2" Grid.Row="3" Width="108"
                                    Foreground="{ DynamicResource SystemControlBackgroundBaseMediumHighBrush}"/>
@@ -191,7 +193,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
                      VirtualizingPanel.ScrollUnit='Pixel'  >
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <wpftk:VirtualizingWrapPanel Orientation="Vertical" />
+                    <wpftk:VirtualizingWrapPanel Orientation="Vertical" Margin="0,0,16,0"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
             <ListView.GroupStyle>
@@ -235,6 +237,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Static GridView.GridViewItemContainerStyleKey}}">
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="0,0,16,0"/>
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.GroupStyle>

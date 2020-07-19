@@ -1,36 +1,15 @@
-﻿using System;
+﻿using ClassifyFiles.Data;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Media;
+using System.Windows.Markup;
 
 namespace ClassifyFiles.UI
 {
-    public static class UIUtility
-    {
-        public static T GetVisualChild<T>(this Visual referenceVisual) where T : Visual
-        {
-            Visual child = null;
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(referenceVisual); i++)
-            {
-                child = VisualTreeHelper.GetChild(referenceVisual, i) as Visual;
-                if (child != null && child is T)
-                {
-                    break;
-                }
-                else if (child != null)
-                {
-                    child = GetVisualChild<T>(child);
-                    if (child != null && child is T)
-                    {
-                        break;
-                    }
-                }
-            }
-            return child as T;
-        }
-
-    }
     public class MagnificationConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -97,7 +76,7 @@ namespace ClassifyFiles.UI
 
     }
 
-    public class TimeSpan2Ms : IValueConverter
+    public class TimeSpan2MsConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -167,6 +146,58 @@ namespace ClassifyFiles.UI
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
+        }
+    }
+    public class MatchConditionType2ControlVisibilityConverter : IValueConverter
+    {
+        private static Dictionary<MatchType, string> MatchConditionTypeWithControlType = new Dictionary<MatchType, string>()
+        {
+            [MatchType.InFileName] = "text",
+            [MatchType.InDirName] = "text",
+            [MatchType.InDirNameWithRegex] = "text",
+            [MatchType.InFileNameWithRegex] = "text",
+            [MatchType.InPath] = "text",
+            [MatchType.WithExtension] = "text",
+            [MatchType.InPathWithRegex] = "text",
+            [MatchType.SizeLargerThan] = "text",
+            [MatchType.SizeSmallerThan] = "text",
+            [MatchType.TimeEarlierThan] = "time",
+            [MatchType.TimeLaterThan] = "time",
+
+        };
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (MatchConditionTypeWithControlType[(MatchType)value] == parameter as string)
+            {
+                return Visibility.Visible;
+            }
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class EnumToItemsSourceExtension : MarkupExtension
+    {
+        private Type Type { get; }
+
+        public EnumToItemsSourceExtension(Type type)
+        {
+            Type = type;
+        }
+
+        public override object ProvideValue(IServiceProvider serviceProvider)
+        {
+            return System.Enum.GetValues(Type).Cast<object>()
+                .Select(e =>
+                {
+                    var enumItem = e.GetType().GetMember(e.ToString()).First();
+                    var desc = (enumItem.GetCustomAttributes(false).First() as DescriptionAttribute).Description;
+                    return new { Value = e, DisplayName = desc };
+                });
         }
     }
 }

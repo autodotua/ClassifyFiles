@@ -1,4 +1,4 @@
-﻿<dialog:DialogBase
+﻿<dialog:ContentDialogBase
     xmlns:dialog="clr-namespace:ClassifyFiles.UI.Dialog"
     x:Class="ClassifyFiles.UI.InputDialog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -9,9 +9,9 @@
     PrimaryButtonText="确定"
     CloseButtonText="取消"
              mc:Ignorable="d" >
-    <dialog:DialogBase.Resources>
+    <dialog:ContentDialogBase.Resources>
         <local:ValueMinusConverter x:Key="minus"/>
-    </dialog:DialogBase.Resources>
+    </dialog:ContentDialogBase.Resources>
             <Grid Margin="8" MinWidth="160" MaxHeight="600" >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -29,4 +29,4 @@
                          VerticalAlignment="Center" Text="{Binding InputContent}"/>
             </Grid>
 
-</dialog:DialogBase>
+</dialog:ContentDialogBase>

@@ -1,4 +1,4 @@
-﻿<dialog:DialogBase  xmlns:dialog="clr-namespace:ClassifyFiles.UI.Dialog"
+﻿<dialog:ContentDialogBase  xmlns:dialog="clr-namespace:ClassifyFiles.UI.Dialog"
                     x:Class="ClassifyFiles.UI.ErrorDialog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -28,4 +28,4 @@
         </Expander>
     </m:SimpleStackPanel>
 
-</dialog:DialogBase>
+</dialog:ContentDialogBase>

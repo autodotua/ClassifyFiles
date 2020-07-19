@@ -8,7 +8,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClassifyFiles.UI.Panel" 
     xmlns:data="clr-namespace:ClassifyFiles.Data;assembly=ClassifyFiles.Core"
-    
+    xmlns:uiuti="clr-namespace:ClassifyFiles.UI.Util"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:m="http://schemas.modernwpf.com/2019"
     Loaded="WindowBase_Loaded"
@@ -16,7 +16,7 @@
     <UserControl.Resources>
         <ui:NotFirst2VisibilityConverter x:Key="i2v"/>
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
-        <panel:MatchConditionType2ControlVisibilityConverter x:Key="mt2v"/>
+        <ui:MatchConditionType2ControlVisibilityConverter x:Key="mt2v"/>
     </UserControl.Resources>
     <Grid >
         <Grid.RowDefinitions>
@@ -61,12 +61,12 @@
                                           DisplayMemberPath="DisplayName"  SelectedValuePath="Value"
                                           SelectedValue="{Binding ConnectionLogic}"
                                           Visibility="{Binding Index, Converter={StaticResource i2v}}"
-                                          ItemsSource="{panel:EnumToItemsSource {x:Type data:Logic}}"/>
+                                          ItemsSource="{uiuti:EnumToItemsSource {x:Type data:Logic}}"/>
                                 <ComboBox  
                                     VerticalAlignment="Bottom" Grid.Column="2" HorizontalAlignment="Stretch"
                                             SelectedValuePath="Value"  DisplayMemberPath="DisplayName"
                                           SelectedValue="{Binding Type}"
-                                          ItemsSource="{panel:EnumToItemsSource {x:Type data:MatchType}}"/>
+                                          ItemsSource="{uiuti:EnumToItemsSource {x:Type data:MatchType}}"/>
                                 <CheckBox Content="取反" VerticalAlignment="Bottom" IsChecked="{Binding Not}" Grid.Column="4" Margin="0,0,-12,0"/>
                                 <TextBox VerticalAlignment="Bottom"   HorizontalAlignment="Stretch"
                                          Text="{Binding Value}" Grid.Column="6" Visibility="{Binding Type, Converter={StaticResource mt2v}, ConverterParameter=text}"/>                                

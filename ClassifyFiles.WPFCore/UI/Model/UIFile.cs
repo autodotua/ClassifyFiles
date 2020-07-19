@@ -32,7 +32,6 @@ namespace ClassifyFiles.UI.Model
             FileInfo = file.GetFileInfo();
             SubUIFiles = file.SubFiles.Select(p => new UIFile(p)).ToList();
             Display = new UIFileDisplay(file);
-            Size = new UIFileSize();
 
         }
         public List<UIFile> SubUIFiles { get; private set; } = new List<UIFile>();
@@ -48,7 +47,6 @@ namespace ClassifyFiles.UI.Model
             }
         }
         private bool loaded = false;
-        public UIFileSize Size { get; set; }
         public UIFileDisplay Display { get; set; }
         public System.IO.FileInfo FileInfo { get; private set; }
         public async Task LoadAsync(AppDbContext db = null)

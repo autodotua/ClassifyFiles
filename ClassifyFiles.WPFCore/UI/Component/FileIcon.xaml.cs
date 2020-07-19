@@ -33,6 +33,10 @@ namespace ClassifyFiles.UI.Component
         public FileIcon()
         {
             InitializeComponent();
+            UIFileSize.StaticPropertyChanged += (p1, p2) =>
+            {
+                this.Notify(nameof(IconSize));
+            };
         }
         public bool EnableCache { get; set; } = true;
         public bool Square { get; set; } = true;
@@ -105,11 +109,11 @@ namespace ClassifyFiles.UI.Component
                 && !(File.Display.Image != null && caches[File.File.ID] is FontIcon))
                 {
                     item = caches[File.File.ID];
-                    if(item is Image image)
+                    if (item is Image image)
                     {
                         BindingSize(image);
                     }
-                    else if(item is FontIcon icon)
+                    else if (item is FontIcon icon)
                     {
                         BindingSize(icon);
                     }
@@ -155,10 +159,10 @@ namespace ClassifyFiles.UI.Component
         {
             if (Scale == 1)
             {
-                image.SetBinding(WidthProperty, "File.Size.IconSize");
+                image.SetBinding(WidthProperty, "IconSize");
                 if (Square)
                 {
-                    image.SetBinding(HeightProperty, "File.Size.IconSize");
+                    image.SetBinding(HeightProperty, "IconSize");
                 }
 
             }
@@ -172,10 +176,10 @@ namespace ClassifyFiles.UI.Component
             }
             else
             {
-                image.SetBinding(WidthProperty, new Binding("File.Size.IconSize") { Converter = mc, ConverterParameter = Scale });
+                image.SetBinding(WidthProperty, new Binding("IconSize") { Converter = mc, ConverterParameter = Scale });
                 if (Square)
                 {
-                    image.SetBinding(HeightProperty, new Binding("File.Size.IconSize") { Converter = mc, ConverterParameter = Scale });
+                    image.SetBinding(HeightProperty, new Binding("IconSize") { Converter = mc, ConverterParameter = Scale });
                 }
             }
         }
@@ -183,7 +187,7 @@ namespace ClassifyFiles.UI.Component
         {
             if (Scale == 1)
             {
-                icon.SetBinding(FontIcon.FontSizeProperty, "File.Size.FontIconSize");
+                icon.SetBinding(FontIcon.FontSizeProperty, new Binding("IconSize") { Converter = mc, ConverterParameter = 0.8 });
             }
             else if (Scale < 0)
             {
@@ -191,9 +195,11 @@ namespace ClassifyFiles.UI.Component
             }
             else
             {
-                icon.SetBinding(FontIcon.FontSizeProperty, new Binding("File.Size.FontIconSize") { Converter = mc, ConverterParameter = Scale });
+                icon.SetBinding(FontIcon.FontSizeProperty, new Binding("IconSize") { Converter = mc, ConverterParameter = Scale * 0.8 });
             }
         }
+
+        public double IconSize => UIFileSize.DefaultIconSize;
         private async void UserControlBase_Loaded(object sender, RoutedEventArgs e)
         {
 

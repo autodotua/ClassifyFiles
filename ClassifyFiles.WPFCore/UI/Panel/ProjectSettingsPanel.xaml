@@ -8,6 +8,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClassifyFiles.UI.Panel"
     xmlns:util="clr-namespace:ClassifyFiles.Util;assembly=ClassifyFiles.Core"
+    xmlns:uiutil="clr-namespace:ClassifyFiles.UI.Util"
     xmlns:m="http://schemas.modernwpf.com/2019"
      xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
@@ -87,7 +88,7 @@
                         <ComboBox VerticalAlignment="Bottom"  Width="120"
                                           DisplayMemberPath="DisplayName"  SelectedValuePath="Value"
                                           SelectedValue="{Binding ExportFormat}"
-                                                                          SelectedIndex="0"         ItemsSource="{panel:EnumToItemsSource {x:Type util:ExportFormat}}"/>
+                                                                          SelectedIndex="0"         ItemsSource="{uiutil:EnumToItemsSource {x:Type util:ExportFormat}}"/>
 
                         <TextBlock VerticalAlignment="Center" >分隔符：</TextBlock>
                         <TextBox MinWidth="120" Text="{Binding Splitter}"/>

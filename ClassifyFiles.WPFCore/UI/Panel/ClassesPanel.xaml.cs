@@ -6,6 +6,7 @@ using static ClassifyFiles.Util.ClassUtility;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Linq;
+using ClassifyFiles.UI.Event;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -111,17 +112,5 @@ namespace ClassifyFiles.UI.Panel
         {
             SelectedItem = null;
         }
-    }
-
-    public class SelectedClassChangedEventArgs : EventArgs
-    {
-        public SelectedClassChangedEventArgs(Class oldValue, Class newValue)
-        {
-            OldValue = oldValue;
-            NewValue = newValue;
-        }
-
-        public Class OldValue { get; set; }
-        public Class NewValue { get; set; }
     }
 }

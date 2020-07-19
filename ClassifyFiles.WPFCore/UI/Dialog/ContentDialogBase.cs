@@ -7,9 +7,9 @@ using System.Windows.Controls;
 
 namespace ClassifyFiles.UI.Dialog
 {
-   public abstract class DialogBase: ContentDialog, INotifyPropertyChanged
+    public class ContentDialogBase : ContentDialog, INotifyPropertyChanged
     {
-        public DialogBase()
+        public ContentDialogBase()
         {
             DataContext = this;
         }

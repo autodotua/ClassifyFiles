@@ -12,7 +12,7 @@ namespace ClassifyFiles.UI
     /// <summary>
     /// Dialog.xaml 的交互逻辑
     /// </summary>
-    public partial class InputDialog : DialogBase
+    public partial class InputDialog : ContentDialogBase
     {
         public InputDialog()
         {

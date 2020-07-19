@@ -24,7 +24,7 @@ namespace ClassifyFiles.UI
     /// <summary>
     /// Dialog.xaml 的交互逻辑
     /// </summary>
-    public partial class ErrorDialog : DialogBase
+    public partial class ErrorDialog : ContentDialogBase
     {
         public ErrorDialog()
         {

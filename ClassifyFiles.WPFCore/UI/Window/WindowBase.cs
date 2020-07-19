@@ -17,16 +17,6 @@ using ModernWpf;
 
 namespace ClassifyFiles.UI
 {
-    public class DialogWindowBase : WindowBase
-    {
-        public DialogWindowBase()
-        {
-            ShowInTaskbar = false;
-            ResizeMode = ResizeMode.NoResize;
-            WindowStyle = WindowStyle.ToolWindow;
-            WindowStartupLocation = WindowStartupLocation.CenterOwner;
-        }
-    }
     public class WindowBase : Window, INotifyPropertyChanged
     {
         [DllImport("gdi32.dll", EntryPoint = "DeleteObject")]

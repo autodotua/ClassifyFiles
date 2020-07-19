@@ -21,6 +21,7 @@ using ClassifyFiles.Util;
 using ClassifyFiles.UI;
 using System.Windows.Markup;
 using System.Diagnostics;
+using ClassifyFiles.UI.Event;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -129,56 +130,5 @@ namespace ClassifyFiles.UI.Panel
         }
     }
 
-    public class MatchConditionType2ControlVisibilityConverter : IValueConverter
-    {
-        private static Dictionary<MatchType, string> MatchConditionTypeWithControlType = new Dictionary<MatchType, string>()
-        {
-            [MatchType.InFileName] = "text",
-            [MatchType.InDirName] = "text",
-            [MatchType.InDirNameWithRegex] = "text",
-            [MatchType.InFileNameWithRegex] = "text",
-            [MatchType.InPath] = "text",
-            [MatchType.WithExtension] = "text",
-            [MatchType.InPathWithRegex] = "text",
-            [MatchType.SizeLargerThan] = "text",
-            [MatchType.SizeSmallerThan] = "text",
-            [MatchType.TimeEarlierThan] = "time",
-            [MatchType.TimeLaterThan] = "time",
-
-        };
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (MatchConditionTypeWithControlType[(MatchType)value] == parameter as string)
-            {
-                return Visibility.Visible;
-            }
-            return Visibility.Collapsed;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class EnumToItemsSource : MarkupExtension
-    {
-        private Type Type { get; }
-
-        public EnumToItemsSource(Type type)
-        {
-            Type = type;
-        }
-
-        public override object ProvideValue(IServiceProvider serviceProvider)
-        {
-            return Enum.GetValues(Type).Cast<object>()
-                .Select(e =>
-                {
-                    var enumItem = e.GetType().GetMember(e.ToString()).First();
-                    var desc = (enumItem.GetCustomAttributes(false).First() as DescriptionAttribute).Description;
-                    return new { Value = e, DisplayName = desc };
-                });
-        }
-    }
+    
 }

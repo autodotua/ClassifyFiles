@@ -8,6 +8,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClassifyFiles.UI.Panel"
     xmlns:data="clr-namespace:ClassifyFiles.Data;assembly=ClassifyFiles.Core"
+    xmlns:enum="clr-namespace:ClassifyFiles.Enum"
     xmlns:m="http://schemas.modernwpf.com/2019"
      xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
     Loaded="WindowBase_Loaded"
@@ -65,47 +66,47 @@
                     <m:MenuFlyout x:Name="menuSort" >
                         <m:RadioMenuItem x:Name="menuSortDefault" Header="默认（按目录）" IsCheckable="True" IsChecked="True" Checked="RadioMenuItem_Checked">
                             <m:RadioMenuItem.Tag>
-                                <local:SortType>Default</local:SortType>
+                                <enum:SortType>Default</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
                         <m:RadioMenuItem Header="文件名（升序）" IsCheckable="True" Checked="RadioMenuItem_Checked">
                             <m:RadioMenuItem.Tag>
-                                <local:SortType>NameUp</local:SortType>
+                                <enum:SortType>NameUp</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
                         <m:RadioMenuItem Header="文件名（降序）" IsCheckable="True" Checked="RadioMenuItem_Checked">
                             <m:RadioMenuItem.Tag>
-                                <local:SortType>NameDown</local:SortType>
+                                <enum:SortType>NameDown</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
                         <m:RadioMenuItem Header="大小（从小到大）" IsCheckable="True" Checked="RadioMenuItem_Checked">
                             <m:RadioMenuItem.Tag>
-                                <local:SortType>LengthUp</local:SortType>
+                                <enum:SortType>LengthUp</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
                         <m:RadioMenuItem Header="大小（从小到小）" IsCheckable="True" Checked="RadioMenuItem_Checked">
                             <m:RadioMenuItem.Tag>
-                                <local:SortType>LengthDown</local:SortType>
+                                <enum:SortType>LengthDown</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
                         <m:RadioMenuItem Header="修改时间（从早到晚）" IsCheckable="True" Checked="RadioMenuItem_Checked">
                             <m:RadioMenuItem.Tag>
-                                <local:SortType>LastWriteTimeUp</local:SortType>
+                                <enum:SortType>LastWriteTimeUp</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
                         <m:RadioMenuItem Header="修改时间（从晚到早）" IsCheckable="True" Checked="RadioMenuItem_Checked">
                             <m:RadioMenuItem.Tag>
-                                <local:SortType>LastWriteTimeDown</local:SortType>
+                                <enum:SortType>LastWriteTimeDown</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
                         <m:RadioMenuItem Header="创建时间（从早到晚）" IsCheckable="True" Checked="RadioMenuItem_Checked">
                             <m:RadioMenuItem.Tag>
-                                <local:SortType>CreationTimeUp</local:SortType>
+                                <enum:SortType>CreationTimeUp</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
                         <m:RadioMenuItem Header="创建时间（从晚到早）" IsCheckable="True" Checked="RadioMenuItem_Checked">
                             <m:RadioMenuItem.Tag>
-                                <local:SortType>CreationTimeDown</local:SortType>
+                                <enum:SortType>CreationTimeDown</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
                     </m:MenuFlyout>

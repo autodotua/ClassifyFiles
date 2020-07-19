@@ -2,26 +2,17 @@
 using ClassifyFiles.WPFCore;
 using System.Windows.Media;
 using System.ComponentModel;
+using System;
 
 namespace ClassifyFiles.UI.Model
 {
-    public class UIFileSize : INotifyPropertyChanged
+    public static class UIFileSize
     {
-        public UIFileSize()
-        {
-            if (font == null)
-            {
-                App.Current.Dispatcher.Invoke(() =>
-                {
-                    font = App.Current.MainWindow.FontFamily;
-                });
-            }
-        }
         private static double defualtIconSize = Configs.IconSize;
         /// <summary>
         /// 默认图标的大小
         /// </summary>
-        public static double DefualtIconSize
+        public static double DefaultIconSize
         {
             get => defualtIconSize;
             set
@@ -31,27 +22,10 @@ namespace ClassifyFiles.UI.Model
                     return;
                 }
                 defualtIconSize = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(DefaultIconSize)));
             }
         }
+        public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
 
-        public double IconSize { get; private set; } = DefualtIconSize;
-        public double FontIconSize { get; private set; } = DefualtIconSize / 1.5;
-        public double FontSize { get; private set; } = 12;
-        public double SmallFontSize { get; private set; } = 11;
-        private static FontFamily font;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public double TotalIconViewHeight => Configs.ShowIconViewNames ? IconSize*2 + 16 * 2 + 8 : IconSize * 2;
-        public double TotalTileViewHeight => IconSize * 2 + 32;
-        public double TileTitleHeight => FontSize * font.LineSpacing * 2;
-        public double TileDirHeight => SmallFontSize * font.LineSpacing * 2;
-
-        public void UpdateIconSize()
-        {
-            IconSize = DefualtIconSize ;
-            FontIconSize = DefualtIconSize / 1.5;
-            this.Notify(nameof(IconSize), nameof(FontIconSize),nameof(TotalIconViewHeight),nameof(TotalTileViewHeight));
-        }
     }
 }

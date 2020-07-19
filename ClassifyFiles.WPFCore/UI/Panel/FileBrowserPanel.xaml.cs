@@ -31,6 +31,10 @@ using static ClassifyFiles.Util.FileClassUtility;
 using static ClassifyFiles.Util.FileProjectUtilty;
 using static ClassifyFiles.Util.ProjectUtility;
 using System.Windows.Media.Animation;
+using ClassifyFiles.Enum;
+using ClassifyFiles.UI.Util;
+using ClassifyFiles.UI.Event;
+using ClassifyFiles.UI.Dialog;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -139,7 +143,7 @@ namespace ClassifyFiles.UI.Panel
                 return;
             }
             GetProgress().Show(true);
-            if (new UpdateFilesWindow(Project) { Owner = Window.GetWindow(this) }.ShowDialog() == true)
+            if (new UpdateFilesDialog(Project) { Owner = Window.GetWindow(this) }.ShowDialog() == true)
             {
                 if (classPanel.SelectedItem != null)
                 {
@@ -189,7 +193,7 @@ namespace ClassifyFiles.UI.Panel
 
         private async Task AddFilesAsync(IList<string> files)
         {
-            var dialog = new AddFilesWindow(classPanel.SelectedItem, files)
+            var dialog = new AddFilesDialog(classPanel.SelectedItem, files)
             { Owner = Window.GetWindow(this) };
             dialog.ShowDialog();
             if (dialog.AddedFiles != null)
@@ -308,8 +312,8 @@ namespace ClassifyFiles.UI.Panel
                     return;
                 }
                 Configs.IconSize = value;
-                UIFileSize.DefualtIconSize = value;
-                filesViewer.Files.ForEach(p => p.Size.UpdateIconSize());
+                UIFileSize.DefaultIconSize = value;
+                //filesViewer.Files.ForEach(p => p.Size.UpdateIconSize());
                 this.Notify(nameof(IconSize), nameof(IconSizeString));
             }
         }
@@ -390,46 +394,5 @@ namespace ClassifyFiles.UI.Panel
                 StartAnimation(cd.Width.Value-8);
             }
         }
-    }
-
-    public class ClickEventHelper
-    {
-        private DateTime downTime;
-        public Point downPosition;
-        private FrameworkElement downSender;
-
-        public ClickEventHelper(FrameworkElement element)
-        {
-            element.PreviewMouseDown += MouseDown;
-            element.PreviewMouseUp += MouseUp;
-        }
-
-        private void MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                downPosition = e.GetPosition(null);
-                downSender = sender as FrameworkElement;
-                downTime = DateTime.Now;
-            }
-        }
-
-        private void MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            var newPosition = e.GetPosition(null);
-            double distance = Math.Sqrt(Math.Pow(newPosition.X - downPosition.X, 2) + Math.Pow(newPosition.Y - downPosition.Y, 2));
-            if (distance < 5 &&
-                e.LeftButton == MouseButtonState.Released &&
-                sender == downSender)
-            {
-                TimeSpan timeSinceDown = DateTime.Now - this.downTime;
-                if (timeSinceDown.TotalMilliseconds < 500)
-                {
-                    Click?.Invoke(downSender, new EventArgs());
-                }
-            }
-        }
-
-        public event EventHandler Click;
     }
 }

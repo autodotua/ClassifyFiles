@@ -2,21 +2,21 @@
 
 ## 介绍
 
-
+文件分类浏览器，可以根据文件名、路径名、扩展名、文件信息等各种文件的元数据对海量文件进行自动分类并显示，也可以作为基于标签的文件管理和浏览器，进行手动分类
 
 ## 截图
 
-![image](https://github.com/autodotua/ClassifyFiles/blob/master/Image/Screenshot_1.png)
+![image](Image/Screenshot_1.png)
 
-![image](https://github.com/autodotua/ClassifyFiles/blob/master/Image/Screenshot_2.png)
+![image](Image/Screenshot_2.png)
 
-![image](https://github.com/autodotua/ClassifyFiles/blob/master/Image/Screenshot_3.png)
+![image](Image/Screenshot_3.png)
 
-![image](https://github.com/autodotua/ClassifyFiles/blob/master/Image/Screenshot_4.png)
+![image](Image/Screenshot_4.png)
 
-![image](https://github.com/autodotua/ClassifyFiles/blob/master/Image/Screenshot_5.png)
+![image](Image/Screenshot_5.png)
 
-![image](https://github.com/autodotua/ClassifyFiles/blob/master/Image/Screenshot_6.png)
+![image](Image/Screenshot_6.png)
 
 ## 特性
 
@@ -313,3 +313,13 @@
 修改了主界面的分类和文件区域的布局，从Expander变为GridSplitter，支持点一下收回和弹出
 
 修改了部分布局
+
+至此，程序功能的编写基本结束
+
+------
+
+### 2020719
+
+对许多一个文件多个类的进行了重新分类
+
+将尺寸相关属性全部改为静态属性，然后使用静态绑定

@@ -2,36 +2,36 @@
 using ClassifyFiles.Util;
 using FzLib.Extension;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using static ClassifyFiles.Util.FileClassUtility;
 
-namespace ClassifyFiles.UI
+namespace ClassifyFiles.UI.Dialog
 {
     /// <summary>
     /// LogsWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class AddFilesWindow : DialogWindowBase
+    public partial class UpdateFilesDialog : DialogWindowBase
     {
-        public AddFilesWindow(Class c, IList<string> files)
+        public UpdateFilesDialog(Project project)
         {
             InitializeComponent();
-            Class = c;
-            Files = files;
+            Project = project;
         }
 
-        private async void WindowBase_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+
+        public Project Project { get; }
+
+        private  async void WindowBase_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (working)
+            if(working)
             {
                 e.Cancel = true;
-                if (stopping)
+                if(stopping)
                 {
                     return;
                 }
-                if (await new ConfirmDialog().ShowAsync("正在更新文件，是否强制停止？", "停止"))
+                if(await new ConfirmDialog().ShowAsync("正在更新文件，是否强制停止？","停止"))
                 {
                     stopping = true;
                 }
@@ -43,10 +43,10 @@ namespace ClassifyFiles.UI
 
         }
         bool working = false;
-        bool stopping = false;
+        bool stopping = false;  
         private bool Callback(double per, Data.File file)
         {
-            if (stopping)
+            if(stopping)
             {
                 Dispatcher.Invoke(() =>
                 {
@@ -80,56 +80,28 @@ namespace ClassifyFiles.UI
             }
         }
         public bool Updated { get; private set; }
-        public Class Class { get; }
-        public IList<string> Files { get; }
-
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             (sender as Button).IsEnabled = false;
             stkSettings.IsEnabled = false;
-            IList<string> files = null;
-
-            if (rbtnFolderAsFile.IsChecked.Value)
-            {
-                files = Files;
-            }
-            else if(rbtnFolderIgnore.IsChecked.Value)
-            {
-                files = Files.Where(p => System.IO.File.Exists(p)).ToList();
-            }
-            else
-            {
-                files = new List<string>();
-                foreach (var file in Files)
-                {
-                    if(System.IO.File.Exists(file))
-                    {
-                        files.Add(file);
-                    }
-                    else if(System.IO.Directory.Exists(file))
-                    {
-                        (files as List<string>).AddRange(System.IO.Directory.EnumerateFiles(file, "*", System.IO.SearchOption.AllDirectories)); ;
-                    }
-                }
-            }
             UpdateFilesArgs args = new UpdateFilesArgs()
             {
-                Project = Class.Project,
-                Class = Class,
-                Files = files,
+                Project = Project,
+                Research = chkResearch.IsChecked.Value,
+                Reclassify = chkReclassify.IsChecked.Value,
                 IncludeThumbnails = chkIncludeThumbnails.IsChecked.Value,
-                IncludeExplorerIcons= chkIncludeExplorerIcons.IsChecked.Value,
+                IncludeExplorerIcons = chkIncludeExplorerIcons.IsChecked.Value,
                 Callback = Callback
             };
             working = true;
             Message = "正在初始化";
             try
             {
-                AddedFiles= await AddFilesToClassAsync(args);
+                await UpdateFilesOfClassesAsync(args);
                 working = false;
                 Updated = true;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 await new ErrorDialog().ShowAsync(ex, "更新失败");
                 working = false;
@@ -137,7 +109,5 @@ namespace ClassifyFiles.UI
             }
             Close();
         }
-
-        public IReadOnlyList<File> AddedFiles { get; private set; }
     }
 }
