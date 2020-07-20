@@ -24,6 +24,33 @@ namespace ClassifyFiles.Util
             var files = db.Files.Where(p => p.Project.ID == projectID).Include(p => p.Project);
             return await files.ToListAsync();
         }
+        public async static Task<List<File>> GetNoClassesFilesByProjectAsync(int projectID)
+        {
+            Debug.WriteLine("db: " + nameof(GetNoClassesFilesByProjectAsync));
+            List<File> files = null;
+            await Task.Run(() =>
+            {
+                files = db.Files.Where(p => p.ProjectID == projectID)
+                    .Join(db.FileClasses,
+                    f => f.ID,
+                    fc => fc.FileID,
+                    (f, fc) => new { f, fc })
+                    .DefaultIfEmpty()
+                    .AsEnumerable()
+                    .GroupBy(p => p.f)
+                    .Where(p => !p.Any())
+                    .Select(p => p.Key)
+                    .ToList();
+                 files = (from f in db.Files
+                                join fc in db.FileClasses on f.ID equals fc.FileID into temp
+                                from ffc in temp.DefaultIfEmpty()
+                                where ffc == null
+                                select f).ToList();
+
+
+            });
+            return files;
+        }
 
 
         public static Task<int> GetFilesCountAsync(Project project)

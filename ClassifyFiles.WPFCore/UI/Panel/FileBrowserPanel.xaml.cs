@@ -92,19 +92,51 @@ namespace ClassifyFiles.UI.Panel
             (sender as Button).ContextMenu.IsOpen = true;
         }
 
-
+        private bool ignoreClassChanged = false;
         private async void SelectedClassChanged(object sender, SelectedClassChangedEventArgs e)
         {
+            if (ignoreClassChanged)
+            {
+                return;
+            }
+            if (GetItemsPanel().SelectedItem == null)
+            {
+                //await SetFilesAsync(() => GetFilesByProjectAsync(Project.ID));
+            }
+            else
+            {
+                await SetFilesAsync(() => GetFilesByClassAsync(GetItemsPanel().SelectedItem.ID));
+            }
+        }
+
+        /// <summary>
+        /// 设置FileViewer的文件
+        /// </summary>
+        /// <param name="func">用于获取文件的异步函数</param>
+        /// <returns></returns>
+        private async Task SetFilesAsync(Func<Task<List<File>>> func)
+        {
             GetProgress().Show(true);
-            Debug.WriteLine("Selected Class Changed, Project Hashcode is " + Project.GetHashCode()
+            Debug.WriteLine("Set Files, Project Hashcode is " + Project.GetHashCode()
             + ", Class is " + (GetItemsPanel().SelectedItem == null ? "null" : GetItemsPanel().SelectedItem.Name));
-            List<File> files = GetItemsPanel().SelectedItem == null ?
-                await GetFilesByProjectAsync(Project.ID)
-                : await GetFilesByClassAsync(GetItemsPanel().SelectedItem.ID);
+            List<File> files = await func();
             await filesViewer.SetFilesAsync(files);
-            Dirs = filesViewer.Files == null ? null : new HashSet<string>(filesViewer.Files.Select(p => p.File.Dir));
+            if (filesViewer.Files == null)
+            {
+                Dirs = null;
+            }
+            else
+            {
+                HashSet<string> dirs = null;
+                await Task.Run(() =>
+                {
+                    dirs = new HashSet<string>(filesViewer.Files.Select(p => p.File.Dir));
+                });
+                Dirs = dirs;
+            }
             GetProgress().Close();
         }
+
         public HashSet<string> dirs;
         public HashSet<string> Dirs
         {
@@ -207,16 +239,9 @@ namespace ClassifyFiles.UI.Panel
             SelectedClassChanged(null, null);
         }
 
-        private  void btnAllFiles_Click(object sender, RoutedEventArgs e)
+        private async void btnAllFiles_Click(object sender, RoutedEventArgs e)
         {
-            if (GetItemsPanel().SelectedItem == null)
-            {
-                 filesViewer.Refresh();
-            }
-            else
-            {
-                GetItemsPanel().SelectedItem = null;
-            }
+            await SetFilesAsync(() => GetFilesByProjectAsync(Project.ID));
         }
         public bool ShowClassTags
         {
@@ -362,7 +387,7 @@ namespace ClassifyFiles.UI.Panel
             StartAnimation(to);
         }
 
-        private void StartAnimation( double to)
+        private void StartAnimation(double to)
         {
             DoubleAnimation ani = new DoubleAnimation(to, TimeSpan.FromSeconds(0.5))
             {
@@ -374,14 +399,9 @@ namespace ClassifyFiles.UI.Panel
                 isAnimating = false;
                 grdSplitter.IsEnabled = true;
                 grdLeft.Width = to;
-                grdMain.ColumnDefinitions[0] .Width= GridLength.Auto;
+                grdMain.ColumnDefinitions[0].Width = GridLength.Auto;
             };
             grdLeft.BeginAnimation(WidthProperty, ani);
-        }
-
-        private void grdSplitter_PreviewMouseMove(object sender, MouseEventArgs e)
-        {
-           
         }
 
         private void grdSplitter_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -389,8 +409,14 @@ namespace ClassifyFiles.UI.Panel
             var cd = grdMain.ColumnDefinitions[0];
             if (cd.Width.IsAbsolute)
             {
-                StartAnimation(cd.Width.Value-8);
+                StartAnimation(cd.Width.Value - 8);
             }
+        }
+
+        private async void btnNoClassesFiles_Click(object sender, RoutedEventArgs e)
+        {
+            await SetFilesAsync(() => GetNoClassesFilesByProjectAsync(Project.ID));
+
         }
     }
 }

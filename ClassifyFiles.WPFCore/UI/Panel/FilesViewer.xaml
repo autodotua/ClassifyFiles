@@ -25,7 +25,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
         <sys:Double x:Key="twoFive">2.5</sys:Double>
         
         <!--公用的右键菜单-->
-        <ContextMenu x:Key="menu" Opened="ContextMenu_Opened"  Closed="ContextMenu_Closed">
+        <ContextMenu x:Key="menu" Opened="ContextMenu_Opened">
         </ContextMenu>
         
         <!--分组项的样式-->
@@ -92,18 +92,18 @@ xmlns:app="clr-namespace:ClassifyFiles"
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="8"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0">文件名：</TextBlock>
-                    <TextBlock Grid.Row="2">目录：</TextBlock>
-                    <TextBlock Grid.Row="4">大小：</TextBlock>
+                    <TextBlock Grid.Row="0" VerticalAlignment="Center">文件名：</TextBlock>
+                    <TextBlock Grid.Row="2" VerticalAlignment="Center">目录：</TextBlock>
+                    <TextBlock Grid.Row="4" VerticalAlignment="Center">大小：</TextBlock>
                     <TextBlock Grid.Row="6" VerticalAlignment="Center">分类：</TextBlock>
-                    <TextBlock Grid.Row="8">修改时间：</TextBlock>
-                    <TextBlock Grid.Row="10">创建时间：</TextBlock>
-                    <TextBlock Grid.Column="2" Grid.Row="0"  FontWeight="Bold" Text="{Binding Display.DisplayName}"/>
-                    <TextBlock  Grid.Column="2" Grid.Row="2"  Text="{Binding Display.DisplayDir}"/>
-                    <TextBlock  Grid.Column="2" Grid.Row="4"  Text="{Binding Display.Length}"/>
+                    <TextBlock Grid.Row="8" VerticalAlignment="Center">修改时间：</TextBlock>
+                    <TextBlock Grid.Row="10" VerticalAlignment="Center">创建时间：</TextBlock>
+                    <TextBlock Grid.Column="2" Grid.Row="0"  VerticalAlignment="Center" FontWeight="Bold" Text="{Binding Display.DisplayName}"/>
+                    <TextBlock  Grid.Column="2" Grid.Row="2"  VerticalAlignment="Center" Text="{Binding Display.DisplayDir}" TextWrapping="Wrap"/>
+                    <TextBlock  Grid.Column="2" Grid.Row="4" VerticalAlignment="Center"  Text="{Binding Display.Length}"/>
                     <component:TagGroup  Grid.Column="2" Grid.Row="6"  File="{Binding .}"/>
-                    <TextBlock  Grid.Column="2" Grid.Row="8"  Text="{Binding FileInfo.LastWriteTime}"/>
-                    <TextBlock  Grid.Column="2" Grid.Row="10"  Text="{Binding FileInfo.CreationTime}"/>
+                    <TextBlock  Grid.Column="2" Grid.Row="8"  VerticalAlignment="Center" Text="{Binding FileInfo.LastWriteTime}"/>
+                    <TextBlock  Grid.Column="2" Grid.Row="10"  VerticalAlignment="Center" Text="{Binding FileInfo.CreationTime}"/>
 
                 </Grid>
             </m:SimpleStackPanel>
@@ -223,7 +223,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
         </m:ListView>
 
         <!--树状图-->
-        <TreeView x:Key="treeFiles"  ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="treeFiles_PreviewMouseRightButtonDown"
+        <TreeView x:Key="treeFiles"  ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="TreeFiles_PreviewMouseRightButtonDown"
                                           Grid.Row="4"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
                    ItemTemplate="{StaticResource listDataTemplate}"/>
 
@@ -273,7 +273,7 @@ xmlns:app="clr-namespace:ClassifyFiles"
                     <GridViewColumn Header="分类" Width="144">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <component:TagGroup File="{Binding .}"/>
+                                <component:TagGroup File="{Binding .}"  TagMouseDown="Tags_MouseDown"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -309,7 +309,6 @@ xmlns:app="clr-namespace:ClassifyFiles"
                         TextChanged="SearchTextBox_TextChanged"
                         QueryIcon="Find"
                         QuerySubmitted="SearchTextBox_QuerySubmitted"
-                        SuggestionChosen="SearchTextBox_SuggestionChosen" 
                     VerticalAlignment="Center"/>
             <m:ProgressRing Grid.Column="4" x:Name="progress"/>
             <Grid x:Name="grdAppBar" Grid.Column="99" HorizontalAlignment="Right">

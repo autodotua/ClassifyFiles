@@ -29,8 +29,8 @@
         </Grid.RowDefinitions>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" 
                       VerticalAlignment="Stretch" Background="Transparent" PreviewMouseUp="grdSplitter_PreviewMouseDown"
-                      x:Name="grdSplitter" PreviewMouseMove="grdSplitter_PreviewMouseMove"/>
-        <Label Grid.Column="1" Content="⁞" Foreground="White" VerticalAlignment="Center" 
+                      x:Name="grdSplitter" />
+        <Label Grid.Column="1" Content="⁞" VerticalAlignment="Center" 
                Opacity="0.5" FontSize="26" FontWeight="Bold" IsHitTestVisible="False"/>
         <Grid Margin="8,0,0,0"  x:Name="grdLeft" Width="200" HorizontalAlignment="Left">
             <Grid.RowDefinitions>
@@ -40,6 +40,8 @@
                 <RowDefinition Height="8"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="8"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="0"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <m:SimpleStackPanel Orientation="Horizontal" Spacing="16">
@@ -51,8 +53,11 @@
 
             <panel:ClassesPanel x:Name="classPanel"   Grid.Row="4" SelectedClassChanged="SelectedClassChanged"/>
 
-            <Button Content="显示全部文件" Background="{StaticResource SystemControlBackgroundChromeBlackHighBrush}"
-                x:Name="btnAllFiles" Click="btnAllFiles_Click" Margin="0,8" Padding="10,8" Grid.Row="6"
+            <Button Content="显示没有被分类的文件" Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                x:Name="btnNoClassesFiles" Click="btnNoClassesFiles_Click"  Padding="10,6" Grid.Row="6"
+                    HorizontalContentAlignment="Left"  HorizontalAlignment="Stretch"/>
+            <Button Content="显示全部文件" Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                x:Name="btnAllFiles" Click="btnAllFiles_Click" Margin="0,8" Padding="10,6" Grid.Row="8"
                     HorizontalContentAlignment="Left"  HorizontalAlignment="Stretch"/>
         </Grid>
 

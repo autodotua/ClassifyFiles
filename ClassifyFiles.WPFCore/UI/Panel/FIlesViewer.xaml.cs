@@ -52,11 +52,7 @@ namespace ClassifyFiles.UI.Panel
             FileIcon.Tasks.ProcessStatusChanged += TaskQueue_ProcessStatusChanged;
         }
 
-        private void TaskQueue_ProcessStatusChanged(object sender, ProcessStatusChangedEventArgs e)
-        {
-            progress.IsActive = e.IsRunning;
-        }
-
+        #region 属性和字段
         private ItemsControl filesContent;
         public ItemsControl FilesContent
         {
@@ -67,11 +63,11 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(FilesContent));
             }
         }
-        protected ProgressDialog GetProgress()
-        {
-            return (Window.GetWindow(this) as MainWindow).Progress;
-        }
+
         private Project project;
+        /// <summary>
+        /// 当前项目
+        /// </summary>
         public virtual Project Project
         {
             get => project;
@@ -81,6 +77,7 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(Project));
             }
         }
+
         private ObservableCollection<UIFile> files;
         public ObservableCollection<UIFile> Files
         {
@@ -91,51 +88,54 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(Files), nameof(FileTree));
             }
         }
+
         /// <summary>
         /// 供树状图使用的文件树
         /// </summary>
         public List<UIFile> FileTree => Files == null ? null : new List<UIFile>(
-            FileUtility.GetFileTree<UIFile>(Project, Files, p => new UIFile(p), p => p.File.Dir, p => p.SubUIFiles)
+            FileUtility.GetFileTree(Project, Files,
+                p => new UIFile(p), p => p.File.Dir, p => p.SubUIFiles)
             .SubUIFiles);
 
-        private double iconSize = 64;
-        public double IconSize
-        {
-            get => iconSize;
-            set
-            {
-                iconSize = value;
-                this.Notify(nameof(IconSize));
-            }
-        }
-        public const int pagingItemsCount = 120;
-
         public event PropertyChangedEventHandler PropertyChanged;
+        #endregion
 
+        #region 文件相关
+
+        /// <summary>
+        /// 设置文件
+        /// </summary>
+        /// <param name="files"></param>
+        /// <returns></returns>
         public async Task SetFilesAsync(IEnumerable<File> files)
         {
             if (files == null || !files.Any())
             {
+                //如果为空
                 Files = new ObservableCollection<UIFile>();
             }
             else
             {
                 List<UIFile> filesWithIcon = new List<UIFile>();
                 await Task.Run(() =>
-               {
-                   foreach (var file in files)
-                   {
-                       UIFile uiFile = new UIFile(file);
-                       filesWithIcon.Add(uiFile);
-                   }
-               });
-                Files = new ObservableCollection<UIFile>(filesWithIcon);
-                await Task.Delay(100);//不延迟大概率会一直转圈
-                //await RealtimeRefresh(Files.Take(100));
-            }
-            if(Configs.SortType!=0)
-            {
-                await SortAsync((SortType)Configs.SortType);
+                {
+                    //把每个File要转换为UIFile
+                    foreach (var file in files)
+                    {
+                        UIFile uiFile = new UIFile(file);
+                        filesWithIcon.Add(uiFile);
+                    }
+                });
+
+                if (Configs.SortType == 0)
+                {
+                    //如果使用默认排序（已经在数据库那边排了）
+                    Files = new ObservableCollection<UIFile>(filesWithIcon);
+                }
+                else
+                {
+                    await SortAsync((SortType)Configs.SortType, filesWithIcon);
+                }
             }
         }
 
@@ -143,14 +143,14 @@ namespace ClassifyFiles.UI.Panel
         {
             List<UIFile> filesWithIcon = new List<UIFile>();
             await Task.Run(() =>
-           {
-               foreach (var file in files)
-               {
-                   UIFile uiFile = new UIFile(file);
-                   //await uiFile.LoadTagsAsync(Project);
-                   filesWithIcon.Add(uiFile);
-               }
-           });
+            {
+                foreach (var file in files)
+                {
+                    UIFile uiFile = new UIFile(file);
+                    //await uiFile.LoadTagsAsync(Project);
+                    filesWithIcon.Add(uiFile);
+                }
+            });
             foreach (var file in filesWithIcon)
             {
                 Files.Add(file);
@@ -160,6 +160,10 @@ namespace ClassifyFiles.UI.Panel
             this.Notify(nameof(Files));
         }
 
+        /// <summary>
+        /// 获取被选中的文件（1个）
+        /// </summary>
+        /// <returns></returns>
         private UIFile GetSelectedFile()
         {
             return FilesContent switch
@@ -169,6 +173,11 @@ namespace ClassifyFiles.UI.Panel
                 _ => null,
             };
         }
+
+        /// <summary>
+        /// 获取所有被选中的文件
+        /// </summary>
+        /// <returns></returns>
         private IReadOnlyList<UIFile> GetSelectedFiles()
         {
             return FilesContent switch
@@ -179,6 +188,270 @@ namespace ClassifyFiles.UI.Panel
             };
         }
 
+        /// <summary>
+        /// 选择指定文件夹的第一个文件
+        /// </summary>
+        /// <param name="dir"></param>
+        public void SelectFileByDir(string dir)
+        {
+            UIFile file = null;
+            switch (CurrentFileView)
+            {
+                case FileView.List:
+                case FileView.Icon:
+                case FileView.Tile:
+                case FileView.Detail:
+                    file = Files.FirstOrDefault(p => p.File.Dir == dir);
+                    break;
+                default:
+                    break;
+            }
+            SelectFile(file);
+        }
+
+        /// <summary>
+        /// 选中指定文件
+        /// </summary>
+        /// <param name="file"></param>
+        public void SelectFile(UIFile file)
+        {
+            if (FilesContent is ListBox lbx)
+            {
+                lbx.SelectedItem = file;
+                lbx.ScrollIntoView(file);
+            }
+            else if (filesContent is ModernWpf.Controls.ListView lvw)
+            {
+                lvw.SelectedItem = file;
+                lvw.ScrollIntoView(file);
+            }
+        }
+
+        /// <summary>
+        /// 刷新，实质就是重新设置一遍Files
+        /// </summary>
+        public void Refresh()
+        {
+            FileIcon.ClearCaches();
+            var files = Files;
+            Files = null;
+            if (files == null || !files.Any())
+            {
+                Files = new ObservableCollection<UIFile>();
+            }
+            else
+            {
+                Files = new ObservableCollection<UIFile>(files);
+            }
+        }
+
+        /// <summary>
+        /// 排序
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="rawFiles"></param>
+        /// <returns></returns>
+        public async Task SortAsync(SortType type, IEnumerable<UIFile> rawFiles = null)
+        {
+            IEnumerable<UIFile> files = null;
+            if (rawFiles == null)
+            {
+                rawFiles = Files;
+            }
+            await Task.Run(() =>
+            {
+                switch (type)
+                {
+                    case SortType.Default:
+                        files = rawFiles
+                            .OrderBy(p => p.File.Dir)
+                            .ThenBy(p => p.File.Name);
+                        break;
+                    case SortType.NameUp:
+                        files = rawFiles
+                            .OrderBy(p => p.File.Name)
+                            .ThenBy(p => p.File.Dir);
+                        break;
+                    case SortType.NameDown:
+                        files = rawFiles
+                           .OrderByDescending(p => p.File.Name)
+                           .ThenByDescending(p => p.File.Dir);
+                        break;
+                    case SortType.LengthUp:
+                        files = rawFiles
+                          .OrderBy(p => GetFileInfoValue(p, nameof(FI.Length)))
+                          .ThenBy(p => p.File.Name)
+                          .ThenBy(p => p.File.Dir);
+                        break;
+                    case SortType.LengthDown:
+                        files = rawFiles
+                          .OrderByDescending(p => GetFileInfoValue(p, nameof(FI.Length)))
+                          .ThenByDescending(p => p.File.Name)
+                          .ThenByDescending(p => p.File.Dir);
+                        break;
+                    case SortType.LastWriteTimeUp:
+                        files = rawFiles
+                          .OrderBy(p => GetFileInfoValue(p, nameof(FI.LastWriteTime)))
+                          .ThenBy(p => p.File.Name)
+                          .ThenBy(p => p.File.Dir);
+                        break;
+                    case SortType.LastWriteTimeDown:
+                        files = rawFiles
+                          .OrderByDescending(p => GetFileInfoValue(p, nameof(FI.LastWriteTime)))
+                          .ThenByDescending(p => p.File.Name)
+                          .ThenByDescending(p => p.File.Dir);
+                        break;
+                    case SortType.CreationTimeUp:
+                        files = rawFiles
+                          .OrderBy(p => GetFileInfoValue(p, nameof(FI.CreationTime)))
+                          .ThenBy(p => p.File.Name)
+                          .ThenBy(p => p.File.Dir);
+                        break;
+                    case SortType.CreationTimeDown:
+                        files = rawFiles
+                          .OrderByDescending(p => GetFileInfoValue(p, nameof(FI.CreationTime)))
+                          .ThenByDescending(p => p.File.Name)
+                          .ThenByDescending(p => p.File.Dir);
+                        break;
+                }
+                //在非UI线程里就得把Lazy的全都计算好
+                files = files.ToArray();
+            });
+            Files = new ObservableCollection<UIFile>(files);
+            //当排序开启时，一律不支持分组
+            SetGroupEnable(false);
+
+            //若文件不存在，直接访问FileInfo属性会报错，因此需要加一层try
+            static long GetFileInfoValue(UIFile file, string name)
+            {
+                try
+                {
+                    return name switch
+                    {
+                        nameof(FI.Length) => file.FileInfo.Length,
+                        nameof(FI.LastWriteTime) => file.FileInfo.LastWriteTime.Ticks,
+                        nameof(FI.CreationTime) => file.FileInfo.CreationTime.Ticks,
+                        _ => throw new NotImplementedException(),
+                    };
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
+        }
+
+        #endregion
+
+        #region 视图相关
+
+        /// <summary>
+        /// 获取“处理中”圈圈
+        /// </summary>
+        /// <returns></returns>
+        protected ProgressDialog GetProgress()
+        {
+            return (Window.GetWindow(this) as MainWindow).Progress;
+        }
+
+        /// <summary>
+        /// 视图类型改变事件
+        /// </summary>
+        public event EventHandler ViewTypeChanged;
+
+        /// <summary>
+        /// 视图类型的5个按钮的单击事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ViewTypeButton_Click(object sender, RoutedEventArgs e)
+        {
+            int type = int.Parse((sender as FrameworkElement).Tag as string);
+            //由于并不是RadioButton，因此需要手动设置IsChecked值
+            //为了防止递归，这边采用的是Click事件而不是Checked事件
+            grdAppBar.Children.OfType<AppBarToggleButton>().ForEach(p => p.IsChecked = false);
+            (sender as AppBarToggleButton).IsChecked = true;
+            CurrentFileView = (FileView)type;
+            RefreshFileView();
+        }
+
+        /// <summary>
+        /// 设置是否分组
+        /// </summary>
+        /// <param name="enable"></param>
+        public void SetGroupEnable(bool enable)
+        {
+            foreach (var list in Resources.Values.OfType<ListBox>())
+            {
+                //如果启用，那么ItemsSource绑定为xaml中的分组数据源
+                if (enable)
+                {
+                    list.SetBinding(ItemsControl.ItemsSourceProperty, new Binding() { Source = FindResource("listDetailItemsSource") as CollectionViewSource });
+                }
+                else
+                {
+                    list.SetBinding(ItemsControl.ItemsSourceProperty, nameof(Files));
+                }
+            }
+        }
+
+        /// <summary>
+        /// 刷新视图
+        /// </summary>
+        private void RefreshFileView()
+        {
+            var selectedFile = GetSelectedFile();
+            if (CurrentFileView == FileView.List)
+            {
+                FilesContent = FindResource("lvwFiles") as ListBox;
+
+            }
+            else if (CurrentFileView == FileView.Icon || CurrentFileView == FileView.Tile)
+            {
+                FilesContent = FindResource("grdFiles") as ListBox;
+                FilesContent.ItemTemplate = FindResource(CurrentFileView == FileView.Icon ? "grdIconView" : "grdTileView") as DataTemplate;
+            }
+            else if (CurrentFileView == FileView.Tree)
+            {
+                FilesContent = FindResource("treeFiles") as TreeView;
+            }
+            else if (CurrentFileView == FileView.Detail)
+            {
+                FilesContent = FindResource("lvwDetailFiles") as ListView;
+            }
+            if (selectedFile != null && FilesContent is ListBox list)
+            {
+                list.SelectedItem = selectedFile;
+                list.ScrollIntoView(selectedFile);
+            }
+            Configs.LastViewType = (int)CurrentFileView;
+            ViewTypeChanged?.Invoke(this, new EventArgs());
+        }
+
+        /// <summary>
+        /// 当前的视图
+        /// </summary>
+        public FileView CurrentFileView { get; private set; } = FileView.List;
+
+        #endregion
+
+        #region 事件处理
+
+        /// <summary>
+        /// 任务队列状态改变事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TaskQueue_ProcessStatusChanged(object sender, ProcessStatusChangedEventArgs e)
+        {
+            progress.IsActive = e.IsRunning;
+        }
+
+        /// <summary>
+        /// 双击事件，用于打开文件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void Viewer_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var parent = VisualTreeHelper.GetParent(e.OriginalSource as DependencyObject);
@@ -229,9 +502,13 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
+        /// <summary>
+        /// 鼠标滚轮事件。当按下Ctrl时滚动滚轮，将能够缩放。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && CurrentFileView != FileView.Detail)
             {
                 Configs.IconSize += e.Delta / 30;
@@ -239,7 +516,12 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
-        private void treeFiles_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        /// <summary>
+        /// 树状图鼠标右键按下事件，目的是让鼠标按下时就能选中鼠标下面的项，不然右键菜单就会不对应
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TreeFiles_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             TreeViewItem treeViewItem = VisualUpwardSearch(e.OriginalSource as DependencyObject);
 
@@ -258,6 +540,11 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
+        /// <summary>
+        /// 右键菜单打开目录单击事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OpenDirMernuItem_Click(object sender, RoutedEventArgs e)
         {
             if (GetSelectedFile() != null)
@@ -267,122 +554,24 @@ namespace ClassifyFiles.UI.Panel
                 {
                     FileName = "explorer.exe",
                     Arguments = $"/select, \"{GetSelectedFile().File.GetAbsolutePath(false)}\"",
-                    UseShellExecute = true
+                    UseShellExecute = true//在.Net Core中，需要加这一条才能够正常运行
                 };
                 p.Start();
             }
         }
 
-        public  void Refresh()
-        {
-            FileIcon.ClearCaches();
-            var files = Files;
-            Files = null; 
-            if (files == null || !files.Any())
-            {
-                Files = new ObservableCollection<UIFile>();
-            }
-            else
-            {
-                Files = new ObservableCollection<UIFile>(files);
-            }
-        }
-
-        public event EventHandler ViewTypeChanged;
-        private void ViewTypeButton_Click(object sender, RoutedEventArgs e)
-        {
-            int type = int.Parse((sender as FrameworkElement).Tag as string);
-            grdAppBar.Children.OfType<AppBarToggleButton>().ForEach(p => p.IsChecked = false);
-            (sender as AppBarToggleButton).IsChecked = true;
-            CurrentFileView = (FileView)type;
-            RefreshFileView();
-        }
-
-        public void SetGroupEnable(bool enable)
-        {
-            foreach (var list in Resources.Values.OfType<ListBox>())
-            {
-                if (enable)
-                {
-                    list.SetBinding(ListBox.ItemsSourceProperty, new Binding() { Source = FindResource("listDetailItemsSource") as CollectionViewSource });
-                }
-                else
-                {
-                    list.SetBinding(ListBox.ItemsSourceProperty, nameof(Files));
-                }
-            }
-        }
-
-        private void RefreshFileView()
-        {
-            var selectedFile = GetSelectedFile();
-            if (CurrentFileView == FileView.List)
-            {
-                FilesContent = FindResource("lvwFiles") as ListBox;
-
-            }
-            else if (CurrentFileView == FileView.Icon || CurrentFileView == FileView.Tile)
-            {
-                FilesContent = FindResource("grdFiles") as ListBox;
-                FilesContent.ItemTemplate = FindResource(CurrentFileView == FileView.Icon ? "grdIconView" : "grdTileView") as DataTemplate;
-            }
-            else if (CurrentFileView == FileView.Tree)
-            {
-                FilesContent = FindResource("treeFiles") as TreeView;
-            }
-            else if (CurrentFileView == FileView.Detail)
-            {
-                FilesContent = FindResource("lvwDetailFiles") as ListView;
-            }
-            if (selectedFile != null && FilesContent is ListBox list)
-            {
-                list.SelectedItem = selectedFile;
-                list.ScrollIntoView(selectedFile);
-            }
-            Configs.LastViewType = (int)CurrentFileView;
-            ViewTypeChanged?.Invoke(this, new EventArgs());
-        }
-
-        public void SelectFileByDir(string dir)
-        {
-            UIFile file = null;
-            switch (CurrentFileView)
-            {
-                case FileView.List:
-                case FileView.Icon:
-                case FileView.Tile:
-                case FileView.Detail:
-                    file = Files.FirstOrDefault(p => p.File.Dir == dir);
-                    break;
-                default:
-                    break;
-            }
-            SelectFile(file);
-        }
-        public void SelectFile(UIFile file)
-        {
-            if (FilesContent is ListBox lbx)
-            {
-                lbx.SelectedItem = file;
-                lbx.ScrollIntoView(file);
-            }
-            else if (filesContent is ModernWpf.Controls.ListView lvw)
-            {
-                lvw.SelectedItem = file;
-                lvw.ScrollIntoView(file);
-            }
-        }
-        public FileView CurrentFileView { get; private set; } = FileView.List;
-        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-        }
-
+        /// <summary>
+        /// 标签被按下事件，用于跳转到指定类和删除标签
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void Tags_MouseDown(object sender, MouseButtonEventArgs e)
         {
             Class c = (e.Source as ContentPresenter).Content as Class;
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 ClickTag?.Invoke(this, new ClickTagEventArgs(c));
+                //向FileBrowsePanel传递
             }
             else if (e.MiddleButton == MouseButtonState.Pressed)
             {
@@ -393,16 +582,57 @@ namespace ClassifyFiles.UI.Panel
             }
             e.Handled = true;
         }
+
+        /// <summary>
+        /// 标签被单击事件
+        /// </summary>
         public event EventHandler<ClickTagEventArgs> ClickTag;
 
+        /// <summary>
+        /// 搜索框的文本改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void SearchTextBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                string txt = sender.Text.ToLower();
+                var suggestions = Files == null ? new List<UIFile>() :
+                    Files.Where(p => (p.File.IsFolder ? p.File.Dir : p.File.Name).ToLower().Contains(txt)).ToList();
+
+                sender.ItemsSource = suggestions.Count > 0 ?
+                    suggestions : new string[] { "结果为空" } as IEnumerable;
+            }
+        }
+
+        /// <summary>
+        /// 搜索框比选中
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void SearchTextBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            UIFile file = args.ChosenSuggestion as UIFile;
+            SelectFile(file);
+        }
+
+        #endregion
+
+        #region 菜单相关
+        /// <summary>
+        /// 右键菜单打开
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ContextMenu_Opened(object sender, RoutedEventArgs e)
         {
-
             ContextMenu menu = FindResource("menu") as ContextMenu;
             menu.Items.Clear();
             var files = GetSelectedFiles();
             if (files == null || files.Count == 0)
             {
+                //没有被选中的文件的话，就只能一闪而过了
                 menu.IsOpen = false;
                 return;
             }
@@ -414,9 +644,12 @@ namespace ClassifyFiles.UI.Panel
 
             }
             MenuItem menuCopy = new MenuItem() { Header = "复制" };
-            menuCopy.Click += MenuCopy_Click; ;
+            menuCopy.Click += MenuCopy_Click;
             menu.Items.Add(menuCopy);
-            if ((!files.Any(p => p.File.IsFolder) || CurrentFileView != FileView.Tree) && Project.Classes != null)
+            if ((!files.Any(p => p.File.IsFolder)
+                || CurrentFileView != FileView.Tree)
+                && Project.Classes != null)
+            //要显示标签的条件：有被选中的类，非树状图不能包含文件夹，树状图可以包含文件夹
             {
                 menu.Items.Add(new Separator());
 
@@ -425,10 +658,14 @@ namespace ClassifyFiles.UI.Panel
                     bool? isChecked = null;
                     if (!files.Any(p => p.Classes == null))
                     {
+                        //首先确保被选中的文件都知道它们的类。
+                        //因为时虚拟列表，所以没有显示的部分可能是还没有得到他们的类的。
                         if (files.Any(p => p.Classes.Any(q => q.ID == tag.ID)))
                         {
+                            //如果有一部分或全部都属于该类
                             if (files.All(p => p.Classes.Any(q => q.ID == tag.ID)))
                             {
+                                //如果全部属于该类
                                 isChecked = true;
                             }
                             //这里else  isChecked = null;
@@ -444,41 +681,48 @@ namespace ClassifyFiles.UI.Panel
                         IsChecked = isChecked
                     };
                     chk.Click += async (p1, p2) =>
-                     {
-                         GetProgress().Show(false);
-                         if (chk.IsChecked == true)
-                         {
-                             await AddFilesToClassAsync(files.Select(p => p.File), tag);
-                             foreach (var file in files)
-                             {
-                                 var newC = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
-                                 if (newC == null)
-                                 {
-                                     file.Classes.Add(tag);
-                                 }
-                             }
-                         }
-                         else
-                         {
-                             await RemoveFilesFromClass(files.Select(p => p.File), tag);
-                             foreach (var file in files)
-                             {
-                                 var c = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
-                                 if (c != null)
-                                 {
-                                     file.Classes.Remove(c);
-                                 }
-                             }
-                         }
+                    {
+                        GetProgress().Show(false);
+                        if (chk.IsChecked == true)
+                        {
+                            //添加到类
+                            await AddFilesToClassAsync(files.Select(p => p.File), tag);
+                            foreach (var file in files)
+                            {
+                                var newC = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
+                                if (newC == null)
+                                {
+                                    file.Classes.Add(tag);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            //从类中删除
+                            await RemoveFilesFromClass(files.Select(p => p.File), tag);
+                            foreach (var file in files)
+                            {
+                                var c = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
+                                if (c != null)
+                                {
+                                    file.Classes.Remove(c);
+                                }
+                            }
+                        }
 
-                         GetProgress().Close();
-                     };
+                        GetProgress().Close();
+                    };
                     menu.Items.Add(chk);
                 }
             }
 
         }
 
+        /// <summary>
+        /// 复制菜单单击
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MenuCopy_Click(object sender, RoutedEventArgs e)
         {
             var files = new StringCollection();
@@ -494,116 +738,7 @@ namespace ClassifyFiles.UI.Panel
             Clipboard.SetFileDropList(files);
         }
 
-        private void SearchTextBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
-        {
-            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
-            {
-                string txt = sender.Text.ToLower();
-                var suggestions = Files == null ? new List<UIFile>() :
-                    Files.Where(p => (p.File.IsFolder ? p.File.Dir : p.File.Name).ToLower().Contains(txt)).ToList();
-
-                sender.ItemsSource = suggestions.Count > 0 ?
-                    suggestions : new string[] { "结果为空" } as IEnumerable;
-            }
-        }
-
-        private void SearchTextBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-            UIFile file = args.ChosenSuggestion as UIFile;
-            SelectFile(file);
-        }
-
-        private void SearchTextBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-        {
-
-        }
-
-        private void ContextMenu_Closed(object sender, RoutedEventArgs e)
-        {
-        }
-        public async Task SortAsync(SortType type)
-        {
-            IEnumerable<UIFile> files = null;
-            await Task.Run(() =>
-            {
-                switch (type)
-                {
-                    case SortType.Default:
-                        files = Files
-                            .OrderBy(p => p.File.Dir)
-                            .ThenBy(p => p.File.Name);
-                        break;
-                    case SortType.NameUp:
-                        files = Files
-                            .OrderBy(p => p.File.Name)
-                            .ThenBy(p => p.File.Dir);
-                        break;
-                    case SortType.NameDown:
-                        files = Files
-                           .OrderByDescending(p => p.File.Name)
-                           .ThenByDescending(p => p.File.Dir);
-                        break;
-                    case SortType.LengthUp:
-                        files = Files
-                          .OrderBy(p => GetFileInfoValue(p, nameof(FI.Length)))
-                          .ThenBy(p => p.File.Name)
-                          .ThenBy(p => p.File.Dir);
-                        break;
-                    case SortType.LengthDown:
-                        files = Files
-                          .OrderByDescending(p => GetFileInfoValue(p,nameof(FI.Length)))
-                          .ThenByDescending(p => p.File.Name)
-                          .ThenByDescending(p => p.File.Dir);
-                        break;
-                    case SortType.LastWriteTimeUp:
-                        files = Files
-                          .OrderBy(p => GetFileInfoValue(p, nameof(FI.LastWriteTime)))
-                          .ThenBy(p => p.File.Name)
-                          .ThenBy(p => p.File.Dir);
-                        break;
-                    case SortType.LastWriteTimeDown:
-                        files = Files
-                          .OrderByDescending(p => GetFileInfoValue(p, nameof(FI.LastWriteTime)))
-                          .ThenByDescending(p => p.File.Name)
-                          .ThenByDescending(p => p.File.Dir);
-                        break;
-                    case SortType.CreationTimeUp:
-                        files = Files
-                          .OrderBy(p => GetFileInfoValue(p, nameof(FI.CreationTime)))
-                          .ThenBy(p => p.File.Name)
-                          .ThenBy(p => p.File.Dir);
-                        break;
-                    case SortType.CreationTimeDown:
-                        files = Files
-                          .OrderByDescending(p => GetFileInfoValue(p, nameof(FI.CreationTime)))
-                          .ThenByDescending(p => p.File.Name)
-                          .ThenByDescending(p => p.File.Dir);
-                        break;
-                }
-                files = files.ToArray();
-            });
-            Files = new ObservableCollection<UIFile>(files);
-            SetGroupEnable(false);
-            //this.Notify(nameof(Files));
-
-            long GetFileInfoValue(UIFile file, string name)
-            {
-                try
-                {
-                    return name switch
-                    {
-                        nameof(FI.Length) => file.FileInfo.Length,
-                        nameof(FI.LastWriteTime) => file.FileInfo.LastWriteTime.Ticks,
-                        nameof(FI.CreationTime) => file.FileInfo.CreationTime.Ticks,
-                        _ => throw new NotImplementedException(),
-                    };
-                }
-                catch
-                {
-                    return 0;
-                }
-            }
-        }
+        #endregion
     }
 
 }
