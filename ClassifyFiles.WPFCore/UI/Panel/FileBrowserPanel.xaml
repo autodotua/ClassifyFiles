@@ -11,7 +11,6 @@
     xmlns:enum="clr-namespace:ClassifyFiles.Enum"
     xmlns:m="http://schemas.modernwpf.com/2019"
      xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
-    Loaded="WindowBase_Loaded"
         mc:Ignorable="d">
     <UserControl.Resources>
         <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
@@ -28,7 +27,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" 
-                      VerticalAlignment="Stretch" Background="Transparent" PreviewMouseUp="grdSplitter_PreviewMouseDown"
+                      VerticalAlignment="Stretch" Background="Transparent" PreviewMouseUp="Splitter_PreviewMouseUp"
                       x:Name="grdSplitter" />
         <Label Grid.Column="1" Content="⁞" VerticalAlignment="Center" 
                Opacity="0.5" FontSize="26" FontWeight="Bold" IsHitTestVisible="False"/>
@@ -54,17 +53,17 @@
             <panel:ClassesPanel x:Name="classPanel"   Grid.Row="4" SelectedClassChanged="SelectedClassChanged"/>
 
             <Button Content="显示没有被分类的文件" Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                x:Name="btnNoClassesFiles" Click="btnNoClassesFiles_Click"  Padding="10,6" Grid.Row="6"
+                x:Name="btnNoClassesFiles" Click="BtnNoClassesFiles_Click"  Padding="10,6" Grid.Row="6"
                     HorizontalContentAlignment="Left"  HorizontalAlignment="Stretch"/>
             <Button Content="显示全部文件" Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                x:Name="btnAllFiles" Click="btnAllFiles_Click" Margin="0,8" Padding="10,6" Grid.Row="8"
+                x:Name="btnAllFiles" Click="BtnAllFiles_Click" Margin="0,8" Padding="10,6" Grid.Row="8"
                     HorizontalContentAlignment="Left"  HorizontalAlignment="Stretch"/>
         </Grid>
 
 
-        <panel:FilesViewer ViewTypeChanged="filesViewer_ViewTypeChanged" 
+        <panel:FilesViewer ViewTypeChanged="FilesViewer_ViewTypeChanged" 
                            x:Name="filesViewer" Grid.Column="2"  AllowDrop="True"
-             Drop="UserControl_Drop" ClickTag="filesViewer_ClickTag" PreviewMouseWheel="filesViewer_PreviewMouseWheel"/>
+             Drop="FileViewer_Drop" ClickTag="FilesViewer_ClickTag" PreviewMouseWheel="FilesViewer_PreviewMouseWheel"/>
         <m:CommandBar  Grid.Row="2" Grid.ColumnSpan="999" DefaultLabelPosition="Right">
             <m:AppBarButton x:Name="btnSort" Icon="Sort" Label="排序">
                 <m:FlyoutService.Flyout>
@@ -168,7 +167,7 @@
                                     <TextBlock Grid.Column="2" x:Name="tbkIconSize" Text="{Binding IconSizeString}" VerticalAlignment="Center"/>
                                     <Slider Orientation="Horizontal" Minimum="16"  VerticalAlignment="Center"
                                             SmallChange="1" LargeChange="10" Interval="1" Maximum="256" Value="{Binding IconSize}"
-                                            PreviewMouseDoubleClick="sldIconSize_PreviewMouseDoubleClick" IsMoveToPointEnabled="True"
+                                            PreviewMouseDoubleClick="IconSize_PreviewMouseDoubleClick" IsMoveToPointEnabled="True"
                                         x:Name="sldIconSize" />
 
                                 </Grid>
@@ -186,7 +185,7 @@
             </m:AppBarButton>
 
             <m:AppBarSeparator/>
-            <m:AppBarButton  x:Name="btnAddFile" Icon="Add"  Label="添加文件" Click="btnAddFile_Click"
+            <m:AppBarButton  x:Name="btnAddFile" Icon="Add"  Label="添加文件" Click="BtnAddFile_Click"
                              IsEnabled="{Binding ElementName=classPanel, Path=SelectedItem, Converter={StaticResource nn2b}}"/>
             <m:AppBarButton  x:Name="btnRefresh" Icon="Refresh"  Label="刷新" Click="RefreshButton_Click"
                                                           IsEnabled="{Binding ElementName=classPanel, Path=SelectedItem, Converter={StaticResource nn2b}}"/>

@@ -1,38 +1,19 @@
-﻿using FzLib.Basic;
-using FzLib.Extension;
+﻿using FzLib.Extension;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using ClassifyFiles.Data;
-using ClassifyFiles.Util;
-using ClassifyFiles.UI;
-using ClassifyFiles.UI.Panel;
 using System.Diagnostics;
-using DImg = System.Drawing.Image;
-using ModernWpf.Controls;
-using ClassifyFiles.UI.Model;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using IO = System.IO;
-using static ClassifyFiles.Util.ClassUtility;
 using static ClassifyFiles.Util.FileClassUtility;
 using static ClassifyFiles.Util.FileProjectUtilty;
 using static ClassifyFiles.Util.ProjectUtility;
 using System.Windows.Media.Animation;
 using ClassifyFiles.Enum;
-using ClassifyFiles.UI.Util;
 using ClassifyFiles.UI.Event;
 using ClassifyFiles.UI.Dialog;
 
@@ -45,7 +26,7 @@ namespace ClassifyFiles.UI.Panel
         public FileBrowserPanel()
         {
             InitializeComponent();
-            new ClickEventHelper(grdSplitter).Click += GridSplitter_Click;
+            new ClickEventHelper(grdSplitter).Click += Splitter_Click;
             foreach (MenuItem item in menuSort.Items)
             {
                 if ((int)item.Tag == Configs.SortType)
@@ -56,43 +37,31 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
-
-
-        public override ClassesPanel GetItemsPanel()
-        {
-            return classPanel;
-        }
-
-        private async void WindowBase_Loaded(object sender, RoutedEventArgs e)
-        {
-        }
-
         public override async Task LoadAsync(Project project)
         {
             filesViewer.Project = project;
             await base.LoadAsync(project);
 
         }
-        private async void RenameProjectButton_Click(object sender, RoutedEventArgs e)
+
+        #region 分类面板
+
+        public override ClassesPanel GetItemsPanel()
         {
-            string newName = await new InputDialog().ShowAsync("请输入新的项目名", false, "项目名", Project.Name);
-            Project.Name = newName;
-            await UpdateProjectAsync(Project);
+            return classPanel;
         }
 
-        private async void DeleteButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow mainWin = (Window.GetWindow(this) as MainWindow);
-            await mainWin.DeleteSelectedProjectAsync();
-        }
-
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            (sender as Button).ContextMenu.IsOpen = true;
-        }
-
+        /// <summary>
+        /// 是否忽略类选择事件。当显示全部文件或未被分类的文件时，
+        /// 类会被设置为null，但是又不需要进行事件响应，故有此字段。
+        /// </summary>
         private bool ignoreClassChanged = false;
+
+        /// <summary>
+        /// 被选中的类发生了改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void SelectedClassChanged(object sender, SelectedClassChangedEventArgs e)
         {
             if (ignoreClassChanged)
@@ -101,6 +70,7 @@ namespace ClassifyFiles.UI.Panel
             }
             if (GetItemsPanel().SelectedItem == null)
             {
+                //这里应该是不需要有任何操作了
                 //await SetFilesAsync(() => GetFilesByProjectAsync(Project.ID));
             }
             else
@@ -109,6 +79,9 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
+        #endregion
+
+        #region 文件视图
         /// <summary>
         /// 设置FileViewer的文件
         /// </summary>
@@ -137,76 +110,25 @@ namespace ClassifyFiles.UI.Panel
             GetProgress().Close();
         }
 
-        public HashSet<string> dirs;
-        public HashSet<string> Dirs
-        {
-            get => dirs;
-            set
-            {
-                dirs = value;
-                this.Notify(nameof(Dirs));
-            }
-        }
-
-
-        private async void JumpToDirComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            string dir = e.AddedItems.Count == 0 ? null : e.AddedItems.Cast<string>().First();
-            if (dir != null)
-            {
-                filesViewer.SelectFileByDir(dir);
-                await Task.Delay(250);
-                flyoutJumpToDir.Hide();// = false;
-                (sender as ListBox).SelectedItem = null;
-            }
-        }
-
-        private void filesViewer_ViewTypeChanged(object sender, EventArgs e)
-        {
-            btnLocateByDir.IsEnabled = filesViewer.CurrentFileView != FileView.Tree;
-            btnSort.IsEnabled = filesViewer.CurrentFileView != FileView.Tree;
-        }
-
-        private async void ClassifyButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrEmpty(Project.RootPath))
-            {
-                await new ErrorDialog().ShowAsync("请先设置根目录地址！", "错误");
-                return;
-            }
-            GetProgress().Show(true);
-            if (new UpdateFilesDialog(Project) { Owner = Window.GetWindow(this) }.ShowDialog() == true)
-            {
-                if (classPanel.SelectedItem != null)
-                {
-                    await filesViewer.SetFilesAsync(await GetFilesByClassAsync(classPanel.SelectedItem.ID));
-                }
-            }
-            GetProgress().Close();
-        }
-
-        private async void btnAddFile_Click(object sender, RoutedEventArgs e)
-        {
-            CommonOpenFileDialog dialog = new CommonOpenFileDialog()
-            {
-                Multiselect = true,
-                DefaultDirectory = Project.RootPath
-            };
-            if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
-            {
-                await AddFilesAsync(dialog.FileNames.ToList());
-            }
-        }
-
-        private void filesViewer_ClickTag(object sender, ClickTagEventArgs e)
+        /// <summary>
+        /// 文件视图中的标签被单机了
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FilesViewer_ClickTag(object sender, ClickTagEventArgs e)
         {
             if (e.Class != GetItemsPanel().SelectedItem)
             {
                 GetItemsPanel().SelectedItem = e.Class;
             }
         }
-
-        private async void UserControl_Drop(object sender, DragEventArgs e)
+        
+        /// <summary>
+        /// 有拖放落在了文件视图上方
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void FileViewer_Drop(object sender, DragEventArgs e)
         {
             if (classPanel.SelectedItem == null)
             {
@@ -214,6 +136,8 @@ namespace ClassifyFiles.UI.Panel
             }
             if (e.Data.GetDataPresent(nameof(ClassifyFiles)))
             {
+                //这里是因为当文件拖出去的时候，会有一个名为ClassifyFiles的拖放格式
+                //需要把这个格式排除掉，因为这是自己拖出去的
                 return;
             }
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -223,26 +147,55 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
-        private async Task AddFilesAsync(IList<string> files)
+        /// <summary>
+        /// 文件视图的类型发生了改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FilesViewer_ViewTypeChanged(object sender, EventArgs e)
         {
-            var dialog = new AddFilesDialog(classPanel.SelectedItem, files)
-            { Owner = Window.GetWindow(this) };
-            dialog.ShowDialog();
-            if (dialog.AddedFiles != null)
-            {
-                await filesViewer.AddFilesAsync(dialog.AddedFiles);
-            }
+            btnLocateByDir.IsEnabled = filesViewer.CurrentFileView != FileView.Tree;
+            btnSort.IsEnabled = filesViewer.CurrentFileView != FileView.Tree;
         }
 
-        private void RefreshButton_Click(object sender, RoutedEventArgs e)
-        {
-            SelectedClassChanged(null, null);
-        }
-
-        private async void btnAllFiles_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// 单击全部文件按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void BtnAllFiles_Click(object sender, RoutedEventArgs e)
         {
             await SetFilesAsync(() => GetFilesByProjectAsync(Project.ID));
         }
+
+        /// <summary>
+        /// 单击未分类文件按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void BtnNoClassesFiles_Click(object sender, RoutedEventArgs e)
+        {
+            await SetFilesAsync(() => GetNoClassesFilesByProjectAsync(Project.ID));
+
+        }
+
+        /// <summary>
+        /// 文件视图滚轮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FilesViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            {
+                //需要通知显示设置面板里的滑动条
+                this.Notify(nameof(IconSize), nameof(IconSizeString));
+            }
+        }
+
+        #endregion
+
+        #region 显示设置面板
         public bool ShowClassTags
         {
             get => Configs.ShowClassTags;
@@ -308,6 +261,23 @@ namespace ClassifyFiles.UI.Panel
             set => Configs.ShowToolTipImage = value;
         }
         bool isSettingSortChecked = false;
+        public double IconSize
+        {
+            get => Configs.IconSize;
+            set
+            {
+                tbkIconSize.Text = ((int)(value / 32 * 100)).ToString() + "%";
+                if (!IsLoaded)
+                {
+                    return;
+                }
+                Configs.IconSize = value;
+                this.Notify(nameof(IconSize), nameof(IconSizeString));
+            }
+        }
+
+        public string IconSizeString => ((int)(IconSize / 32 * 100)).ToString() + "%";
+
         public bool GroupByDir
         {
             get => Configs.GroupByDir;
@@ -326,35 +296,120 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
-        public double IconSize
-        {
-            get => Configs.IconSize;
-            set
-            {
-                tbkIconSize.Text = ((int)(value / 32 * 100)).ToString() + "%";
-                if (!IsLoaded)
-                {
-                    return;
-                }
-                Configs.IconSize = value;
-                this.Notify(nameof(IconSize), nameof(IconSizeString));
-            }
-        }
-        public string IconSizeString => ((int)(IconSize / 32 * 100)).ToString() + "%";
-
-
-        private void sldIconSize_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        /// <summary>
+        /// 双击缩放条，将缩放设置为默认值
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void IconSize_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             sldIconSize.Value = 32;
         }
 
-        private void filesViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+
+        #endregion
+
+        #region 底部操作栏
+
+        public HashSet<string> dirs;
+        /// <summary>
+        /// 所有的目录
+        /// </summary>
+        public HashSet<string> Dirs
         {
-            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            get => dirs;
+            set
             {
-                this.Notify(nameof(IconSize), nameof(IconSizeString));
+                dirs = value;
+                this.Notify(nameof(Dirs));
             }
         }
+
+        /// <summary>
+        /// 跳转到某一个目录被选择
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void JumpToDirComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string dir = e.AddedItems.Count == 0 ? null : e.AddedItems.Cast<string>().First();
+            if (dir != null)
+            {
+                filesViewer.SelectFileByDir(dir);
+                //延时1/4秒，让用户能够看到被选中的状态
+                await Task.Delay(250);
+                flyoutJumpToDir.Hide();// = false;
+                (sender as ListBox).SelectedItem = null;
+            }
+        }
+
+        /// <summary>
+        /// 单击分类按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ClassifyButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(Project.RootPath))
+            {
+                await new ErrorDialog().ShowAsync("请先设置根目录地址！", "错误");
+                return;
+            }
+            GetProgress().Show(true);
+            if (new UpdateFilesDialog(Project) { Owner = Window.GetWindow(this) }.ShowDialog() == true)
+            {
+                if (classPanel.SelectedItem != null)
+                {
+                    await filesViewer.SetFilesAsync(await GetFilesByClassAsync(classPanel.SelectedItem.ID));
+                }
+            }
+            GetProgress().Close();
+        }
+
+        /// <summary>
+        /// 单击添加文件/文件夹按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void BtnAddFile_Click(object sender, RoutedEventArgs e)
+        {
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog()
+            {
+                Multiselect = true,
+                DefaultDirectory = Project.RootPath
+            };
+            if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
+            {
+                await AddFilesAsync(dialog.FileNames.ToList());
+            }
+        }
+
+        /// <summary>
+        /// 向文件视图添加文件
+        /// </summary>
+        /// <param name="files"></param>
+        /// <returns></returns>
+        private async Task AddFilesAsync(IList<string> files)
+        {
+            var dialog = new AddFilesDialog(classPanel.SelectedItem, files)
+            { Owner = Window.GetWindow(this) };
+            dialog.ShowDialog();
+            if (dialog.AddedFiles != null)
+            {
+                await filesViewer.AddFilesAsync(dialog.AddedFiles);
+            }
+        }
+
+        /// <summary>
+        /// 单击刷新按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            SelectedClassChanged(null, null);
+        }
+
 
         private async void RadioMenuItem_Checked(object sender, RoutedEventArgs e)
         {
@@ -372,9 +427,21 @@ namespace ClassifyFiles.UI.Panel
             //GroupByDir = false;
             GetProgress().Close();
         }
+        #endregion
 
+        #region 左侧分类列表面板
+
+        /// <summary>
+        /// 是否正在执行左侧面板伸展和收缩的动画
+        /// </summary>
         bool isAnimating = false;
-        private void GridSplitter_Click(object sender, EventArgs e)
+
+        /// <summary>
+        /// 单击分界处
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Splitter_Click(object sender, EventArgs e)
         {
             if (isAnimating)
             {
@@ -387,36 +454,43 @@ namespace ClassifyFiles.UI.Panel
             StartAnimation(to);
         }
 
+        /// <summary>
+        /// 开始执行宽度动画
+        /// </summary>
+        /// <param name="to"></param>
         private void StartAnimation(double to)
         {
             DoubleAnimation ani = new DoubleAnimation(to, TimeSpan.FromSeconds(0.5))
             {
                 EasingFunction = new CubicEase() { EasingMode = EasingMode.EaseInOut },
-                FillBehavior = FillBehavior.Stop
+                //FillBehavior = FillBehavior.Stop
             };
             ani.Completed += (p1, p2) =>
             {
                 isAnimating = false;
                 grdSplitter.IsEnabled = true;
-                grdLeft.Width = to;
+                //grdLeft.Width = to;
+                //本来是写了上面注释掉的部分的，后来发现反正改变宽度都是用动画，那么就无所谓了
                 grdMain.ColumnDefinitions[0].Width = GridLength.Auto;
             };
             grdLeft.BeginAnimation(WidthProperty, ani);
         }
 
-        private void grdSplitter_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        /// <summary>
+        /// 在分界处鼠标抬起
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Splitter_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
+            //此处不是MouseMove，而是在移动结束后，通过动画的形式改变左侧面板的宽度，这样节省性能
             var cd = grdMain.ColumnDefinitions[0];
             if (cd.Width.IsAbsolute)
             {
                 StartAnimation(cd.Width.Value - 8);
+                //这边可能是有Margin什么的，要-8才能没有顿挫
             }
         }
-
-        private async void btnNoClassesFiles_Click(object sender, RoutedEventArgs e)
-        {
-            await SetFilesAsync(() => GetNoClassesFilesByProjectAsync(Project.ID));
-
-        }
+        #endregion
     }
 }

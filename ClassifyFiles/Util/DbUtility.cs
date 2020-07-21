@@ -8,7 +8,7 @@ namespace ClassifyFiles.Util
 {
     public static class DbUtility
     {
-        public static string DbPath { get; private set; } = "data.db";
+        public static string DbPath => System.IO.Path.GetFullPath("data.db");
         internal static AppDbContext db = new AppDbContext(DbPath);
         const string dbReplacedMessage = "由于保存出错，数据库上下文被替换，更改已丢失";
         public async static Task SaveChangesAsync()
@@ -20,8 +20,14 @@ namespace ClassifyFiles.Util
             catch (Exception ex)
             {
                 db = new AppDbContext(DbPath);
-                LogUtility.AddLogAsync(dbReplacedMessage + Environment.NewLine + ex.ToString());
                 System.Diagnostics.Debug.WriteLine(dbReplacedMessage);
+                try
+                {
+                    await LogUtility.AddLogAsync(dbReplacedMessage + Environment.NewLine + ex.ToString());
+                }
+                catch
+                {
+                }
             }
         }
         public static void SaveChanges()
@@ -33,8 +39,15 @@ namespace ClassifyFiles.Util
             catch (Exception ex)
             {
                 db = new AppDbContext(DbPath);
-                LogUtility.AddLogAsync(dbReplacedMessage + Environment.NewLine + ex.ToString());
                 System.Diagnostics.Debug.WriteLine(dbReplacedMessage);
+                try
+                {
+                    LogUtility.AddLogAsync(dbReplacedMessage + Environment.NewLine + ex.ToString()).Wait();
+                }
+                catch
+                {
+
+                }
             }
         }
         public static Task ZipAsync()
