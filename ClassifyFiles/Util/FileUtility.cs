@@ -18,12 +18,13 @@ using FzLib.Basic;
 using static ClassifyFiles.Util.DbUtility;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-using ClassifyFiles.Util.Shell;
 
 namespace ClassifyFiles.Util
 {
     public static class FileUtility
     {
+      public static Func<string, Bitmap> GetFileIcon { get; set; }
+      public static  Func<string, Bitmap> GetFolderIcon { get; set; }
         private static EncoderParameters encParams;
         private static ImageCodecInfo encoder;
         static FileUtility()
@@ -86,14 +87,10 @@ namespace ClassifyFiles.Util
             return false;
 
         }
-        public static Bitmap GetFolderExplorerIcon()
+
+        public static bool TryGenerateExplorerIcon(File file           )
         {
-            Bitmap bitmap = ShellEx.GetBitmapFromFolderPath("C:\\Windows", ShellEx.IconSizeEnum.ExtraLargeIcon);
-            return bitmap;
-        }
-        public static bool TryGenerateExplorerIcon(File file)
-        {
-           
+
             string path = file.GetAbsolutePath();
             try
             {
@@ -103,13 +100,13 @@ namespace ClassifyFiles.Util
                 Bitmap bitmap;
                 if (file.IsFolder)
                 {
-                    bitmap = ShellEx.GetBitmapFromFolderPath(path, ShellEx.IconSizeEnum.ExtraLargeIcon);
+                    bitmap = GetFileIcon(path);
                 }
                 else
                 {
-                    bitmap = ShellEx.GetBitmapFromFilePath(path, ShellEx.IconSizeEnum.ExtraLargeIcon);
+                    bitmap = GetFolderIcon(path);
                 }
-                bitmap.Save(iconPath,ImageFormat.Png);
+                bitmap.Save(iconPath, ImageFormat.Png);
                 file.IconGUID = guid;
             }
             catch (Exception ex)
@@ -295,29 +292,37 @@ namespace ClassifyFiles.Util
             }
             return null;
         }
-        public static File GetFileTree(IEnumerable<File> files) 
+        public static File GetFileTree(IEnumerable<File> files)
         {
             Dictionary<File, Queue<string>> fileDirs = new Dictionary<File, Queue<string>>();
-            File root = new File() { Dir = "根",Project=files.First().Project };
+            File root = new File() { Dir = "根", Project = files.First().Project };
 
             foreach (var file in files)
             {
-                var dirs = file.Dir.Split('/', '\\');
-                var current = root;
-                foreach (var dir in dirs)
+                if (string.IsNullOrEmpty(file.Dir))
                 {
-                    if (current.SubFiles.FirstOrDefault(p => p.Dir == dir) is File sub)
-                    {
-                        current = sub;
-                    }
-                    else
-                    {
-                        sub = new File() { Dir = dir, Project = file.Project };
-                        current.SubFiles.Add(sub);
-                        current = sub;
-                    }
+                    //位于根目录
+                    root.SubFiles.Add(file);
                 }
-                current.SubFiles.Add(file);
+                else
+                {
+                    var dirs = file.Dir.Split('/', '\\');
+                    var current = root;
+                    foreach (var dir in dirs)
+                    {
+                        if (current.SubFiles.FirstOrDefault(p => p.Dir == dir) is File sub)
+                        {
+                            current = sub;
+                        }
+                        else
+                        {
+                            sub = new File() { Dir = dir, Project = file.Project };
+                            current.SubFiles.Add(sub);
+                            current = sub;
+                        }
+                    }
+                    current.SubFiles.Add(file);
+                }
             }
             return root;
         }
@@ -334,22 +339,30 @@ namespace ClassifyFiles.Util
 
             foreach (var file in files)
             {
-                var dirs = getDir(file).Split('/', '\\');
-                var current = root;
-                foreach (var dir in dirs)
+                if (string.IsNullOrEmpty(getDir(file)))
                 {
-                    if (getSubFiles(current).FirstOrDefault(p => getDir(p) == dir) is T sub)
-                    {
-                        current = sub;
-                    }
-                    else
-                    {
-                        sub = getNewItem(new File() { Dir = dir, Project = project });
-                        getSubFiles(current).Add(sub);
-                        current = sub;
-                    }
+                    //位于根目录
+                    getSubFiles(root).Add(file);
                 }
-                getSubFiles(current).Add(file);
+                else
+                {
+                    var dirs = getDir(file).Split('/', '\\');
+                    var current = root;
+                    foreach (var dir in dirs)
+                    {
+                        if (getSubFiles(current).FirstOrDefault(p => getDir(p) == dir) is T sub)
+                        {
+                            current = sub;
+                        }
+                        else
+                        {
+                            sub = getNewItem(new File() { Dir = dir, Project = project });
+                            getSubFiles(current).Add(sub);
+                            current = sub;
+                        }
+                    }
+                    getSubFiles(current).Add(file);
+                }
             }
             return root;
         }
@@ -357,7 +370,7 @@ namespace ClassifyFiles.Util
         public static string GetAbsolutePath(this File file, bool dirOnly = false)
         {
             string rootPath = file.Project.RootPath;
-            if (dirOnly)
+            if (dirOnly || file.IsFolder)
             {
                 return P.Combine(rootPath, file.Dir);
             }
@@ -463,7 +476,7 @@ namespace ClassifyFiles.Util
             files.ForEach(p => db.Entry(p).State = EntityState.Modified);
             await db.SaveChangesAsync();
         }
-      
+
 
         public static Task DeleteThumbnailsAsync(int projectID)
         {
@@ -478,8 +491,9 @@ namespace ClassifyFiles.Util
                         string path = GetThumbnailPath(file.ThumbnailGUID);
                         if (F.Exists(path))
                         {
-                            try { 
-                            F.Delete(path);
+                            try
+                            {
+                                F.Delete(path);
                             }
                             catch (Exception ex)
                             {
@@ -498,7 +512,7 @@ namespace ClassifyFiles.Util
                             {
                                 F.Delete(path);
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
 
                             }

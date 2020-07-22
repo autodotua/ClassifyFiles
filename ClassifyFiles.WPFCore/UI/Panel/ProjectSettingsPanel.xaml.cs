@@ -139,10 +139,6 @@ namespace ClassifyFiles.UI.Panel
 
             }
         }
-        public override ClassesPanel GetItemsPanel()
-        {
-            return null;
-        }
 
         private async void DeleteFiles_Click(object sender, RoutedEventArgs e)
         {

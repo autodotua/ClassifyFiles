@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClassifyFiles.Util.Shell
+namespace ClassifyFiles.Util.Win32.Shell
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct IMAGEINFO
@@ -15,6 +15,6 @@ namespace ClassifyFiles.Util.Shell
         public IntPtr hbmMask;
         public int Unused1;
         public int Unused2;
-        public Shell.RECT rcImage;
+        public RECT rcImage;
     }
 }

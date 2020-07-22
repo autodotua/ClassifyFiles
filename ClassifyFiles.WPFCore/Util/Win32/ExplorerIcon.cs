@@ -1,10 +1,11 @@
+﻿using ClassifyFiles.Util.Win32.Shell;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace ClassifyFiles.Util.Shell
+namespace ClassifyFiles.Util.Win32
 {
-    public class ShellEx
+    public class ExplorerIcon
     {
         private const int SHGFI_SMALLICON = 0x1;
         private const int SHGFI_LARGEICON = 0x0;
@@ -33,13 +34,13 @@ namespace ClassifyFiles.Util.Shell
         private static extern int SHGetImageList(
             int iImageList,
             ref Guid riid,
-            out Shell.IImageList ppv);
+            out IImageList ppv);
 
         [DllImport("Shell32.dll")]
         public static extern int SHGetFileInfo(
             string pszPath,
             int dwFileAttributes,
-            ref Shell.SHFILEINFO psfi,
+            ref SHFILEINFO psfi,
             int cbFileInfo,
             uint uFlags);
 
@@ -48,7 +49,7 @@ namespace ClassifyFiles.Util.Shell
             IntPtr hIcon);
 
         public static System.Drawing.Bitmap GetBitmapFromFolderPath(
-            string filepath, IconSizeEnum iconsize)
+            string filepath, IconSizeEnum iconsize=IconSizeEnum.ExtraLargeIcon)
         {
             IntPtr hIcon = GetIconHandleFromFolderPath(filepath, iconsize);
             return getBitmapFromIconHandle(hIcon);
@@ -94,13 +95,13 @@ namespace ClassifyFiles.Util.Shell
         {
             if(filepath.EndsWith(".exe")|| filepath.EndsWith(".lnk")|| filepath.EndsWith(".msi"))
             {
-                var shinfo = new Shell.SHFILEINFO();
+                var shinfo = new SHFILEINFO();
                 return getIconHandleFromFilePathWithFlags(filepath, iconsize, ref shinfo);
             }
             else
             {
 
-                var shinfo = new Shell.SHFILEINFO();
+                var shinfo = new SHFILEINFO();
                 const uint SHGFI_SYSICONINDEX = 0x4000;
                 const int FILE_ATTRIBUTE_NORMAL = 0x80;
                 uint flags = SHGFI_SYSICONINDEX;
@@ -110,7 +111,7 @@ namespace ClassifyFiles.Util.Shell
 
         private static IntPtr GetIconHandleFromFolderPath(string folderpath, IconSizeEnum iconsize)
         {
-            var shinfo = new Shell.SHFILEINFO();
+            var shinfo = new SHFILEINFO();
 
             const uint SHGFI_ICON = 0x000000100;
             const uint SHGFI_USEFILEATTRIBUTES = 0x000000010;
@@ -121,14 +122,14 @@ namespace ClassifyFiles.Util.Shell
 
         private static IntPtr getIconHandleFromFilePathWithFlags(
             string filepath, IconSizeEnum iconsize,
-            ref Shell.SHFILEINFO shinfo, int fileAttributeFlag, uint flags)
+            ref SHFILEINFO shinfo, int fileAttributeFlag, uint flags)
         {
             const int ILD_TRANSPARENT = 1;
             var retval = SHGetFileInfo(filepath, fileAttributeFlag, ref shinfo, Marshal.SizeOf(shinfo), flags);
             if (retval == 0) throw (new System.IO.FileNotFoundException());
             var iconIndex = shinfo.iIcon;
             var iImageListGuid = new Guid("46EB5926-582E-4017-9FDF-E8998DAA0950");
-            Shell.IImageList iml;
+            IImageList iml;
             var hres = SHGetImageList((int)iconsize, ref iImageListGuid, out iml);
             var hIcon = IntPtr.Zero;
             hres = iml.GetIcon(iconIndex, ILD_TRANSPARENT, ref hIcon);
@@ -136,7 +137,7 @@ namespace ClassifyFiles.Util.Shell
         }
         private static IntPtr getIconHandleFromFilePathWithFlags(
             string filepath, IconSizeEnum iconsize,
-            ref Shell.SHFILEINFO shinfo)
+            ref SHFILEINFO shinfo)
         {
             const int ILD_TRANSPARENT = 1;
             var retval = SHGetFileInfo(filepath, 0, ref shinfo, Marshal.SizeOf(shinfo), (uint)16640);
@@ -144,15 +145,4 @@ namespace ClassifyFiles.Util.Shell
         }
 
     }
-
-    public struct SHFILEINFO
-    {
-        public IntPtr hIcon;
-        public int iIcon;
-        public uint dwAttributes;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 254)]
-        public string szDisplayName;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-        public string szTypeName;
-    };
 }

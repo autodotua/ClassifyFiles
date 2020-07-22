@@ -19,9 +19,6 @@ namespace ClassifyFiles.UI
 {
     public class WindowBase : Window, INotifyPropertyChanged
     {
-        [DllImport("gdi32.dll", EntryPoint = "DeleteObject")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool DeleteObject([In] IntPtr hObject);
         public WindowBase()
         {
             DataContext = this;
@@ -30,17 +27,8 @@ namespace ClassifyFiles.UI
             WPFCore.App.SetTheme(this);
            
         }
-        private static ImageSource icon;
-
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public static ImageSource ImageSourceFromBitmap(Bitmap bmp)
-        {
-            var handle = bmp.GetHbitmap();
-
-            return Imaging.CreateBitmapSourceFromHBitmap(handle, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-
-        }
         public bool IsClosed { get; private set; }
         protected override void OnClosed(EventArgs e)
         {

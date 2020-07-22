@@ -39,17 +39,16 @@ namespace ClassifyFiles.UI.Panel
 
         public override async Task LoadAsync(Project project)
         {
-            filesViewer.Project = project;
             await base.LoadAsync(project);
+            filesViewer.Project = project;
+            await filesViewer.SetFilesAsync(null);
+            await classPanel.LoadAsync(project);
 
         }
 
         #region 分类面板
 
-        public override ClassesPanel GetItemsPanel()
-        {
-            return classPanel;
-        }
+
 
         /// <summary>
         /// 是否忽略类选择事件。当显示全部文件或未被分类的文件时，
@@ -68,14 +67,14 @@ namespace ClassifyFiles.UI.Panel
             {
                 return;
             }
-            if (GetItemsPanel().SelectedItem == null)
+            if (classPanel.SelectedItem == null)
             {
                 //这里应该是不需要有任何操作了
                 //await SetFilesAsync(() => GetFilesByProjectAsync(Project.ID));
             }
             else
             {
-                await SetFilesAsync(() => GetFilesByClassAsync(GetItemsPanel().SelectedItem.ID));
+                await SetFilesAsync(() => GetFilesByClassAsync(classPanel.SelectedItem.ID));
             }
         }
 
@@ -91,7 +90,7 @@ namespace ClassifyFiles.UI.Panel
         {
             GetProgress().Show(true);
             Debug.WriteLine("Set Files, Project Hashcode is " + Project.GetHashCode()
-            + ", Class is " + (GetItemsPanel().SelectedItem == null ? "null" : GetItemsPanel().SelectedItem.Name));
+            + ", Class is " + (classPanel.SelectedItem == null ? "null" : classPanel.SelectedItem.Name));
             List<File> files = await func();
             await filesViewer.SetFilesAsync(files);
             if (filesViewer.Files == null)
@@ -117,12 +116,12 @@ namespace ClassifyFiles.UI.Panel
         /// <param name="e"></param>
         private void FilesViewer_ClickTag(object sender, ClickTagEventArgs e)
         {
-            if (e.Class != GetItemsPanel().SelectedItem)
+            if (e.Class != classPanel.SelectedItem)
             {
-                GetItemsPanel().SelectedItem = e.Class;
+                classPanel.SelectedItem = e.Class;
             }
         }
-        
+
         /// <summary>
         /// 有拖放落在了文件视图上方
         /// </summary>
@@ -165,6 +164,9 @@ namespace ClassifyFiles.UI.Panel
         /// <param name="e"></param>
         private async void BtnAllFiles_Click(object sender, RoutedEventArgs e)
         {
+            ignoreClassChanged = true;
+            classPanel.SelectedItem = null;
+            ignoreClassChanged = false;
             await SetFilesAsync(() => GetFilesByProjectAsync(Project.ID));
         }
 
@@ -175,6 +177,9 @@ namespace ClassifyFiles.UI.Panel
         /// <param name="e"></param>
         private async void BtnNoClassesFiles_Click(object sender, RoutedEventArgs e)
         {
+            ignoreClassChanged = true;
+            classPanel.SelectedItem = null;
+            ignoreClassChanged = false;
             await SetFilesAsync(() => GetNoClassesFilesByProjectAsync(Project.ID));
 
         }

@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace ClassifyFiles.Util.Shell
+namespace ClassifyFiles.Util.Win32.Shell
 {
     [ComImportAttribute()]
     [GuidAttribute("46EB5926-582E-4017-9FDF-E8998DAA0950")]
@@ -39,7 +39,7 @@ namespace ClassifyFiles.Util.Shell
 
         [PreserveSig]
         int Draw(
-            ref Shell.IMAGELISTDRAWPARAMS pimldp);
+            ref IMAGELISTDRAWPARAMS pimldp);
 
         [PreserveSig]
         int Remove(

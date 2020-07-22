@@ -1,5 +1,7 @@
 ﻿using ClassifyFiles.UI;
 using ClassifyFiles.Util;
+using ClassifyFiles.Util.Win32;
+using ClassifyFiles.Util.Win32.Shell;
 using ModernWpf;
 using ModernWpf.Controls.Primitives;
 using System;
@@ -24,10 +26,13 @@ namespace ClassifyFiles.WPFCore
         public static new App Current { get; private set; }
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            FileUtility.ThumbnailFolderPath = "thumb";
+            FileUtility.GetFileIcon = path => ExplorerIcon.GetBitmapFromFilePath(path, ExplorerIcon.IconSizeEnum.ExtraLargeIcon);
+            FileUtility.GetFolderIcon = path => ExplorerIcon.GetBitmapFromFolderPath(path, ExplorerIcon.IconSizeEnum.ExtraLargeIcon);
+
             FzLib.Program.Runtime.UnhandledException.RegistAll();
             FzLib.Program.Runtime.UnhandledException.UnhandledExceptionCatched += UnhandledException_UnhandledExceptionCatched;
 
-            FileUtility.ThumbnailFolderPath = "thumb";
             if (!Directory.Exists("thumb"))
             {
                 Directory.CreateDirectory("thumb");

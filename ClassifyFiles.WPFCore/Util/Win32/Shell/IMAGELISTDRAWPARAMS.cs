@@ -1,6 +1,6 @@
 using System;
 
-namespace ClassifyFiles.Util.Shell
+namespace ClassifyFiles.Util.Win32.Shell
 {
     public struct IMAGELISTDRAWPARAMS
     {

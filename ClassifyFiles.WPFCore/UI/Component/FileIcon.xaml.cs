@@ -2,6 +2,8 @@
 using ClassifyFiles.UI.Model;
 using ClassifyFiles.UI.Panel;
 using ClassifyFiles.Util;
+using ClassifyFiles.Util.Win32;
+using ClassifyFiles.Util.Win32.Shell;
 using FzLib.Extension;
 using ModernWpf.Controls;
 using System;
@@ -99,7 +101,7 @@ namespace ClassifyFiles.UI.Component
             {
                 if (folderIconPath == null)
                 {
-                    var bitmap = FileUtility.GetFolderExplorerIcon();
+                    var bitmap = ExplorerIcon.GetBitmapFromFolderPath(File.File.GetAbsolutePath());
                     string tempFileName = System.IO.Path.GetTempFileName() + ".png";
                     bitmap.Save(tempFileName);
                     folderIconPath = tempFileName;

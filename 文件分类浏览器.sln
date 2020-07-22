@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.29318.209
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "其他文件", "其他文件", "{F10EA956-8925-4FA7-8DCB-3517835E7FB2}"
 	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -12,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassifyFiles", "ClassifyFi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassifyFiles.WPFCore", "ClassifyFiles.WPFCore\ClassifyFiles.WPFCore.csproj", "{81B053E2-6B8E-4130-9E5D-7E4D64B59165}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassifyFiles.Test", "ClassifyFiles.Test\ClassifyFiles.Test.csproj", "{86A86FAA-37D8-41AC-B416-C2EE69956D7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassifyFiles.Test", "ClassifyFiles.Test\ClassifyFiles.Test.csproj", "{86A86FAA-37D8-41AC-B416-C2EE69956D7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

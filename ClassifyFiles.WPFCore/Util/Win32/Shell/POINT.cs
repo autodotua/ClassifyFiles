@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace ClassifyFiles.Util.Shell
+namespace ClassifyFiles.Util.Win32.Shell
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct POINT

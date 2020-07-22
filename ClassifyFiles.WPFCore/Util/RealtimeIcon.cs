@@ -1,4 +1,5 @@
 ﻿using ClassifyFiles.UI.Model;
+using ClassifyFiles.Util.Win32.Shell;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -39,7 +40,7 @@ namespace ClassifyFiles.Util
                     if (!generatedIcons.ContainsKey(file.File.ID) && file.File.IconGUID == null && file.File.IconGUID != "")
                     {
                         generatedIcons.TryAdd(file.File.ID, file);
-                        if (FileUtility.TryGenerateExplorerIcon(file.File))
+                        if (FileUtility.TryGenerateExplorerIcon(file.File ))
                         {
                             result = true;
                             DbUtility.SetObjectModified(file.File);

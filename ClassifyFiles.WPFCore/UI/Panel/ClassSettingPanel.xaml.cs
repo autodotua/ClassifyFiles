@@ -32,10 +32,6 @@ namespace ClassifyFiles.UI.Panel
             InitializeComponent();
         }
 
-        public override ClassesPanel GetItemsPanel()
-        {
-            return classes;
-        }
         public ObservableCollection<MatchCondition> matchConditions;
 
         public ObservableCollection<MatchCondition> MatchConditions
@@ -47,7 +43,7 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(MatchConditions));
             }
         }
-        private  void WindowBase_Loaded(object sender, RoutedEventArgs e)
+        private void WindowBase_Loaded(object sender, RoutedEventArgs e)
         {
         }
 
@@ -64,7 +60,11 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
-
+        public override async Task LoadAsync(Project project)
+        {
+            await base.LoadAsync(project);
+            await classes.LoadAsync(project);
+        }
 
         public Task SaveClassAsync()
         {
@@ -86,7 +86,7 @@ namespace ClassifyFiles.UI.Panel
                 }
                 c.MatchConditions.Clear();
                 c.MatchConditions.AddRange(MatchConditions);
-                await ClassUtility. SaveClassAsync(c);
+                await ClassUtility.SaveClassAsync(c);
             }
         }
 
@@ -130,5 +130,5 @@ namespace ClassifyFiles.UI.Panel
         }
     }
 
-    
+
 }

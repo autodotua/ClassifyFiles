@@ -22,13 +22,7 @@ namespace ClassifyFiles.UI.Panel
         public virtual async Task LoadAsync(Project project)
         {
             Project = project;
-            if (GetItemsPanel() != null)
-            {
-                ClassesPanel panel = GetItemsPanel();
-                await panel.LoadAsync(project);
-            }
         }
-        public abstract ClassesPanel GetItemsPanel();
         private Project project;
         public virtual Project Project
         {

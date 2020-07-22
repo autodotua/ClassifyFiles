@@ -96,7 +96,8 @@ namespace ClassifyFiles.Util
                         {
                             goto next;
                         }
-                        if (existedFileClass.Disabled)//存在但被禁用
+                        //存在但被禁用
+                        if (existedFileClass != null && existedFileClass.Disabled)
                         {
                             fs.Add(existedFile);
                             existedFileClass.Disabled = false;

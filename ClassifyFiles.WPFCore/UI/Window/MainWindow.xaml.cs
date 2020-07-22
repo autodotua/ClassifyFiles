@@ -97,7 +97,9 @@ namespace ClassifyFiles.UI
             SelectedProject = Projects[0];
             RadioButton_Checked(btnModeView, null);
         }
-
+        FileBrowserPanel fileBrowserPanel = new FileBrowserPanel();
+        ClassSettingPanel classSettingPanel = new ClassSettingPanel();
+        ProjectSettingsPanel projectSettingsPanel = new ProjectSettingsPanel();
         private async Task LoadProjectAsync()
         {
             if (MainPanel != null)
@@ -105,7 +107,7 @@ namespace ClassifyFiles.UI
                 Progress.Show(false);
                 try
                 {
-                    MainPanel = Activator.CreateInstance(MainPanel.GetType()) as ILoadable;
+                    //MainPanel = Activator.CreateInstance(MainPanel.GetType()) as ILoadable;
                     await MainPanel.LoadAsync(SelectedProject);
                 }
                 catch (Exception ex)
@@ -179,13 +181,13 @@ namespace ClassifyFiles.UI
             switch (btn.Name)
             {
                 case nameof(btnModeView):
-                    MainPanel = new FileBrowserPanel();
+                    MainPanel = fileBrowserPanel;// new FileBrowserPanel();
                     break;
                 case nameof(btnModeClasses):
-                    MainPanel = new ClassSettingPanel();
+                    MainPanel = classSettingPanel; // new ClassSettingPanel();
                     break;
                 case nameof(btnModeProjectSettings):
-                    MainPanel = new ProjectSettingsPanel();
+                    MainPanel = projectSettingsPanel;// new ProjectSettingsPanel();
                     break;
                 case null:
                     return;

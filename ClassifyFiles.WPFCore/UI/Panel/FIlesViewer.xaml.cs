@@ -26,6 +26,8 @@ using FI = System.IO.FileInfo;
 using ClassifyFiles.UI.Util;
 using ClassifyFiles.Enum;
 using ClassifyFiles.UI.Event;
+using System.Runtime.InteropServices;
+using ClassifyFiles.Util.Win32;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -620,6 +622,9 @@ namespace ClassifyFiles.UI.Panel
         #endregion
 
         #region 菜单相关
+
+
+
         /// <summary>
         /// 右键菜单打开
         /// </summary>
@@ -646,6 +651,16 @@ namespace ClassifyFiles.UI.Panel
             MenuItem menuCopy = new MenuItem() { Header = "复制" };
             menuCopy.Click += MenuCopy_Click;
             menu.Items.Add(menuCopy);
+            if (files.Count == 1)
+            {
+                MenuItem menuShowProperties = new MenuItem() { Header = "属性" };
+                menuShowProperties.Click += (p1, p2) =>
+                {
+                    FileProperty.ShowFileProperties(files[0].File.GetAbsolutePath());
+                };
+                menu.Items.Add(menuShowProperties);
+            }
+
             if ((!files.Any(p => p.File.IsFolder)
                 || CurrentFileView != FileView.Tree)
                 && Project.Classes != null)
