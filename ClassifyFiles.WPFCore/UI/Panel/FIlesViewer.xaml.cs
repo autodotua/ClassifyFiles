@@ -28,6 +28,7 @@ using ClassifyFiles.Enum;
 using ClassifyFiles.UI.Event;
 using System.Runtime.InteropServices;
 using ClassifyFiles.Util.Win32;
+using System.Windows.Controls.Primitives;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -41,9 +42,15 @@ namespace ClassifyFiles.UI.Panel
             DataContext = this;
             InitializeComponent();
             SetGroupEnable(Configs.GroupByDir);
+            treeViewHelper = new TreeViewHelper<UIFile>(
+                FindResource("treeFiles") as TreeView,
+                p => p.Parent,
+                p => p.SubUIFiles
+                );
             new DragDropFilesHelper(FindResource("lvwFiles") as ListBox).Regist();
             new DragDropFilesHelper(FindResource("grdFiles") as ListBox).Regist();
             new DragDropFilesHelper(FindResource("lvwDetailFiles") as ListBox).Regist();
+            new DragDropFilesHelper(FindResource("treeFiles") as TreeView).Regist();
             var btn = grdAppBar.Children.OfType<AppBarToggleButton>()
                 .FirstOrDefault(p => int.Parse(p.Tag as string) == Configs.LastViewType);
             if (btn != null)
@@ -55,6 +62,8 @@ namespace ClassifyFiles.UI.Panel
         }
 
         #region 属性和字段
+        TreeViewHelper<UIFile> treeViewHelper;
+
         private ItemsControl filesContent;
         public ItemsControl FilesContent
         {
@@ -98,7 +107,8 @@ namespace ClassifyFiles.UI.Panel
             FileUtility.GetFileTree(Project, Files,
                 p => new UIFile(p),
                 p => p.File,
-                p => p.SubUIFiles)
+                p => p.SubUIFiles,
+                (c, p) => c.Parent = p)
             .SubUIFiles);
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -423,18 +433,28 @@ namespace ClassifyFiles.UI.Panel
             {
                 FilesContent = FindResource("lvwDetailFiles") as ListView;
             }
-            if (selectedFile != null && FilesContent is ListBox list)
-            {
-                list.SelectedItem = selectedFile;
-                list.ScrollIntoView(selectedFile);
-            }
+
+
             Configs.LastViewType = (int)CurrentFileView;
             ViewTypeChanged?.Invoke(this, new EventArgs());
-        }
 
+            if (selectedFile != null)
+            {
+                if (FilesContent is ListBox list)
+                {
+                    list.SelectedItem = selectedFile;
+                    list.ScrollIntoView(selectedFile);
+                }
+                if (FilesContent is TreeView tree)
+                {
+                    treeViewHelper.SelectItemWhileLoaded(selectedFile,FileTree);
+                }
+            }
+        }
+   
         /// <summary>
-        /// 当前的视图
-        /// </summary>
+                 /// 当前的视图
+                 /// </summary>
         public FileView CurrentFileView { get; private set; } = FileView.List;
 
         #endregion
@@ -459,8 +479,8 @@ namespace ClassifyFiles.UI.Panel
         private async void Viewer_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var parent = VisualTreeHelper.GetParent(e.OriginalSource as DependencyObject);
-            if (parent is System.Windows.Controls.Primitives.RepeatButton
-                || parent is System.Windows.Controls.Primitives.Thumb)
+            if (parent is RepeatButton
+                || parent is Thumb)
             {
                 //由于双击滚动条也会触发该事件，因此需要判断该事件是不是从滚动条发出来的。
                 //没有很好的方法来判断是不是滚动条
@@ -468,10 +488,12 @@ namespace ClassifyFiles.UI.Panel
             }
             try
             {
+                UIFile uiFile = GetSelectedFile();
                 File file = GetSelectedFile()?.File;
                 if (file != null)
                 {
-                    if (file.IsFolder && CurrentFileView == FileView.Tree)//是目录
+                    if (file.IsFolder && CurrentFileView == FileView.Tree
+                        && uiFile.SubUIFiles != null && uiFile.SubUIFiles.Count > 0)//是目录
                     {
                         return;
                     }
@@ -648,11 +670,13 @@ namespace ClassifyFiles.UI.Panel
                 MenuItem menuOpenFolder = new MenuItem() { Header = "打开目录" };
                 menuOpenFolder.Click += OpenDirMernuItem_Click;
                 menu.Items.Add(menuOpenFolder);
-
             }
             MenuItem menuCopy = new MenuItem() { Header = "复制" };
             menuCopy.Click += MenuCopy_Click;
             menu.Items.Add(menuCopy);
+            MenuItem menuDelete = new MenuItem() { Header = "删除记录", ToolTip = "这不会删除磁盘上的文件，仅仅删除记录" };
+            menuDelete.Click += MenuDelete_Click;
+            menu.Items.Add(menuDelete);
             if (files.Count == 1)
             {
                 MenuItem menuShowProperties = new MenuItem() { Header = "属性" };
@@ -703,6 +727,22 @@ namespace ClassifyFiles.UI.Panel
             }
             //}
 
+        }
+
+        private async void MenuDelete_Click(object sender, RoutedEventArgs e)
+        {
+            var files = GetSelectedFiles();
+            GetProgress().Show(false);
+            await FileUtility.DeleteFilesRecordAsync(files.Select(p => p.File));
+            foreach (var file in files)
+            {
+                Files.Remove(file);
+            }
+            if (CurrentFileView == FileView.Tree)
+            {
+
+            }
+            GetProgress().Close();
         }
 
         private async void ChkTag_Click(object sender, RoutedEventArgs e)

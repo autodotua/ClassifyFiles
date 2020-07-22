@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 using System.Linq;
 using ClassifyFiles.UI.Event;
 using System.Windows.Controls;
+using ClassifyFiles.UI.Model;
+using System.Windows.Media.Effects;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -116,17 +120,34 @@ namespace ClassifyFiles.UI.Panel
 
         private void ListBoxItem_Drop(object sender, DragEventArgs e)
         {
+            ListBoxItem item = sender as ListBoxItem;
+            Class c = item.DataContext as Class;
+            //后来想了下，不需要这一段，因为程序可以在类之间进行拖放
             if (e.Data.GetDataPresent(nameof(ClassifyFiles)))
             {
-                //这里是因为当文件拖出去的时候，会有一个名为ClassifyFiles的拖放格式
-                //需要把这个格式排除掉，因为这是自己拖出去的
-                return;
+                var files = (UIFile[])e.Data.GetData(nameof(ClassifyFiles));
+                ClassFilesDrop?.Invoke(sender, new ClassFilesDropEventArgs(c, files));
             }
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            else if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                ClassFilesDrop?.Invoke(sender, new ClassFilesDropEventArgs((sender as ListBoxItem).DataContext as Class, files));
+                ClassFilesDrop?.Invoke(sender, new ClassFilesDropEventArgs(c, files));
             }
+            
+            //开始设置背景渐变动画
+            //需要使用非冻结的颜色，因此需要Clone。而且很奇怪，不能加null判断
+            item.Background = (FindResource("SystemControlBackgroundBaseLowBrush") as Brush).Clone();
+            DoubleAnimation ani = new DoubleAnimation()
+            {
+                Duration = TimeSpan.FromSeconds(0.5),
+                FillBehavior = FillBehavior.HoldEnd,
+                To = 1,
+                From=0,
+                AutoReverse = true,
+                RepeatBehavior = new RepeatBehavior(1)
+            };
+       
+            item.Background.BeginAnimation(Brush.OpacityProperty, ani);
         }
 
         public event EventHandler<ClassFilesDropEventArgs> ClassFilesDrop;

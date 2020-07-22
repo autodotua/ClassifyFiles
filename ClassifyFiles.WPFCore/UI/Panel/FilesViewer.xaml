@@ -1,47 +1,43 @@
-﻿<UserControl x:Class="ClassifyFiles.UI.Panel.FilesViewer"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ClassifyFiles.UI.Panel"
-             mc:Ignorable="d" 
-                  xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
-    xmlns:ui="clr-namespace:ClassifyFiles.UI"
+﻿<UserControl
+    x:Class="ClassifyFiles.UI.Panel.FilesViewer"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:app="clr-namespace:ClassifyFiles"
+    xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ClassifyFiles.UI.Panel"
+    xmlns:m="http://schemas.modernwpf.com/2019"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:root="clr-namespace:ClassifyFiles"
-                 xmlns:m="http://schemas.modernwpf.com/2019"
-xmlns:app="clr-namespace:ClassifyFiles"
-             xmlns:uim="clr-namespace:ClassifyFiles.UI.Model"
-             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
-        xmlns:wpftk="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
-
-             d:DesignHeight="450" d:DesignWidth="800">
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    xmlns:ui="clr-namespace:ClassifyFiles.UI"
+    xmlns:uim="clr-namespace:ClassifyFiles.UI.Model"
+    xmlns:wpftk="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
+    d:DesignHeight="450" d:DesignWidth="800" mc:Ignorable="d">
     <UserControl.Resources>
-        <ui:MagnificationConverter x:Key="mc"/>
-        <ui:NotFirst2VisibilityConverter x:Key="i2v"/>
-        <ui:Bool2VisibilityConverter x:Key="b2v"/>
-        <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
-        <ui:IsNotNull2VisibilityConverter x:Key="nn2v"/>
+        <ui:MagnificationConverter x:Key="mc" />
+        <ui:NotFirst2VisibilityConverter x:Key="i2v" />
+        <ui:Bool2VisibilityConverter x:Key="b2v" />
+        <ui:IsNotNull2BoolConverter x:Key="nn2b" />
+        <ui:IsNotNull2VisibilityConverter x:Key="nn2v" />
         <sys:Double x:Key="two">2.0</sys:Double>
         <sys:Double x:Key="twoFive">2.5</sys:Double>
-        
-        <!--公用的右键菜单-->
-        <ContextMenu x:Key="menu" Opened="ContextMenu_Opened">
-        </ContextMenu>
-        
-        <!--分组项的样式-->
+
+        <!--  公用的右键菜单  -->
+        <ContextMenu x:Key="menu" Opened="ContextMenu_Opened" />
+
+        <!--  分组项的样式  -->
         <Style x:Key="groupStyle" TargetType="{x:Type GroupItem}">
-            <Setter Property="Margin" Value="0,8,0,4"/>
+            <Setter Property="Margin" Value="0,8,0,4" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type GroupItem}">
-                        <Expander IsExpanded="True" BorderBrush="Gray" 
-                          BorderThickness="0,1,0,0">
+                        <Expander BorderBrush="Gray" BorderThickness="0,1,0,0" IsExpanded="True">
                             <Expander.Header>
                                 <DockPanel>
-                                    <TextBlock FontWeight="Bold" Text="{Binding Path=Name}" 
-                                 Margin="8,04,0,0" />
-                                    <TextBlock   Margin="16,4,0,8">
-                                        <Run  Text="{Binding Path=ItemCount, Mode=OneWay}"/>
+                                    <TextBlock Margin="8,04,0,0" FontWeight="Bold" Text="{Binding Path=Name}" />
+                                    <TextBlock Margin="16,4,0,8">
+                                        <Run Text="{Binding Path=ItemCount, Mode=OneWay}" />
                                         <Run>个文件</Run>
                                     </TextBlock>
                                 </DockPanel>
@@ -55,42 +51,49 @@ xmlns:app="clr-namespace:ClassifyFiles"
             </Setter>
         </Style>
 
-        <!--带分组的数据源-->
-        <CollectionViewSource x:Key='listDetailItemsSource' 
-                      Source="{Binding Files}">
+        <!--  带分组的数据源  -->
+        <CollectionViewSource x:Key="listDetailItemsSource" Source="{Binding Files}">
             <CollectionViewSource.GroupDescriptions>
                 <PropertyGroupDescription PropertyName="File.Dir" />
             </CollectionViewSource.GroupDescriptions>
         </CollectionViewSource>
 
-        <!--提示框-->
-        <ToolTip x:Key="toolTip"  Placement="Right" Padding="8" BorderThickness="0" Visibility="{Binding Path=(root:Configs.ShowToolTip),Mode=OneWay,Converter={StaticResource b2v}}">
-            <m:SimpleStackPanel Spacing="8"   Orientation="Vertical">
-                <TextBlock Grid.Column="2" Grid.Row="0"     
-                        Style="{StaticResource BaseTextBlockStyle}" TextWrapping="Wrap"  HorizontalAlignment="Center" Text="{Binding Display.DisplayName}"/>
+        <!--  提示框  -->
+        <ToolTip
+            x:Key="toolTip" Padding="8" BorderThickness="0"
+            Placement="Right"
+            Visibility="{Binding Path=(root:Configs.ShowToolTip), Mode=OneWay, Converter={StaticResource b2v}}">
+            <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
+                <TextBlock
+                    Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center"
+                    Style="{StaticResource BaseTextBlockStyle}"
+                    Text="{Binding Display.DisplayName}"
+                    TextWrapping="Wrap" />
 
-                <component:FileIcon DisplayRawImage="True"  
-                                    EnableCache="False" Square="False" Visibility="{Binding Path=(root:Configs.ShowToolTipImage),Mode=OneWay,Converter={StaticResource b2v}}"
-                                    File="{Binding .,Mode=OneTime}" Scale="-360"/>
+                <component:FileIcon
+                    DisplayRawImage="True" EnableCache="False"
+                    File="{Binding ., Mode=OneTime}"
+                    Scale="-360" Square="False"
+                    Visibility="{Binding Path=(root:Configs.ShowToolTipImage), Mode=OneWay, Converter={StaticResource b2v}}" />
                 <Grid Margin="8">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="8"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="0"/>
-                        <RowDefinition Height="0"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="8"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="8"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="8"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="8"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="0" />
+                        <RowDefinition Height="0" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" VerticalAlignment="Center">文件名：</TextBlock>
                     <TextBlock Grid.Row="2" VerticalAlignment="Center">目录：</TextBlock>
@@ -98,259 +101,287 @@ xmlns:app="clr-namespace:ClassifyFiles"
                     <TextBlock Grid.Row="6" VerticalAlignment="Center">分类：</TextBlock>
                     <TextBlock Grid.Row="8" VerticalAlignment="Center">修改时间：</TextBlock>
                     <TextBlock Grid.Row="10" VerticalAlignment="Center">创建时间：</TextBlock>
-                    <TextBlock Grid.Column="2" Grid.Row="0"  VerticalAlignment="Center" FontWeight="Bold" Text="{Binding Display.DisplayName}"/>
-                    <TextBlock  Grid.Column="2" Grid.Row="2"  VerticalAlignment="Center" Text="{Binding Display.DisplayDir}" TextWrapping="Wrap"/>
-                    <TextBlock  Grid.Column="2" Grid.Row="4" VerticalAlignment="Center"  Text="{Binding Display.Length}"/>
-                    <component:TagGroup  Grid.Column="2" Grid.Row="6"  File="{Binding .}"/>
-                    <TextBlock  Grid.Column="2" Grid.Row="8"  VerticalAlignment="Center" Text="{Binding FileInfo.LastWriteTime}"/>
-                    <TextBlock  Grid.Column="2" Grid.Row="10"  VerticalAlignment="Center" Text="{Binding FileInfo.CreationTime}"/>
+                    <TextBlock
+                        Grid.Row="0" Grid.Column="2" VerticalAlignment="Center"
+                        FontWeight="Bold"
+                        Text="{Binding Display.DisplayName}" />
+                    <TextBlock
+                        Grid.Row="2" Grid.Column="2" VerticalAlignment="Center"
+                        Text="{Binding Display.DisplayDir}"
+                        TextWrapping="Wrap" />
+                    <TextBlock Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" Text="{Binding Display.Length}" />
+                    <component:TagGroup Grid.Row="6" Grid.Column="2" File="{Binding .}" />
+                    <TextBlock Grid.Row="8" Grid.Column="2" VerticalAlignment="Center" Text="{Binding FileInfo.LastWriteTime}" />
+                    <TextBlock Grid.Row="10" Grid.Column="2" VerticalAlignment="Center" Text="{Binding FileInfo.CreationTime}" />
 
                 </Grid>
             </m:SimpleStackPanel>
         </ToolTip>
 
-        <!--图标视图模板-->
+        <!--#region  视图模板-->
+        <!--  图标视图模板  -->
         <DataTemplate x:Key="grdIconView">
-            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,8"  MinWidth="64" >
-                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  ToolTip="{StaticResource toolTip}"
-                           Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}">
-                    <TextBlock DockPanel.Dock="Bottom"  
-                               Visibility="{Binding  Path=Display.ShowIconViewNames, Converter={StaticResource b2v}}" 
-                               Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
-                               Margin="0,8,0,0" HorizontalAlignment="Center" TextWrapping="Wrap" LineHeight="16" Height="36" 
-                               MaxWidth="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}"/>
-                    <component:FileIcon Scale="2.0" File="{Binding .}"   
-                                        Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" 
-                                        Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"/>
+            <Border MinWidth="64" Padding="0,8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <DockPanel Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="{StaticResource toolTip}">
+                    <TextBlock
+                        Height="36"
+                        MaxWidth="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}"
+                        Margin="0,8,0,0" HorizontalAlignment="Center"
+                        DockPanel.Dock="Bottom" LineHeight="16"
+                        Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
+                        TextWrapping="Wrap"
+                        Visibility="{Binding Path=Display.ShowIconViewNames, Converter={StaticResource b2v}}" />
+                    <component:FileIcon Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" File="{Binding .}" Scale="2.0" />
                 </DockPanel>
             </Border>
         </DataTemplate>
-        
-        <!--平铺视图模板-->
+
+        <!--  平铺视图模板  -->
         <DataTemplate x:Key="grdTileView">
-            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" 
-                      ToolTip="{StaticResource toolTip}"
-                      Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}" >
+            <Grid Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}" HorizontalAlignment="Stretch" VerticalAlignment="Center" ToolTip="{StaticResource toolTip}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"/>
-                    <ColumnDefinition Width="8"/>
-                    <ColumnDefinition Width="144"/>
+                    <ColumnDefinition Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="144" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="8"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
-                                 HorizontalAlignment="Left" TextWrapping="Wrap" />
-                <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding Display.DisplayDir,Mode=OneTime}"
-                               Foreground="Gray" TextWrapping="Wrap" Style="{StaticResource CaptionTextBlockStyle}"
-                               Visibility="{Binding Display.ShowTileViewPaths, Converter={StaticResource b2v}}"/>
-                <component:TagGroup Grid.ColumnSpan="99" File="{Binding .}" Orientation="Horizontal" 
-                                        Grid.RowSpan="99" HorizontalAlignment="Right" VerticalAlignment="Bottom" TagMouseDown="Tags_MouseDown"/>
-                <component:FileIcon Scale="2.0"  File="{Binding .}" Grid.RowSpan="99" />
+                <TextBlock
+                    Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left"
+                    Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
+                    TextWrapping="Wrap" />
+                <TextBlock
+                    Grid.Row="3" Grid.Column="2" Foreground="Gray"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="{Binding Display.DisplayDir, Mode=OneTime}"
+                    TextWrapping="Wrap"
+                    Visibility="{Binding Display.ShowTileViewPaths, Converter={StaticResource b2v}}" />
+                <component:TagGroup
+                    Grid.RowSpan="99" Grid.ColumnSpan="99"
+                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                    File="{Binding .}"
+                    Orientation="Horizontal" TagMouseDown="Tags_MouseDown" />
+                <component:FileIcon Grid.RowSpan="99" File="{Binding .}" Scale="2.0" />
             </Grid>
         </DataTemplate>
 
-        <!--列表和树状视图模板-->
-        <HierarchicalDataTemplate  ItemsSource="{Binding SubUIFiles}"   x:Key="listDataTemplate">
-            <Grid Margin="0,4,24,4"  ToolTip="{StaticResource toolTip}"  >
+        <!--  列表和树状视图模板  -->
+        <HierarchicalDataTemplate x:Key="listDataTemplate" ItemsSource="{Binding SubUIFiles}">
+            <Grid Margin="0,4,24,4" ToolTip="{StaticResource toolTip}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{Binding Path=(root:Configs.IconSize)}"/>
-                    <ColumnDefinition Width="16"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="16"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="16"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="{Binding Path=(root:Configs.IconSize)}" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="4"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="4"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="4"/>
+                    <RowDefinition Height="4" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="4" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="4" />
                 </Grid.RowDefinitions>
-                <component:FileIcon File="{Binding .}" Grid.RowSpan="99" />
-                <TextBlock Text="{Binding Display.DisplayName}" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" FontWeight="Bold"/>
-                <TextBlock Text="{Binding Display.Length}"  Grid.Column="2" Grid.Row="3" Width="108"
-                                   Foreground="{ DynamicResource SystemControlBackgroundBaseMediumHighBrush}"/>
-                <TextBlock Text="{Binding Display.DisplayDir}" Grid.Column="4" Grid.Row="3" 
-                                   Foreground="{ DynamicResource SystemControlBackgroundBaseMediumBrush}"/>
-                <!--横向的标签列表-->
-                <component:TagGroup Grid.Column="99" Grid.RowSpan="99" File="{Binding .}" TagMouseDown="Tags_MouseDown"/>
+                <component:FileIcon Grid.RowSpan="99" File="{Binding .}" />
+                <TextBlock
+                    Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3"
+                    FontWeight="Bold"
+                    Text="{Binding Display.DisplayName}" />
+                <TextBlock
+                    Grid.Row="3" Grid.Column="2" Width="108"
+                    Foreground="{DynamicResource SystemControlBackgroundBaseMediumHighBrush}"
+                    Text="{Binding Display.Length}" />
+                <TextBlock Grid.Row="3" Grid.Column="4" Foreground="{DynamicResource SystemControlBackgroundBaseMediumBrush}" Text="{Binding Display.DisplayDir}" />
+                <!--  横向的标签列表  -->
+                <component:TagGroup Grid.RowSpan="99" Grid.Column="99" File="{Binding .}" TagMouseDown="Tags_MouseDown" />
             </Grid>
         </HierarchicalDataTemplate>
+        <!--#endregion-->
 
-        <!--图标和平铺视图-->
-        <ListView  x:Key="grdFiles" ContextMenu="{StaticResource menu}"
-                      PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"  
-                         ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
-                    VirtualizingPanel.IsVirtualizing='True'
-                     VirtualizingPanel.IsVirtualizingWhenGrouping='True'
-                     VirtualizingPanel.ScrollUnit='Pixel' >
+        <!--#region 视图-->
+        <!--  图标和平铺视图  -->
+        <ListView
+            x:Key="grdFiles"
+            ContextMenu="{StaticResource menu}"
+            ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
+            PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
+            VirtualizingPanel.IsVirtualizing="True"
+            VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+            VirtualizingPanel.ScrollUnit="Pixel">
 
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <wpftk:VirtualizingWrapPanel  SpacingMode="Uniform"  
-                                                  Orientation="Vertical" Margin="0,0,16,0"/>
+                    <wpftk:VirtualizingWrapPanel Margin="0,0,16,0" Orientation="Vertical" SpacingMode="Uniform" />
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
             <ListView.GroupStyle>
-                <GroupStyle ContainerStyle="{StaticResource groupStyle}"/>
+                <GroupStyle ContainerStyle="{StaticResource groupStyle}" />
             </ListView.GroupStyle>
         </ListView>
 
-        <!--列表视图-->
-        <m:ListView ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}" 
-                    x:Key="lvwFiles" SelectionMode="Extended"
-                    PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
-                        ContextMenu="{StaticResource menu}"
-                    ItemTemplate="{StaticResource listDataTemplate}"
-                                        VirtualizingPanel.IsVirtualizing='True'
-                     VirtualizingPanel.IsVirtualizingWhenGrouping='True'
-                     VirtualizingPanel.ScrollUnit='Pixel'  >
-            <m:ListView.ItemContainerStyle >
+        <!--  列表视图  -->
+        <m:ListView
+            x:Key="lvwFiles"
+            ContextMenu="{StaticResource menu}"
+            ItemTemplate="{StaticResource listDataTemplate}"
+            ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
+            PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
+            SelectionMode="Extended"
+            VirtualizingPanel.IsVirtualizing="True"
+            VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+            VirtualizingPanel.ScrollUnit="Pixel">
+            <m:ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type m:ListViewItem}">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                 </Style>
             </m:ListView.ItemContainerStyle>
             <m:ListView.GroupStyle>
-                <GroupStyle ContainerStyle="{StaticResource groupStyle}"/>
+                <GroupStyle ContainerStyle="{StaticResource groupStyle}" />
             </m:ListView.GroupStyle>
         </m:ListView>
 
-        <!--树状图-->
-        <TreeView x:Key="treeFiles"  ContextMenu="{StaticResource menu}" PreviewMouseRightButtonDown="TreeFiles_PreviewMouseRightButtonDown"
-                                          Grid.Row="4"  ItemsSource="{Binding FileTree}" PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
-                   ItemTemplate="{StaticResource listDataTemplate}"/>
+        <!--  树状图  -->
+        <TreeView
+            x:Key="treeFiles" Grid.Row="4"
+            ContextMenu="{StaticResource menu}"
+            ItemTemplate="{StaticResource listDataTemplate}"
+            ItemsSource="{Binding FileTree}"
+            PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
+            PreviewMouseRightButtonDown="TreeFiles_PreviewMouseRightButtonDown" />
 
 
-    
-        <!--详细信息视图-->
-        <ListView x:Key="lvwDetailFiles" SelectionMode="Extended" ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
-                    PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"        
-                     VirtualizingPanel.IsVirtualizing='True'
-                     VirtualizingPanel.IsVirtualizingWhenGrouping='True'
-                     VirtualizingPanel.ScrollUnit='Pixel'  
-                  ContextMenu="{StaticResource menu}"  Style="{StaticResource {x:Static GridView.GridViewStyleKey}}">
+
+        <!--  详细信息视图  -->
+        <ListView
+            x:Key="lvwDetailFiles"
+            ContextMenu="{StaticResource menu}"
+            ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
+            PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
+            SelectionMode="Extended"
+            Style="{StaticResource {x:Static GridView.GridViewStyleKey}}"
+            VirtualizingPanel.IsVirtualizing="True"
+            VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+            VirtualizingPanel.ScrollUnit="Pixel">
             <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Static GridView.GridViewItemContainerStyleKey}}">
-                    <Setter Property="VerticalContentAlignment" Value="Center"/>
-                    <Setter Property="Margin" Value="0,0,16,0"/>
+                <Style BasedOn="{StaticResource {x:Static GridView.GridViewItemContainerStyleKey}}" TargetType="ListViewItem">
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                    <Setter Property="Margin" Value="0,0,16,0" />
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.GroupStyle>
-                <GroupStyle ContainerStyle="{StaticResource groupStyle}"/>
+                <GroupStyle ContainerStyle="{StaticResource groupStyle}" />
             </ListView.GroupStyle>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="" Width="36">
+                    <GridViewColumn Width="36" Header="">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid ToolTip="{StaticResource toolTip}">
-                                    <component:FileIcon File="{Binding .}" Scale="-24"/>
+                                    <component:FileIcon File="{Binding .}" Scale="-24" />
                                 </Grid>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="文件名" >
+                    <GridViewColumn Header="文件名">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock ToolTip="{StaticResource toolTip}" Text="{Binding Display.DisplayName}"/>
+                                <TextBlock Text="{Binding Display.DisplayName}" ToolTip="{StaticResource toolTip}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="文件夹路径" >
+                    <GridViewColumn Header="文件夹路径">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock ToolTip="{StaticResource toolTip}" Text="{Binding Display.DisplayDir}"/>
+                                <TextBlock Text="{Binding Display.DisplayDir}" ToolTip="{StaticResource toolTip}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="分类" Width="144">
+                    <GridViewColumn Width="144" Header="分类">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <component:TagGroup File="{Binding .}"  TagMouseDown="Tags_MouseDown"/>
+                                <component:TagGroup File="{Binding .}" TagMouseDown="Tags_MouseDown" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="大小" DisplayMemberBinding="{Binding Display.Length}"/>
-                    <GridViewColumn Header="修改时间" DisplayMemberBinding="{Binding FileInfo.LastWriteTime}"/>
-                    <GridViewColumn Header="创建时间" DisplayMemberBinding="{Binding FileInfo.CreationTime}"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Display.Length}" Header="大小" />
+                    <GridViewColumn DisplayMemberBinding="{Binding FileInfo.LastWriteTime}" Header="修改时间" />
+                    <GridViewColumn DisplayMemberBinding="{Binding FileInfo.CreationTime}" Header="创建时间" />
                 </GridView>
             </ListView.View>
         </ListView>
 
+        <!--#endregion-->
+
     </UserControl.Resources>
-    <Grid  Margin="8,4,0,0" PreviewMouseWheel="ListBox_PreviewMouseWheel" >
+    <Grid Margin="8,4,0,0" PreviewMouseWheel="ListBox_PreviewMouseWheel">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="4"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="4" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid >
+        <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="8"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="8"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="8"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <m:AutoSuggestBox
-                    Grid.Column="0"
-                        x:Name="txtSearch"
-                        PlaceholderText="{Binding Files.Count, StringFormat={}文件总数：{0:}}"
-                        TextChanged="SearchTextBox_TextChanged"
-                        QueryIcon="Find"
-                        QuerySubmitted="SearchTextBox_QuerySubmitted"
-                    VerticalAlignment="Center"/>
-            <m:ProgressRing Grid.Column="4" x:Name="progress"/>
+                x:Name="txtSearch" Grid.Column="0"
+                VerticalAlignment="Center"
+                PlaceholderText="{Binding Files.Count, StringFormat={}文件总数：{0:}}"
+                QueryIcon="Find"
+                QuerySubmitted="SearchTextBox_QuerySubmitted"
+                TextChanged="SearchTextBox_TextChanged" />
+            <m:ProgressRing x:Name="progress" Grid.Column="4" />
             <Grid x:Name="grdAppBar" Grid.Column="99" HorizontalAlignment="Right">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <m:AppBarToggleButton Grid.Column="3"  Label="列表"  Click="ViewTypeButton_Click" Tag="1" >
+                <m:AppBarToggleButton Grid.Column="3" Click="ViewTypeButton_Click" Label="列表" Tag="1">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon Glyph="&#xF168;" />
                     </m:AppBarToggleButton.Icon>
                 </m:AppBarToggleButton>
-                <m:AppBarToggleButton Grid.Column="4" Label="图标" Click="ViewTypeButton_Click" Tag="2">
+                <m:AppBarToggleButton Grid.Column="4" Click="ViewTypeButton_Click" Label="图标" Tag="2">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon Glyph="&#xF0E2;" />
                     </m:AppBarToggleButton.Icon>
-                </m:AppBarToggleButton>  
-                <m:AppBarToggleButton Grid.Column="5" Label="平铺" Click="ViewTypeButton_Click" Tag="3">
+                </m:AppBarToggleButton>
+                <m:AppBarToggleButton Grid.Column="5" Click="ViewTypeButton_Click" Label="平铺" Tag="3">
                     <m:AppBarToggleButton.Icon>
-                        <m:FontIcon    Glyph="&#xE8BC;" />
+                        <m:FontIcon Glyph="&#xE8BC;" />
                     </m:AppBarToggleButton.Icon>
                 </m:AppBarToggleButton>
-                <m:AppBarToggleButton Grid.Column="6"  Label="树型"  Click="ViewTypeButton_Click" Tag="4">
+                <m:AppBarToggleButton Grid.Column="6" Click="ViewTypeButton_Click" Label="树型" Tag="4">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon Glyph="&#xED25;" />
                     </m:AppBarToggleButton.Icon>
-                </m:AppBarToggleButton>     
-                <m:AppBarToggleButton Grid.Column="7"  Label="详细信息"  Click="ViewTypeButton_Click" Tag="5">
+                </m:AppBarToggleButton>
+                <m:AppBarToggleButton Grid.Column="7" Click="ViewTypeButton_Click" Label="详细信息" Tag="5">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon Glyph="&#xE8FD;" />
                     </m:AppBarToggleButton.Icon>
                 </m:AppBarToggleButton>
-                <TextBlock
-                        x:Name="Control5Output"
-                        Margin="8,0,0,0"
-                        VerticalAlignment="Center" />
+                <TextBlock x:Name="Control5Output" Margin="8,0,0,0" VerticalAlignment="Center" />
             </Grid>
         </Grid>
 

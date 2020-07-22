@@ -21,7 +21,9 @@ namespace ClassifyFiles.Util
         public async static Task<List<File>> GetFilesByProjectAsync(int projectID)
         {
             Debug.WriteLine("db: " + nameof(GetFilesByProjectAsync));
-            var files = db.Files.Where(p => p.Project.ID == projectID).Include(p => p.Project);
+            var files = db.Files
+                .Where(p => p.Project.ID == projectID)
+                .Include(p => p.Project);
             return await files.ToListAsync();
         }
         public async static Task<List<File>> GetNoClassesFilesByProjectAsync(int projectID)

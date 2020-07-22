@@ -35,7 +35,7 @@ namespace ClassifyFiles.UI.Model
 
         }
         public List<UIFile> SubUIFiles { get; private set; } = new List<UIFile>();
-
+        public UIFile Parent { get; set; }
         private File file;
         public File File
         {

@@ -1,47 +1,50 @@
 ﻿<local:ProjectPanelBase
-    xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
-    xmlns:ui="clr-namespace:ClassifyFiles.UI"
     x:Class="ClassifyFiles.UI.Panel.FileBrowserPanel"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ClassifyFiles.UI.Panel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:data="clr-namespace:ClassifyFiles.Data;assembly=ClassifyFiles.Core"
     xmlns:enum="clr-namespace:ClassifyFiles.Enum"
+    xmlns:local="clr-namespace:ClassifyFiles.UI.Panel"
     xmlns:m="http://schemas.modernwpf.com/2019"
-     xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
-        mc:Ignorable="d">
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
+    xmlns:ui="clr-namespace:ClassifyFiles.UI" mc:Ignorable="d">
     <UserControl.Resources>
-        <ui:IsNotNull2BoolConverter x:Key="nn2b"/>
+        <ui:IsNotNull2BoolConverter x:Key="nn2b" />
     </UserControl.Resources>
     <Grid x:Name="grdMain">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" MaxWidth="600" />
-            <ColumnDefinition Width="8"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="4"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="4" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" 
-                      VerticalAlignment="Stretch" Background="Transparent" PreviewMouseUp="Splitter_PreviewMouseUp"
-                      x:Name="grdSplitter" />
-        <Label Grid.Column="1" Content="⁞" VerticalAlignment="Center" 
-               Opacity="0.5" FontSize="26" FontWeight="Bold" IsHitTestVisible="False"/>
-        <Grid Margin="8,0,0,0"  x:Name="grdLeft" Width="200" HorizontalAlignment="Left">
+        <GridSplitter
+            x:Name="grdSplitter" Grid.Column="1"
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+            Background="Transparent"
+            PreviewMouseUp="Splitter_PreviewMouseUp" />
+        <Label
+            Grid.Column="1" VerticalAlignment="Center" Content="⁞"
+            FontSize="26" FontWeight="Bold" IsHitTestVisible="False"
+            Opacity="0.5" />
+        <Grid x:Name="grdLeft" Width="200" Margin="8,0,0,0" HorizontalAlignment="Left">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="4"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="8"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="8"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="0"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="4" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="0" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <m:SimpleStackPanel Orientation="Horizontal" Spacing="16">
                 <!--<TextBlock Text="{Binding Project.Name}"   VerticalAlignment="Center"  FontSize="24"/>-->
@@ -50,67 +53,75 @@
                       VerticalAlignment="Bottom" Text="{Binding Project.RootPath}"/>-->
             </m:SimpleStackPanel>
 
-            <panel:ClassesPanel x:Name="classPanel"   Grid.Row="4"
-                                SelectedClassChanged="SelectedClassChanged"
-                                ClassFilesDrop="ClassPanel_ClassFilesDrop"/>
+            <panel:ClassesPanel x:Name="classPanel" Grid.Row="4" ClassFilesDrop="ClassPanel_ClassFilesDrop" SelectedClassChanged="SelectedClassChanged" />
 
-            <Button Content="显示没有被分类的文件" Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                x:Name="btnNoClassesFiles" Click="BtnNoClassesFiles_Click"  Padding="10,6" Grid.Row="6"
-                    HorizontalContentAlignment="Left"  HorizontalAlignment="Stretch"/>
-            <Button Content="显示全部文件" Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                x:Name="btnAllFiles" Click="BtnAllFiles_Click" Margin="0,8" Padding="10,6" Grid.Row="8"
-                    HorizontalContentAlignment="Left"  HorizontalAlignment="Stretch"/>
+            <Button
+                x:Name="btnNoClassesFiles" Grid.Row="6" Padding="10,6"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Left"
+                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                Click="BtnNoClassesFiles_Click" Content="显示没有被分类的文件" />
+            <Button
+                x:Name="btnAllFiles" Grid.Row="8" Margin="0,8"
+                Padding="10,6" HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Left"
+                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                Click="BtnAllFiles_Click" Content="显示全部文件" />
         </Grid>
 
 
-        <panel:FilesViewer ViewTypeChanged="FilesViewer_ViewTypeChanged" 
-                           x:Name="filesViewer" Grid.Column="2"  AllowDrop="True"
-             Drop="FileViewer_Drop" ClickTag="FilesViewer_ClickTag" PreviewMouseWheel="FilesViewer_PreviewMouseWheel"/>
-        <m:CommandBar  Grid.Row="2" Grid.ColumnSpan="999" DefaultLabelPosition="Right">
+        <panel:FilesViewer
+            x:Name="filesViewer" Grid.Column="2" AllowDrop="True"
+            ClickTag="FilesViewer_ClickTag" Drop="FileViewer_Drop"
+            PreviewMouseWheel="FilesViewer_PreviewMouseWheel"
+            ViewTypeChanged="FilesViewer_ViewTypeChanged" />
+        <m:CommandBar Grid.Row="2" Grid.ColumnSpan="999" DefaultLabelPosition="Right">
             <m:AppBarButton x:Name="btnSort" Icon="Sort" Label="排序">
                 <m:FlyoutService.Flyout>
-                    <m:MenuFlyout x:Name="menuSort" >
-                        <m:RadioMenuItem x:Name="menuSortDefault" Header="默认（按目录）" IsCheckable="True" IsChecked="True" Checked="RadioMenuItem_Checked">
+                    <m:MenuFlyout x:Name="menuSort">
+                        <m:RadioMenuItem
+                            x:Name="menuSortDefault" Checked="RadioMenuItem_Checked"
+                            Header="默认（按目录）" IsCheckable="True" IsChecked="True">
                             <m:RadioMenuItem.Tag>
                                 <enum:SortType>Default</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
-                        <m:RadioMenuItem Header="文件名（升序）" IsCheckable="True" Checked="RadioMenuItem_Checked">
+                        <m:RadioMenuItem Checked="RadioMenuItem_Checked" Header="文件名（升序）" IsCheckable="True">
                             <m:RadioMenuItem.Tag>
                                 <enum:SortType>NameUp</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
-                        <m:RadioMenuItem Header="文件名（降序）" IsCheckable="True" Checked="RadioMenuItem_Checked">
+                        <m:RadioMenuItem Checked="RadioMenuItem_Checked" Header="文件名（降序）" IsCheckable="True">
                             <m:RadioMenuItem.Tag>
                                 <enum:SortType>NameDown</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
-                        <m:RadioMenuItem Header="大小（从小到大）" IsCheckable="True" Checked="RadioMenuItem_Checked">
+                        <m:RadioMenuItem Checked="RadioMenuItem_Checked" Header="大小（从小到大）" IsCheckable="True">
                             <m:RadioMenuItem.Tag>
                                 <enum:SortType>LengthUp</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
-                        <m:RadioMenuItem Header="大小（从小到小）" IsCheckable="True" Checked="RadioMenuItem_Checked">
+                        <m:RadioMenuItem Checked="RadioMenuItem_Checked" Header="大小（从小到小）" IsCheckable="True">
                             <m:RadioMenuItem.Tag>
                                 <enum:SortType>LengthDown</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
-                        <m:RadioMenuItem Header="修改时间（从早到晚）" IsCheckable="True" Checked="RadioMenuItem_Checked">
+                        <m:RadioMenuItem Checked="RadioMenuItem_Checked" Header="修改时间（从早到晚）" IsCheckable="True">
                             <m:RadioMenuItem.Tag>
                                 <enum:SortType>LastWriteTimeUp</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
-                        <m:RadioMenuItem Header="修改时间（从晚到早）" IsCheckable="True" Checked="RadioMenuItem_Checked">
+                        <m:RadioMenuItem Checked="RadioMenuItem_Checked" Header="修改时间（从晚到早）" IsCheckable="True">
                             <m:RadioMenuItem.Tag>
                                 <enum:SortType>LastWriteTimeDown</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
-                        <m:RadioMenuItem Header="创建时间（从早到晚）" IsCheckable="True" Checked="RadioMenuItem_Checked">
+                        <m:RadioMenuItem Checked="RadioMenuItem_Checked" Header="创建时间（从早到晚）" IsCheckable="True">
                             <m:RadioMenuItem.Tag>
                                 <enum:SortType>CreationTimeUp</enum:SortType>
                             </m:RadioMenuItem.Tag>
                         </m:RadioMenuItem>
-                        <m:RadioMenuItem Header="创建时间（从晚到早）" IsCheckable="True" Checked="RadioMenuItem_Checked">
+                        <m:RadioMenuItem Checked="RadioMenuItem_Checked" Header="创建时间（从晚到早）" IsCheckable="True">
                             <m:RadioMenuItem.Tag>
                                 <enum:SortType>CreationTimeDown</enum:SortType>
                             </m:RadioMenuItem.Tag>
@@ -118,59 +129,61 @@
                     </m:MenuFlyout>
                 </m:FlyoutService.Flyout>
             </m:AppBarButton>
-            <m:AppBarButton Icon="View" Label="显示" >
+            <m:AppBarButton Icon="View" Label="显示">
                 <m:FlyoutService.Flyout>
-                    <m:Flyout x:Name="flyoutDisplay"  >
+                    <m:Flyout x:Name="flyoutDisplay">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="8"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="8"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="8"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="8"/>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="8" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="8" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="8" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <GroupBox Header="通用" Grid.RowSpan="5">
+                            <GroupBox Grid.RowSpan="5" Header="通用">
                                 <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
                                     <m:ToggleSwitch x:Name="swtTags" Header="显示分类标签" IsOn="{Binding ShowClassTags}" />
-                                    <m:ToggleSwitch x:Name="swtThumbs" Header="显示缩略图"  IsOn="{Binding ShowThumbnail}"/>
-                                    <m:ToggleSwitch x:Name="swtIcons" Header="显示资源管理器图标" IsOn="{Binding ShowExplorerIcon}"/>
-                                    <m:ToggleSwitch x:Name="swtGroup" Header="按目录进行分组" IsOn="{Binding GroupByDir}"/>
-                                    <m:ToggleSwitch  Header="显示文件扩展名" IsOn="{Binding ShowFileExtension}"/>
+                                    <m:ToggleSwitch x:Name="swtThumbs" Header="显示缩略图" IsOn="{Binding ShowThumbnail}" />
+                                    <m:ToggleSwitch x:Name="swtIcons" Header="显示资源管理器图标" IsOn="{Binding ShowExplorerIcon}" />
+                                    <m:ToggleSwitch x:Name="swtGroup" Header="按目录进行分组" IsOn="{Binding GroupByDir}" />
+                                    <m:ToggleSwitch Header="显示文件扩展名" IsOn="{Binding ShowFileExtension}" />
                                 </m:SimpleStackPanel>
                             </GroupBox>
-                            <GroupBox Header="图标视图" Grid.Column="2">
-                                <m:ToggleSwitch x:Name="swtIconViewNames" Header="显示文件名" IsOn="{Binding ShowIconViewNames}"/>
+                            <GroupBox Grid.Column="2" Header="图标视图">
+                                <m:ToggleSwitch x:Name="swtIconViewNames" Header="显示文件名" IsOn="{Binding ShowIconViewNames}" />
                             </GroupBox>
-                            <GroupBox Header="平铺视图" Grid.Column="2" Grid.Row="2">
-                                <m:ToggleSwitch x:Name="swtShowTilePath" Header="显示文件夹路径" IsOn="{Binding ShowTilePath}"/>
+                            <GroupBox Grid.Row="2" Grid.Column="2" Header="平铺视图">
+                                <m:ToggleSwitch x:Name="swtShowTilePath" Header="显示文件夹路径" IsOn="{Binding ShowTilePath}" />
                             </GroupBox>
-                            <GroupBox Header="提示" Grid.Column="2" Grid.Row="4">
+                            <GroupBox Grid.Row="4" Grid.Column="2" Header="提示">
                                 <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
-                                    <m:ToggleSwitch x:Name="swtShowToolTip" Header="显示提示" IsOn="{Binding ShowToolTip}"/>
-                                    <m:ToggleSwitch  Header="在提示中显示图片" IsOn="{Binding ShowToolTipImage}"
-                                                     IsEnabled="{Binding ElementName=swtShowToolTip, Path=IsOn}"/>
-                                    <!--上面这行不知道为什么，无效-->
+                                    <m:ToggleSwitch x:Name="swtShowToolTip" Header="显示提示" IsOn="{Binding ShowToolTip}" />
+                                    <m:ToggleSwitch Header="在提示中显示图片" IsEnabled="{Binding ElementName=swtShowToolTip, Path=IsOn}" IsOn="{Binding ShowToolTipImage}" />
+                                    <!--  上面这行不知道为什么，无效  -->
                                 </m:SimpleStackPanel>
                             </GroupBox>
-                            <GroupBox Header="缩放" Grid.Row="99" Grid.ColumnSpan="99">
+                            <GroupBox Grid.Row="99" Grid.ColumnSpan="99" Header="缩放">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="8"/>
-                                        <ColumnDefinition Width="48"/>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="48" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column="2" x:Name="tbkIconSize" Text="{Binding IconSizeString}" VerticalAlignment="Center"/>
-                                    <Slider Orientation="Horizontal" Minimum="16"  VerticalAlignment="Center"
-                                            SmallChange="1" LargeChange="10" Interval="1" Maximum="256" Value="{Binding IconSize}"
-                                            PreviewMouseDoubleClick="IconSize_PreviewMouseDoubleClick" IsMoveToPointEnabled="True"
-                                        x:Name="sldIconSize" />
+                                    <TextBlock x:Name="tbkIconSize" Grid.Column="2" VerticalAlignment="Center" Text="{Binding IconSizeString}" />
+                                    <Slider
+                                        x:Name="sldIconSize" VerticalAlignment="Center" Interval="1"
+                                        IsMoveToPointEnabled="True" LargeChange="10" Maximum="256"
+                                        Minimum="16" Orientation="Horizontal"
+                                        PreviewMouseDoubleClick="IconSize_PreviewMouseDoubleClick"
+                                        SmallChange="1"
+                                        Value="{Binding IconSize}" />
 
                                 </Grid>
                             </GroupBox>
@@ -178,25 +191,30 @@
                     </m:Flyout>
                 </m:FlyoutService.Flyout>
             </m:AppBarButton>
-            <m:AppBarButton x:Name="btnLocateByDir" Icon="OpenLocal" Label="根据文件夹定位" >
+            <m:AppBarButton x:Name="btnLocateByDir" Icon="OpenLocal" Label="根据文件夹定位">
                 <m:FlyoutService.Flyout>
-                    <m:Flyout x:Name="flyoutJumpToDir" >
-                        <ListBox Grid.Row="2" SelectionChanged="JumpToDirComboBox_SelectionChanged" ItemsSource="{Binding Dirs}" MaxHeight="600"/>
+                    <m:Flyout x:Name="flyoutJumpToDir">
+                        <ListBox Grid.Row="2" MaxHeight="600" ItemsSource="{Binding Dirs}" SelectionChanged="JumpToDirComboBox_SelectionChanged" />
                     </m:Flyout>
                 </m:FlyoutService.Flyout>
             </m:AppBarButton>
 
-            <m:AppBarSeparator/>
-            <m:AppBarButton  x:Name="btnAddFile" Icon="Add"  Label="添加文件" Click="BtnAddFile_Click"
-                             IsEnabled="{Binding ElementName=classPanel, Path=SelectedItem, Converter={StaticResource nn2b}}"/>
-            <m:AppBarButton  x:Name="btnRefresh" Icon="Refresh"  Label="刷新" Click="RefreshButton_Click"
-                                                          IsEnabled="{Binding ElementName=classPanel, Path=SelectedItem, Converter={StaticResource nn2b}}"/>
-            <m:AppBarButton x:Name="btn"  IsCompact="False"  Label="更新文件" Click="ClassifyButton_Click">
+            <m:AppBarSeparator />
+            <m:AppBarButton
+                x:Name="btnAddFile" Click="BtnAddFile_Click" Icon="Add"
+                IsEnabled="{Binding ElementName=classPanel, Path=SelectedItem, Converter={StaticResource nn2b}}"
+                Label="添加文件" />
+            <m:AppBarButton
+                x:Name="btnRefresh" Click="RefreshButton_Click"
+                Icon="Refresh"
+                IsEnabled="{Binding ElementName=classPanel, Path=SelectedItem, Converter={StaticResource nn2b}}"
+                Label="刷新" />
+            <m:AppBarButton x:Name="btn" Click="ClassifyButton_Click" IsCompact="False" Label="更新文件">
                 <m:AppBarButton.Icon>
-                    <m:FontIcon Glyph="&#xE72C;&#xEA37;"/>
+                    <m:FontIcon Glyph="&#xE72C;&#xEA37;" />
                 </m:AppBarButton.Icon>
             </m:AppBarButton>
- 
+
         </m:CommandBar>
     </Grid>
 </local:ProjectPanelBase>

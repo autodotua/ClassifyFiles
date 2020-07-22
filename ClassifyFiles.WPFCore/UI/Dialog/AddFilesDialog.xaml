@@ -1,30 +1,29 @@
 ﻿<local:DialogWindowBase
     x:Class="ClassifyFiles.UI.Dialog.AddFilesDialog"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                xmlns:m="http://schemas.modernwpf.com/2019"
- xmlns:local="clr-namespace:ClassifyFiles.UI.Dialog"
-        mc:Ignorable="d"
-    xmlns:root="clr-namespace:ClassifyFiles"
-    Closing="WindowBase_Closing"
-    Loaded="Dialog_Loaded"
-        Title="添加文件" Height="380" Width="600">
-    <m:SimpleStackPanel Spacing="16" Margin="8" Orientation="Vertical" VerticalAlignment="Center">
-        <m:SimpleStackPanel x:Name="stkSettings" Spacing="8" Orientation="Vertical">
-            <CheckBox x:Name="chkIncludeThumbnails" IsChecked="True" >生成缩略图</CheckBox>
-            <CheckBox x:Name="chkIncludeExplorerIcons" IsChecked="True" >生成资源管理器图标</CheckBox>
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ClassifyFiles.UI.Dialog"
+    xmlns:m="http://schemas.modernwpf.com/2019"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:root="clr-namespace:ClassifyFiles" Title="添加文件"
+    Width="600" Closing="WindowBase_Closing"
+    Loaded="Dialog_Loaded" SizeToContent="Height"
+    mc:Ignorable="d">
+    <m:SimpleStackPanel Margin="8" VerticalAlignment="Center" Orientation="Vertical" Spacing="16">
+        <m:SimpleStackPanel x:Name="stkSettings" Orientation="Vertical" Spacing="8">
+            <CheckBox x:Name="chkIncludeThumbnails" IsChecked="True">生成缩略图</CheckBox>
+            <CheckBox x:Name="chkIncludeExplorerIcons" IsChecked="True">生成资源管理器图标</CheckBox>
             <TextBlock>对于文件夹：</TextBlock>
-            <RadioButton x:Name="rbtnFolderAsFile" IsChecked="True" Margin="12,0">作为一个文件项</RadioButton>
+            <RadioButton x:Name="rbtnFolderAsFile" Margin="12,0" IsChecked="True">作为一个文件项</RadioButton>
             <RadioButton x:Name="rbtnFolderIgnore" Margin="12,0">忽略</RadioButton>
             <RadioButton x:Name="rbtnFolderImportFiles" Margin="12,0">导入文件夹内的文件</RadioButton>
         </m:SimpleStackPanel>
-        <m:SimpleStackPanel Spacing="8" Orientation="Vertical" >
-            <TextBlock Text="{Binding Message}" TextWrapping="Wrap"/>
-            <ProgressBar Minimum="0" Maximum="1" Value="{Binding Percentage}"/>
+        <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
+            <TextBlock Height="48" Text="{Binding Message}" TextWrapping="Wrap" />
+            <ProgressBar Maximum="1" Minimum="0" Value="{Binding Percentage}" />
             <Grid>
-                <CheckBox IsChecked="{Binding Path=(root:Configs.AutoAddFiles)}" HorizontalAlignment="Left" >记住并自动开始</CheckBox>
+                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Path=(root:Configs.AutoAddFiles)}">记住并自动开始</CheckBox>
                 <Button x:Name="btnStart" HorizontalAlignment="Right" Click="Button_Click">开始</Button>
 
             </Grid>

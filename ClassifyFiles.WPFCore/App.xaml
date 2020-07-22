@@ -1,9 +1,10 @@
-﻿<Application x:Class="ClassifyFiles.WPFCore.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:ClassifyFiles.WPFCore"
-             Startup="Application_Startup"
-             xmlns:ui="http://schemas.modernwpf.com/2019">
+﻿<Application
+    x:Class="ClassifyFiles.WPFCore.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:ClassifyFiles.WPFCore"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    Startup="Application_Startup">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -19,7 +20,7 @@
             </Style>
             <Style TargetType="{x:Type TextBlock }">
                 <Setter Property="FontFamily" Value="微软雅黑"/>
-            </Style>--> 
+            </Style>-->
         </ResourceDictionary>
     </Application.Resources>
 

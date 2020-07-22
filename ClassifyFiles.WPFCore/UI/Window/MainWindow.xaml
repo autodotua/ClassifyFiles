@@ -1,66 +1,73 @@
 ﻿<local:WindowBase
     x:Class="ClassifyFiles.UI.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"             
-        xmlns:local="clr-namespace:ClassifyFiles.UI"
-    Loaded="Window_Loaded"
-    mc:Ignorable="d"
-    Closing="Window_Closing"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ClassifyFiles.UI"
     xmlns:m="http://schemas.modernwpf.com/2019"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="win" Title="文件分类浏览器" Width="1200" Height="600"
     m:ScrollViewerHelper.AutoHideScrollBars="True"
-    WindowStartupLocation="CenterScreen"
-        Title="文件分类浏览器" Height="600" Width="1200" x:Name="win">
+    Closing="Window_Closing" Loaded="Window_Loaded"
+    WindowStartupLocation="CenterScreen" mc:Ignorable="d">
     <local:WindowBase.Resources>
-        <local:IsNotNull2BoolConverter x:Key="nn2b"/>
-    </local:WindowBase.Resources> 
-    <Grid x:Name="outGrd" >
+        <local:IsNotNull2BoolConverter x:Key="nn2b" />
+    </local:WindowBase.Resources>
+    <Grid x:Name="outGrd">
         <Grid.RowDefinitions>
-            <RowDefinition Height="48"/>
-            <RowDefinition Height="0"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="48" />
+            <RowDefinition Height="0" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TabControl x:Name="tab" ItemsSource="{Binding Projects}"
-                    SelectedItem="{Binding SelectedProject}" Grid.RowSpan="99">
+        <TabControl x:Name="tab" Grid.RowSpan="99" ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProject}">
             <m:TabControlHelper.TabStripHeader>
-                <m:AppBarButton Grid.Column="0" LabelPosition="Collapsed" IsCompact="True" Icon="Add"  Click="AddProjectButton_Click"/>
+                <m:AppBarButton
+                    Grid.Column="0" Click="AddProjectButton_Click" Icon="Add"
+                    IsCompact="True" LabelPosition="Collapsed" />
             </m:TabControlHelper.TabStripHeader>
             <m:TabControlHelper.TabStripFooter>
                 <m:SimpleStackPanel HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
-                    <m:CommandBar DefaultLabelPosition="Right" x:Name="cmdBarPanel" Background="Transparent">
-                        <m:AppBarToggleButton IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}"
-                                              x:Name="btnModeView"  Background="Transparent"  Grid.Column="0"  Icon="View"  Label="浏览" 
-                                              Checked="RadioButton_Checked" IsChecked="True"/>
-                        <m:AppBarToggleButton IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}"
-                                              x:Name="btnModeClasses" Background="Transparent" Grid.Column="0" Icon="List"  Label="分类"
-                                              Checked="RadioButton_Checked"/>
-                        <m:AppBarToggleButton IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}"
-                                              x:Name="btnModeProjectSettings"  Background="Transparent" Grid.Column="0"  Label="项目设置"
-                                              Checked="RadioButton_Checked">
+                    <m:CommandBar x:Name="cmdBarPanel" Background="Transparent" DefaultLabelPosition="Right">
+                        <m:AppBarToggleButton
+                            x:Name="btnModeView" Grid.Column="0"
+                            Background="Transparent" Checked="RadioButton_Checked"
+                            Icon="View" IsChecked="True"
+                            IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}"
+                            Label="浏览" />
+                        <m:AppBarToggleButton
+                            x:Name="btnModeClasses" Grid.Column="0"
+                            Background="Transparent" Checked="RadioButton_Checked"
+                            Icon="List"
+                            IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}"
+                            Label="分类" />
+                        <m:AppBarToggleButton
+                            x:Name="btnModeProjectSettings" Grid.Column="0"
+                            Background="Transparent" Checked="RadioButton_Checked"
+                            IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}"
+                            Label="项目设置">
                             <m:AppBarToggleButton.Icon>
-                                <m:FontIcon Glyph="&#xF259;"/>
+                                <m:FontIcon Glyph="&#xF259;" />
                             </m:AppBarToggleButton.Icon>
                         </m:AppBarToggleButton>
-                        <m:AppBarButton Icon="Setting" Label="设置" LabelPosition="Collapsed" Click="SettingMenuItem_Click" />
+                        <m:AppBarButton Click="SettingMenuItem_Click" Icon="Setting" Label="设置" LabelPosition="Collapsed" />
                     </m:CommandBar>
                 </m:SimpleStackPanel>
             </m:TabControlHelper.TabStripFooter>
             <TabControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name}"/>
+                    <TextBlock Text="{Binding Name}" />
                 </DataTemplate>
             </TabControl.ItemTemplate>
             <TabControl.ContentTemplate>
                 <DataTemplate>
-                    <TextBlock/>
+                    <TextBlock />
                 </DataTemplate>
             </TabControl.ContentTemplate>
         </TabControl>
-   
-        <ContentControl Content="{Binding MainPanel}" Grid.Row="2" IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}"/>
 
-        <local:ProgressDialog x:Name="Progress" Grid.RowSpan="999" Grid.ColumnSpan="999"/>
+        <ContentControl Grid.Row="2" Content="{Binding MainPanel}" IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}" />
+
+        <local:ProgressDialog x:Name="Progress" Grid.RowSpan="999" Grid.ColumnSpan="999" />
     </Grid>
 </local:WindowBase>

@@ -22,19 +22,16 @@ namespace ClassifyFiles.UI.Dialog
 
         public Project Project { get; }
 
-        private  async void WindowBase_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void WindowBase_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if(working)
+            if (working)
             {
                 e.Cancel = true;
-                if(stopping)
+                if (stopping)
                 {
                     return;
                 }
-                if(await new ConfirmDialog().ShowAsync("正在更新文件，是否强制停止？","停止"))
-                {
-                    stopping = true;
-                }
+                stopping = true;
             }
         }
 
@@ -43,10 +40,10 @@ namespace ClassifyFiles.UI.Dialog
 
         }
         bool working = false;
-        bool stopping = false;  
+        bool stopping = false;
         private bool Callback(double per, Data.File file)
         {
-            if(stopping)
+            if (stopping)
             {
                 Dispatcher.Invoke(() =>
                 {
@@ -101,7 +98,7 @@ namespace ClassifyFiles.UI.Dialog
                 working = false;
                 Updated = true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 await new ErrorDialog().ShowAsync(ex, "更新失败");
                 working = false;

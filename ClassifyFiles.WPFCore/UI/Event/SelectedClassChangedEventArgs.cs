@@ -1,5 +1,6 @@
 ﻿using System;
 using ClassifyFiles.Data;
+using ClassifyFiles.UI.Model;
 
 namespace ClassifyFiles.UI.Event
 {
@@ -21,8 +22,14 @@ namespace ClassifyFiles.UI.Event
             Class = c;
             Files = files;
         }
+        public ClassFilesDropEventArgs(Class c, UIFile[] files)
+        {
+            Class = c;
+            UIFiles = files;
+        }
 
         public Class Class { get; }
         public string[] Files { get; }
+        public UIFile[] UIFiles { get; }
     }
 }

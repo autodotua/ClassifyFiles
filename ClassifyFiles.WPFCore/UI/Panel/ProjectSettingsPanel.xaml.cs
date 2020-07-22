@@ -143,9 +143,11 @@ namespace ClassifyFiles.UI.Panel
         private async void DeleteFiles_Click(object sender, RoutedEventArgs e)
         {
             flyoutDeleteFiles.Hide();
-            GetProgress().Show(false);
+            GetProgress().Show(true);
             await DeleteFilesOfProjectAsync(Project);
             GetProgress().Close();
+            await new MessageDialog().ShowAsync("删除成功", "删除文件");
+
         }
 
         private async void CheckButton_Click(object sender, RoutedEventArgs e)

@@ -1,16 +1,16 @@
-﻿<ui:UserControlBase  xmlns:ui="clr-namespace:ClassifyFiles.UI"
-                     x:Class="ClassifyFiles.UI.Component.FileIcon"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ClassifyFiles.UI.Component" 
-                     xmlns:uim="clr-namespace:ClassifyFiles.UI.Model"
-                     mc:Ignorable="d"                 
-                     xmlns:m="http://schemas.modernwpf.com/2019"   
-                     Loaded="UserControlBase_Loaded">
+﻿<ui:UserControlBase
+    x:Class="ClassifyFiles.UI.Component.FileIcon"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ClassifyFiles.UI.Component"
+    xmlns:m="http://schemas.modernwpf.com/2019"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="clr-namespace:ClassifyFiles.UI"
+    xmlns:uim="clr-namespace:ClassifyFiles.UI.Model"
+    Loaded="UserControlBase_Loaded" mc:Ignorable="d">
     <Viewbox x:Name="view">
 
-        <ContentControl x:Name="main"/>
+        <ContentControl x:Name="main" />
     </Viewbox>
 </ui:UserControlBase>

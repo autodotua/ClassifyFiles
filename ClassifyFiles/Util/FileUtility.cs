@@ -1,30 +1,27 @@
 ﻿using ClassifyFiles.Data;
+using FzLib.Basic;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using Dir = System.IO.Directory;
-using F = System.IO.File;
-using P = System.IO.Path;
-using FI = System.IO.FileInfo;
-using DI = System.IO.DirectoryInfo;
-using SO = System.IO.SearchOption;
-using System.Text;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Text.RegularExpressions;
-using System.ComponentModel;
-using FzLib.Basic;
+using System.Threading.Tasks;
 using static ClassifyFiles.Util.DbUtility;
-using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
+using Dir = System.IO.Directory;
+using F = System.IO.File;
+using FI = System.IO.FileInfo;
+using P = System.IO.Path;
 
 namespace ClassifyFiles.Util
 {
     public static class FileUtility
     {
-      public static Func<string, Bitmap> GetFileIcon { get; set; }
-      public static  Func<string, Bitmap> GetFolderIcon { get; set; }
+        public static Func<string, Bitmap> GetFileIcon { get; set; }
+        public static Func<string, Bitmap> GetFolderIcon { get; set; }
         private static EncoderParameters encParams;
         private static ImageCodecInfo encoder;
         static FileUtility()
@@ -88,7 +85,7 @@ namespace ClassifyFiles.Util
 
         }
 
-        public static bool TryGenerateExplorerIcon(File file           )
+        public static bool TryGenerateExplorerIcon(File file)
         {
 
             string path = file.GetAbsolutePath();
@@ -100,11 +97,11 @@ namespace ClassifyFiles.Util
                 Bitmap bitmap;
                 if (file.IsFolder)
                 {
-                    bitmap = GetFileIcon(path);
+                    bitmap = GetFolderIcon(path);
                 }
                 else
                 {
-                    bitmap = GetFolderIcon(path);
+                    bitmap = GetFileIcon(path);
                 }
                 bitmap.Save(iconPath, ImageFormat.Png);
                 file.IconGUID = guid;
@@ -331,7 +328,8 @@ namespace ClassifyFiles.Util
         IEnumerable<T> files,
         Func<File, T> getNewItem,
         Func<T, File> getFile,
-        Func<T, IList<T>> getSubFiles
+        Func<T, IList<T>> getSubFiles,
+        Action<T, T> setParent
         ) where T : class
         {
             Dictionary<T, Queue<string>> fileDirs = new Dictionary<T, Queue<string>>();
@@ -381,6 +379,7 @@ namespace ClassifyFiles.Util
                         }
                     }
                     getSubFiles(current).Add(file);
+                    setParent(file, current);
                 }
             }
             return root;
@@ -497,7 +496,14 @@ namespace ClassifyFiles.Util
             await db.SaveChangesAsync();
         }
 
-
+        public async static Task DeleteFilesRecordAsync(IEnumerable<File> files)
+        {
+            foreach (var file in files)
+            {
+                db.Entry(file).State = EntityState.Deleted;
+            }
+            await SaveChangesAsync();
+        }
         public static Task DeleteThumbnailsAsync(int projectID)
         {
             return Task.Run(() =>

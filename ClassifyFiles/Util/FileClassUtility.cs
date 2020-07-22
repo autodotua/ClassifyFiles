@@ -23,7 +23,7 @@ namespace ClassifyFiles.Util
             return db.FileClasses
                 .Where(p => p.FileID == fileID && !p.Disabled)
                 .IncludeAll()
-                .OrderBy(p=>p.Class.Name)
+                .OrderBy(p => p.Class.Name)
                 .Select(p => p.Class)
                 .ToListAsync();
         }
@@ -82,7 +82,7 @@ namespace ClassifyFiles.Util
                         {
                             FileUtility.TryGenerateThumbnail(f);
                         }
-                        if(args.IncludeExplorerIcons)
+                        if (args.IncludeExplorerIcons)
                         {
                             FileUtility.TryGenerateExplorerIcon(f);
                         }
@@ -129,16 +129,19 @@ namespace ClassifyFiles.Util
             return db.FileClasses.CountAsync(p => p.File.Project == project);
         }
 
-        public async static Task AddFilesToClassAsync(IEnumerable<File> files, Class c)
+        public async static Task<IReadOnlyList<File>> AddFilesToClassAsync(IEnumerable<File> files, Class c)
         {
+            List<File> addedFiles = new List<File>();
             foreach (var file in files)
             {
                 if (!await db.FileClasses.AnyAsync(p => p.FileID == file.ID && p.ClassID == c.ID))
                 {
                     db.FileClasses.Add(new FileClass(c, file, true));
+                    addedFiles.Add(file);
                 }
             }
             await db.SaveChangesAsync();
+            return addedFiles.AsReadOnly();
         }
         public async static Task RemoveFilesFromClass(IEnumerable<File> files, Class c)
         {

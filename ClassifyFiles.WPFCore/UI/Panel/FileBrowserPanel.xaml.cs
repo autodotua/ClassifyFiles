@@ -16,6 +16,8 @@ using System.Windows.Media.Animation;
 using ClassifyFiles.Enum;
 using ClassifyFiles.UI.Event;
 using ClassifyFiles.UI.Dialog;
+using ClassifyFiles.UI.Model;
+using ClassifyFiles.Util;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -181,8 +183,9 @@ namespace ClassifyFiles.UI.Panel
             classPanel.SelectedItem = null;
             ignoreClassChanged = false;
             await SetFilesAsync(() => GetNoClassesFilesByProjectAsync(Project.ID));
-
         }
+
+        public bool displayingNoClassFiles = true;
 
         /// <summary>
         /// 文件视图滚轮
@@ -399,11 +402,12 @@ namespace ClassifyFiles.UI.Panel
             var dialog = new AddFilesDialog(c, files)
             { Owner = Window.GetWindow(this) };
             dialog.ShowDialog();
-            if (c==classPanel.SelectedItem && dialog.AddedFiles != null)
+            if (c == classPanel.SelectedItem && dialog.AddedFiles != null)
             {
                 await filesViewer.AddFilesAsync(dialog.AddedFiles);
             }
         }
+
 
         /// <summary>
         /// 单击刷新按钮
@@ -500,7 +504,25 @@ namespace ClassifyFiles.UI.Panel
 
         private async void ClassPanel_ClassFilesDrop(object sender, ClassFilesDropEventArgs e)
         {
-            await AddFilesAsync(e.Class, e.Files);
+            if (e.Files != null)
+            {
+                await AddFilesAsync(e.Class, e.Files);
+            }
+            else if (e.UIFiles != null)
+            {
+                var files = await AddFilesToClassAsync(e.UIFiles.Select(p => p.File), e.Class);
+                if (displayingNoClassFiles)
+                {
+                    foreach (var file in files)
+                    {
+                        var f = filesViewer.Files.FirstOrDefault(p => p.File.ID == file.ID);
+                        if (f != null)
+                        {
+                            filesViewer.Files.Remove(f);
+                        }
+                    }
+                }
+            }
         }
     }
 }
