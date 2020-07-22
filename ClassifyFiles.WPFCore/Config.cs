@@ -151,6 +151,18 @@ namespace ClassifyFiles
         {
             get => Get(ref showToolTipImage, GetBool, true, nameof(ShowToolTipImage));
             set => Set(ref showToolTipImage, value, nameof(ShowToolTipImage));
+        }   
+        private static bool? autoAddFiles = null;
+        public static bool AutoAddFiles
+        {
+            get => Get(ref autoAddFiles, GetBool, false, nameof(AutoAddFiles));
+            set => Set(ref autoAddFiles, value, nameof(AutoAddFiles));
+        }        
+        private static string addFilesOptionJson = null;
+        public static string AddFilesOptionJson
+        {
+            get => Get(ref addFilesOptionJson, GetString, "", nameof(AddFilesOptionJson));
+            set => Set(ref addFilesOptionJson, value, nameof(AddFilesOptionJson));
         }
 
 
@@ -161,9 +173,23 @@ namespace ClassifyFiles
                 field = dbGet(key, defultValue);
             }
             return field.Value;
+        }    
+        private static T Get<T>(ref T field, Func<string, T, T> dbGet, T defultValue, string key) where T : class
+        {
+            if (field == null)
+            {
+                field = dbGet(key, defultValue);
+            }
+            return field;
         }
 
         private static void Set<T>(ref T? field, T value, string key) where T : struct
+        {
+            field = value;
+            ConfigUtility.Set(key, value);
+            StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(key));
+        }  
+        private static void Set<T>(ref T field, T value, string key) where T : class
         {
             field = value;
             ConfigUtility.Set(key, value);

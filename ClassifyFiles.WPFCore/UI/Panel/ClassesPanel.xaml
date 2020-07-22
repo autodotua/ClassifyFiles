@@ -19,6 +19,8 @@
         <ListBox.Resources>
             <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource DefaultListBoxItemStyle}">
                 <Setter Property="Padding" Value="12,6"/>
+                <Setter Property="AllowDrop" Value="True"/>
+                <EventSetter Event="Drop" Handler="ListBoxItem_Drop"/>
             </Style>
         </ListBox.Resources>
         <ListBox.ItemTemplate>

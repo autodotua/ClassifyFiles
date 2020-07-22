@@ -80,7 +80,7 @@ namespace ClassifyFiles.UI.Model
                 return System.IO.Path.GetFileNameWithoutExtension(File.Name);
             }
         }
-        public string DisplayDir => File.IsFolder ? File.Dir.Substring(0, File.Dir.Length - DisplayName.Length) : File.Dir;
+        public string DisplayDir => File.IsFolder ? File.Dir.Substring(0, File.Dir.Length - DisplayName.Length).Trim('\\') : File.Dir;
         public bool ShowIconViewNames => Configs.ShowIconViewNames;
         public bool ShowTileViewPaths => Configs.ShowTilePath;
         public const string FileGlyph = "\uED41";

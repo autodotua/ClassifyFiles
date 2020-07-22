@@ -34,7 +34,7 @@ namespace ClassifyFiles.Util
                                  join fc in db.FileClasses on f.ID equals fc.FileID into temp
                                  from ffc in temp.DefaultIfEmpty()
                                  where ffc == null
-                                 select f).AsEnumerable();
+                                 select f).Include(p=>p.Project).AsEnumerable();
 
                 var dirs = db.FileClasses
                 .Where(p => p.File.ProjectID == projectID)

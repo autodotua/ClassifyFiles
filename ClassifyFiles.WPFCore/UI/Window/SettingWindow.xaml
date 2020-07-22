@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                 xmlns:m="http://schemas.modernwpf.com/2019"
  xmlns:local="clr-namespace:ClassifyFiles.UI"
+        xmlns:root="clr-namespace:ClassifyFiles"
         mc:Ignorable="d"
     WindowStartupLocation="CenterOwner"
     Closing="WindowBase_Closing"
@@ -70,6 +71,9 @@
                         <Button Content="导出" Click="ExportMenu_Click"/>
 
                     </m:SimpleStackPanel>
+                </GroupBox>
+                <GroupBox Header="记忆">
+                    <Button IsEnabled="{Binding Path=(root:Configs.AutoAddFiles)}" Content="取消自动添加文件" Click="Button_Click_1"/>
                 </GroupBox>
                 <GroupBox Header="日志">
                     <Button Content="查看日志" Click="Button_Click"/>

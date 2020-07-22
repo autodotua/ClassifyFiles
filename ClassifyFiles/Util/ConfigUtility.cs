@@ -27,7 +27,7 @@ namespace ClassifyFiles.Util
             string value = (db.Configs.FirstOrDefault(p => p.Key == key))?.Value;
             return value == null ? defaultValue : bool.Parse(value);
         }
-        public static string Get(string key, string defaultValue)
+        public static string GetString(string key, string defaultValue)
         {
             string value = (db.Configs.FirstOrDefault(p => p.Key == key))?.Value;
             return value ?? defaultValue;

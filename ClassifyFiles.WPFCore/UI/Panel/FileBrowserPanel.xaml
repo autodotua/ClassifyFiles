@@ -50,7 +50,9 @@
                       VerticalAlignment="Bottom" Text="{Binding Project.RootPath}"/>-->
             </m:SimpleStackPanel>
 
-            <panel:ClassesPanel x:Name="classPanel"   Grid.Row="4" SelectedClassChanged="SelectedClassChanged"/>
+            <panel:ClassesPanel x:Name="classPanel"   Grid.Row="4"
+                                SelectedClassChanged="SelectedClassChanged"
+                                ClassFilesDrop="ClassPanel_ClassFilesDrop"/>
 
             <Button Content="显示没有被分类的文件" Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
                 x:Name="btnNoClassesFiles" Click="BtnNoClassesFiles_Click"  Padding="10,6" Grid.Row="6"

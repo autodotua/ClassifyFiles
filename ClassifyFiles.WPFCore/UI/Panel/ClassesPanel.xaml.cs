@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Linq;
 using ClassifyFiles.UI.Event;
+using System.Windows.Controls;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -25,7 +26,7 @@ namespace ClassifyFiles.UI.Panel
             Project = project;
             var classes = await GetClassesAsync(Project);
             Items = new ObservableCollection<Class>(classes);
-            if(Items.Any(p=>p.ID== Configs.LastClassID))
+            if (Items.Any(p => p.ID == Configs.LastClassID))
             {
                 SelectedItem = items.First(p => p.ID == Configs.LastClassID);
             }
@@ -54,7 +55,7 @@ namespace ClassifyFiles.UI.Panel
                 var oldValue = selectedItem;
                 selectedItem = value;
                 this.Notify(nameof(SelectedItem));
-                if(value!=null)
+                if (value != null)
                 {
                     Configs.LastClassID = value.ID;
                 }
@@ -65,7 +66,7 @@ namespace ClassifyFiles.UI.Panel
 
         public async Task<Class> AddAsync()
         {
-            var c= await AddClassAsync(Project);
+            var c = await AddClassAsync(Project);
             Items.Add(c);
             SelectedItem = c;
             return c;
@@ -82,9 +83,9 @@ namespace ClassifyFiles.UI.Panel
                 int index = items.IndexOf(SelectedItem);
                 await DeleteClassAsync(SelectedItem);
                 Items.Remove(SelectedItem);
-                if(Items.Count>0)
+                if (Items.Count > 0)
                 {
-                        SelectedItem = index == 0? Items[0]:Items[index-1];
+                    SelectedItem = index == 0 ? Items[0] : Items[index - 1];
                 }
             }
         }
@@ -101,7 +102,7 @@ namespace ClassifyFiles.UI.Panel
                 if (!string.IsNullOrWhiteSpace(value))
                 {
                     SelectedItem.Name = value;
-                     await SaveClassAsync(SelectedItem);
+                    await SaveClassAsync(SelectedItem);
                 }
             }
         }
@@ -112,5 +113,24 @@ namespace ClassifyFiles.UI.Panel
         {
             SelectedItem = null;
         }
+
+        private void ListBoxItem_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(nameof(ClassifyFiles)))
+            {
+                //这里是因为当文件拖出去的时候，会有一个名为ClassifyFiles的拖放格式
+                //需要把这个格式排除掉，因为这是自己拖出去的
+                return;
+            }
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                ClassFilesDrop?.Invoke(sender, new ClassFilesDropEventArgs((sender as ListBoxItem).DataContext as Class, files));
+            }
+        }
+
+        public event EventHandler<ClassFilesDropEventArgs> ClassFilesDrop;
     }
+
+
 }

@@ -330,33 +330,52 @@ namespace ClassifyFiles.Util
         public static T GetFileTree<T>(Project project,
         IEnumerable<T> files,
         Func<File, T> getNewItem,
-        Func<T, string> getDir,
+        Func<T, File> getFile,
         Func<T, IList<T>> getSubFiles
         ) where T : class
         {
             Dictionary<T, Queue<string>> fileDirs = new Dictionary<T, Queue<string>>();
-            T root = getNewItem(new File() { Dir = "根目录", Project = project });
+            T root = getNewItem(new File() { Dir = "", Project = project });
 
             foreach (var file in files)
             {
-                if (string.IsNullOrEmpty(getDir(file)))
+                if (string.IsNullOrEmpty(getFile(file).Dir))
                 {
                     //位于根目录
                     getSubFiles(root).Add(file);
                 }
                 else
                 {
-                    var dirs = getDir(file).Split('/', '\\');
+                    string[] dirs = getFile(file).Dir.Split('/', '\\');
+                    if (getFile(file).IsFolder)
+                    {
+                        //如果是文件夹，那么层级上需要减少最后一个目录级别，
+                        //因为最后一个目录级别就是文件夹本身
+                        string[] newDirs = new string[dirs.Length - 1];
+                        Array.Copy(dirs, newDirs, newDirs.Length);
+                        dirs = newDirs;
+                    }
                     var current = root;
+                    string path = "";
                     foreach (var dir in dirs)
                     {
-                        if (getSubFiles(current).FirstOrDefault(p => getDir(p) == dir) is T sub)
+                        //dir是单个层级的名称，File.Dir是路径名，因此需要进行连接
+                        if (path.Length == 0)
                         {
+                            path += dir;
+                        }
+                        else
+                        {
+                            path += "\\" + dir;
+                        }
+                        if (getSubFiles(current).FirstOrDefault(p => getFile(p).Dir == path) is T sub)
+                        {
+                            //如果是已经存在的子目录，那么直接获取
                             current = sub;
                         }
                         else
                         {
-                            sub = getNewItem(new File() { Dir = dir, Project = project });
+                            sub = getNewItem(new File() { Dir = path, Project = project });
                             getSubFiles(current).Add(sub);
                             current = sub;
                         }
@@ -370,6 +389,7 @@ namespace ClassifyFiles.Util
         public static string GetAbsolutePath(this File file, bool dirOnly = false)
         {
             string rootPath = file.Project.RootPath;
+
             if (dirOnly || file.IsFolder)
             {
                 return P.Combine(rootPath, file.Dir);

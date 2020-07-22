@@ -96,7 +96,9 @@ namespace ClassifyFiles.UI.Panel
         /// </summary>
         public List<UIFile> FileTree => Files == null ? null : new List<UIFile>(
             FileUtility.GetFileTree(Project, Files,
-                p => new UIFile(p), p => p.File.Dir, p => p.SubUIFiles)
+                p => new UIFile(p),
+                p => p.File,
+                p => p.SubUIFiles)
             .SubUIFiles);
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -661,76 +663,84 @@ namespace ClassifyFiles.UI.Panel
                 menu.Items.Add(menuShowProperties);
             }
 
-            if ((!files.Any(p => p.File.IsFolder)
-                || CurrentFileView != FileView.Tree)
-                && Project.Classes != null)
-            //要显示标签的条件：有被选中的类，非树状图不能包含文件夹，树状图可以包含文件夹
+            //if ((!files.Any(p => p.File.IsFolder)
+            //    || CurrentFileView != FileView.Tree)
+            //    && Project.Classes != null)
+            ////要显示标签的条件：有被选中的类，非树状图不能包含文件夹，树状图可以包含文件夹
+            //{
+            menu.Items.Add(new Separator());
+
+            foreach (var tag in Project.Classes)
             {
-                menu.Items.Add(new Separator());
-
-                foreach (var tag in Project.Classes)
+                bool? isChecked = null;
+                if (!files.Any(p => p.Classes == null))
                 {
-                    bool? isChecked = null;
-                    if (!files.Any(p => p.Classes == null))
+                    //首先确保被选中的文件都知道它们的类。
+                    //因为时虚拟列表，所以没有显示的部分可能是还没有得到他们的类的。
+                    if (files.Any(p => p.Classes.Any(q => q.ID == tag.ID)))
                     {
-                        //首先确保被选中的文件都知道它们的类。
-                        //因为时虚拟列表，所以没有显示的部分可能是还没有得到他们的类的。
-                        if (files.Any(p => p.Classes.Any(q => q.ID == tag.ID)))
+                        //如果有一部分或全部都属于该类
+                        if (files.All(p => p.Classes.Any(q => q.ID == tag.ID)))
                         {
-                            //如果有一部分或全部都属于该类
-                            if (files.All(p => p.Classes.Any(q => q.ID == tag.ID)))
-                            {
-                                //如果全部属于该类
-                                isChecked = true;
-                            }
-                            //这里else  isChecked = null;
+                            //如果全部属于该类
+                            isChecked = true;
                         }
-                        else
-                        {
-                            isChecked = false;
-                        }
+                        //这里else  isChecked = null;
                     }
-                    CheckBox chk = new CheckBox()
+                    else
                     {
-                        Content = tag.Name,
-                        IsChecked = isChecked
-                    };
-                    chk.Click += async (p1, p2) =>
-                    {
-                        GetProgress().Show(false);
-                        if (chk.IsChecked == true)
-                        {
-                            //添加到类
-                            await AddFilesToClassAsync(files.Select(p => p.File), tag);
-                            foreach (var file in files)
-                            {
-                                var newC = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
-                                if (newC == null)
-                                {
-                                    file.Classes.Add(tag);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            //从类中删除
-                            await RemoveFilesFromClass(files.Select(p => p.File), tag);
-                            foreach (var file in files)
-                            {
-                                var c = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
-                                if (c != null)
-                                {
-                                    file.Classes.Remove(c);
-                                }
-                            }
-                        }
+                        isChecked = false;
+                    }
+                }
+                CheckBox chk = new CheckBox()
+                {
+                    Content = tag.Name,
+                    IsChecked = isChecked,
+                    Tag = tag
+                };
+                chk.Click += ChkTag_Click;
+                menu.Items.Add(chk);
+            }
+            //}
 
-                        GetProgress().Close();
-                    };
-                    menu.Items.Add(chk);
+        }
+
+        private async void ChkTag_Click(object sender, RoutedEventArgs e)
+        {
+            GetProgress().Show(false);
+            await Task.Delay(100);
+            var files = GetSelectedFiles();
+            CheckBox chk = sender as CheckBox;
+            Class tag = chk.Tag as Class;
+
+            if (chk.IsChecked == true)
+            {
+                //添加到类
+                await AddFilesToClassAsync(files.Select(p => p.File), tag);
+                foreach (var file in files)
+                {
+                    var newC = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
+                    if (newC == null)
+                    {
+                        file.Classes.Add(tag);
+                    }
+                }
+            }
+            else
+            {
+                //从类中删除
+                await RemoveFilesFromClass(files.Select(p => p.File), tag);
+                foreach (var file in files)
+                {
+                    var c = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
+                    if (c != null)
+                    {
+                        file.Classes.Remove(c);
+                    }
                 }
             }
 
+            GetProgress().Close();
         }
 
         /// <summary>

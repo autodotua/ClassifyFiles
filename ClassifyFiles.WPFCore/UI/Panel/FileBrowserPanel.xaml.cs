@@ -142,7 +142,7 @@ namespace ClassifyFiles.UI.Panel
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                await AddFilesAsync(files);
+                await AddFilesAsync(classPanel.SelectedItem, files);
             }
         }
 
@@ -385,7 +385,7 @@ namespace ClassifyFiles.UI.Panel
             };
             if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
             {
-                await AddFilesAsync(dialog.FileNames.ToList());
+                await AddFilesAsync(classPanel.SelectedItem, dialog.FileNames.ToList());
             }
         }
 
@@ -394,12 +394,12 @@ namespace ClassifyFiles.UI.Panel
         /// </summary>
         /// <param name="files"></param>
         /// <returns></returns>
-        private async Task AddFilesAsync(IList<string> files)
+        private async Task AddFilesAsync(Class c, IList<string> files)
         {
-            var dialog = new AddFilesDialog(classPanel.SelectedItem, files)
+            var dialog = new AddFilesDialog(c, files)
             { Owner = Window.GetWindow(this) };
             dialog.ShowDialog();
-            if (dialog.AddedFiles != null)
+            if (c==classPanel.SelectedItem && dialog.AddedFiles != null)
             {
                 await filesViewer.AddFilesAsync(dialog.AddedFiles);
             }
@@ -497,5 +497,10 @@ namespace ClassifyFiles.UI.Panel
             }
         }
         #endregion
+
+        private async void ClassPanel_ClassFilesDrop(object sender, ClassFilesDropEventArgs e)
+        {
+            await AddFilesAsync(e.Class, e.Files);
+        }
     }
 }

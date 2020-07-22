@@ -128,5 +128,10 @@ namespace ClassifyFiles.UI
         {
             new LogsWindow().Show();
         }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            Configs.AutoAddFiles = false;   
+        }
     }
 }
