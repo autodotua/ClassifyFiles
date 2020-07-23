@@ -23,6 +23,7 @@ namespace ClassifyFiles.Util
             Debug.WriteLine("db: " + nameof(GetFilesByProjectAsync));
             var files = db.Files
                 .Where(p => p.Project.ID == projectID)
+                .Where(p => p.Name.Length>0)
                 .Include(p => p.Project);
             return await files.ToListAsync();
         }

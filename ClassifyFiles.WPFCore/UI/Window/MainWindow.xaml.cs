@@ -104,10 +104,9 @@ namespace ClassifyFiles.UI
         {
             if (MainPanel != null)
             {
-                Progress.Show(false);
+                Progress.Show(true);
                 try
                 {
-                    //MainPanel = Activator.CreateInstance(MainPanel.GetType()) as ILoadable;
                     await MainPanel.LoadAsync(SelectedProject);
                 }
                 catch (Exception ex)

@@ -88,6 +88,7 @@ namespace ClassifyFiles.UI.Dialog
                 Reclassify = chkReclassify.IsChecked.Value,
                 IncludeThumbnails = chkIncludeThumbnails.IsChecked.Value,
                 IncludeExplorerIcons = chkIncludeExplorerIcons.IsChecked.Value,
+                DeleteNonExistentItems = chkDeleteNonExistentItems.IsChecked.Value,
                 Callback = Callback
             };
             working = true;

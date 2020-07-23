@@ -16,6 +16,7 @@ namespace ClassifyFiles.Util
         /// </summary>
         public Func<double, File, bool> Callback { get; set; }
         public bool Reclassify { get; set; }
+        public bool DeleteNonExistentItems { get; set; }
         public Class Class { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using FI = System.IO.FileInfo;
 using DI = System.IO.DirectoryInfo;
 using SO = System.IO.SearchOption;
 using static ClassifyFiles.Util.DbUtility;
@@ -73,7 +74,7 @@ namespace ClassifyFiles.Util
                 int count = args.Files.Count;
                 foreach (var path in args.Files)
                 {
-                    File f = new File(new System.IO.FileInfo(path), args.Project);
+                    File f = new File(new FI(path), args.Project);
                     File existedFile = db.Files.FirstOrDefault(p => p.Name == f.Name && p.Dir == f.Dir);
                     //文件不存在的话，需要首先新增文件
                     if (existedFile == null)
@@ -169,19 +170,24 @@ namespace ClassifyFiles.Util
                 if (args.Research)
                 {
                     dbFiles = new HashSet<File>(db.Files.Where(p => p.ProjectID == args.Project.ID));
-                    List<System.IO.FileInfo> diskFiles = new DI(args.Project.RootPath).EnumerateFiles("*", SO.AllDirectories).ToList();
-                    HashSet<string> paths = new HashSet<string>(diskFiles.Select(p => p.FullName));
-
-                    //删除已不存在的文件
-                    foreach (var file in dbFiles)
+                    List<System.IO.FileSystemInfo> diskFiles = new DI(args.Project.RootPath).EnumerateFileSystemInfos("*", SO.AllDirectories).ToList();
+                    if (args.DeleteNonExistentItems)
                     {
-                        if (!paths.Contains(file.GetAbsolutePath()))
+                        HashSet<string> paths = new HashSet<string>(diskFiles.Select(p => p.FullName));
+
+                        //删除已不存在的文件
+                        foreach (var file in dbFiles)
                         {
-                            db.Entry<File>(file).State = EntityState.Deleted;
+                            if (!paths.Contains(file.GetAbsolutePath()))
+                            {
+                                db.Entry(file).State = EntityState.Deleted;
+                            }
                         }
+                        db.SaveChanges();
                     }
-                    db.SaveChanges();
-                    files = diskFiles.Select(p => new File(p, args.Project)).ToList();
+                    files = diskFiles
+                    .OfType<FI>()
+                    .Select(p => new File(p, args.Project)).ToList();
                 }
                 else
                 {

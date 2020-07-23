@@ -13,6 +13,7 @@
             <CheckBox x:Name="chkResearch" IsChecked="True">重新搜索物理文件</CheckBox>
             <CheckBox x:Name="chkIncludeThumbnails" Margin="12,0" IsChecked="False" IsEnabled="{Binding IsChecked, ElementName=chkResearch}">生成缩略图</CheckBox>
             <CheckBox x:Name="chkIncludeExplorerIcons" Margin="12,0" IsChecked="False" IsEnabled="{Binding IsChecked, ElementName=chkResearch}">生成资源管理器图标</CheckBox>
+            <CheckBox x:Name="chkDeleteNonExistentItems" Margin="12,0" IsChecked="True" IsEnabled="{Binding IsChecked, ElementName=chkResearch}">删除物理文件不存在的文件项</CheckBox>
             <CheckBox x:Name="chkReclassify" IsChecked="True">重新根据匹配条件进行自动分类</CheckBox>
         </m:SimpleStackPanel>
         <m:SimpleStackPanel Orientation="Vertical" Spacing="8">

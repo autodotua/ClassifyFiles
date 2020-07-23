@@ -62,7 +62,7 @@ namespace ClassifyFiles.UI.Panel
         }
 
         #region 属性和字段
-        TreeViewHelper<UIFile> treeViewHelper;
+        private TreeViewHelper<UIFile> treeViewHelper;
 
         private ItemsControl filesContent;
         public ItemsControl FilesContent
@@ -172,6 +172,19 @@ namespace ClassifyFiles.UI.Panel
             }
 
             this.Notify(nameof(Files));
+        }
+
+        public async Task RemoveFilesAsync(IEnumerable<UIFile> files)
+        {
+            foreach (var file in files)
+            {
+                Files.Remove(file);
+
+                if (CurrentFileView == FileView.Tree && GetSelectedFile() != null)
+                {
+                    await treeViewHelper.RemoveItemAsync(file, FileTree);
+                }
+            }
         }
 
         /// <summary>
@@ -378,7 +391,7 @@ namespace ClassifyFiles.UI.Panel
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ViewTypeButton_Click(object sender, RoutedEventArgs e)
+        private async void ViewTypeButton_Click(object sender, RoutedEventArgs e)
         {
             int type = int.Parse((sender as FrameworkElement).Tag as string);
             //由于并不是RadioButton，因此需要手动设置IsChecked值
@@ -386,7 +399,7 @@ namespace ClassifyFiles.UI.Panel
             grdAppBar.Children.OfType<AppBarToggleButton>().ForEach(p => p.IsChecked = false);
             (sender as AppBarToggleButton).IsChecked = true;
             CurrentFileView = (FileView)type;
-            RefreshFileView();
+            await RefreshFileViewAsync();
         }
 
         /// <summary>
@@ -412,7 +425,7 @@ namespace ClassifyFiles.UI.Panel
         /// <summary>
         /// 刷新视图
         /// </summary>
-        private void RefreshFileView()
+        private async Task RefreshFileViewAsync()
         {
             var selectedFile = GetSelectedFile();
             if (CurrentFileView == FileView.List)
@@ -447,14 +460,14 @@ namespace ClassifyFiles.UI.Panel
                 }
                 if (FilesContent is TreeView tree)
                 {
-                    treeViewHelper.SelectItemWhileLoaded(selectedFile,FileTree);
+                    await treeViewHelper.SelectItemWhileLoadedAsync(selectedFile, FileTree);
                 }
             }
         }
-   
+
         /// <summary>
-                 /// 当前的视图
-                 /// </summary>
+        /// 当前的视图
+        /// </summary>
         public FileView CurrentFileView { get; private set; } = FileView.List;
 
         #endregion
@@ -738,9 +751,9 @@ namespace ClassifyFiles.UI.Panel
             {
                 Files.Remove(file);
             }
-            if (CurrentFileView == FileView.Tree)
+            if (CurrentFileView == FileView.Tree && GetSelectedFile() != null)
             {
-
+                await treeViewHelper.RemoveItemAsync(files[0], FileTree);
             }
             GetProgress().Close();
         }

@@ -139,12 +139,12 @@ namespace ClassifyFiles.UI.Panel
             item.Background = (FindResource("SystemControlBackgroundBaseLowBrush") as Brush).Clone();
             DoubleAnimation ani = new DoubleAnimation()
             {
-                Duration = TimeSpan.FromSeconds(0.5),
+                Duration = TimeSpan.FromSeconds(0.2),
                 FillBehavior = FillBehavior.HoldEnd,
                 To = 1,
                 From=0,
                 AutoReverse = true,
-                RepeatBehavior = new RepeatBehavior(1)
+                RepeatBehavior = new RepeatBehavior(3)
             };
        
             item.Background.BeginAnimation(Brush.OpacityProperty, ani);

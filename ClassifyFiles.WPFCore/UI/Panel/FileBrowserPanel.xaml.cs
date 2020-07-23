@@ -76,7 +76,29 @@ namespace ClassifyFiles.UI.Panel
             }
             else
             {
-                await SetFilesAsync(() => GetFilesByClassAsync(classPanel.SelectedItem.ID));
+                await SetFilesAsync(() => GetFilesByClassAsync(classPanel.SelectedItem.ID),FileCollectionType.Class);
+            }
+        }
+        
+        /// <summary>
+        /// 分类面板接收到文件拖放信息
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ClassPanel_ClassFilesDrop(object sender, ClassFilesDropEventArgs e)
+        {
+            if (e.Files != null)
+            {
+                await AddFilesAsync(e.Class, e.Files);
+            }
+            else if (e.UIFiles != null)//说明是由软件内部拖放过来的
+            {
+                var files = await AddFilesToClassAsync(e.UIFiles.Select(p => p.File), e.Class);
+                if (currentFileCollectionType==FileCollectionType.NoClass)
+                {
+                    //如果当前显示的是没有被分类的文件，那么当拖放之后，自然就不再是没有分类的文件了，所以要从列表中删去
+                    await filesViewer.RemoveFilesAsync(e.UIFiles);
+                }
             }
         }
 
@@ -88,8 +110,9 @@ namespace ClassifyFiles.UI.Panel
         /// </summary>
         /// <param name="func">用于获取文件的异步函数</param>
         /// <returns></returns>
-        private async Task SetFilesAsync(Func<Task<List<File>>> func)
+        private async Task SetFilesAsync(Func<Task<List<File>>> func, FileCollectionType type)
         {
+            currentFileCollectionType = type;
             GetProgress().Show(true);
             Debug.WriteLine("Set Files, Project Hashcode is " + Project.GetHashCode()
             + ", Class is " + (classPanel.SelectedItem == null ? "null" : classPanel.SelectedItem.Name));
@@ -112,7 +135,7 @@ namespace ClassifyFiles.UI.Panel
         }
 
         /// <summary>
-        /// 文件视图中的标签被单机了
+        /// 文件视图中的标签被单击了
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -169,7 +192,7 @@ namespace ClassifyFiles.UI.Panel
             ignoreClassChanged = true;
             classPanel.SelectedItem = null;
             ignoreClassChanged = false;
-            await SetFilesAsync(() => GetFilesByProjectAsync(Project.ID));
+            await SetFilesAsync(() => GetFilesByProjectAsync(Project.ID), FileCollectionType.All);
         }
 
         /// <summary>
@@ -182,10 +205,10 @@ namespace ClassifyFiles.UI.Panel
             ignoreClassChanged = true;
             classPanel.SelectedItem = null;
             ignoreClassChanged = false;
-            await SetFilesAsync(() => GetNoClassesFilesByProjectAsync(Project.ID));
+            await SetFilesAsync(() => GetNoClassesFilesByProjectAsync(Project.ID), FileCollectionType.NoClass);
         }
 
-        public bool displayingNoClassFiles = true;
+        public FileCollectionType currentFileCollectionType = FileCollectionType.None;
 
         /// <summary>
         /// 文件视图滚轮
@@ -502,27 +525,5 @@ namespace ClassifyFiles.UI.Panel
         }
         #endregion
 
-        private async void ClassPanel_ClassFilesDrop(object sender, ClassFilesDropEventArgs e)
-        {
-            if (e.Files != null)
-            {
-                await AddFilesAsync(e.Class, e.Files);
-            }
-            else if (e.UIFiles != null)
-            {
-                var files = await AddFilesToClassAsync(e.UIFiles.Select(p => p.File), e.Class);
-                if (displayingNoClassFiles)
-                {
-                    foreach (var file in files)
-                    {
-                        var f = filesViewer.Files.FirstOrDefault(p => p.File.ID == file.ID);
-                        if (f != null)
-                        {
-                            filesViewer.Files.Remove(f);
-                        }
-                    }
-                }
-            }
-        }
     }
 }

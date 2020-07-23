@@ -30,11 +30,11 @@ namespace ClassifyFiles.UI.Model
         {
             File = file;
             FileInfo = file.GetFileInfo();
-            SubUIFiles = file.SubFiles.Select(p => new UIFile(p)).ToList();
+            SubUIFiles = new ObservableCollection<UIFile>(file.SubFiles.Select(p => new UIFile(p)));
             Display = new UIFileDisplay(file);
 
         }
-        public List<UIFile> SubUIFiles { get; private set; } = new List<UIFile>();
+        public ObservableCollection<UIFile> SubUIFiles { get; } = new ObservableCollection<UIFile>();
         public UIFile Parent { get; set; }
         private File file;
         public File File
@@ -92,6 +92,11 @@ namespace ClassifyFiles.UI.Model
                 return file.File.Equals(File);
             }
             return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return File.GetHashCode();
         }
     }
 }

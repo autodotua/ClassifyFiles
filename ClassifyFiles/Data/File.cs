@@ -8,7 +8,7 @@ using System.IO;
 
 namespace ClassifyFiles.Data
 {
-    [DebuggerDisplay("Dir={Dir}, Name={Name}")]
+    [DebuggerDisplay("{ID}: Dir={Dir}, Name={Name}")]
     public class File : DbModelBase
     {
         public File()

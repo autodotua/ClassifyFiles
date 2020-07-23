@@ -11,6 +11,11 @@ namespace ClassifyFiles.Util
         public static string DbPath => System.IO.Path.GetFullPath("data.db");
         internal static AppDbContext db = new AppDbContext(DbPath);
         const string dbReplacedMessage = "由于保存出错，数据库上下文被替换，更改已丢失";
+        public async static Task ReplaceDbContextAsync()
+        {
+            await db.DisposeAsync();
+            db = new AppDbContext(DbPath);
+        }
         public async static Task SaveChangesAsync()
         {
             try
