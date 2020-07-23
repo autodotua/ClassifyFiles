@@ -58,7 +58,7 @@ namespace ClassifyFiles.UI.Util
             return list switch
             {
                 ListBox lvw => lvw.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
-                TreeView t => new List<UIFile>() { t.SelectedItem as UIFile }.AsReadOnly(),
+                TreeView t => t.SelectedItem==null? new List<UIFile>().AsReadOnly() : new List<UIFile>() { t.SelectedItem as UIFile }.AsReadOnly(),
                 _ => new List<UIFile>().AsReadOnly(),
             };
         }
@@ -96,7 +96,7 @@ namespace ClassifyFiles.UI.Util
             beginPosition = e.GetPosition(null);
             //当鼠标点击列表项时，如果鼠标位置在已经被选中的项的上方，那么取消响应
             //这是由于ListView总是在拖放之前就把多选变成了单选，与拖放需求不符
-            if (e.ClickCount > 1)
+            if (e.ClickCount > 1 || GetSelectedFiles().Count==0)
             {
                 return;
             }

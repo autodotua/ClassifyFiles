@@ -8,6 +8,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static ClassifyFiles.Util.DbUtility;
@@ -45,6 +47,10 @@ namespace ClassifyFiles.Util
         "mp4",
         "mkv",
         "avi",
+        }.AsReadOnly();
+        public static readonly IReadOnlyList<string> programExtensions = new List<string>() {
+        "exe",
+        "msi"
         }.AsReadOnly();
 
 
@@ -91,20 +97,43 @@ namespace ClassifyFiles.Util
             string path = file.GetAbsolutePath();
             try
             {
-                string guid = Guid.NewGuid().ToString();
-                var iconPath = GetIconPath(guid);
 
-                Bitmap bitmap;
+                string ext = P.GetExtension(path).Replace(".", string.Empty);
                 if (file.IsFolder)
                 {
-                    bitmap = GetFolderIcon(path);
+                    string guid = GetGuidFromString("folder").ToString();
+                    //文件夹，统一图标
+                    if (!F.Exists(GetIconPath(guid)))
+                    {
+                        var iconPath = GetIconPath(guid);
+                        GetFolderIcon(path).Save(iconPath, ImageFormat.Png);
+                    }
+                    file.IconGUID = guid;
+                }
+                else if (programExtensions.Contains(ext))
+                {
+                    //程序文件，每个图标都不同
+                    string guid = Guid.NewGuid().ToString();
+                    var iconPath = GetIconPath(guid);
+                    GetFileIcon(path).Save(iconPath, ImageFormat.Png);
+                    file.IconGUID = guid;
                 }
                 else
                 {
-                    bitmap = GetFileIcon(path);
+                    string guid = GetGuidFromString(ext).ToString();
+                    var iconPath = GetIconPath(guid);
+                    //这里在实时更新时，可能会因为多个线程一起尝试写入同一个文件（同一个扩展名文件相同）文件导致异常。
+                    //所以提前先把IconGUID的值给了
+                    file.IconGUID = guid;
+                    //其他文件，同一个格式的用同一个图标
+                    if (F.Exists(iconPath))
+                    {
+                    }
+                    else
+                    {
+                        GetFileIcon(path).Save(iconPath, ImageFormat.Png);
+                    }
                 }
-                bitmap.Save(iconPath, ImageFormat.Png);
-                file.IconGUID = guid;
             }
             catch (Exception ex)
             {
@@ -112,6 +141,13 @@ namespace ClassifyFiles.Util
             }
             return false;
 
+        }
+        private static Guid GetGuidFromString(string str)
+        {
+            using MD5 md5 = MD5.Create();
+            byte[] hash = md5.ComputeHash(Encoding.Default.GetBytes(str));
+            Guid result = new Guid(hash);
+            return result;
         }
 
         public static string GetThumbnailPath(string guid)
@@ -512,7 +548,7 @@ namespace ClassifyFiles.Util
 
                 foreach (var file in files)
                 {
-                    if (!string.IsNullOrEmpty(file.ThumbnailGUID))
+                    if (file.ThumbnailGUID != null && file.ThumbnailGUID.Length > 0)
                     {
                         string path = GetThumbnailPath(file.ThumbnailGUID);
                         if (F.Exists(path))
@@ -529,7 +565,12 @@ namespace ClassifyFiles.Util
                         file.ThumbnailGUID = null;
                         db.Entry(file).State = EntityState.Modified;
                     }
-                    if (!string.IsNullOrEmpty(file.IconGUID))
+                    else if (file.ThumbnailGUID != null && file.ThumbnailGUID.Length == 0)
+                    {
+                        file.ThumbnailGUID = null;
+                        db.Entry(file).State = EntityState.Modified;
+                    }
+                    if (file.IconGUID != null && file.IconGUID.Length > 0)
                     {
                         string path = GetIconPath(file.IconGUID);
                         if (F.Exists(path))
@@ -543,6 +584,11 @@ namespace ClassifyFiles.Util
 
                             }
                         }
+                        file.IconGUID = null;
+                        db.Entry(file).State = EntityState.Modified;
+                    }
+                    else if (file.IconGUID != null && file.IconGUID.Length == 0)
+                    {
                         file.IconGUID = null;
                         db.Entry(file).State = EntityState.Modified;
                     }
