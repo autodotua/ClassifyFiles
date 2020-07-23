@@ -18,11 +18,12 @@ using ClassifyFiles.UI.Event;
 using ClassifyFiles.UI.Dialog;
 using ClassifyFiles.UI.Model;
 using ClassifyFiles.Util;
+using ClassifyFiles.UI.Panel;
 
-namespace ClassifyFiles.UI.Panel
+namespace ClassifyFiles.UI.Page
 {
 
-    public partial class FileBrowserPanel : ProjectPanelBase
+    public partial class FileBrowserPanel : ProjectPageBase
     {
 
         public FileBrowserPanel()
@@ -41,10 +42,13 @@ namespace ClassifyFiles.UI.Panel
 
         public override async Task LoadAsync(Project project)
         {
-            await base.LoadAsync(project);
-            filesViewer.Project = project;
-            await filesViewer.SetFilesAsync(null);
-            await classPanel.LoadAsync(project);
+            if (project != Project)
+            {
+                await base.LoadAsync(project);
+                filesViewer.Project = project;
+                await filesViewer.SetFilesAsync(null);
+                await classPanel.LoadAsync(project);
+            }
             UpdateAppBarButtonsEnable();
         }
 
@@ -503,7 +507,7 @@ namespace ClassifyFiles.UI.Panel
         /// <param name="to"></param>
         private void StartAnimation(double to)
         {
-            DoubleAnimation ani = new DoubleAnimation(to, TimeSpan.FromSeconds(0.5))
+            DoubleAnimation ani = new DoubleAnimation(to, Configs.AnimationDuration * 2)
             {
                 EasingFunction = new CubicEase() { EasingMode = EasingMode.EaseInOut },
                 //FillBehavior = FillBehavior.Stop

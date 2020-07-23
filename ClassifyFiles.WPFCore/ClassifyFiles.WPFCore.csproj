@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
-    <PackageReference Include="ModernWpfUI" Version="0.9.0" />
+    <PackageReference Include="ModernWpfUI" Version="0.9.1" />
     <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
     <PackageReference Include="VirtualizingWrapPanel" Version="1.5.0" />
   </ItemGroup>
@@ -62,13 +62,13 @@
     <Page Update="UI\Dialog\MessageDialog.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="UI\Panel\ClassSettingPanel.xaml">
+    <Page Update="UI\Page\ClassSettingPanel.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="UI\Panel\ProjectSettingsPanel.xaml">
+    <Page Update="UI\Page\ProjectSettingsPanel.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="UI\Panel\FileBrowserPanel.xaml">
+    <Page Update="UI\Page\FileBrowserPanel.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="UI\Dialog\AddFilesDialog.xaml">

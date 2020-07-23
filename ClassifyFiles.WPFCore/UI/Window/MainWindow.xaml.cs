@@ -25,6 +25,11 @@ using static ClassifyFiles.Util.FileClassUtility;
 using static ClassifyFiles.Util.FileProjectUtilty;
 using static ClassifyFiles.Util.ProjectUtility;
 using static ClassifyFiles.Util.DbUtility;
+using System.Windows.Media.Animation;
+using System.Windows.Media;
+using ClassifyFiles.UI.Page;
+using System.Windows.Media.Imaging;
+using System.IO;
 
 namespace ClassifyFiles.UI
 {
@@ -49,15 +54,11 @@ namespace ClassifyFiles.UI
             get => selectedProject;
             set
             {
-                if (selectedProject != null)
-                {
-                    selectedProject.PropertyChanged -= Project_PropertyChanged;
-                }
+
                 selectedProject = value;
                 this.Notify(nameof(SelectedProject));
                 if (value != null)
                 {
-                    value.PropertyChanged += Project_PropertyChanged;
                     if (value.ID != Configs.LastProjectID)
                     {
                         Configs.LastProjectID = value.ID;
@@ -67,19 +68,27 @@ namespace ClassifyFiles.UI
             }
         }
 
-        private void Project_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-        }
 
         public MainWindow()
         {
+            Projects = new ObservableCollection<Project>(GetProjectsAsync().Result);
+            if (Projects.Count == 0)
+            {
+                Projects.Add(AddProjectAsync().Result);
+            }
+            if (Projects.Any(p => p.ID == Configs.LastProjectID))
+            {
+                selectedProject = Projects.First(p => p.ID == Configs.LastProjectID);
+            }
+            else
+            {
+                selectedProject = Projects[0];
+            }
             InitializeComponent();
             var width = SystemParameters.WorkArea.Width;
             var height = SystemParameters.WorkArea.Height;
             Width = width * 0.8;
             Height = height * 0.8;
-            //Left = width * .1;
-            //Top = height * .1;
 
         }
 
@@ -100,49 +109,62 @@ namespace ClassifyFiles.UI
         FileBrowserPanel fileBrowserPanel = new FileBrowserPanel();
         ClassSettingPanel classSettingPanel = new ClassSettingPanel();
         ProjectSettingsPanel projectSettingsPanel = new ProjectSettingsPanel();
+
+        System.Windows.Controls.Page emptyPage = new System.Windows.Controls.Page();
         private async Task LoadProjectAsync()
         {
-            if (MainPanel != null)
+            if (frame.Content == mainPage)
+            {
+                //两次页面不同，才能够有动画
+                RenderTargetBitmap renderTargetBitmap =
+       new RenderTargetBitmap((int)(mainPage as FrameworkElement).ActualWidth,
+       (int)(mainPage as FrameworkElement).ActualHeight,
+       96, 96, PixelFormats.Pbgra32);
+                renderTargetBitmap.Render(mainPage as Visual);
+                PngBitmapEncoder pngImage = new PngBitmapEncoder();
+                pngImage.Frames.Add(BitmapFrame.Create(renderTargetBitmap));
+                using MemoryStream ms = new MemoryStream();
+                pngImage.Save(ms);
+                var imageSource = new BitmapImage();
+                imageSource.BeginInit();
+                imageSource.StreamSource = ms;
+                imageSource.EndInit();
+
+                emptyPage.Content = new Image();
+                (emptyPage.Content as Image).Source = imageSource;
+                //首先设置Content，这个是没有动画的
+                //但是如果直接来，那么画面会先黑一下，效果不好
+                //所以先给页面截一张图，放到空白的Page上，然后再进行设置和动画
+                frame.Content = emptyPage;
+                await Task.Delay(1);
+            }
+            frame.Navigate(mainPage);
+            if (mainPage != null)
             {
                 Progress.Show(true);
                 try
                 {
-                    await MainPanel.LoadAsync(SelectedProject);
+                    await mainPage.LoadAsync(SelectedProject);
                 }
                 catch (Exception ex)
-                { }
+                {
+                    throw ex;
+                }
                 Progress.Close();
+                IsHitTestVisible = false;
+                //在动画的时候不让界面能够点击
+                await Task.Delay(Configs.AnimationDuration * 2);
+                IsHitTestVisible = true;
             }
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Projects = new ObservableCollection<Project>(await GetProjectsAsync());
-            if (Projects.Count == 0)
-            {
-                Projects.Add(await AddProjectAsync());
-            }
-            if (Projects.Any(p => p.ID == Configs.LastProjectID))
-            {
-                SelectedProject = Projects.First(p => p.ID == Configs.LastProjectID);
-            }
-            else
-            {
-                SelectedProject = Projects[0];
-            }
+
+            await LoadProjectAsync();
         }
 
-        public ILoadable mainPanel = new FileBrowserPanel();
-        public ILoadable MainPanel
-        {
-            get => mainPanel;
-            set
-            {
-                mainPanel = value;
-                this.Notify(nameof(MainPanel));
-            }
-        }
-
+        public ILoadable mainPage = new FileBrowserPanel();
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
@@ -164,35 +186,34 @@ namespace ClassifyFiles.UI
                 return;
             }
             ToggleButton btn = sender as ToggleButton;
-            var a = cmdBarPanel.Content;
             foreach (var t in cmdBarPanel.PrimaryCommands.OfType<ToggleButton>())
             {
-                (t as ToggleButton).IsChecked = btn == t;
+                t.IsChecked = btn == t;
             }
-            if (MainPanel is ClassSettingPanel)
+            if (mainPage is ClassSettingPanel)
             {
-                await (MainPanel as ClassSettingPanel).SaveClassAsync();
+                await (mainPage as ClassSettingPanel).SaveClassAsync();
             }
-            else if (MainPanel is ProjectSettingsPanel)
+            else if (mainPage is ProjectSettingsPanel)
             {
                 await SaveChangesAsync();
             }
             switch (btn.Name)
             {
                 case nameof(btnModeView):
-                    MainPanel = fileBrowserPanel;// new FileBrowserPanel();
+                    mainPage = fileBrowserPanel;// new FileBrowserPanel();
                     break;
                 case nameof(btnModeClasses):
-                    MainPanel = classSettingPanel; // new ClassSettingPanel();
+                    mainPage = classSettingPanel; // new ClassSettingPanel();
                     break;
                 case nameof(btnModeProjectSettings):
-                    MainPanel = projectSettingsPanel;// new ProjectSettingsPanel();
+                    mainPage = projectSettingsPanel;// new ProjectSettingsPanel();
                     break;
                 case null:
                     return;
             }
-
             await LoadProjectAsync();
+
         }
 
         private async void AddProjectButton_Click(object sender, RoutedEventArgs e)

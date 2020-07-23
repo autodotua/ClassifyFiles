@@ -9,21 +9,33 @@ using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using FzLib.Extension;
 using System.Windows;
+using System.ComponentModel;
+using ClassifyFiles.WPFCore;
 
-namespace ClassifyFiles.UI.Panel
+namespace ClassifyFiles.UI.Page
 {
     public interface ILoadable
     {
         public Task LoadAsync(Project project);
 
     }
-    public abstract class ProjectPanelBase : UserControlBase, ILoadable 
+    public abstract class ProjectPageBase : ModernWpf.Controls.Page, ILoadable ,INotifyPropertyChanged
     {
+        public ProjectPageBase()
+        {
+            Initialized += (p1, p2) =>
+            {
+                (Content as System.Windows.FrameworkElement).DataContext = this;
+            };
+        }
         public virtual async Task LoadAsync(Project project)
         {
             Project = project;
         }
         private Project project;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public virtual Project Project
         {
             get => project;
@@ -35,7 +47,7 @@ namespace ClassifyFiles.UI.Panel
         }
         protected ProgressDialog GetProgress()
         {
-            return (Window.GetWindow(this) as MainWindow).Progress;
+            return (App.Current.MainWindow as MainWindow).Progress;
         }
     }
 }

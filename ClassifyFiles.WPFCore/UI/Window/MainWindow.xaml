@@ -6,10 +6,13 @@
     xmlns:local="clr-namespace:ClassifyFiles.UI"
     xmlns:m="http://schemas.modernwpf.com/2019"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    x:Name="win" Title="文件分类浏览器" Width="1200" Height="600"
+    x:Name="win" Title="文件分类浏览器"
+    Width="1200" Height="600"
     m:ScrollViewerHelper.AutoHideScrollBars="True"
-    Closing="Window_Closing" Loaded="Window_Loaded"
-    WindowStartupLocation="CenterScreen" mc:Ignorable="d">
+    Closing="Window_Closing"
+    Loaded="Window_Loaded"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
     <local:WindowBase.Resources>
         <local:IsNotNull2BoolConverter x:Key="nn2b" />
     </local:WindowBase.Resources>
@@ -20,37 +23,53 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TabControl x:Name="tab" Grid.RowSpan="99" ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProject}">
+        <TabControl
+            x:Name="tab" Grid.RowSpan="99"
+            ItemsSource="{Binding Projects}"
+            SelectedItem="{Binding SelectedProject}">
             <m:TabControlHelper.TabStripHeader>
                 <m:AppBarButton
-                    Grid.Column="0" Click="AddProjectButton_Click" Icon="Add"
-                    IsCompact="True" LabelPosition="Collapsed" />
+                    Grid.Column="0"
+                    Click="AddProjectButton_Click"
+                    Icon="Add" IsCompact="True"
+                    LabelPosition="Collapsed" />
             </m:TabControlHelper.TabStripHeader>
             <m:TabControlHelper.TabStripFooter>
-                <m:SimpleStackPanel HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
-                    <m:CommandBar x:Name="cmdBarPanel" Background="Transparent" DefaultLabelPosition="Right">
+                <m:SimpleStackPanel
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal" Spacing="8">
+                    <m:CommandBar
+                        x:Name="cmdBarPanel"
+                        Background="Transparent"
+                        DefaultLabelPosition="Right">
                         <m:AppBarToggleButton
                             x:Name="btnModeView" Grid.Column="0"
-                            Background="Transparent" Checked="RadioButton_Checked"
+                            Background="Transparent"
+                            Checked="RadioButton_Checked"
                             Icon="View" IsChecked="True"
                             IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}"
                             Label="浏览" />
                         <m:AppBarToggleButton
                             x:Name="btnModeClasses" Grid.Column="0"
-                            Background="Transparent" Checked="RadioButton_Checked"
+                            Background="Transparent"
+                            Checked="RadioButton_Checked"
                             Icon="List"
                             IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}"
                             Label="分类" />
                         <m:AppBarToggleButton
-                            x:Name="btnModeProjectSettings" Grid.Column="0"
-                            Background="Transparent" Checked="RadioButton_Checked"
+                            x:Name="btnModeProjectSettings"
+                            Grid.Column="0" Background="Transparent"
+                            Checked="RadioButton_Checked"
                             IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}"
                             Label="项目设置">
                             <m:AppBarToggleButton.Icon>
                                 <m:FontIcon Glyph="&#xF259;" />
                             </m:AppBarToggleButton.Icon>
                         </m:AppBarToggleButton>
-                        <m:AppBarButton Click="SettingMenuItem_Click" Icon="Setting" Label="设置" LabelPosition="Collapsed" />
+                        <m:AppBarButton
+                            Click="SettingMenuItem_Click"
+                            Icon="Setting" Label="设置"
+                            LabelPosition="Collapsed" />
                     </m:CommandBar>
                 </m:SimpleStackPanel>
             </m:TabControlHelper.TabStripFooter>
@@ -66,8 +85,16 @@
             </TabControl.ContentTemplate>
         </TabControl>
 
-        <ContentControl Grid.Row="2" Content="{Binding MainPanel}" IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}" />
+        <m:Frame
+            x:Name="frame" Grid.Row="2"
+            IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}">
+            <ContentControl.RenderTransform>
+                <TranslateTransform />
+            </ContentControl.RenderTransform>
+        </m:Frame>
 
-        <local:ProgressDialog x:Name="Progress" Grid.RowSpan="999" Grid.ColumnSpan="999" />
+        <local:ProgressDialog
+            x:Name="Progress" Grid.RowSpan="999"
+            Grid.ColumnSpan="999" />
     </Grid>
 </local:WindowBase>

@@ -1,0 +1,129 @@
+﻿<local:ProjectPageBase
+    x:Class="ClassifyFiles.UI.Page.ClassSettingPanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:data="clr-namespace:ClassifyFiles.Data;assembly=ClassifyFiles.Core"
+    xmlns:local="clr-namespace:ClassifyFiles.UI.Page"
+    xmlns:m="http://schemas.modernwpf.com/2019"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    xmlns:ui="clr-namespace:ClassifyFiles.UI"
+    xmlns:uiuti="clr-namespace:ClassifyFiles.UI.Util"
+    Loaded="WindowBase_Loaded"
+    mc:Ignorable="d">
+    <local:ProjectPageBase.Resources>
+        <ui:NotFirst2VisibilityConverter x:Key="i2v" />
+        <ui:IsNotNull2BoolConverter x:Key="nn2b" />
+        <ui:MatchConditionType2ControlVisibilityConverter x:Key="mt2v" />
+    </local:ProjectPageBase.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="2*" />
+        </Grid.ColumnDefinitions>
+        <panel:ClassesPanel x:Name="classes" SelectedClassChanged="classes_SelectedItemChanged_1" />
+        <GroupBox
+            Grid.Column="2" Header="匹配条件"
+            IsEnabled="{Binding ElementName=classes, Path=SelectedItem, Converter={StaticResource nn2b}}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="8" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <ItemsControl x:Name="lst" ItemsSource="{Binding MatchConditions}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="88" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="164" />
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="8" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.Resources />
+                                <ComboBox
+                                    VerticalAlignment="Bottom"
+                                    DisplayMemberPath="DisplayName"
+                                    ItemsSource="{uiuti:EnumToItemsSource {x:Type data:Logic}}"
+                                    SelectedValue="{Binding ConnectionLogic}"
+                                    SelectedValuePath="Value"
+                                    Visibility="{Binding Index, Converter={StaticResource i2v}}" />
+                                <ComboBox
+                                    Grid.Column="2"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Bottom"
+                                    DisplayMemberPath="DisplayName"
+                                    ItemsSource="{uiuti:EnumToItemsSource {x:Type data:MatchType}}"
+                                    SelectedValue="{Binding Type}"
+                                    SelectedValuePath="Value" />
+                                <CheckBox
+                                    Grid.Column="4" Margin="0,0,-12,0"
+                                    VerticalAlignment="Bottom" Content="取反"
+                                    IsChecked="{Binding Not}" />
+                                <TextBox
+                                    Grid.Column="6"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Bottom"
+                                    Text="{Binding Value}"
+                                    Visibility="{Binding Type, Converter={StaticResource mt2v}, ConverterParameter=text}" />
+                                <DatePicker
+                                    Grid.Column="6"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Bottom"
+                                    Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                    Visibility="{Binding Type, Converter={StaticResource mt2v}, ConverterParameter=time}" />
+                                <Button
+                                    Grid.Column="8"
+                                    Click="RemoveMatchConditionButton_Click"
+                                    Tag="{Binding .}">
+                                    <m:SymbolIcon Symbol="Delete" />
+                                </Button>
+                            </Grid>
+
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+            </Grid>
+        </GroupBox>
+        <m:CommandBar
+            Grid.Row="2" Grid.ColumnSpan="999"
+            DefaultLabelPosition="Right">
+            <m:AppBarButton
+                Click="AddClassInButton_Click"
+                Icon="Add" Label="新增分类" />
+            <m:AppBarButton
+                Click="DeleteClassButton_Click"
+                Icon="Delete"
+                IsEnabled="{Binding ElementName=classes, Path=SelectedItem, Converter={StaticResource nn2b}}"
+                Label="删除分类" />
+            <m:AppBarButton
+                Click="RenameClassButton_Click"
+                Icon="Rename"
+                IsEnabled="{Binding ElementName=classes, Path=SelectedItem, Converter={StaticResource nn2b}}"
+                Label="重命名分类" />
+            <m:AppBarSeparator />
+            <m:AppBarButton
+                Click="AddMatchConditionButton_Click"
+                Icon="Add"
+                IsEnabled="{Binding ElementName=classes, Path=SelectedItem, Converter={StaticResource nn2b}}"
+                Label="新建匹配条件" />
+
+        </m:CommandBar>
+    </Grid>
+</local:ProjectPageBase>

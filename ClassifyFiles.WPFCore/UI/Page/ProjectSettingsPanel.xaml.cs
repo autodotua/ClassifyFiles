@@ -35,9 +35,9 @@ using static ClassifyFiles.Util.ProjectUtility;
 using ClassifyFiles.UI.Component;
 using ClassifyFiles.UI.Util;
 
-namespace ClassifyFiles.UI.Panel
+namespace ClassifyFiles.UI.Page
 {
-    public partial class ProjectSettingsPanel : ProjectPanelBase
+    public partial class ProjectSettingsPanel : ProjectPageBase
     {
         public string Splitter { get; set; } = "-";
         public ProjectSettingsPanel()

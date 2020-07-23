@@ -23,9 +23,9 @@ using System.Windows.Markup;
 using System.Diagnostics;
 using ClassifyFiles.UI.Event;
 
-namespace ClassifyFiles.UI.Panel
+namespace ClassifyFiles.UI.Page
 {
-    public partial class ClassSettingPanel : ProjectPanelBase
+    public partial class ClassSettingPanel : ProjectPageBase
     {
         public ClassSettingPanel()
         {

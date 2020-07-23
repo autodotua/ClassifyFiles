@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Input;
 
-namespace ClassifyFiles.UI.Panel
+namespace ClassifyFiles.UI.Event
 {
     public class ClickEventHelper
     {

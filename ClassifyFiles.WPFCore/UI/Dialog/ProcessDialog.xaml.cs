@@ -44,7 +44,7 @@ namespace ClassifyFiles.UI
             ring.IsActive = true;
             Opacity = 0;
             Visibility = Visibility.Visible;
-            DoubleAnimation ani = new DoubleAnimation(1, TimeSpan.FromSeconds(0.2));
+            DoubleAnimation ani = new DoubleAnimation(1, Configs.AnimationDuration);
             BeginAnimation(OpacityProperty, ani);
         }
 
@@ -52,7 +52,7 @@ namespace ClassifyFiles.UI
         {
             canClose = true;
             ring.IsActive = false;
-            DoubleAnimation ani = new DoubleAnimation(0, TimeSpan.FromSeconds(0.2));
+            DoubleAnimation ani = new DoubleAnimation(0, Configs.AnimationDuration);
             ani.Completed += (p1, p2) =>
             {
                 Visibility = Visibility.Collapsed;

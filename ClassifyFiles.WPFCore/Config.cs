@@ -183,6 +183,8 @@ namespace ClassifyFiles
             return field;
         }
 
+        public static TimeSpan AnimationDuration { get; } = TimeSpan.FromSeconds(0.2);
+
         private static void Set<T>(ref T? field, T value, string key) where T : struct
         {
             field = value;
@@ -195,6 +197,7 @@ namespace ClassifyFiles
             ConfigUtility.Set(key, value);
             StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(key));
         }
+
         public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
     }
 }

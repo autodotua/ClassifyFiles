@@ -26,7 +26,7 @@
 ## 特性
 
 - 使用.Net Core 3.1 + WPF + SQLite+EFCore 开发
-- 使用WinUI风格的界面
+- 使用WinUI（[ModernWpfUI](https://github.com/Kinnara/ModernWpf)）风格的界面
 
 ## 更新计划和待解决BUG
 

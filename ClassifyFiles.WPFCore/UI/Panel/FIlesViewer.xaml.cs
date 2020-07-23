@@ -212,13 +212,21 @@ namespace ClassifyFiles.UI.Panel
         /// </summary>
         private void ResetFileTree()
         {
-            FileTree = Files == null ? null : new ObservableCollection<UIFile>(
-             FileUtility.GetFileTree(Project, Files,
-                 p => new UIFile(p),
-                 p => p.File,
-                 p => p.SubUIFiles,
-                 (c, p) => c.Parent = p)
-             .SubUIFiles);
+            if(Files==null || Files.Count==0)
+            {
+                FileTree = null;
+            }
+            else
+            {
+                FileTree =  new ObservableCollection<UIFile>(
+               FileUtility.GetFileTree(Project, Files,
+                   p => new UIFile(p),
+                   p => p.File,
+                   p => p.SubUIFiles,
+                   (c, p) => c.Parent = p)
+               .SubUIFiles);
+            }
+           
         }
         /// <summary>
         /// 获取被选中的文件（1个）

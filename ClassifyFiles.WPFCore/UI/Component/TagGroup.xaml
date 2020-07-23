@@ -36,17 +36,16 @@
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}">
                     <Setter Property="Focusable" Value="false" />
-                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                     <Setter Property="Background" Value="Transparent" />
                     <Setter Property="BorderThickness" Value="0" />
                     <Setter Property="ContentTemplate">
                         <Setter.Value>
                             <DataTemplate>
-                                <Border x:Name="border"
-                                    Padding="4,2"
-                                        BorderThickness="2"
+                                <Border
+                                    x:Name="border" Padding="4,2"
                                     Background="{DynamicResource SystemAccentColorDark1Brush}"
-                                    CornerRadius="4">
+                                    BorderThickness="2" CornerRadius="4">
                                     <Grid>
                                         <TextBlock Foreground="White" Text="{Binding Name}" />
                                     </Grid>
@@ -54,7 +53,7 @@
                                 <DataTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Trigger.Setters>
-                                            <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource SystemControlBackgroundBaseHighBrush}"/>
+                                            <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource SystemControlBackgroundBaseHighBrush}" />
                                         </Trigger.Setters>
                                     </Trigger>
                                 </DataTemplate.Triggers>
