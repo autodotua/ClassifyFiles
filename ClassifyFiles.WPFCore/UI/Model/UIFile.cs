@@ -20,7 +20,7 @@ using ClassifyFiles.Util;
 
 namespace ClassifyFiles.UI.Model
 {
-    public class UIFile:INotifyPropertyChanged
+    public class UIFile : INotifyPropertyChanged
     {
         public UIFile()
         {
@@ -35,7 +35,16 @@ namespace ClassifyFiles.UI.Model
 
         }
         public ObservableCollection<UIFile> SubUIFiles { get; } = new ObservableCollection<UIFile>();
-        public UIFile Parent { get; set; }
+        private UIFile parent;
+        public UIFile Parent
+        {
+            get => parent;
+            set
+            {
+                parent = value;
+                this.Notify(nameof(Parent));
+            }
+        }
         private File file;
         public File File
         {
@@ -87,7 +96,7 @@ namespace ClassifyFiles.UI.Model
 
         public override bool Equals(object obj)
         {
-            if(obj is UIFile file)
+            if (obj is UIFile file)
             {
                 return file.File.Equals(File);
             }

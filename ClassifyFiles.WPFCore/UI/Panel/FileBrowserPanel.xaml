@@ -10,9 +10,11 @@
     xmlns:m="http://schemas.modernwpf.com/2019"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
-    xmlns:ui="clr-namespace:ClassifyFiles.UI" mc:Ignorable="d">
+    xmlns:ui="clr-namespace:ClassifyFiles.UI"
+    mc:Ignorable="d">
     <UserControl.Resources>
         <ui:IsNotNull2BoolConverter x:Key="nn2b" />
+        <ui:Equal2BoolConverter x:Key="e2b"/>
     </UserControl.Resources>
     <Grid x:Name="grdMain">
         <Grid.ColumnDefinitions>
@@ -27,13 +29,15 @@
         </Grid.RowDefinitions>
         <GridSplitter
             x:Name="grdSplitter" Grid.Column="1"
-            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
             Background="Transparent"
             PreviewMouseUp="Splitter_PreviewMouseUp" />
         <Label
-            Grid.Column="1" VerticalAlignment="Center" Content="⁞"
-            FontSize="26" FontWeight="Bold" IsHitTestVisible="False"
-            Opacity="0.5" />
+            Grid.Column="1"
+            VerticalAlignment="Center" Content="⁞"
+            FontSize="26" FontWeight="Bold"
+            IsHitTestVisible="False" Opacity="0.5" />
         <Grid x:Name="grdLeft" Width="200" Margin="8,0,0,0" HorizontalAlignment="Left">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -56,23 +60,29 @@
             <panel:ClassesPanel x:Name="classPanel" Grid.Row="4" ClassFilesDrop="ClassPanel_ClassFilesDrop" SelectedClassChanged="SelectedClassChanged" />
 
             <Button
-                x:Name="btnNoClassesFiles" Grid.Row="6" Padding="10,6"
+                x:Name="btnNoClassesFiles" Grid.Row="6"
+                Padding="10,6"
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Left"
                 Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                Click="BtnNoClassesFiles_Click" Content="显示没有被分类的文件" />
+                Click="BtnNoClassesFiles_Click"
+                Content="显示没有被分类的文件" />
             <Button
-                x:Name="btnAllFiles" Grid.Row="8" Margin="0,8"
-                Padding="10,6" HorizontalAlignment="Stretch"
+                x:Name="btnAllFiles" Grid.Row="8"
+                Margin="0,8" Padding="10,6"
+                HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Left"
                 Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                Click="BtnAllFiles_Click" Content="显示全部文件" />
+                Click="BtnAllFiles_Click"
+                Content="显示全部文件" />
         </Grid>
 
 
         <panel:FilesViewer
-            x:Name="filesViewer" Grid.Column="2" AllowDrop="True"
-            ClickTag="FilesViewer_ClickTag" Drop="FileViewer_Drop"
+            x:Name="filesViewer" Grid.Column="2"
+            AllowDrop="True"
+            ClickTag="FilesViewer_ClickTag"
+            Drop="FileViewer_Drop"
             PreviewMouseWheel="FilesViewer_PreviewMouseWheel"
             ViewTypeChanged="FilesViewer_ViewTypeChanged" />
         <m:CommandBar Grid.Row="2" Grid.ColumnSpan="999" DefaultLabelPosition="Right">
@@ -80,8 +90,10 @@
                 <m:FlyoutService.Flyout>
                     <m:MenuFlyout x:Name="menuSort">
                         <m:RadioMenuItem
-                            x:Name="menuSortDefault" Checked="RadioMenuItem_Checked"
-                            Header="默认（按目录）" IsCheckable="True" IsChecked="True">
+                            x:Name="menuSortDefault"
+                            Checked="RadioMenuItem_Checked"
+                            Header="默认（按目录）" IsCheckable="True"
+                            IsChecked="True">
                             <m:RadioMenuItem.Tag>
                                 <enum:SortType>Default</enum:SortType>
                             </m:RadioMenuItem.Tag>
@@ -152,7 +164,7 @@
                                     <m:ToggleSwitch x:Name="swtTags" Header="显示分类标签" IsOn="{Binding ShowClassTags}" />
                                     <m:ToggleSwitch x:Name="swtThumbs" Header="显示缩略图" IsOn="{Binding ShowThumbnail}" />
                                     <m:ToggleSwitch x:Name="swtIcons" Header="显示资源管理器图标" IsOn="{Binding ShowExplorerIcon}" />
-                                    <m:ToggleSwitch x:Name="swtGroup" Header="按目录进行分组" IsOn="{Binding GroupByDir}" />
+                                    <m:ToggleSwitch x:Name="swtGroup" Header="按目录进行分组" IsOn="{Binding GroupByDir}" IsEnabled="{Binding ElementName=menuSortDefault, Path=IsChecked}" />
                                     <m:ToggleSwitch Header="显示文件扩展名" IsOn="{Binding ShowFileExtension}" />
                                 </m:SimpleStackPanel>
                             </GroupBox>
@@ -178,8 +190,10 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBlock x:Name="tbkIconSize" Grid.Column="2" VerticalAlignment="Center" Text="{Binding IconSizeString}" />
                                     <Slider
-                                        x:Name="sldIconSize" VerticalAlignment="Center" Interval="1"
-                                        IsMoveToPointEnabled="True" LargeChange="10" Maximum="256"
+                                        x:Name="sldIconSize"
+                                        VerticalAlignment="Center" Interval="1"
+                                        IsMoveToPointEnabled="True"
+                                        LargeChange="10" Maximum="256"
                                         Minimum="16" Orientation="Horizontal"
                                         PreviewMouseDoubleClick="IconSize_PreviewMouseDoubleClick"
                                         SmallChange="1"
@@ -201,11 +215,13 @@
 
             <m:AppBarSeparator />
             <m:AppBarButton
-                x:Name="btnAddFile" Click="BtnAddFile_Click" Icon="Add"
+                x:Name="btnAddFile"
+                Click="BtnAddFile_Click" Icon="Add"
                 IsEnabled="{Binding ElementName=classPanel, Path=SelectedItem, Converter={StaticResource nn2b}}"
                 Label="添加文件" />
             <m:AppBarButton
-                x:Name="btnRefresh" Click="RefreshButton_Click"
+                x:Name="btnRefresh"
+                Click="RefreshButton_Click"
                 Icon="Refresh"
                 IsEnabled="{Binding ElementName=classPanel, Path=SelectedItem, Converter={StaticResource nn2b}}"
                 Label="刷新" />

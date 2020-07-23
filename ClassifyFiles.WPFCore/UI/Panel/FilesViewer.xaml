@@ -13,15 +13,18 @@
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
     xmlns:uim="clr-namespace:ClassifyFiles.UI.Model"
     xmlns:wpftk="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
-    d:DesignHeight="450" d:DesignWidth="800" mc:Ignorable="d">
+    d:DesignHeight="450" d:DesignWidth="800"
+    mc:Ignorable="d">
     <UserControl.Resources>
         <ui:MagnificationConverter x:Key="mc" />
         <ui:NotFirst2VisibilityConverter x:Key="i2v" />
         <ui:Bool2VisibilityConverter x:Key="b2v" />
         <ui:IsNotNull2BoolConverter x:Key="nn2b" />
         <ui:IsNotNull2VisibilityConverter x:Key="nn2v" />
+        <sys:Double x:Key="half">0.5</sys:Double>
         <sys:Double x:Key="two">2.0</sys:Double>
         <sys:Double x:Key="twoFive">2.5</sys:Double>
+        <sys:Double x:Key="three">3.0</sys:Double>
 
         <!--  公用的右键菜单  -->
         <ContextMenu x:Key="menu" Opened="ContextMenu_Opened" />
@@ -32,10 +35,15 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type GroupItem}">
-                        <Expander BorderBrush="Gray" BorderThickness="0,1,0,0" IsExpanded="True">
+                        <Expander
+                            BorderBrush="Gray"
+                            BorderThickness="0,1,0,0"
+                            IsExpanded="True">
                             <Expander.Header>
                                 <DockPanel>
-                                    <TextBlock Margin="8,04,0,0" FontWeight="Bold" Text="{Binding Path=Name}" />
+                                    <TextBlock
+                                        Margin="8,04,0,0" FontWeight="Bold"
+                                        Text="{Binding Path=Name}" />
                                     <TextBlock Margin="16,4,0,8">
                                         <Run Text="{Binding Path=ItemCount, Mode=OneWay}" />
                                         <Run>个文件</Run>
@@ -54,24 +62,26 @@
         <!--  带分组的数据源  -->
         <CollectionViewSource x:Key="listDetailItemsSource" Source="{Binding Files}">
             <CollectionViewSource.GroupDescriptions>
-                <PropertyGroupDescription PropertyName="File.Dir" />
+                <PropertyGroupDescription PropertyName="Display.DisplayDir" />
             </CollectionViewSource.GroupDescriptions>
         </CollectionViewSource>
 
         <!--  提示框  -->
         <ToolTip
-            x:Key="toolTip" Padding="8" BorderThickness="0"
-            Placement="Right"
+            x:Key="toolTip" Padding="8"
+            BorderThickness="0" Placement="Right"
             Visibility="{Binding Path=(root:Configs.ShowToolTip), Mode=OneWay, Converter={StaticResource b2v}}">
             <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
                 <TextBlock
-                    Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center"
+                    Grid.Row="0" Grid.Column="2"
+                    HorizontalAlignment="Center"
                     Style="{StaticResource BaseTextBlockStyle}"
                     Text="{Binding Display.DisplayName}"
                     TextWrapping="Wrap" />
 
                 <component:FileIcon
-                    DisplayRawImage="True" EnableCache="False"
+                    DisplayRawImage="True"
+                    EnableCache="False"
                     File="{Binding ., Mode=OneTime}"
                     Scale="-360" Square="False"
                     Visibility="{Binding Path=(root:Configs.ShowToolTipImage), Mode=OneWay, Converter={StaticResource b2v}}" />
@@ -102,17 +112,30 @@
                     <TextBlock Grid.Row="8" VerticalAlignment="Center">修改时间：</TextBlock>
                     <TextBlock Grid.Row="10" VerticalAlignment="Center">创建时间：</TextBlock>
                     <TextBlock
-                        Grid.Row="0" Grid.Column="2" VerticalAlignment="Center"
+                        Grid.Row="0" Grid.Column="2"
+                        VerticalAlignment="Center"
                         FontWeight="Bold"
                         Text="{Binding Display.DisplayName}" />
                     <TextBlock
-                        Grid.Row="2" Grid.Column="2" VerticalAlignment="Center"
+                        Grid.Row="2" Grid.Column="2"
+                        VerticalAlignment="Center"
                         Text="{Binding Display.DisplayDir}"
                         TextWrapping="Wrap" />
-                    <TextBlock Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" Text="{Binding Display.Length}" />
-                    <component:TagGroup Grid.Row="6" Grid.Column="2" File="{Binding .}" />
-                    <TextBlock Grid.Row="8" Grid.Column="2" VerticalAlignment="Center" Text="{Binding FileInfo.LastWriteTime}" />
-                    <TextBlock Grid.Row="10" Grid.Column="2" VerticalAlignment="Center" Text="{Binding FileInfo.CreationTime}" />
+                    <TextBlock
+                        Grid.Row="4" Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Text="{Binding Display.Length}" />
+                    <component:TagGroup
+                        Grid.Row="6" Grid.Column="2"
+                        File="{Binding .}" />
+                    <TextBlock
+                        Grid.Row="8" Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Text="{Binding FileInfo.LastWriteTime}" />
+                    <TextBlock
+                        Grid.Row="10" Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Text="{Binding FileInfo.CreationTime}" />
 
                 </Grid>
             </m:SimpleStackPanel>
@@ -121,57 +144,85 @@
         <!--#region  视图模板-->
         <!--  图标视图模板  -->
         <DataTemplate x:Key="grdIconView">
-            <Border MinWidth="64" Padding="0,8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <DockPanel Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ToolTip="{StaticResource toolTip}">
+            <Border
+                MinWidth="64" Padding="0,8"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+                <DockPanel
+                    Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    ToolTip="{StaticResource toolTip}">
                     <TextBlock
                         Height="36"
                         MaxWidth="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}"
-                        Margin="0,8,0,0" HorizontalAlignment="Center"
+                        Margin="0,8,0,0"
+                        HorizontalAlignment="Center"
                         DockPanel.Dock="Bottom" LineHeight="16"
                         Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
                         TextWrapping="Wrap"
                         Visibility="{Binding Path=Display.ShowIconViewNames, Converter={StaticResource b2v}}" />
-                    <component:FileIcon Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" File="{Binding .}" Scale="2.0" />
+                    <component:FileIcon
+                        Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
+                        Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
+                        File="{Binding .}"
+                        Scale="2.0" />
                 </DockPanel>
             </Border>
         </DataTemplate>
 
         <!--  平铺视图模板  -->
         <DataTemplate x:Key="grdTileView">
-            <Grid Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}" HorizontalAlignment="Stretch" VerticalAlignment="Center" ToolTip="{StaticResource toolTip}">
+            <Grid
+                Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource three}}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                ToolTip="{StaticResource toolTip}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" />
                     <ColumnDefinition Width="8" />
                     <ColumnDefinition Width="144" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="8" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
+                    <RowDefinition Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource half}}" />
+                    <RowDefinition Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource half}}" />
+                    <RowDefinition Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource half}}" />
+                    <RowDefinition Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource half}}" />
+                    <RowDefinition Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource half}}" />
+                    <RowDefinition Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource half}}" />
+
                 </Grid.RowDefinitions>
                 <TextBlock
-                    Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left"
+                    Grid.Row="1" Grid.RowSpan="3" Grid.Column="2"
+                    HorizontalAlignment="Left"
                     Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
                     TextWrapping="Wrap" />
                 <TextBlock
-                    Grid.Row="3" Grid.Column="2" Foreground="Gray"
+                    Grid.Row="4" Grid.RowSpan="1" Grid.Column="2"
+                    Foreground="Gray"
                     Style="{StaticResource CaptionTextBlockStyle}"
                     Text="{Binding Display.DisplayDir, Mode=OneTime}"
                     TextWrapping="Wrap"
                     Visibility="{Binding Display.ShowTileViewPaths, Converter={StaticResource b2v}}" />
                 <component:TagGroup
                     Grid.RowSpan="99" Grid.ColumnSpan="99"
-                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
                     File="{Binding .}"
-                    Orientation="Horizontal" TagMouseDown="Tags_MouseDown" />
-                <component:FileIcon Grid.RowSpan="99" File="{Binding .}" Scale="2.0" />
+                    Orientation="Horizontal"
+                    TagMouseDown="Tags_MouseDown" />
+                <component:FileIcon
+                    Grid.Row="1" Grid.RowSpan="4"
+                    File="{Binding .}"
+                    Scale="2.0" />
             </Grid>
         </DataTemplate>
 
         <!--  列表和树状视图模板  -->
-        <HierarchicalDataTemplate x:Key="listDataTemplate" ItemsSource="{Binding SubUIFiles}">
+        <HierarchicalDataTemplate
+            x:Key="listDataTemplate"
+            DataType="{x:Type uim:UIFile}"
+            ItemsSource="{Binding SubUIFiles}">
             <Grid Margin="0,4,24,4" ToolTip="{StaticResource toolTip}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="{Binding Path=(root:Configs.IconSize)}" />
@@ -191,16 +242,23 @@
                 </Grid.RowDefinitions>
                 <component:FileIcon Grid.RowSpan="99" File="{Binding .}" />
                 <TextBlock
-                    Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3"
-                    FontWeight="Bold"
+                    Grid.Row="1" Grid.Column="2"
+                    Grid.ColumnSpan="3" FontWeight="Bold"
                     Text="{Binding Display.DisplayName}" />
                 <TextBlock
-                    Grid.Row="3" Grid.Column="2" Width="108"
+                    Grid.Row="3" Grid.Column="2"
+                    Width="108"
                     Foreground="{DynamicResource SystemControlBackgroundBaseMediumHighBrush}"
                     Text="{Binding Display.Length}" />
-                <TextBlock Grid.Row="3" Grid.Column="4" Foreground="{DynamicResource SystemControlBackgroundBaseMediumBrush}" Text="{Binding Display.DisplayDir}" />
+                <TextBlock
+                    Grid.Row="3" Grid.Column="4"
+                    Foreground="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
+                    Text="{Binding Display.DisplayDir}" />
                 <!--  横向的标签列表  -->
-                <component:TagGroup Grid.RowSpan="99" Grid.Column="99" File="{Binding .}" TagMouseDown="Tags_MouseDown" />
+                <component:TagGroup
+                    Grid.RowSpan="99" Grid.Column="99"
+                    File="{Binding .}"
+                    TagMouseDown="Tags_MouseDown" />
             </Grid>
         </HierarchicalDataTemplate>
         <!--#endregion-->
@@ -218,7 +276,9 @@
 
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <wpftk:VirtualizingWrapPanel Margin="0,0,16,0" Orientation="Vertical" SpacingMode="Uniform" />
+                    <wpftk:VirtualizingWrapPanel
+                        Margin="0,0,16,0" Orientation="Vertical"
+                        SpacingMode="Uniform" />
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
             <ListView.GroupStyle>
@@ -345,7 +405,9 @@
                 QuerySubmitted="SearchTextBox_QuerySubmitted"
                 TextChanged="SearchTextBox_TextChanged" />
             <m:ProgressRing x:Name="progress" Grid.Column="4" />
-            <Grid x:Name="grdAppBar" Grid.Column="99" HorizontalAlignment="Right">
+            <Grid
+                x:Name="grdAppBar" Grid.Column="99"
+                HorizontalAlignment="Right">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -356,32 +418,49 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <m:AppBarToggleButton Grid.Column="3" Click="ViewTypeButton_Click" Label="列表" Tag="1">
+                <m:AppBarToggleButton
+                    Grid.Column="3"
+                    Click="ViewTypeButton_Click" Label="列表"
+                    Tag="1">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon Glyph="&#xF168;" />
                     </m:AppBarToggleButton.Icon>
                 </m:AppBarToggleButton>
-                <m:AppBarToggleButton Grid.Column="4" Click="ViewTypeButton_Click" Label="图标" Tag="2">
+                <m:AppBarToggleButton
+                    Grid.Column="4"
+                    Click="ViewTypeButton_Click" Label="图标"
+                    Tag="2">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon Glyph="&#xF0E2;" />
                     </m:AppBarToggleButton.Icon>
                 </m:AppBarToggleButton>
-                <m:AppBarToggleButton Grid.Column="5" Click="ViewTypeButton_Click" Label="平铺" Tag="3">
+                <m:AppBarToggleButton
+                    Grid.Column="5"
+                    Click="ViewTypeButton_Click" Label="平铺"
+                    Tag="3">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon Glyph="&#xE8BC;" />
                     </m:AppBarToggleButton.Icon>
                 </m:AppBarToggleButton>
-                <m:AppBarToggleButton Grid.Column="6" Click="ViewTypeButton_Click" Label="树型" Tag="4">
+                <m:AppBarToggleButton
+                    Grid.Column="6"
+                    Click="ViewTypeButton_Click" Label="树型"
+                    Tag="4">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon Glyph="&#xED25;" />
                     </m:AppBarToggleButton.Icon>
                 </m:AppBarToggleButton>
-                <m:AppBarToggleButton Grid.Column="7" Click="ViewTypeButton_Click" Label="详细信息" Tag="5">
+                <m:AppBarToggleButton
+                    Grid.Column="7"
+                    Click="ViewTypeButton_Click"
+                    Label="详细信息" Tag="5">
                     <m:AppBarToggleButton.Icon>
                         <m:FontIcon Glyph="&#xE8FD;" />
                     </m:AppBarToggleButton.Icon>
                 </m:AppBarToggleButton>
-                <TextBlock x:Name="Control5Output" Margin="8,0,0,0" VerticalAlignment="Center" />
+                <TextBlock
+                    x:Name="Control5Output" Margin="8,0,0,0"
+                    VerticalAlignment="Center" />
             </Grid>
         </Grid>
 

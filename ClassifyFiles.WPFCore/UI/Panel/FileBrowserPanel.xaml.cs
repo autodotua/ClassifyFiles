@@ -45,7 +45,7 @@ namespace ClassifyFiles.UI.Panel
             filesViewer.Project = project;
             await filesViewer.SetFilesAsync(null);
             await classPanel.LoadAsync(project);
-
+            UpdateAppBarButtonsEnable();
         }
 
         #region 分类面板
@@ -76,10 +76,10 @@ namespace ClassifyFiles.UI.Panel
             }
             else
             {
-                await SetFilesAsync(() => GetFilesByClassAsync(classPanel.SelectedItem.ID),FileCollectionType.Class);
+                await SetFilesAsync(() => GetFilesByClassAsync(classPanel.SelectedItem.ID), FileCollectionType.Class);
             }
         }
-        
+
         /// <summary>
         /// 分类面板接收到文件拖放信息
         /// </summary>
@@ -94,7 +94,7 @@ namespace ClassifyFiles.UI.Panel
             else if (e.UIFiles != null)//说明是由软件内部拖放过来的
             {
                 var files = await AddFilesToClassAsync(e.UIFiles.Select(p => p.File), e.Class);
-                if (currentFileCollectionType==FileCollectionType.NoClass)
+                if (currentFileCollectionType == FileCollectionType.NoClass)
                 {
                     //如果当前显示的是没有被分类的文件，那么当拖放之后，自然就不再是没有分类的文件了，所以要从列表中删去
                     await filesViewer.RemoveFilesAsync(e.UIFiles);
@@ -178,7 +178,13 @@ namespace ClassifyFiles.UI.Panel
         /// <param name="e"></param>
         private void FilesViewer_ViewTypeChanged(object sender, EventArgs e)
         {
-            btnLocateByDir.IsEnabled = filesViewer.CurrentFileView != FileView.Tree;
+            UpdateAppBarButtonsEnable();
+        }
+
+        private void UpdateAppBarButtonsEnable()
+        {
+            btnLocateByDir.IsEnabled = filesViewer.CurrentFileView != FileView.Tree
+              && Configs.SortType == (int)SortType.Default;
             btnSort.IsEnabled = filesViewer.CurrentFileView != FileView.Tree;
         }
 
@@ -324,6 +330,7 @@ namespace ClassifyFiles.UI.Panel
                 }
                 this.Notify(nameof(GroupByDir));
                 filesViewer.SetGroupEnable(value);
+                UpdateAppBarButtonsEnable();
             }
         }
 
@@ -366,7 +373,7 @@ namespace ClassifyFiles.UI.Panel
             string dir = e.AddedItems.Count == 0 ? null : e.AddedItems.Cast<string>().First();
             if (dir != null)
             {
-                filesViewer.SelectFileByDir(dir);
+                await filesViewer.SelectFileByDirAsync(dir);
                 //延时1/4秒，让用户能够看到被选中的状态
                 await Task.Delay(250);
                 flyoutJumpToDir.Hide();// = false;
@@ -442,7 +449,11 @@ namespace ClassifyFiles.UI.Panel
             SelectedClassChanged(null, null);
         }
 
-
+        /// <summary>
+        /// 排序类型的单选框被选择
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void RadioMenuItem_Checked(object sender, RoutedEventArgs e)
         {
             if (!IsLoaded || isSettingSortChecked)
@@ -456,7 +467,7 @@ namespace ClassifyFiles.UI.Panel
             Configs.GroupByDir = false;
 
             this.Notify(nameof(GroupByDir));
-            //GroupByDir = false;
+            UpdateAppBarButtonsEnable();
             GetProgress().Close();
         }
         #endregion

@@ -10,16 +10,21 @@ namespace ClassifyFiles.UI.Util
 {
     public class TreeViewHelper<TModel>
     {
-        public TreeViewHelper(TreeView treeView, Func<TModel, TModel> getParent, Func<TModel, IList<TModel>> getSubItems)
+        public TreeViewHelper(TreeView treeView,
+            Func<TModel, TModel> getParent,
+            Func<TModel, IList<TModel>> getSubItems,
+             Action<TModel,TModel> setParent)
         {
             TreeView = treeView;
             GetParent = getParent;
             GetSubItems = getSubItems;
+            SetParent = setParent;
         }
 
         public TreeView TreeView { get; }
         public Func<TModel, TModel> GetParent { get; }
         public Func<TModel, IList<TModel>> GetSubItems { get; }
+        public Action<TModel, TModel> SetParent { get; }
 
         public void SelectItemWhileLoaded(TModel node, IList<TModel> rootNodes)
         {
@@ -146,16 +151,15 @@ namespace ClassifyFiles.UI.Util
             if (rootNodes.Contains(node))
             {
                 rootNodes.Remove(node);
+                SetParent(node, default);
+                //TreeView.UpdateLayout();
+                //TreeView.Items.Refresh();
             }
             else
             {
-                //树状图只能删除一条，之后的虽然从数据库中删除了，但是不会从视图中删除
-                //目前不知道原因
-                var pItem =await GetItemAsync(GetParent(node), rootNodes);
                 var items = GetSubItems(GetParent(node));
                 items.Remove(node);
-                //所以目前只能够重新绑定进行刷新视图，投机取巧我喜欢
-                pItem.ItemsSource = items;
+                SetParent(node, default);
                 if (items.Count>0)
                 {
                     await SelectItemAsync(items[0], rootNodes);

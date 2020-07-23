@@ -45,7 +45,8 @@ namespace ClassifyFiles.UI.Panel
             treeViewHelper = new TreeViewHelper<UIFile>(
                 FindResource("treeFiles") as TreeView,
                 p => p.Parent,
-                p => p.SubUIFiles
+                p => p.SubUIFiles,
+                (c, p) => c.Parent = p
                 );
             new DragDropFilesHelper(FindResource("lvwFiles") as ListBox).Regist();
             new DragDropFilesHelper(FindResource("grdFiles") as ListBox).Regist();
@@ -59,6 +60,7 @@ namespace ClassifyFiles.UI.Panel
             }
 
             FileIcon.Tasks.ProcessStatusChanged += TaskQueue_ProcessStatusChanged;
+
         }
 
         #region 属性和字段
@@ -96,20 +98,23 @@ namespace ClassifyFiles.UI.Panel
             set
             {
                 files = value;
-                this.Notify(nameof(Files), nameof(FileTree));
+                this.Notify(nameof(Files));
             }
         }
 
+        private ObservableCollection<UIFile> fileTree;
         /// <summary>
         /// 供树状图使用的文件树
         /// </summary>
-        public List<UIFile> FileTree => Files == null ? null : new List<UIFile>(
-            FileUtility.GetFileTree(Project, Files,
-                p => new UIFile(p),
-                p => p.File,
-                p => p.SubUIFiles,
-                (c, p) => c.Parent = p)
-            .SubUIFiles);
+        public ObservableCollection<UIFile> FileTree
+        {
+            get => fileTree;
+            set
+            {
+                fileTree = value;
+                this.Notify(nameof(FileTree));
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
@@ -151,8 +156,14 @@ namespace ClassifyFiles.UI.Panel
                     await SortAsync((SortType)Configs.SortType, filesWithIcon);
                 }
             }
+            ResetFileTree();
         }
-
+        /// <summary>
+        /// 添加文件
+        /// </summary>
+        /// <param name="files"></param>
+        /// <param name="tags"></param>
+        /// <returns></returns>
         public async Task AddFilesAsync(IEnumerable<File> files, bool tags = true)
         {
             List<UIFile> filesWithIcon = new List<UIFile>();
@@ -172,8 +183,17 @@ namespace ClassifyFiles.UI.Panel
             }
 
             this.Notify(nameof(Files));
+            ResetFileTree();
+            if (filesWithIcon.Count > 0)
+            {
+                await SelectFileAsync(filesWithIcon.First());
+            }
         }
-
+        /// <summary>
+        /// 移除文件
+        /// </summary>
+        /// <param name="files"></param>
+        /// <returns></returns>
         public async Task RemoveFilesAsync(IEnumerable<UIFile> files)
         {
             foreach (var file in files)
@@ -182,11 +202,24 @@ namespace ClassifyFiles.UI.Panel
 
                 if (CurrentFileView == FileView.Tree && GetSelectedFile() != null)
                 {
+                    //树状图需要单独移除
                     await treeViewHelper.RemoveItemAsync(file, FileTree);
                 }
             }
         }
-
+        /// <summary>
+        /// 重新设置树状图
+        /// </summary>
+        private void ResetFileTree()
+        {
+            FileTree = Files == null ? null : new ObservableCollection<UIFile>(
+             FileUtility.GetFileTree(Project, Files,
+                 p => new UIFile(p),
+                 p => p.File,
+                 p => p.SubUIFiles,
+                 (c, p) => c.Parent = p)
+             .SubUIFiles);
+        }
         /// <summary>
         /// 获取被选中的文件（1个）
         /// </summary>
@@ -219,38 +252,34 @@ namespace ClassifyFiles.UI.Panel
         /// 选择指定文件夹的第一个文件
         /// </summary>
         /// <param name="dir"></param>
-        public void SelectFileByDir(string dir)
+        public async Task SelectFileByDirAsync(string dir)
         {
-            UIFile file = null;
-            switch (CurrentFileView)
+            UIFile file = Files.FirstOrDefault(p => p.File.Dir == dir);
+            if (file != null)
             {
-                case FileView.List:
-                case FileView.Icon:
-                case FileView.Tile:
-                case FileView.Detail:
-                    file = Files.FirstOrDefault(p => p.File.Dir == dir);
-                    break;
-                default:
-                    break;
+                await SelectFileAsync(file);
             }
-            SelectFile(file);
         }
 
         /// <summary>
         /// 选中指定文件
         /// </summary>
         /// <param name="file"></param>
-        public void SelectFile(UIFile file)
+        public async Task SelectFileAsync(UIFile file)
         {
             if (FilesContent is ListBox lbx)
             {
                 lbx.SelectedItem = file;
                 lbx.ScrollIntoView(file);
             }
-            else if (filesContent is ModernWpf.Controls.ListView lvw)
+            else if (FilesContent is ModernWpf.Controls.ListView lvw)
             {
                 lvw.SelectedItem = file;
                 lvw.ScrollIntoView(file);
+            }
+            else if (FilesContent is TreeView tree)
+            {
+                await treeViewHelper.SelectItemWhileLoadedAsync(file, FileTree);
             }
         }
 
@@ -453,17 +482,10 @@ namespace ClassifyFiles.UI.Panel
 
             if (selectedFile != null)
             {
-                if (FilesContent is ListBox list)
-                {
-                    list.SelectedItem = selectedFile;
-                    list.ScrollIntoView(selectedFile);
-                }
-                if (FilesContent is TreeView tree)
-                {
-                    await treeViewHelper.SelectItemWhileLoadedAsync(selectedFile, FileTree);
-                }
+                await SelectFileAsync(selectedFile);
             }
         }
+
 
         /// <summary>
         /// 当前的视图
@@ -650,10 +672,10 @@ namespace ClassifyFiles.UI.Panel
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private void SearchTextBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        private async void SearchTextBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             UIFile file = args.ChosenSuggestion as UIFile;
-            SelectFile(file);
+            await SelectFileAsync(file);
         }
 
         #endregion
