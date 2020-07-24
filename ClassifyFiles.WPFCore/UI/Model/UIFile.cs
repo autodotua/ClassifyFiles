@@ -58,9 +58,9 @@ namespace ClassifyFiles.UI.Model
         private bool loaded = false;
         public UIFileDisplay Display { get; set; }
         public System.IO.FileInfo FileInfo { get; private set; }
-        public async Task LoadAsync(AppDbContext db = null)
+        public async Task LoadAsync(AppDbContext db = null,bool force=false)
         {
-            if (!loaded)
+            if (!loaded || force)
             {
                 loaded = true;
                 IEnumerable<Class> classes;

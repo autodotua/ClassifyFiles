@@ -4,27 +4,50 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:ClassifyFiles.UI.Panel"
+    xmlns:m="http://schemas.modernwpf.com/2019"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
-    d:DesignHeight="450" d:DesignWidth="800" mc:Ignorable="d">
+    d:DesignHeight="450" d:DesignWidth="800"
+    mc:Ignorable="d">
     <UserControl.Resources>
         <ui:Bool2VisibilityConverter x:Key="b2v" />
 
     </UserControl.Resources>
+    <Grid>    
+        <ListBox
+            Background="Transparent"
+            ItemsSource="{Binding UIClasses}"
+            SelectedItem="{Binding SelectedUIClass}">
+            <ListBox.Resources>
+                <Style BasedOn="{StaticResource DefaultListBoxItemStyle}" TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="AllowDrop" Value="True" />
+                    <Setter Property="Padding" Value="12,6" />
+                    <EventSetter Event="Drop" Handler="ListBoxItem_Drop" />
+                </Style>
+            </ListBox.Resources>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <m:SimpleStackPanel Orientation="Vertical" Spacing="0">
 
-    <ListBox Background="Transparent" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}">
-        <ListBox.Resources>
-            <Style BasedOn="{StaticResource DefaultListBoxItemStyle}" TargetType="{x:Type ListBoxItem}">
-                <Setter Property="Padding" Value="12,6" />
-                <Setter Property="AllowDrop" Value="True" />
-                <EventSetter Event="Drop" Handler="ListBoxItem_Drop" />
-            </Style>
-        </ListBox.Resources>
-        <ListBox.ItemTemplate>
-            <DataTemplate>
-                <TextBlock Text="{Binding Name}" />
-            </DataTemplate>
-        </ListBox.ItemTemplate>
-    </ListBox>
+                        <TextBlock Text="{Binding Class.Name}" />
+                        <TextBlock Grid.Column="2" Foreground="{DynamicResource SystemControlBackgroundBaseMediumLowBrush}">
+                            <Run Text="{Binding FileCount, Mode=OneWay}" />
+                            <Run>个文件，</Run>
+                            <Run Text="{Binding MatchConditionsCount, Mode=OneWay}" />
+
+                            <Run>个条件</Run>
+                        </TextBlock>
+                    </m:SimpleStackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <!--<ListView.View>
+            <GridView>
+                <GridViewColumn Header="类名"  DisplayMemberBinding="{Binding Class.Name}"/>
+                <GridViewColumn Header="文件数"  DisplayMemberBinding="{Binding FileCount}"/>
+            </GridView>
+        </ListView.View>-->
+        </ListBox>
+    </Grid>
+
 
 </ui:UserControlBase>

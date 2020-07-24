@@ -11,6 +11,8 @@ namespace ClassifyFiles.Data
         public DateTime Time { get; set; }
         [Required]
         public string Message { get; set; } = "";
+        [Required]
+        public string Details { get; set; } = "";
 
     }
 }

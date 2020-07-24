@@ -16,6 +16,7 @@
     <local:ProjectPageBase.Resources>
         <ui:NotFirst2VisibilityConverter x:Key="i2v" />
         <ui:IsNotNull2BoolConverter x:Key="nn2b" />
+        <ui:IsNotNull2VisibilityConverter x:Key="nn2v" />
         <ui:MatchConditionType2ControlVisibilityConverter x:Key="mt2v" />
     </local:ProjectPageBase.Resources>
     <Grid>
@@ -29,10 +30,10 @@
             <ColumnDefinition Width="8" />
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
-        <panel:ClassesPanel x:Name="classes" SelectedClassChanged="classes_SelectedItemChanged_1" />
+        <panel:ClassesPanel x:Name="classes" SelectedClassChanged="SelectedUIClassesChanged" />
         <GroupBox
             Grid.Column="2" Header="匹配条件"
-            IsEnabled="{Binding ElementName=classes, Path=SelectedItem, Converter={StaticResource nn2b}}">
+            IsEnabled="{Binding ElementName=classes, Path=SelectedUIClass, Converter={StaticResource nn2b}}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -108,22 +109,33 @@
                 Click="AddClassInButton_Click"
                 Icon="Add" Label="新增分类" />
             <m:AppBarButton
-                Click="DeleteClassButton_Click"
-                Icon="Delete"
-                IsEnabled="{Binding ElementName=classes, Path=SelectedItem, Converter={StaticResource nn2b}}"
-                Label="删除分类" />
+                x:Name="btnDelete" Icon="Delete"
+                Label="删除分类">
+                <m:AppBarButton.Flyout>
+                    <m:Flyout x:Name="flyDelete">
+                        <Button Background="Red" Click="DeleteClassButton_Click">确认删除</Button>
+                    </m:Flyout>
+                </m:AppBarButton.Flyout>
+            </m:AppBarButton>
             <m:AppBarButton
-                Click="RenameClassButton_Click"
-                Icon="Rename"
-                IsEnabled="{Binding ElementName=classes, Path=SelectedItem, Converter={StaticResource nn2b}}"
-                Label="重命名分类" />
+                x:Name="btnRename" Icon="Rename"
+                Label="重命名分类">
+                <m:AppBarButton.Flyout>
+                    <m:Flyout Closed="Flyout_Closed">
+                        <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
+                            <TextBlock>分类名：</TextBlock>
+                            <TextBox
+                                x:Name="txtName" Width="200"
+                                LostFocus="TextBox_LostFocus" />
+                        </m:SimpleStackPanel>
+                    </m:Flyout>
+                </m:AppBarButton.Flyout>
+            </m:AppBarButton>
             <m:AppBarSeparator />
             <m:AppBarButton
+                x:Name="btnAddMatchCondition"
                 Click="AddMatchConditionButton_Click"
-                Icon="Add"
-                IsEnabled="{Binding ElementName=classes, Path=SelectedItem, Converter={StaticResource nn2b}}"
-                Label="新建匹配条件" />
-
+                Icon="Add" Label="新建匹配条件" />
         </m:CommandBar>
     </Grid>
 </local:ProjectPageBase>

@@ -28,7 +28,7 @@ namespace ClassifyFiles.Util
                 System.Diagnostics.Debug.WriteLine(dbReplacedMessage);
                 try
                 {
-                    await LogUtility.AddLogAsync(dbReplacedMessage + Environment.NewLine + ex.ToString());
+                    await LogUtility.AddLogAsync(dbReplacedMessage, ex.ToString());
                 }
                 catch
                 {
@@ -47,7 +47,7 @@ namespace ClassifyFiles.Util
                 System.Diagnostics.Debug.WriteLine(dbReplacedMessage);
                 try
                 {
-                    LogUtility.AddLogAsync(dbReplacedMessage + Environment.NewLine + ex.ToString()).Wait();
+                    LogUtility.AddLogAsync(dbReplacedMessage, ex.ToString()).Wait();
                 }
                 catch
                 {

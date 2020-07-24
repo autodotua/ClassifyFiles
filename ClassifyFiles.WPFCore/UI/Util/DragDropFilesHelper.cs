@@ -32,7 +32,6 @@ namespace ClassifyFiles.UI.Util
         {
             Point position = e.GetPosition(null);
             double distance = Math.Sqrt(Math.Pow(position.X - beginPosition.X, 2) + Math.Pow(position.Y - beginPosition.Y, 2));
-            System.Diagnostics.Debug.WriteLine(set + "  " + mouseDown);
             //如果还没有放置项，并且鼠标已经按下，并且移动距离超过了10单位
             if (!set && mouseDown && distance > 10)
             {
@@ -58,7 +57,7 @@ namespace ClassifyFiles.UI.Util
             return list switch
             {
                 ListBox lvw => lvw.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
-                TreeView t => t.SelectedItem==null? new List<UIFile>().AsReadOnly() : new List<UIFile>() { t.SelectedItem as UIFile }.AsReadOnly(),
+                TreeView t => t.SelectedItem== null? new List<UIFile>().AsReadOnly() : new List<UIFile>() { t.SelectedItem as UIFile }.AsReadOnly(),
                 _ => new List<UIFile>().AsReadOnly(),
             };
         }

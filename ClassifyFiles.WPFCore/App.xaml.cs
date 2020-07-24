@@ -72,7 +72,7 @@ namespace ClassifyFiles.WPFCore
 
             try
             {
-                await LogUtility.AddLogAsync(e.Exception.ToString());
+                await LogUtility.AddLogAsync(e.Exception.Message, e.Exception.ToString());
             }
             catch (Exception ex)
             {

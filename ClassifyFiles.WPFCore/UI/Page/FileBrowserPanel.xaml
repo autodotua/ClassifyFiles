@@ -302,13 +302,13 @@
             <m:AppBarButton
                 x:Name="btnAddFile"
                 Click="BtnAddFile_Click" Icon="Add"
-                IsEnabled="{Binding ElementName=classPanel, Path=SelectedItem, Converter={StaticResource nn2b}}"
+                IsEnabled="{Binding ElementName=classPanel, Path=SelectedUIClass, Converter={StaticResource nn2b}}"
                 Label="添加文件" />
             <m:AppBarButton
                 x:Name="btnRefresh"
                 Click="RefreshButton_Click"
                 Icon="Refresh"
-                IsEnabled="{Binding ElementName=classPanel, Path=SelectedItem, Converter={StaticResource nn2b}}"
+                IsEnabled="{Binding ElementName=classPanel, Path=SelectedUIClass, Converter={StaticResource nn2b}}"
                 Label="刷新" />
             <m:AppBarButton
                 x:Name="btn"

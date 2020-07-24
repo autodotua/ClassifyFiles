@@ -129,13 +129,16 @@ namespace ClassifyFiles.UI.Model
             {
                 try
                 {
-                    var bitmapImage = new BitmapImage(new Uri(File.GetAbsolutePath(), UriKind.Absolute));
-                    return bitmapImage;
+                    if (System.IO.File.Exists(File.GetAbsolutePath()))
+                    {
+                        var bitmapImage = new BitmapImage(new Uri(File.GetAbsolutePath(), UriKind.Absolute));
+                        return bitmapImage;
+                    }
                 }
-                catch
+                catch(Exception ex)
                 {
-                    return null;
                 }
+                return null;
             }
         }
 
@@ -149,7 +152,15 @@ namespace ClassifyFiles.UI.Model
                     {
                         try
                         {
-                            return new BitmapImage(new Uri(FileUtility.GetThumbnailPath(File.ThumbnailGUID), UriKind.Absolute));
+                            string path = FileUtility.GetThumbnailPath(File.ThumbnailGUID);
+                            if (System.IO.File.Exists(FileUtility.GetThumbnailPath(File.ThumbnailGUID)))
+                            {
+                                return new BitmapImage(new Uri(path, UriKind.Absolute));
+                            }
+                            else
+                            {
+                                File.ThumbnailGUID = null;
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -162,7 +173,15 @@ namespace ClassifyFiles.UI.Model
                     {
                         try
                         {
-                            return new BitmapImage(new Uri(FileUtility.GetIconPath(File.IconGUID), UriKind.Absolute));
+                            string path = FileUtility.GetIconPath(File.IconGUID);
+                            if (System.IO.File.Exists(FileUtility.GetIconPath(File.IconGUID)))
+                            {
+                                return new BitmapImage(new Uri(path, UriKind.Absolute));
+                            }
+                            else
+                            {
+                                File.IconGUID = null;
+                            }
                         }
                         catch (Exception ex)
                         {

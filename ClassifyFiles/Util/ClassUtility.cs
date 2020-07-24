@@ -23,6 +23,14 @@ namespace ClassifyFiles.Util
             return classes;
         }
 
+        public static Task<int> GetFilesCountOfClassAsync(Class c)
+        {
+            return db.FileClasses
+                .Where(p => p.Class == c)
+                .Where(p => !p.Disabled)
+                .CountAsync();
+        }
+
         public static async Task<Class> AddClassAsync(Project project)
         {
             Debug.WriteLine("db: " + nameof(AddClassAsync));
@@ -38,7 +46,7 @@ namespace ClassifyFiles.Util
             db.Entry(c).State = EntityState.Deleted;
             await db.SaveChangesAsync();
         }
-        
+
         public static async Task SaveClassAsync(Class c)
         {
             Debug.WriteLine("db: " + nameof(SaveClassAsync));

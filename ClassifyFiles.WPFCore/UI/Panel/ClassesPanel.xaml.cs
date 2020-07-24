@@ -22,48 +22,60 @@ namespace ClassifyFiles.UI.Panel
     {
         public ClassesPanel()
         {
-            DataContext = this;
             InitializeComponent();
         }
         public async Task LoadAsync(Project project)
         {
             Project = project;
             var classes = await GetClassesAsync(Project);
-            Items = new ObservableCollection<Class>(classes);
-            if (Items.Any(p => p.ID == Configs.LastClassID))
+            UIClasses = new ObservableCollection<UIClass>(classes.Select(p => new UIClass(p)));
+            foreach (var c in UIClasses)
             {
-                SelectedItem = items.First(p => p.ID == Configs.LastClassID);
+                await c.UpdatePropertiesAsync();
+            }
+            if (UIClasses.Any(p => p.Class.ID == Configs.LastClassID))
+            {
+                SelectedUIClass = UIClasses.First(p => p.Class.ID == Configs.LastClassID);
             }
         }
 
-        private ObservableCollection<Class> items;
-        public ObservableCollection<Class> Items
+        private ObservableCollection<UIClass> uIClasses;
+        public ObservableCollection<UIClass> UIClasses
         {
-            get => items;
+            get => uIClasses;
             protected set
             {
-                items = value;
-                this.Notify(nameof(Items));
+                uIClasses = value;
+                this.Notify(nameof(UIClasses));
             }
         }
-        private Class selectedItem;
-        public Class SelectedItem
+        private UIClass selectedUIClass;
+        public UIClass SelectedUIClass
         {
-            get => selectedItem;
+            get => selectedUIClass;
             set
             {
-                if (selectedItem == value)
+                if (selectedUIClass == value)
                 {
                     return;
                 }
-                var oldValue = selectedItem;
-                selectedItem = value;
-                this.Notify(nameof(SelectedItem));
+                var oldValue = selectedUIClass;
+                selectedUIClass = value;
+                this.Notify(nameof(SelectedUIClass));
                 if (value != null)
                 {
-                    Configs.LastClassID = value.ID;
+                    Configs.LastClassID = value.Class.ID;
                 }
-                SelectedClassChanged?.Invoke(this, new SelectedClassChangedEventArgs(oldValue, value));
+                
+                SelectedClassChanged?.Invoke(this, new SelectedClassChangedEventArgs(oldValue?.Class, value?.Class));
+            }
+        }
+
+        public async Task UpdateUIClassesAsync()
+        {
+            foreach (var c in UIClasses)
+            {
+                await c.UpdatePropertiesAsync();
             }
         }
         public Project Project { get; protected set; }
@@ -71,42 +83,26 @@ namespace ClassifyFiles.UI.Panel
         public async Task<Class> AddAsync()
         {
             var c = await AddClassAsync(Project);
-            Items.Add(c);
-            SelectedItem = c;
+            UIClass uiC = new UIClass(c);
+            UIClasses.Add(uiC);
+            SelectedUIClass = uiC;
             return c;
         }
 
         public async Task DeleteSelectedAsync()
         {
-            if (SelectedItem == null)
+            if (SelectedUIClass == null)
             {
                 await new MessageDialog().ShowAsync("请先选择一项", "错误");
             }
             else
             {
-                int index = items.IndexOf(SelectedItem);
-                await DeleteClassAsync(SelectedItem);
-                Items.Remove(SelectedItem);
-                if (Items.Count > 0)
+                int index = UIClasses.IndexOf(SelectedUIClass);
+                await DeleteClassAsync(SelectedUIClass.Class);
+                UIClasses.Remove(SelectedUIClass);
+                if (UIClasses.Count > 0)
                 {
-                    SelectedItem = index == 0 ? Items[0] : Items[index - 1];
-                }
-            }
-        }
-
-        public async Task RenameButton()
-        {
-            if (SelectedItem == null)
-            {
-                await new MessageDialog().ShowAsync("请先选择一项", "错误");
-            }
-            else
-            {
-                string value = await new InputDialog().ShowAsync("重命名", false, "请输入新的标题", SelectedItem.Name);
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    SelectedItem.Name = value;
-                    await SaveClassAsync(SelectedItem);
+                    SelectedUIClass = index == 0 ? UIClasses[0] : UIClasses[index - 1];
                 }
             }
         }
@@ -115,25 +111,25 @@ namespace ClassifyFiles.UI.Panel
 
         private void btnAllFiles_Click(object sender, RoutedEventArgs e)
         {
-            SelectedItem = null;
+            SelectedUIClass = null;
         }
 
         private void ListBoxItem_Drop(object sender, DragEventArgs e)
         {
             ListBoxItem item = sender as ListBoxItem;
-            Class c = item.DataContext as Class;
+            UIClass c = item.DataContext as UIClass;
             //后来想了下，不需要这一段，因为程序可以在类之间进行拖放
             if (e.Data.GetDataPresent(nameof(ClassifyFiles)))
             {
                 var files = (UIFile[])e.Data.GetData(nameof(ClassifyFiles));
-                ClassFilesDrop?.Invoke(sender, new ClassFilesDropEventArgs(c, files));
+                ClassFilesDrop?.Invoke(sender, new ClassFilesDropEventArgs(c.Class, files));
             }
             else if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                ClassFilesDrop?.Invoke(sender, new ClassFilesDropEventArgs(c, files));
+                ClassFilesDrop?.Invoke(sender, new ClassFilesDropEventArgs(c.Class, files));
             }
-            
+
             //开始设置背景渐变动画
             //需要使用非冻结的颜色，因此需要Clone。而且很奇怪，不能加null判断
             item.Background = (FindResource("SystemControlBackgroundBaseLowBrush") as Brush).Clone();
@@ -142,11 +138,11 @@ namespace ClassifyFiles.UI.Panel
                 Duration = Configs.AnimationDuration,
                 FillBehavior = FillBehavior.HoldEnd,
                 To = 1,
-                From=0,
+                From = 0,
                 AutoReverse = true,
                 RepeatBehavior = new RepeatBehavior(3)
             };
-       
+
             item.Background.BeginAnimation(Brush.OpacityProperty, ani);
         }
 

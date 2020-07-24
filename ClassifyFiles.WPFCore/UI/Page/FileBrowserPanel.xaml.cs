@@ -76,14 +76,14 @@ namespace ClassifyFiles.UI.Page
             {
                 return;
             }
-            if (classPanel.SelectedItem == null)
+            if (classPanel.SelectedUIClass == null)
             {
                 //这里应该是不需要有任何操作了
                 //await SetFilesAsync(() => GetFilesByProjectAsync(Project.ID));
             }
             else
             {
-                await SetFilesAsync(() => GetFilesByClassAsync(classPanel.SelectedItem.ID), FileCollectionType.Class);
+                await SetFilesAsync(() => GetFilesByClassAsync(classPanel.SelectedUIClass.Class.ID), FileCollectionType.Class);
             }
         }
 
@@ -106,6 +106,11 @@ namespace ClassifyFiles.UI.Page
                     //如果当前显示的是没有被分类的文件，那么当拖放之后，自然就不再是没有分类的文件了，所以要从列表中删去
                     await filesViewer.RemoveFilesAsync(e.UIFiles);
                 }
+                foreach (var file in e.UIFiles)
+                {
+                    await file.LoadAsync(null);
+                }
+                await classPanel.UpdateUIClassesAsync();
             }
         }
 
@@ -122,7 +127,7 @@ namespace ClassifyFiles.UI.Page
             currentFileCollectionType = type;
             GetProgress().Show(true);
             Debug.WriteLine("Set Files, Project Hashcode is " + Project.GetHashCode()
-            + ", Class is " + (classPanel.SelectedItem == null ? "null" : classPanel.SelectedItem.Name));
+            + ", Class is " + (classPanel.SelectedUIClass == null ? "null" : classPanel.SelectedUIClass.Class.Name));
             List<File> files = await func();
             List<UIFile> uiFiles = null;
 
@@ -138,6 +143,7 @@ namespace ClassifyFiles.UI.Page
             });
             await filesViewer.SetFilesAsync(uiFiles);
 
+            await classPanel.UpdateUIClassesAsync();
             await ApplyDirs();
             GetProgress().Close();
         }
@@ -191,9 +197,9 @@ namespace ClassifyFiles.UI.Page
         /// <param name="e"></param>
         private void FilesViewer_ClickTag(object sender, ClickTagEventArgs e)
         {
-            if (e.Class != classPanel.SelectedItem)
+            if (e.Class != classPanel.SelectedUIClass.Class)
             {
-                classPanel.SelectedItem = e.Class;
+                classPanel.SelectedUIClass = classPanel.UIClasses.First(p => p.Class == e.Class);
             }
         }
 
@@ -204,7 +210,7 @@ namespace ClassifyFiles.UI.Page
         /// <param name="e"></param>
         private async void FileViewer_Drop(object sender, DragEventArgs e)
         {
-            if (classPanel.SelectedItem == null)
+            if (classPanel.SelectedUIClass == null)
             {
                 return;
             }
@@ -217,7 +223,7 @@ namespace ClassifyFiles.UI.Page
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                await AddFilesAsync(classPanel.SelectedItem, files);
+                await AddFilesAsync(classPanel.SelectedUIClass.Class, files);
             }
         }
 
@@ -246,7 +252,7 @@ namespace ClassifyFiles.UI.Page
         private async void BtnAllFiles_Click(object sender, RoutedEventArgs e)
         {
             ignoreClassChanged = true;
-            classPanel.SelectedItem = null;
+            classPanel.SelectedUIClass = null;
             ignoreClassChanged = false;
             await SetFilesAsync(() => GetFilesByProjectAsync(Project.ID), FileCollectionType.All);
         }
@@ -259,7 +265,7 @@ namespace ClassifyFiles.UI.Page
         private async void BtnNoClassesFiles_Click(object sender, RoutedEventArgs e)
         {
             ignoreClassChanged = true;
-            classPanel.SelectedItem = null;
+            classPanel.SelectedUIClass = null;
             ignoreClassChanged = false;
             await SetFilesAsync(() => GetNoClassesFilesByProjectAsync(Project.ID), FileCollectionType.NoClass);
         }
@@ -446,7 +452,7 @@ namespace ClassifyFiles.UI.Page
             GetProgress().Show(true);
             if (new UpdateFilesDialog(Project) { Owner = Window.GetWindow(this) }.ShowDialog() == true)
             {
-                classPanel.SelectedItem = null;
+                classPanel.SelectedUIClass = null;
             }
             GetProgress().Close();
         }
@@ -465,7 +471,7 @@ namespace ClassifyFiles.UI.Page
             };
             if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
             {
-                await AddFilesAsync(classPanel.SelectedItem, dialog.FileNames.ToList());
+                await AddFilesAsync(classPanel.SelectedUIClass.Class, dialog.FileNames.ToList());
             }
         }
 
@@ -479,10 +485,11 @@ namespace ClassifyFiles.UI.Page
             var dialog = new AddFilesDialog(c, files)
             { Owner = Window.GetWindow(this) };
             dialog.ShowDialog();
-            if (c == classPanel.SelectedItem && dialog.AddedFiles != null)
+            if (c == classPanel.SelectedUIClass.Class && dialog.AddedFiles != null)
             {
                 await filesViewer.AddFilesAsync(dialog.AddedFiles);
             }
+            await classPanel.UpdateUIClassesAsync();
         }
 
         /// <summary>

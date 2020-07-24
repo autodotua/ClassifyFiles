@@ -20,6 +20,7 @@ namespace ClassifyFiles.Util
         }
         public static async Task<bool> RefreshIcon(UIFile file)
         {
+
             bool result = false;
             await Task.Run(() =>
             {

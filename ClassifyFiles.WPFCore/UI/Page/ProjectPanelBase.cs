@@ -25,7 +25,7 @@ namespace ClassifyFiles.UI.Page
         {
             Initialized += (p1, p2) =>
             {
-                (Content as System.Windows.FrameworkElement).DataContext = this;
+                (Content as FrameworkElement).DataContext = this;
             };
         }
         public virtual async Task LoadAsync(Project project)

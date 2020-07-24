@@ -62,7 +62,7 @@ namespace ClassifyFiles.UI.Panel
             FileIcon.Tasks.ProcessStatusChanged += TaskQueue_ProcessStatusChanged;
 
         }
-
+        private bool IsSingleWindow { get; set; } = false;
         public Window ShowAsWindow()
         {
             //由于本来一个文件只会同时显示一个图标，所以可以用缓存
@@ -77,7 +77,8 @@ namespace ClassifyFiles.UI.Panel
             {
                 Project = Project,
                 Files = Files,
-                FileTree = FileTree
+                FileTree = FileTree,
+                IsSingleWindow = true
             };
             win.Content = fv;
             win.Show();
@@ -761,61 +762,62 @@ namespace ClassifyFiles.UI.Panel
                 menuOpenFolder.Click += OpenDirMernuItem_Click;
                 menu.Items.Add(menuOpenFolder);
             }
+
             MenuItem menuCopy = new MenuItem() { Header = "复制" };
             menuCopy.Click += MenuCopy_Click;
             menu.Items.Add(menuCopy);
-            MenuItem menuDelete = new MenuItem() { Header = "删除记录", ToolTip = "这不会删除磁盘上的文件，仅仅删除记录" };
-            menuDelete.Click += MenuDelete_Click;
-            menu.Items.Add(menuDelete);
+
+            if (!IsSingleWindow)
+            {
+                MenuItem menuDelete = new MenuItem() { Header = "删除记录", ToolTip = "这不会删除磁盘上的文件，仅仅删除记录" };
+                menuDelete.Click += MenuDelete_Click;
+                menu.Items.Add(menuDelete);
+            }
+
             if (files.Count == 1)
             {
                 MenuItem menuShowProperties = new MenuItem() { Header = "属性" };
                 menuShowProperties.Click += (p1, p2) =>
-                {
                     FileProperty.ShowFileProperties(files[0].File.GetAbsolutePath());
-                };
                 menu.Items.Add(menuShowProperties);
             }
 
-            //if ((!files.Any(p => p.File.IsFolder)
-            //    || CurrentFileView != FileView.Tree)
-            //    && Project.Classes != null)
-            ////要显示标签的条件：有被选中的类，非树状图不能包含文件夹，树状图可以包含文件夹
-            //{
-            menu.Items.Add(new Separator());
-
-            foreach (var tag in Project.Classes)
+            if (!IsSingleWindow)
             {
-                bool? isChecked = null;
-                if (!files.Any(p => p.Classes == null))
+                menu.Items.Add(new Separator());
+
+                foreach (var tag in Project.Classes)
                 {
-                    //首先确保被选中的文件都知道它们的类。
-                    //因为时虚拟列表，所以没有显示的部分可能是还没有得到他们的类的。
-                    if (files.Any(p => p.Classes.Any(q => q.ID == tag.ID)))
+                    bool? isChecked = null;
+                    if (!files.Any(p => p.Classes == null))
                     {
-                        //如果有一部分或全部都属于该类
-                        if (files.All(p => p.Classes.Any(q => q.ID == tag.ID)))
+                        //首先确保被选中的文件都知道它们的类。
+                        //因为时虚拟列表，所以没有显示的部分可能是还没有得到他们的类的。
+                        if (files.Any(p => p.Classes.Any(q => q.ID == tag.ID)))
                         {
-                            //如果全部属于该类
-                            isChecked = true;
+                            //如果有一部分或全部都属于该类
+                            if (files.All(p => p.Classes.Any(q => q.ID == tag.ID)))
+                            {
+                                //如果全部属于该类
+                                isChecked = true;
+                            }
+                            //这里else  isChecked = null;
                         }
-                        //这里else  isChecked = null;
+                        else
+                        {
+                            isChecked = false;
+                        }
                     }
-                    else
+                    CheckBox chk = new CheckBox()
                     {
-                        isChecked = false;
-                    }
+                        Content = tag.Name,
+                        IsChecked = isChecked,
+                        Tag = tag
+                    };
+                    chk.Click += ChkTag_Click;
+                    menu.Items.Add(chk);
                 }
-                CheckBox chk = new CheckBox()
-                {
-                    Content = tag.Name,
-                    IsChecked = isChecked,
-                    Tag = tag
-                };
-                chk.Click += ChkTag_Click;
-                menu.Items.Add(chk);
             }
-            //}
 
         }
 

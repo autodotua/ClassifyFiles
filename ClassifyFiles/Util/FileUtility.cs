@@ -126,11 +126,12 @@ namespace ClassifyFiles.Util
                     //所以提前先把IconGUID的值给了
                     file.IconGUID = guid;
                     //其他文件，同一个格式的用同一个图标
-                    if (F.Exists(iconPath))
+                    if (F.Exists(iconPath) || workingIconExts.ContainsKey(guid))
                     {
                     }
                     else
                     {
+                        workingIconExts.TryAdd(guid, null);
                         GetFileIcon(path).Save(iconPath, ImageFormat.Png);
                     }
                 }
@@ -140,8 +141,9 @@ namespace ClassifyFiles.Util
                 file.IconGUID = "";
             }
             return false;
-
         }
+
+        private static System.Collections.Concurrent.ConcurrentDictionary<string, object> workingIconExts = new System.Collections.Concurrent.ConcurrentDictionary<string, object>();
         private static Guid GetGuidFromString(string str)
         {
             using MD5 md5 = MD5.Create();

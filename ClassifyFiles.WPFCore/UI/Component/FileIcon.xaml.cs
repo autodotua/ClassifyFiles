@@ -88,7 +88,7 @@ namespace ClassifyFiles.UI.Component
         private bool Load()
         {
             FrameworkElement item;
-            if(DisplayRawImage)
+            if (DisplayRawImage)
             {
                 var rawImage = File.Display.RawImage;
                 item = new Image()
@@ -122,7 +122,8 @@ namespace ClassifyFiles.UI.Component
                 }
                 else
                 {
-                    if (File.Display.Image == null)
+                    var img = File.Display.Image;
+                    if (img == null)
                     {
                         if (main.Content is Image)
                         {
@@ -134,7 +135,7 @@ namespace ClassifyFiles.UI.Component
                     {
                         item = new Image()
                         {
-                            Source = File.Display.Image,
+                            Source = img,
                         };
                     }
                     item.HorizontalAlignment = HorizontalAlignment.Center;
@@ -174,7 +175,7 @@ namespace ClassifyFiles.UI.Component
                     }
                 };
             }
-           void Set()
+            void Set()
             {
                 view.Width = Configs.IconSize * Scale;
                 if (Square)
@@ -183,7 +184,7 @@ namespace ClassifyFiles.UI.Component
                 }
             }
         }
-       
+
         private async void UserControlBase_Loaded(object sender, RoutedEventArgs e)
         {
 

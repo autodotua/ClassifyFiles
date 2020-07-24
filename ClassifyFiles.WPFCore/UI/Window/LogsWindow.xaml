@@ -1,37 +1,47 @@
 ﻿<local:WindowBase
     x:Class="ClassifyFiles.UI.LogsWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ClassifyFiles.UI"
-        mc:Ignorable="d"
-                xmlns:m="http://schemas.modernwpf.com/2019"
-    WindowStartupLocation="CenterOwner"
-        Title="日志" Height="450" Width="600">
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ClassifyFiles.UI"
+    xmlns:m="http://schemas.modernwpf.com/2019"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="日志" Width="800"
+    Height="600"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
     <Grid Margin="4">
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="8"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-        <ListView x:Name="lvw" ItemsSource="{Binding Logs}" Style="{StaticResource {x:Static GridView.GridViewStyleKey}}"    >
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="时间" DisplayMemberBinding="{Binding Time}"/>
-                        <GridViewColumn Header="内容" DisplayMemberBinding="{Binding Message}"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
-            <m:SimpleStackPanel Grid.Row="2" Spacing="12" Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock VerticalAlignment="Center">开始时间：</TextBlock>
-                <DatePicker SelectedDate="{Binding DateBegin}"/>
-                <TextBlock VerticalAlignment="Center">结束时间：</TextBlock>
-                <DatePicker SelectedDate="{Binding DateEnd}"/>
-                <Button VerticalAlignment="Center"  Click="Button_Click_2" >搜索</Button>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ListView
+            x:Name="lvw"
+            ItemsSource="{Binding Logs}"
+            
+            Style="{StaticResource {x:Static GridView.GridViewStyleKey}}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding Time}" Header="时间" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Message}" Header="内容" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <TextBox IsReadOnly="True" Grid.Row="2" Text="{Binding ElementName=lvw, Path=SelectedItem.Details}"/>
+        <m:SimpleStackPanel
+            Grid.Row="4" HorizontalAlignment="Right"
+            Orientation="Horizontal" Spacing="12">
+            <TextBlock VerticalAlignment="Center">开始时间：</TextBlock>
+            <DatePicker SelectedDate="{Binding DateBegin}" />
+            <TextBlock VerticalAlignment="Center">结束时间：</TextBlock>
+            <DatePicker SelectedDate="{Binding DateEnd}" />
+            <Button VerticalAlignment="Center" Click="Button_Click_2">搜索</Button>
 
-            </m:SimpleStackPanel> 
-        </Grid>
+        </m:SimpleStackPanel>
+    </Grid>
 
 </local:WindowBase>

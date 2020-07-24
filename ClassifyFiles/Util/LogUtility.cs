@@ -15,9 +15,9 @@ namespace ClassifyFiles.Util
             return db.Logs.Where(p => p.Time > from && p.Time < to).ToListAsync() ;
         }
 
-        public async static Task AddLogAsync(string message)
+        public async static Task AddLogAsync(string message,string details)
         {
-            Log log = new Log() { Time = DateTime.Now, Message = message };
+            Log log = new Log() { Time = DateTime.Now, Message = message,Details= details };
             db.Logs.Add(log);
             await db.SaveChangesAsync();
         }

@@ -22,6 +22,7 @@ using ClassifyFiles.UI;
 using System.Windows.Markup;
 using System.Diagnostics;
 using ClassifyFiles.UI.Event;
+using ClassifyFiles.UI.Model;
 
 namespace ClassifyFiles.UI.Page
 {
@@ -45,6 +46,29 @@ namespace ClassifyFiles.UI.Page
         }
         private void WindowBase_Loaded(object sender, RoutedEventArgs e)
         {
+            //不知道为什么，Xaml里绑定不上，只好在代码里绑定了
+            btnDelete.SetBinding(IsEnabledProperty, new Binding(nameof(classes.SelectedUIClass))
+            {
+                ElementName = nameof(classes),
+                Converter = new IsNotNull2BoolConverter()
+            });
+            btnRename.SetBinding(IsEnabledProperty, new Binding(nameof(classes.SelectedUIClass))
+            {
+                ElementName = nameof(classes),
+                Converter = new IsNotNull2BoolConverter()
+            });
+            btnAddMatchCondition.SetBinding(IsEnabledProperty, new Binding(nameof(classes.SelectedUIClass))
+            {
+                ElementName = nameof(classes),
+                Converter = new IsNotNull2BoolConverter()
+            });
+            //但是最后一个无论如何都还是绑定不上
+            txtName.SetBinding(TextBox.TextProperty, 
+                new Binding($"{nameof(classes.SelectedUIClass)}.{nameof(UIClass.Class)}.{nameof(Class.Name)}")
+            {
+                ElementName = nameof(classes),
+                Mode=BindingMode.TwoWay
+            });
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -69,7 +93,7 @@ namespace ClassifyFiles.UI.Page
         public Task SaveClassAsync()
         {
 
-            return SaveClassAsync(classes.SelectedItem as Class);
+            return SaveClassAsync(classes.SelectedUIClass?.Class);
 
         }
         public async Task SaveClassAsync(Class c)
@@ -98,11 +122,7 @@ namespace ClassifyFiles.UI.Page
         private async void DeleteClassButton_Click(object sender, RoutedEventArgs e)
         {
             await classes.DeleteSelectedAsync();
-        }
-
-        private async void RenameClassButton_Click(object sender, RoutedEventArgs e)
-        {
-            await classes.RenameButton();
+            flyDelete.Hide();
         }
 
         private void AddMatchConditionButton_Click(object sender, RoutedEventArgs e)
@@ -110,22 +130,36 @@ namespace ClassifyFiles.UI.Page
             MatchConditions.Add(new MatchCondition() { Index = MatchConditions.Count });
         }
 
-
-
-        private async void classes_SelectedItemChanged_1(object sender, SelectedClassChangedEventArgs e)
+        private async void SelectedUIClassesChanged(object sender, SelectedClassChangedEventArgs e)
         {
-            var old = e.OldValue as Class;
-            if (old != null)
+            //加个延时，让UI先反应一下
+            await Task.Delay(100);
+            Class old = e.OldValue;
+            if (old != null && e.NewValue != null)
             {
                 await SaveClassAsync(old);
             }
-            if (classes.SelectedItem == null)
+            if (classes.SelectedUIClass == null)
             {
                 MatchConditions = null;
             }
             else
+            {
                 MatchConditions = new ObservableCollection<MatchCondition>
-                    (classes.SelectedItem.MatchConditions.OrderBy(p => p.Index));
+                    (classes.SelectedUIClass.Class.MatchConditions.OrderBy(p => p.Index));
+            }
+            txtName.Text = classes.SelectedUIClass?.Class.Name;
+
+        }
+
+        private async void TextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private async void Flyout_Closed(object sender, object e)
+        {
+            classes.SelectedUIClass.Class.Name = txtName.Text;
+            await SaveClassAsync(classes.SelectedUIClass.Class);
 
         }
     }

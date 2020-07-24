@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:root="clr-namespace:ClassifyFiles" Title="添加文件"
     Width="600" Closing="WindowBase_Closing"
-    Loaded="Dialog_Loaded" SizeToContent="Height"
+    Loaded="Dialog_Loaded" Height="390"
     mc:Ignorable="d">
     <m:SimpleStackPanel Margin="8" VerticalAlignment="Center" Orientation="Vertical" Spacing="16">
         <m:SimpleStackPanel x:Name="stkSettings" Orientation="Vertical" Spacing="8">

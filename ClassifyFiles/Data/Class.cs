@@ -2,23 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClassifyFiles.Data
 {
-    public class Config : DbModelBase
-    {
-        public Config()
-        {
-
-        }
-        public Config(string key, string value)
-        {
-            Key = key;
-            Value = value;
-        }
-        public string Key { get; set; }
-        public string Value { get; set; }
-    }
     public class Class : DbModelBase
     {
         private string name = "";
@@ -32,10 +19,10 @@ namespace ClassifyFiles.Data
                 this.Notify(nameof(Name));
             }
         }
-        //public string Name { get; set; } = "";
         public Project Project { get; set; }
         [Required]
         public int ProjectID { get; set; }
+        public bool Secondary { get; set; } = false;
         public List<MatchCondition> MatchConditions { get; set; } = new List<MatchCondition>();
 
     }

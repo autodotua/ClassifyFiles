@@ -6,19 +6,45 @@
     xmlns:local="clr-namespace:ClassifyFiles.UI.Dialog"
     xmlns:m="http://schemas.modernwpf.com/2019"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="更新文件" Width="600" Closing="WindowBase_Closing"
-    SizeToContent="Height" mc:Ignorable="d">
-    <m:SimpleStackPanel Margin="8" Orientation="Vertical" Spacing="16">
-        <m:SimpleStackPanel x:Name="stkSettings" Orientation="Vertical" Spacing="8">
+    Title="更新文件" Width="600"
+    Height="360"
+    Closing="WindowBase_Closing"
+    mc:Ignorable="d">
+    <m:SimpleStackPanel
+        Margin="8" Orientation="Vertical"
+        Spacing="16">
+        <m:SimpleStackPanel
+            x:Name="stkSettings"
+            Orientation="Vertical" Spacing="8">
             <CheckBox x:Name="chkResearch" IsChecked="True">重新搜索物理文件</CheckBox>
-            <CheckBox x:Name="chkIncludeThumbnails" Margin="12,0" IsChecked="False" IsEnabled="{Binding IsChecked, ElementName=chkResearch}">生成缩略图</CheckBox>
-            <CheckBox x:Name="chkIncludeExplorerIcons" Margin="12,0" IsChecked="False" IsEnabled="{Binding IsChecked, ElementName=chkResearch}">生成资源管理器图标</CheckBox>
-            <CheckBox x:Name="chkDeleteNonExistentItems" Margin="12,0" IsChecked="True" IsEnabled="{Binding IsChecked, ElementName=chkResearch}">删除物理文件不存在的文件项</CheckBox>
+            <CheckBox
+                x:Name="chkIncludeThumbnails"
+                Margin="12,0" IsChecked="False"
+                IsEnabled="{Binding IsChecked, ElementName=chkResearch}">
+                生成缩略图
+            </CheckBox>
+            <CheckBox
+                x:Name="chkIncludeExplorerIcons"
+                Margin="12,0" IsChecked="False"
+                IsEnabled="{Binding IsChecked, ElementName=chkResearch}">
+                生成资源管理器图标
+            </CheckBox>
+            <CheckBox
+                x:Name="chkDeleteNonExistentItems"
+                Margin="12,0" IsChecked="True"
+                IsEnabled="{Binding IsChecked, ElementName=chkResearch}">
+                删除物理文件不存在的文件项
+            </CheckBox>
             <CheckBox x:Name="chkReclassify" IsChecked="True">重新根据匹配条件进行自动分类</CheckBox>
         </m:SimpleStackPanel>
         <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
-            <TextBlock Height="48" Text="{Binding Message}" TextWrapping="Wrap" />
-            <ProgressBar Maximum="1" Minimum="0" Value="{Binding Percentage}" />
+            <TextBlock
+                Height="48"
+                Text="{Binding Message}"
+                TextWrapping="Wrap" />
+            <ProgressBar
+                Maximum="1" Minimum="0"
+                Value="{Binding Percentage}" />
             <Button HorizontalAlignment="Right" Click="Button_Click">开始</Button>
         </m:SimpleStackPanel>
     </m:SimpleStackPanel>
