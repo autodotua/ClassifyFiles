@@ -105,7 +105,7 @@ namespace ClassifyFiles.UI.Model
 
         public override int GetHashCode()
         {
-            return File.GetHashCode();
+            return HashCode.Combine(File);
         }
     }
 }

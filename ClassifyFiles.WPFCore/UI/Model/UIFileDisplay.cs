@@ -6,14 +6,16 @@ using System;
 using System.Linq;
 using System.Windows.Media.Imaging;
 using System.ComponentModel;
+using System.IO;
 
 namespace ClassifyFiles.UI.Model
 {
     public class UIFileDisplay : INotifyPropertyChanged
     {
-        public UIFileDisplay(File file)
+        public UIFileDisplay(Data.File file)
         {
             File = file;
+            FileInfo = new FileInfo(file.GetAbsolutePath());
             if (file.IsFolder)
             {
                 Glyph = FolderGlyph;
@@ -36,7 +38,9 @@ namespace ClassifyFiles.UI.Model
                 };
             }
         }
-        public File File { get; private set; }
+        public Data.File File { get; private set; }
+        public FileInfo FileInfo { get; }
+
         public long? length = null;
         public string Length
         {
@@ -78,6 +82,34 @@ namespace ClassifyFiles.UI.Model
                     return File.Name;
                 }
                 return System.IO.Path.GetFileNameWithoutExtension(File.Name);
+            }
+        }
+        public string DisplayLastWriteTime
+        {
+            get
+            {
+                if (FileInfo.Exists)
+                {
+                    return FileInfo.LastWriteTime.ToString();
+                }
+                else
+                {
+                    return "未知";
+                }
+            }
+        }
+        public string DisplayCreationTime
+        {
+            get
+            {
+                if (FileInfo.Exists)
+                {
+                    return FileInfo.CreationTime.ToString();
+                }
+                else
+                {
+                    return "未知";
+                }
             }
         }
         public string DisplayDir => File.IsFolder ? File.Dir.Substring(0, File.Dir.Length - DisplayName.Length).Trim('\\') : File.Dir;

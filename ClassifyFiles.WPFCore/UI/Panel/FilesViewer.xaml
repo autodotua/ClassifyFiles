@@ -131,11 +131,11 @@
                     <TextBlock
                         Grid.Row="8" Grid.Column="2"
                         VerticalAlignment="Center"
-                        Text="{Binding FileInfo.LastWriteTime}" />
+                        Text="{Binding Display.DisplayLastWriteTime}" />
                     <TextBlock
                         Grid.Row="10" Grid.Column="2"
                         VerticalAlignment="Center"
-                        Text="{Binding FileInfo.CreationTime}" />
+                        Text="{Binding Display.DisplayCreationTime}" />
 
                 </Grid>
             </m:SimpleStackPanel>

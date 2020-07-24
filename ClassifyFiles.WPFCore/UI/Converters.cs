@@ -10,6 +10,30 @@ using System.Windows.Markup;
 
 namespace ClassifyFiles.UI
 {
+    public class FilterLabelConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string str = value as string;
+            if (str == "")
+            {
+                return "筛选";
+            }
+            else if (str.Length <= 5)
+            {
+                return $"筛选（{str}）";
+            }
+            else
+            {
+                return $"筛选（{str.Substring(0, 4)}…）";
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class MagnificationConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

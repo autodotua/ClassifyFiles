@@ -36,8 +36,14 @@ namespace ClassifyFiles.UI
                 this.Notify(nameof(Message));
             }
         }
+        public bool Showing { get; private set; }
         public void Show(bool overlay)
         {
+            if(Showing)
+            {
+                return;
+            }
+            Showing = true;
             canClose = false;
             Message = "";
             grdOverlay.Opacity = overlay ? 0.75 : 0;
@@ -56,6 +62,7 @@ namespace ClassifyFiles.UI
             ani.Completed += (p1, p2) =>
             {
                 Visibility = Visibility.Collapsed;
+                Showing = false;
             };
             BeginAnimation(OpacityProperty, ani);
 

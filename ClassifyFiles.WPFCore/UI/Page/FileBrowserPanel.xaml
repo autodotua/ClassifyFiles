@@ -15,6 +15,7 @@
     <local:ProjectPageBase.Resources>
         <ui:IsNotNull2BoolConverter x:Key="nn2b" />
         <ui:Equal2BoolConverter x:Key="e2b" />
+        <ui:FilterLabelConverter x:Key="flc"/>
     </local:ProjectPageBase.Resources>
     <Grid x:Name="grdMain">
         <Grid.ColumnDefinitions>
@@ -95,6 +96,31 @@
             Grid.Row="2" Grid.ColumnSpan="999"
             DefaultLabelPosition="Right">
             <m:AppBarButton
+                x:Name="btnFileViewerWindow" 
+                Label="独立窗口" Click="BtnFileViewerWindow_Click">
+                <m:AppBarButton.Icon>
+                    <m:FontIcon Glyph="&#xE944;"/>
+                </m:AppBarButton.Icon>
+            </m:AppBarButton>
+            <m:AppBarButton
+                x:Name="btnFilter" Icon="Filter"
+                Label="{Binding FilterPattern, Converter={StaticResource flc}}">
+                <m:AppBarButton.Flyout>
+                    <m:Flyout x:Name="flyoutFilter" Opened="FlyoutFilter_Opened">
+                        <m:SimpleStackPanel  Orientation="Vertical" Spacing="12">
+                            <TextBlock x:Name="txtFilter" Text="筛选内容（正则表达式）："/>
+                            <TextBox Text="{Binding FilterPattern, UpdateSourceTrigger=PropertyChanged}" Width="288"/>
+                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                                <Button Click="FilterButton_Click">筛选</Button>
+                                <Button Click="ClearFilterButton_Click">清除筛选</Button>
+
+                            </m:SimpleStackPanel>
+                        </m:SimpleStackPanel>
+                    </m:Flyout>
+                </m:AppBarButton.Flyout>
+            </m:AppBarButton>
+
+            <m:AppBarButton
                 x:Name="btnSort" Icon="Sort"
                 Label="排序">
                 <m:FlyoutService.Flyout>
@@ -168,7 +194,7 @@
                 </m:FlyoutService.Flyout>
             </m:AppBarButton>
             <m:AppBarButton Icon="View" Label="显示">
-                <m:FlyoutService.Flyout>
+                <m:AppBarButton.Flyout>
                     <m:Flyout x:Name="flyoutDisplay">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -257,19 +283,19 @@
                             </GroupBox>
                         </Grid>
                     </m:Flyout>
-                </m:FlyoutService.Flyout>
+                </m:AppBarButton.Flyout>
             </m:AppBarButton>
             <m:AppBarButton
                 x:Name="btnLocateByDir" Icon="OpenLocal"
                 Label="根据文件夹定位">
-                <m:FlyoutService.Flyout>
+                <m:AppBarButton.Flyout>
                     <m:Flyout x:Name="flyoutJumpToDir">
                         <ListBox
                             Grid.Row="2" MaxHeight="600"
                             ItemsSource="{Binding Dirs}"
                             SelectionChanged="JumpToDirComboBox_SelectionChanged" />
                     </m:Flyout>
-                </m:FlyoutService.Flyout>
+                </m:AppBarButton.Flyout>
             </m:AppBarButton>
 
             <m:AppBarSeparator />

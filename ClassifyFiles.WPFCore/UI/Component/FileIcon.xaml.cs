@@ -36,6 +36,7 @@ namespace ClassifyFiles.UI.Component
         {
             InitializeComponent();
         }
+        public static bool StaticEnableCache { get; set; } = true;
         public bool EnableCache { get; set; } = true;
         public bool DisplayRawImage { get; set; } = false;
         public bool Square { get; set; } = true;
@@ -113,6 +114,7 @@ namespace ClassifyFiles.UI.Component
             {
                 if (File.File.IsFolder == false
                     && EnableCache
+                    && StaticEnableCache
                 && caches.ContainsKey(File.File.ID)
                 && !(File.Display.Image != null && caches[File.File.ID] is FontIcon))
                 {

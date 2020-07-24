@@ -19,6 +19,9 @@ using ClassifyFiles.UI.Dialog;
 using ClassifyFiles.UI.Model;
 using ClassifyFiles.Util;
 using ClassifyFiles.UI.Panel;
+using System.Text.RegularExpressions;
+using System.Windows.Data;
+using System.Globalization;
 
 namespace ClassifyFiles.UI.Page
 {
@@ -121,7 +124,51 @@ namespace ClassifyFiles.UI.Page
             Debug.WriteLine("Set Files, Project Hashcode is " + Project.GetHashCode()
             + ", Class is " + (classPanel.SelectedItem == null ? "null" : classPanel.SelectedItem.Name));
             List<File> files = await func();
-            await filesViewer.SetFilesAsync(files);
+            List<UIFile> uiFiles = null;
+
+            await Task.Run(() =>
+            {
+                uiFiles = files.Select(p => new UIFile(p)).ToList();
+                rawFiles = uiFiles;
+                if (FilterPattern.Length > 0)
+                {
+                    Regex r = new Regex(FilterPattern);
+                    uiFiles = uiFiles.Where(p => r.IsMatch(p.File.Name)).ToList();
+                }
+            });
+            await filesViewer.SetFilesAsync(uiFiles);
+
+            await ApplyDirs();
+            GetProgress().Close();
+        }
+        private List<UIFile> rawFiles = null;
+        private async Task ApplyFilterAsync()
+        {
+            GetProgress().Show(true);
+
+            IList<UIFile> files = rawFiles;
+            if (rawFiles != null)
+            {
+                if (FilterPattern.Length > 0)
+                {
+                    await Task.Run(() =>
+                    {
+                        Regex r = new Regex(FilterPattern);
+                        files = files.Where(p => r.IsMatch(p.File.Name)).ToList();
+                    });
+                }
+                else
+                {
+                    files = rawFiles;
+                }
+                await filesViewer.SetFilesAsync(files);
+                await ApplyDirs();
+            }
+            GetProgress().Close();
+        }
+
+        private async Task ApplyDirs()
+        {
             if (filesViewer.Files == null)
             {
                 Dirs = null;
@@ -135,7 +182,6 @@ namespace ClassifyFiles.UI.Page
                 });
                 Dirs = dirs;
             }
-            GetProgress().Close();
         }
 
         /// <summary>
@@ -400,10 +446,7 @@ namespace ClassifyFiles.UI.Page
             GetProgress().Show(true);
             if (new UpdateFilesDialog(Project) { Owner = Window.GetWindow(this) }.ShowDialog() == true)
             {
-                if (classPanel.SelectedItem != null)
-                {
-                    await filesViewer.SetFilesAsync(await GetFilesByClassAsync(classPanel.SelectedItem.ID));
-                }
+                classPanel.SelectedItem = null;
             }
             GetProgress().Close();
         }
@@ -442,7 +485,6 @@ namespace ClassifyFiles.UI.Page
             }
         }
 
-
         /// <summary>
         /// 单击刷新按钮
         /// </summary>
@@ -474,6 +516,63 @@ namespace ClassifyFiles.UI.Page
             UpdateAppBarButtonsEnable();
             GetProgress().Close();
         }
+
+        private string filterContent = "";
+        public string FilterPattern
+        {
+            get => filterContent;
+            set
+            {
+                filterContent = value;
+                this.Notify(nameof(FilterPattern));
+            }
+        }
+
+        /// <summary>
+        /// 单击独立显示文件查看窗口的按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnFileViewerWindow_Click(object sender, RoutedEventArgs e)
+        {
+            filesViewer.ShowAsWindow();
+        }
+
+        /// <summary>
+        /// 单击筛选按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void FilterButton_Click(object sender, RoutedEventArgs e)
+        {
+            flyoutFilter.Hide();
+            await ApplyFilterAsync();
+        }
+
+        /// <summary>
+        /// 单击清除筛选按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ClearFilterButton_Click(object sender, RoutedEventArgs e)
+        {
+            FilterPattern = "";
+            flyoutFilter.Hide();
+            await ApplyFilterAsync();
+        }
+        /// <summary>
+        /// 筛选弹窗打开
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+
+        private void FlyoutFilter_Opened(object sender, object e)
+        {
+            //无效
+            txtFilter.Focus();
+            Keyboard.Focus(txtFilter);
+        }
+
         #endregion
 
         #region 左侧分类列表面板
@@ -541,4 +640,6 @@ namespace ClassifyFiles.UI.Page
         #endregion
 
     }
+
+
 }
