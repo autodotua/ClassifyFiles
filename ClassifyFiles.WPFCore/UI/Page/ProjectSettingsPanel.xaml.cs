@@ -68,7 +68,7 @@ namespace ClassifyFiles.UI.Page
         }
         void ShowProgressMessage(Data.File file)
         {
-            Dispatcher.Invoke(() => GetProgress().Message = "正在导出" + file.Name);
+            Dispatcher.Invoke(() => GetProgress().Message = "正在导出"+Environment.NewLine + Path.Combine(file.Dir,file.Name));
         }
         private async void ExportLinkButton_Click(object sender, RoutedEventArgs e)
         {
@@ -164,6 +164,15 @@ namespace ClassifyFiles.UI.Page
             FileIcon.ClearCaches();
             GetProgress().Close();
             await new MessageDialog().ShowAsync("删除成功", "删除缩略图");
+        }
+
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            flyoutDeleteFileClasses.Hide();
+            GetProgress().Show(true);
+            await DeleteAllFileClassesAsync(Project);
+            GetProgress().Close();
+            await new MessageDialog().ShowAsync("删除成功", "删除文件分类关系");
         }
     }
 }

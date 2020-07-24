@@ -478,13 +478,15 @@ namespace ClassifyFiles.Util
                             break;
                         case ExportFormat.Tree:
                             var tree = GetFileTree(files);
+                            File root = new File();
+                            root.SubFiles = tree.SubFiles;
                             void ExportSub(File file, string currentFolder)
                             {
-                                if (string.IsNullOrEmpty(file.Dir))//是目录
+                                if (file.IsFolder)//是目录
                                 {
                                     foreach (var sub in file.SubFiles)
                                     {
-                                        string newFolder = P.Combine(currentFolder, file.Name);
+                                        string newFolder = P.Combine(currentFolder, file.Dir);
                                         Dir.CreateDirectory(newFolder);
                                         ExportSub(sub, newFolder);
                                     }
@@ -497,7 +499,7 @@ namespace ClassifyFiles.Util
                                     afterExportAFile?.Invoke(file);
                                 }
                             }
-                            ExportSub(tree, folder);
+                            ExportSub(root, folder);
                             break;
                     }
                 });

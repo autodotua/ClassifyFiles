@@ -15,7 +15,7 @@
     <local:ProjectPageBase.Resources>
         <ui:IsNotNull2BoolConverter x:Key="nn2b" />
         <ui:Equal2BoolConverter x:Key="e2b" />
-        <ui:FilterLabelConverter x:Key="flc"/>
+        <ui:FilterLabelConverter x:Key="flc" />
     </local:ProjectPageBase.Resources>
     <Grid x:Name="grdMain">
         <Grid.ColumnDefinitions>
@@ -96,10 +96,11 @@
             Grid.Row="2" Grid.ColumnSpan="999"
             DefaultLabelPosition="Right">
             <m:AppBarButton
-                x:Name="btnFileViewerWindow" 
-                Label="独立窗口" Click="BtnFileViewerWindow_Click">
+                x:Name="btnFileViewerWindow"
+                Click="BtnFileViewerWindow_Click"
+                Label="独立窗口">
                 <m:AppBarButton.Icon>
-                    <m:FontIcon Glyph="&#xE944;"/>
+                    <m:FontIcon Glyph="&#xE944;" />
                 </m:AppBarButton.Icon>
             </m:AppBarButton>
             <m:AppBarButton
@@ -107,9 +108,9 @@
                 Label="{Binding FilterPattern, Converter={StaticResource flc}}">
                 <m:AppBarButton.Flyout>
                     <m:Flyout x:Name="flyoutFilter" Opened="FlyoutFilter_Opened">
-                        <m:SimpleStackPanel  Orientation="Vertical" Spacing="12">
-                            <TextBlock x:Name="txtFilter" Text="筛选内容（正则表达式）："/>
-                            <TextBox Text="{Binding FilterPattern, UpdateSourceTrigger=PropertyChanged}" Width="288"/>
+                        <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
+                            <TextBlock x:Name="txtFilter" Text="筛选内容（正则表达式）：" />
+                            <TextBox Width="288" Text="{Binding FilterPattern, UpdateSourceTrigger=PropertyChanged}" />
                             <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
                                 <Button Click="FilterButton_Click">筛选</Button>
                                 <Button Click="ClearFilterButton_Click">清除筛选</Button>
@@ -224,7 +225,6 @@
                                         IsOn="{Binding ShowExplorerIcon}" />
                                     <m:ToggleSwitch
                                         x:Name="swtGroup" Header="按目录进行分组"
-                                        IsEnabled="{Binding ElementName=menuSortDefault, Path=IsChecked}"
                                         IsOn="{Binding GroupByDir}" />
                                     <m:ToggleSwitch Header="显示文件扩展名" IsOn="{Binding ShowFileExtension}" />
                                 </m:SimpleStackPanel>
@@ -302,7 +302,7 @@
             <m:AppBarButton
                 x:Name="btnAddFile"
                 Click="BtnAddFile_Click" Icon="Add"
-                IsEnabled="{Binding ElementName=classPanel, Path=SelectedUIClass, Converter={StaticResource nn2b}}"
+                IsEnabled="{Binding ElementName=classPanel,Path=SelectedUIClass, Converter={StaticResource nn2b}}"
                 Label="添加文件" />
             <m:AppBarButton
                 x:Name="btnRefresh"

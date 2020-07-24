@@ -130,6 +130,15 @@ namespace ClassifyFiles.Util
             return db.FileClasses.CountAsync(p => p.File.Project == project);
         }
 
+        public async static Task DeleteAllFileClassesAsync(Project project)
+        {
+            await foreach (var fc in db.FileClasses.Where(p => p.File.ProjectID == project.ID).AsAsyncEnumerable())
+            {
+                db.Entry(fc).State = EntityState.Deleted;
+            }
+            await SaveChangesAsync();
+        }
+
         public async static Task<IReadOnlyList<File>> AddFilesToClassAsync(IEnumerable<File> files, Class c)
         {
             List<File> addedFiles = new List<File>();

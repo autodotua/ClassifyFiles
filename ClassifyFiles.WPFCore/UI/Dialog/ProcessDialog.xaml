@@ -1,26 +1,31 @@
-﻿<local:UserControlBase x:Class="ClassifyFiles.UI.ProgressDialog"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ClassifyFiles.UI"
-             mc:Ignorable="d"      
-                       Loaded="UserControlBase_Loaded"
-                       xmlns:ui="http://schemas.modernwpf.com/2019"    Visibility="Collapsed" >
+﻿<local:UserControlBase
+    x:Class="ClassifyFiles.UI.ProgressDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ClassifyFiles.UI"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    Loaded="UserControlBase_Loaded"
+    Visibility="Collapsed" mc:Ignorable="d">
 
     <UserControl.Resources>
         <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="{StaticResource SystemAccentColor}" />
     </UserControl.Resources>
-    <Grid    >
-        <Grid x:Name="grdOverlay" Background="{DynamicResource SystemControlBackgroundAltHighBrush}" Opacity="0.75"/>
-        <ui:SimpleStackPanel Orientation="Vertical" Spacing="12"
-                             VerticalAlignment="Center" HorizontalAlignment="Center">
-            <ui:ProgressRing IsActive="True"
-        x:Name="ring"
-        Width="60"
-        Height="60"/>
-            <TextBlock Text="{Binding Message}"/>
+    <Grid>
+        <Grid
+            x:Name="grdOverlay"
+            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+            Opacity="0.75" />
+        <ui:SimpleStackPanel
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Orientation="Vertical" Spacing="12">
+            <ui:ProgressRing
+                x:Name="ring" Width="60"
+                Height="60" IsActive="True" />
+            <TextBlock Text="{Binding Message}" TextAlignment="Center" />
         </ui:SimpleStackPanel>
     </Grid>
- 
+
 </local:UserControlBase>

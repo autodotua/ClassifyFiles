@@ -64,7 +64,21 @@
                         <Button Background="Red" Foreground="White">
                             <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
                                 <m:SymbolIcon VerticalAlignment="Center" Symbol="Delete" />
-                                <TextBlock VerticalAlignment="Center">删除数据库中的文件</TextBlock>
+                                <TextBlock VerticalAlignment="Center">删除所有关系</TextBlock>
+                            </m:SimpleStackPanel>
+                            <m:FlyoutService.Flyout>
+                                <m:Flyout x:Name="flyoutDeleteFileClasses">
+                                    <m:SimpleStackPanel Spacing="8">
+                                        <TextBlock>即将删除所有文件和分类的连接。这不会删除硬盘中的物理文件。</TextBlock>
+                                        <Button Click="Button_Click_1" Content="确定" />
+                                    </m:SimpleStackPanel>
+                                </m:Flyout>
+                            </m:FlyoutService.Flyout>
+                        </Button>
+                        <Button Background="Red" Foreground="White">
+                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                                <m:SymbolIcon VerticalAlignment="Center" Symbol="Delete" />
+                                <TextBlock VerticalAlignment="Center">删除所有文件</TextBlock>
                             </m:SimpleStackPanel>
                             <m:FlyoutService.Flyout>
                                 <m:Flyout x:Name="flyoutDeleteFiles">
@@ -78,7 +92,7 @@
                         <Button Click="DeleteThumbnails_Click">
                             <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
                                 <m:SymbolIcon VerticalAlignment="Center" Symbol="Delete" />
-                                <TextBlock VerticalAlignment="Center">删除所有文件的缩略图</TextBlock>
+                                <TextBlock VerticalAlignment="Center">删除所有缩略图</TextBlock>
                             </m:SimpleStackPanel>
                         </Button>
                         <Button Click="CheckButton_Click" Content="查询项目数据库错误" />

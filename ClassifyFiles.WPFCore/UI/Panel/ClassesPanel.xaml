@@ -13,7 +13,7 @@
         <ui:Bool2VisibilityConverter x:Key="b2v" />
 
     </UserControl.Resources>
-    <Grid>    
+    <Grid>
         <ListBox
             Background="Transparent"
             ItemsSource="{Binding UIClasses}"
