@@ -12,6 +12,7 @@ using ClassifyFiles.UI.Model;
 using System.Windows.Media.Effects;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Collections.Generic;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -27,7 +28,8 @@ namespace ClassifyFiles.UI.Panel
         public async Task LoadAsync(Project project)
         {
             Project = project;
-            var classes = await GetClassesAsync(Project);
+            List<Class> classes = null;
+            await Task.Run(() => classes = GetClasses(Project));
             UIClasses = new ObservableCollection<UIClass>(classes.Select(p => new UIClass(p)));
             foreach (var c in UIClasses)
             {
@@ -66,7 +68,7 @@ namespace ClassifyFiles.UI.Panel
                 {
                     Configs.LastClassID = value.Class.ID;
                 }
-                
+
                 SelectedClassChanged?.Invoke(this, new SelectedClassChangedEventArgs(oldValue?.Class, value?.Class));
             }
         }
@@ -82,7 +84,7 @@ namespace ClassifyFiles.UI.Panel
 
         public async Task<Class> AddAsync()
         {
-            var c = await AddClassAsync(Project);
+            var c = await Task.Run(() => AddClass(Project));
             UIClass uiC = new UIClass(c);
             UIClasses.Add(uiC);
             SelectedUIClass = uiC;
@@ -98,7 +100,7 @@ namespace ClassifyFiles.UI.Panel
             else
             {
                 int index = UIClasses.IndexOf(SelectedUIClass);
-                await DeleteClassAsync(SelectedUIClass.Class);
+                await Task.Run(() => DeleteClass(SelectedUIClass.Class));
                 UIClasses.Remove(SelectedUIClass);
                 if (UIClasses.Count > 0)
                 {
@@ -118,7 +120,6 @@ namespace ClassifyFiles.UI.Panel
         {
             ListBoxItem item = sender as ListBoxItem;
             UIClass c = item.DataContext as UIClass;
-            //后来想了下，不需要这一段，因为程序可以在类之间进行拖放
             if (e.Data.GetDataPresent(nameof(ClassifyFiles)))
             {
                 var files = (UIFile[])e.Data.GetData(nameof(ClassifyFiles));

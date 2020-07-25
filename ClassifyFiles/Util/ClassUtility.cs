@@ -11,52 +11,54 @@ namespace ClassifyFiles.Util
     public static class ClassUtility
     {
 
-        public static async Task<List<Class>> GetClassesAsync(Project project)
+        public static List<Class> GetClasses(Project project)
         {
-            Debug.WriteLine("db: " + nameof(GetClassesAsync));
+            Debug.WriteLine("db: " + nameof(GetClasses));
 
-            List<Class> classes = await db.Classes
+            List<Class> classes = db.Classes
                 .Where(p => p.Project == project)
                 .Include(p => p.MatchConditions)
-                .ToListAsync();
+                .ToList();
 
             return classes;
         }
 
-        public static Task<int> GetFilesCountOfClassAsync(Class c)
+        public static int GetFilesCountOfClass(Class c)
         {
+            using var db = GetNewDb();
             return db.FileClasses
                 .Where(p => p.Class == c)
                 .Where(p => !p.Disabled)
-                .CountAsync();
+                .Count();
         }
 
-        public static async Task<Class> AddClassAsync(Project project)
+        public static Class AddClass(Project project)
         {
-            Debug.WriteLine("db: " + nameof(AddClassAsync));
+            Debug.WriteLine("db: " + nameof(AddClass));
 
             Class c = new Class() { Project = project, Name = "未命名类" };
             db.Classes.Add(c);
-            await db.SaveChangesAsync();
+            SaveChanges();
             return c;
         }
-        public static async Task DeleteClassAsync(Class c)
+        public static bool DeleteClass(Class c)
         {
-            Debug.WriteLine("db: " + nameof(DeleteClassAsync));
+            Debug.WriteLine("db: " + nameof(DeleteClass));
             db.Entry(c).State = EntityState.Deleted;
-            await db.SaveChangesAsync();
+            return SaveChanges() > 0;
         }
 
-        public static async Task SaveClassAsync(Class c)
+        public static bool SaveClass(Class c)
         {
-            Debug.WriteLine("db: " + nameof(SaveClassAsync));
+            Debug.WriteLine("db: " + nameof(SaveClass));
             db.Entry(c).State = EntityState.Modified;
-            await db.SaveChangesAsync();
+            return SaveChanges() > 0;
         }
 
-        public static Task<int> GetClassesCountAsync(Project project)
+        public static int GetClassesCount(Project project)
         {
-            return db.Classes.CountAsync(p => p.Project == project);
+            using var db = GetNewDb();
+            return db.Classes.Count(p => p.Project == project);
         }
     }
 }

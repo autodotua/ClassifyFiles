@@ -63,12 +63,12 @@ namespace ClassifyFiles.UI.Page
                 Converter = new IsNotNull2BoolConverter()
             });
             //但是最后一个无论如何都还是绑定不上
-            txtName.SetBinding(TextBox.TextProperty, 
+            txtName.SetBinding(TextBox.TextProperty,
                 new Binding($"{nameof(classes.SelectedUIClass)}.{nameof(UIClass.Class)}.{nameof(Class.Name)}")
-            {
-                ElementName = nameof(classes),
-                Mode=BindingMode.TwoWay
-            });
+                {
+                    ElementName = nameof(classes),
+                    Mode = BindingMode.TwoWay
+                });
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -90,28 +90,32 @@ namespace ClassifyFiles.UI.Page
             await classes.LoadAsync(project);
         }
 
-        public Task SaveClassAsync()
+        public async Task SaveClassAsync()
         {
-
-            return SaveClassAsync(classes.SelectedUIClass?.Class);
-
+            if(classes.SelectedUIClass!=null)
+            {
+                await SaveClassAsync(classes.SelectedUIClass.Class);
+            }
         }
         public async Task SaveClassAsync(Class c)
         {
-            if (c != null)
+            await Task.Run(() =>
             {
-                foreach (var m in c.MatchConditions)
+                if (c != null)
                 {
-                    if (m.Value == null)
+                    foreach (var m in c.MatchConditions)
                     {
-                        Debug.Assert(false);
-                        m.Value = "";
+                        if (m.Value == null)
+                        {
+                            Debug.Assert(false);
+                            m.Value = "";
+                        }
                     }
+                    c.MatchConditions.Clear();
+                    c.MatchConditions.AddRange(MatchConditions);
+                    ClassUtility.SaveClass(c);
                 }
-                c.MatchConditions.Clear();
-                c.MatchConditions.AddRange(MatchConditions);
-                await ClassUtility.SaveClassAsync(c);
-            }
+            });
         }
 
         private async void AddClassInButton_Click(object sender, RoutedEventArgs e)
@@ -150,10 +154,6 @@ namespace ClassifyFiles.UI.Page
             }
             txtName.Text = classes.SelectedUIClass?.Class.Name;
 
-        }
-
-        private async void TextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
         }
 
         private async void Flyout_Closed(object sender, object e)

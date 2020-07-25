@@ -29,11 +29,13 @@ namespace ClassifyFiles.Util
         }
         public static string GetString(string key, string defaultValue)
         {
+            using var db= GetNewDb();
             string value = (db.Configs.FirstOrDefault(p => p.Key == key))?.Value;
             return value ?? defaultValue;
         }
         public static void Set(string key, object value)
         {
+            using var db = GetNewDb();
             Config config = db.Configs.FirstOrDefault(p => p.Key == key);
             if (config != null)
             {

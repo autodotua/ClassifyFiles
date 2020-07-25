@@ -29,7 +29,10 @@ namespace ClassifyFiles.UI.Model
         public UIFile(File file) : this()
         {
             File = file;
-            FileInfo = file.GetFileInfo();
+            if (file.Name.Length + file.Dir.Length > 0)
+            {
+                FileInfo = file.GetFileInfo();
+            }
             SubUIFiles = new ObservableCollection<UIFile>(file.SubFiles.Select(p => new UIFile(p)));
             Display = new UIFileDisplay(file);
 
@@ -55,23 +58,26 @@ namespace ClassifyFiles.UI.Model
                 this.Notify(nameof(File));
             }
         }
-        private bool loaded = false;
+        public bool classesLoaded = false;
         public UIFileDisplay Display { get; set; }
         public System.IO.FileInfo FileInfo { get; private set; }
-        public async Task LoadAsync(AppDbContext db = null,bool force=false)
+        public async Task LoadClassesAsync(AppDbContext db = null,bool force=false)
         {
-            if (!loaded || force)
+            if (!classesLoaded || force)
             {
-                loaded = true;
-                IEnumerable<Class> classes;
-                if (db == null)
+                classesLoaded = true;
+                IEnumerable<Class> classes=null;
+                await Task.Run(() =>
                 {
-                    classes = await GetClassesOfFileAsync(File.ID);
-                }
-                else
-                {
-                    classes = await GetClassesOfFileAsync(db, File.ID);
-                }
+                    if (db == null)
+                    {
+                        classes = GetClassesOfFile(File);
+                    }
+                    else
+                    {
+                        classes = GetClassesOfFile(db, File);
+                    }
+                });
                 Classes = new ObservableCollection<Class>(classes);
             }
         }

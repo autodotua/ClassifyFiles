@@ -54,9 +54,18 @@ namespace ClassifyFiles.UI.Page
         public override async Task LoadAsync(Project project)
         {
             await base.LoadAsync(project);
-            tbkFilesCount.Text = (await GetFilesCountAsync(project)).ToString();
-            tbkClassesCount.Text = (await GetClassesCountAsync(project)).ToString();
-            tbkFileClassesCount.Text = (await GetFileClassesCountAsync(project)).ToString();
+            int filesCount = 0;
+            int classesCount = 0;
+            int fileClassesCount = 0;
+            await Task.Run(() =>
+            {
+                filesCount = GetFilesCount(project);
+                classesCount = GetClassesCount(project);
+                fileClassesCount = GetFileClassesCount(project);
+            });
+            tbkFilesCount.Text = filesCount.ToString();
+            tbkClassesCount.Text = classesCount.ToString();
+            tbkFileClassesCount.Text = fileClassesCount.ToString();
         }
 
         public ExportFormat ExportFormat { get; set; }
@@ -68,7 +77,7 @@ namespace ClassifyFiles.UI.Page
         }
         void ShowProgressMessage(Data.File file)
         {
-            Dispatcher.Invoke(() => GetProgress().Message = "正在导出"+Environment.NewLine + Path.Combine(file.Dir,file.Name));
+            Dispatcher.Invoke(() => GetProgress().Message = "正在导出" + Environment.NewLine + Path.Combine(file.Dir, file.Name));
         }
         private async void ExportLinkButton_Click(object sender, RoutedEventArgs e)
         {
@@ -81,8 +90,10 @@ namespace ClassifyFiles.UI.Page
             {
                 string path = dialog.FileName;
                 GetProgress().Show(true);
-                await FileUtility.Export(path, Project, ExportFormat, LinkUtility.CreateLink, Splitter, ShowProgressMessage);
-
+                await Task.Run(() =>
+                {
+                    FileUtility.Export(path, Project, ExportFormat, LinkUtility.CreateLink, Splitter, ShowProgressMessage);
+                });
 
                 GetProgress().Close();
             }
@@ -100,8 +111,11 @@ namespace ClassifyFiles.UI.Page
             {
                 string path = dialog.FileName;
                 GetProgress().Show(true);
-                await FileUtility.Export(path, Project, ExportFormat, (from, to) => System.IO.File.Copy(from, to, true),
-                                    Splitter, ShowProgressMessage);
+                await Task.Run(() =>
+                {
+                    FileUtility.Export(path, Project, ExportFormat, (from, to) => System.IO.File.Copy(from, to, true),
+                                      Splitter, ShowProgressMessage);
+                });
 
                 GetProgress().Close();
             }
@@ -119,7 +133,7 @@ namespace ClassifyFiles.UI.Page
             {
                 string path = dialog.FileName;
                 GetProgress().Show(true);
-                await ExportProjectAsync(path, Project.ID);
+                await Task.Run(() => ExportProject(path, Project));
                 GetProgress().Close();
                 await new MessageDialog().ShowAsync("导出成功", "导出");
             }
@@ -144,7 +158,10 @@ namespace ClassifyFiles.UI.Page
         {
             flyoutDeleteFiles.Hide();
             GetProgress().Show(true);
-            await DeleteFilesOfProjectAsync(Project);
+            await Task.Run(() =>
+            {
+                DeleteFilesOfProject(Project);
+            });
             GetProgress().Close();
             await new MessageDialog().ShowAsync("删除成功", "删除文件");
 
@@ -152,15 +169,19 @@ namespace ClassifyFiles.UI.Page
 
         private async void CheckButton_Click(object sender, RoutedEventArgs e)
         {
+            //无用
             GetProgress().Show(true);
-            await CheckAsync(Project.ID);
+            await Task.Run(() => Check(Project));
             GetProgress().Close();
         }
 
         private async void DeleteThumbnails_Click(object sender, RoutedEventArgs e)
         {
             GetProgress().Show(true);
-            await FileUtility.DeleteThumbnailsAsync(Project.ID);
+            await Task.Run(() =>
+            {
+                FileUtility.DeleteThumbnails(Project.ID);
+            });
             FileIcon.ClearCaches();
             GetProgress().Close();
             await new MessageDialog().ShowAsync("删除成功", "删除缩略图");
@@ -169,8 +190,10 @@ namespace ClassifyFiles.UI.Page
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
             flyoutDeleteFileClasses.Hide();
-            GetProgress().Show(true);
-            await DeleteAllFileClassesAsync(Project);
+            GetProgress().Show(true); await Task.Run(() =>
+            {
+                DeleteAllFileClasses(Project);
+            });
             GetProgress().Close();
             await new MessageDialog().ShowAsync("删除成功", "删除文件分类关系");
         }

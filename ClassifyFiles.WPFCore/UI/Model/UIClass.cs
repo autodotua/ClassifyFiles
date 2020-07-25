@@ -15,7 +15,9 @@ namespace ClassifyFiles.UI.Model
         }
         public async Task UpdatePropertiesAsync()
         {
-            FileCount = await GetFilesCountOfClassAsync(Class);
+            int count = 0;
+            await Task.Run(() => count = GetFilesCountOfClass(Class));
+            FileCount = count;
             MatchConditionsCount = Class.MatchConditions.Count;
         }
 

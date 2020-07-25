@@ -2,6 +2,7 @@
 using ClassifyFiles.Util;
 using FzLib.Extension;
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using static ClassifyFiles.Util.FileClassUtility;
@@ -95,7 +96,7 @@ namespace ClassifyFiles.UI.Dialog
             Message = "正在初始化";
             try
             {
-                await UpdateFilesOfClassesAsync(args);
+                await Task.Run(() => UpdateFilesOfClasses(args));
                 working = false;
                 Updated = true;
             }

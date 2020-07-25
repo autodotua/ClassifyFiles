@@ -10,17 +10,29 @@ namespace ClassifyFiles.Util
     {
         public static string DbPath => System.IO.Path.GetFullPath("data.db");
         internal static AppDbContext db = new AppDbContext(DbPath);
+        /// <summary>
+        /// 获取新的
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// 对于某些查询，并不需要保留查询结果与数据库的关系。
+        /// 为了防止一个上下文被多个查询访问，因此可以对每个查询使用单独的上下文。
+        /// </remarks>
+        internal static AppDbContext GetNewDb()
+        {
+            return new AppDbContext(DbPath);
+        }
         const string dbReplacedMessage = "由于保存出错，数据库上下文被替换，更改已丢失";
         public async static Task ReplaceDbContextAsync()
         {
             await db.DisposeAsync();
             db = new AppDbContext(DbPath);
         }
-        public async static Task SaveChangesAsync()
+        public static int SaveChanges()
         {
             try
             {
-                await db.SaveChangesAsync();
+                return db.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -28,36 +40,18 @@ namespace ClassifyFiles.Util
                 System.Diagnostics.Debug.WriteLine(dbReplacedMessage);
                 try
                 {
-                    await LogUtility.AddLogAsync(dbReplacedMessage, ex.ToString());
-                }
-                catch
-                {
-                }
-            }
-        }
-        public static void SaveChanges()
-        {
-            try
-            {
-                db.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                db = new AppDbContext(DbPath);
-                System.Diagnostics.Debug.WriteLine(dbReplacedMessage);
-                try
-                {
-                    LogUtility.AddLogAsync(dbReplacedMessage, ex.ToString()).Wait();
+                    LogUtility.AddLog(dbReplacedMessage, ex.ToString());
                 }
                 catch
                 {
 
                 }
+                return 0;
             }
         }
-        public static Task ZipAsync()
+        public static void Zip()
         {
-            return db.Database.ExecuteSqlRawAsync("VACUUM;");
+             db.Database.ExecuteSqlRaw("VACUUM;");
         }
         public static void CancelChanges()
         {

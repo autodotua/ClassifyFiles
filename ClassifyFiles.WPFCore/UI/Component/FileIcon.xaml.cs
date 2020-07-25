@@ -188,7 +188,7 @@ namespace ClassifyFiles.UI.Component
         private async void UserControlBase_Loaded(object sender, RoutedEventArgs e)
         {
 
-            await File.LoadAsync();
+            await File.LoadClassesAsync();
             if (!Load())
             {
                 if (Configs.AutoThumbnails)

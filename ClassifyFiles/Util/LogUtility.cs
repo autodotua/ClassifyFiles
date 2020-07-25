@@ -10,16 +10,16 @@ namespace ClassifyFiles.Util
 {
     public static class LogUtility
     {
-        public static Task<List<Log>> GetLogsAsync(DateTime from,DateTime to)
+        public static List<Log> GetLogs(DateTime from, DateTime to)
         {
-            return db.Logs.Where(p => p.Time > from && p.Time < to).ToListAsync() ;
+            return db.Logs.Where(p => p.Time > from && p.Time < to).ToList();
         }
 
-        public async static Task AddLogAsync(string message,string details)
+        public static void AddLog(string message, string details)
         {
-            Log log = new Log() { Time = DateTime.Now, Message = message,Details= details };
+            Log log = new Log() { Time = DateTime.Now, Message = message, Details = details };
             db.Logs.Add(log);
-            await db.SaveChangesAsync();
+            db.SaveChanges();
         }
     }
 }

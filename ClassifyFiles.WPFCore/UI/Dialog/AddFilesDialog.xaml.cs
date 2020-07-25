@@ -149,7 +149,10 @@ namespace ClassifyFiles.UI.Dialog
             Message = "正在初始化";
             try
             {
-                AddedFiles = await AddFilesToClassAsync(args);
+                await Task.Run(() =>
+                {
+                    AddedFiles =  AddFilesToClass(args);
+                });
                 working = false;
                 Updated = true;
             }

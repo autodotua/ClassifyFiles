@@ -10,63 +10,62 @@ namespace ClassifyFiles.Util
 {
     public static class FileProjectUtilty
     {
-        public static Task DeleteFilesOfProjectAsync(Project project)
+        public static void DeleteFilesOfProject(Project project)
         {
-            Debug.WriteLine("db: " + nameof(DeleteFilesOfProjectAsync));
+            Debug.WriteLine("db: " + nameof(DeleteFilesOfProject));
 
-            return db.Database.ExecuteSqlRawAsync("delete from Files where ProjectID = " + project.ID);
-            //await db.SaveChangesAsync();
+            db.Database.ExecuteSqlRaw("delete from Files where ProjectID = " + project.ID);
         }
 
-        public async static Task<List<File>> GetFilesByProjectAsync(int projectID)
+        public static IReadOnlyDictionary<File, Class[]> GetFilesWithClassesByProject(Project project)
         {
-            Debug.WriteLine("db: " + nameof(GetFilesByProjectAsync));
-            var files = db.Files
-                .Where(p => p.Project.ID == projectID)
-                .Where(p => p.Name.Length>0)
-                .Include(p => p.Project);
-            return await files.ToListAsync();
+            Debug.WriteLine("db: " + nameof(GetFilesWithClassesByProject));
+            var tempFiles = (from f in db.Files.Where(p => p.ProjectID == project.ID).Include(p => p.Project)
+                             join fc in db.FileClasses on f.ID equals fc.FileID into temp
+                             from fcc in temp.DefaultIfEmpty()
+                             select new { File = f, fcc.Class })
+                             .ToList();
+            return tempFiles
+                 .GroupBy(p => p.File)
+                 .ToDictionary(p => p.Key, p => p
+                 .Where(q=>q.Class !=null)//由于上面用了左连接，因此会有一些Class为null的出现，需要剔除。
+                 .Select(q => q.Class).ToArray());
         }
-        public async static Task<List<File>> GetNoClassesFilesByProjectAsync(int projectID)
+      
+        public static List<File> GetNoClassesFilesByProject(Project project)
         {
-            Debug.WriteLine("db: " + nameof(GetNoClassesFilesByProjectAsync));
-            List<File> files = null;
-            await Task.Run(() =>
+            Debug.WriteLine("db: " + nameof(GetNoClassesFilesByProject));
+            var tempFiles = (from f in db.Files.Where(p => p.ProjectID == project.ID)
+                             join fc in db.FileClasses on f.ID equals fc.FileID into temp
+                             from ffc in temp.DefaultIfEmpty()
+                             where ffc == null
+                             select f).Include(p => p.Project).AsEnumerable();
+
+            var dirs = db.FileClasses
+            .Where(p => p.File.ProjectID == project.ID)
+            .Select(p => p.File)
+            .Distinct()
+            .Where(p => string.IsNullOrEmpty(p.Name))
+            .Select(p => p.Dir)
+            .ToList();
+
+            return tempFiles.Where(file =>
             {
-                var tempFiles = (from f in db.Files.Where(p => p.ProjectID == projectID)
-                                 join fc in db.FileClasses on f.ID equals fc.FileID into temp
-                                 from ffc in temp.DefaultIfEmpty()
-                                 where ffc == null
-                                 select f).Include(p=>p.Project).AsEnumerable();
-
-                var dirs = db.FileClasses
-                .Where(p => p.File.ProjectID == projectID)
-                .Select(p => p.File)
-                .Distinct()
-                .Where(p => string.IsNullOrEmpty(p.Name))
-                .Select(p => p.Dir)
-                .ToList();
-
-                files = tempFiles.Where(file =>
+                foreach (var dir in dirs)
                 {
-                    foreach (var dir in dirs)
+                    if (file.Dir.StartsWith(dir))
                     {
-                        if (file.Dir.StartsWith(dir))
-                        {
-                            return false;
-                        }
+                        return false;
                     }
-                    return true;
-                }).ToList();
-
-            });
-            return files;
+                }
+                return true;
+            }).ToList();
         }
 
-
-        public static Task<int> GetFilesCountAsync(Project project)
+        public static int GetFilesCount(Project project)
         {
-            return db.Files.CountAsync(p => p.Project == project);
+            using var db = GetNewDb();
+            return db.Files.Count(p => p.Project == project);
         }
     }
 }

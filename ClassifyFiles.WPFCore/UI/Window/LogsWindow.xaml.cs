@@ -4,6 +4,7 @@ using FzLib.Extension;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace ClassifyFiles.UI
@@ -36,7 +37,9 @@ namespace ClassifyFiles.UI
 
         private async void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            Logs = await LogUtility.GetLogsAsync(DateBegin, DateEnd);
+            List<Log> logs = null;
+            await Task.Run(() => logs = LogUtility.GetLogs(DateBegin, DateEnd));
+            Logs = logs;
         }
     }
 }

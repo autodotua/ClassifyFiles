@@ -71,10 +71,10 @@ namespace ClassifyFiles.UI
 
         public MainWindow()
         {
-            Projects = new ObservableCollection<Project>(GetProjectsAsync().Result);
+            Projects = new ObservableCollection<Project>(GetProjects());
             if (Projects.Count == 0)
             {
-                Projects.Add(AddProjectAsync().Result);
+                Projects.Add(AddProject()) ;
             }
             if (Projects.Any(p => p.ID == Configs.LastProjectID))
             {
@@ -95,16 +95,20 @@ namespace ClassifyFiles.UI
 
         public async Task DeleteSelectedProjectAsync()
         {
-            await DeleteProjectAsync(SelectedProject);
-
-            Projects.Remove(SelectedProject);
-            Projects = new ObservableCollection<Project>(await GetProjectsAsync());
-            if (Projects.Count == 0)
-            {
-                Projects.Add(await AddProjectAsync());
-            }
+            List<Project> projects = null;
+            await Task.Run(() => {
+                DeleteProject(SelectedProject);
+                projects = GetProjects();
+                if(projects.Count==0)
+                {
+                    var newProject = AddProject();
+                    projects.Add(newProject);
+                }
+            });
+            Projects = new ObservableCollection<Project>(projects);
             SelectedProject = Projects[0];
             RadioButton_Checked(btnModeView, null);
+
         }
         FileBrowserPanel fileBrowserPanel = new FileBrowserPanel();
         ClassSettingPanel classSettingPanel = new ClassSettingPanel();
@@ -216,9 +220,17 @@ namespace ClassifyFiles.UI
 
         }
 
+        private async Task<int> SaveChangesAsync()
+        {
+            int result = 0;
+            await Task.Run(() => result = SaveChanges());
+            return result;
+        }
+
         private async void AddProjectButton_Click(object sender, RoutedEventArgs e)
         {
-            Project project = await AddProjectAsync();
+            Project project = null;
+            await Task.Run(() => project= AddProject());
             Projects.Add(project);
             SelectedProject = project;
         }

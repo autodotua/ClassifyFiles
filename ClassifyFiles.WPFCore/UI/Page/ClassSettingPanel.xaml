@@ -125,8 +125,7 @@
                         <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
                             <TextBlock>分类名：</TextBlock>
                             <TextBox
-                                x:Name="txtName" Width="200"
-                                LostFocus="TextBox_LostFocus" />
+                                x:Name="txtName" Width="200"/>
                         </m:SimpleStackPanel>
                     </m:Flyout>
                 </m:AppBarButton.Flyout>

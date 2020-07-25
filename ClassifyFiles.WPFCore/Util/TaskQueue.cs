@@ -41,14 +41,17 @@ namespace ClassifyFiles.Util
                             }
                         });
                     });
-                    try
+                    await Task.Run(() =>
                     {
-                        await DbUtility.SaveChangesAsync();
-                    }
-                    catch (Exception ex)
-                    {
+                        try
+                        {
+                            DbUtility.SaveChanges();
+                        }
+                        catch (Exception ex)
+                        {
 
-                    }
+                        }
+                    });
                 }
                 isExcuting = false;
                 ProcessStatusChanged?.Invoke(this, new ProcessStatusChangedEventArgs(false));

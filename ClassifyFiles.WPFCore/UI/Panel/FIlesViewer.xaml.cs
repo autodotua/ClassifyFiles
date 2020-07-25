@@ -222,7 +222,7 @@ namespace ClassifyFiles.UI.Panel
             foreach (var file in filesWithIcon)
             {
                 Files.Add(file);
-                await file.LoadAsync();
+                await file.LoadClassesAsync();
             }
 
             this.Notify(nameof(Files));
@@ -694,7 +694,7 @@ namespace ClassifyFiles.UI.Panel
             {
                 TagGroup tg = sender as TagGroup;
 
-                await RemoveFilesFromClass(new File[] { tg.File.File }, c);
+                await Task.Run(() => RemoveFilesFromClass(new File[] { tg.File.File }, c));
                 tg.File.Classes.Remove(c);
             }
             e.Handled = true;
@@ -825,7 +825,8 @@ namespace ClassifyFiles.UI.Panel
         {
             var files = GetSelectedFiles();
             GetProgress().Show(false);
-            await FileUtility.DeleteFilesRecordAsync(files.Select(p => p.File));
+            await Task.Run(() =>
+            FileUtility.DeleteFilesRecord(files.Select(p => p.File)));
             foreach (var file in files)
             {
                 Files.Remove(file);
@@ -848,7 +849,7 @@ namespace ClassifyFiles.UI.Panel
             if (chk.IsChecked == true)
             {
                 //添加到类
-                await AddFilesToClassAsync(files.Select(p => p.File), tag);
+                await Task.Run(() => AddFilesToClass(files.Select(p => p.File), tag));
                 foreach (var file in files)
                 {
                     var newC = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
@@ -861,7 +862,7 @@ namespace ClassifyFiles.UI.Panel
             else
             {
                 //从类中删除
-                await RemoveFilesFromClass(files.Select(p => p.File), tag);
+                await Task.Run(() => RemoveFilesFromClass(files.Select(p => p.File), tag));
                 foreach (var file in files)
                 {
                     var c = file.Classes.FirstOrDefault(p => p.ID == tag.ID);

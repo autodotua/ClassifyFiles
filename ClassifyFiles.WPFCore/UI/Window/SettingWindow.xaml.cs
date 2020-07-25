@@ -4,9 +4,12 @@ using ClassifyFiles.WPFCore;
 using FzLib.Basic;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 using static ClassifyFiles.Util.ProjectUtility;
 
 namespace ClassifyFiles.UI
@@ -59,7 +62,7 @@ namespace ClassifyFiles.UI
         private async void ZipDatabaseButton_Click(object sender, RoutedEventArgs e)
         {
             long rawLength = new FileInfo(DbUtility.DbPath).Length;
-            await DbUtility.ZipAsync();
+            await Task.Run(() => DbUtility.Zip());
             long nowLength = new FileInfo(DbUtility.DbPath).Length;
             await new MessageDialog().ShowAsync("压缩成功，当前数据库大小为" + FzLib.Basic.Number.ByteToFitString(nowLength)
                 + "，" + System.Environment.NewLine + "共释放" + FzLib.Basic.Number.ByteToFitString(rawLength - nowLength), "压缩成功");
@@ -69,12 +72,16 @@ namespace ClassifyFiles.UI
         {
             flyoutDeleteProjects.Hide();
             Progress.Show(true);
-            foreach (var project in await GetProjectsAsync())
+            Project project = null;
+            await Task.Run(() =>
             {
-                await DeleteProjectAsync(project);
-            }
+                foreach (var p in GetProjects())
+                {
+                    DeleteProject(p);
+                }
+            });
             Projects.Clear();
-            Projects.Add(await AddProjectAsync());
+            Projects.Add(project);
             Progress.Close();
             await new MessageDialog().ShowAsync("删除成功", "删除");
         }
@@ -91,7 +98,8 @@ namespace ClassifyFiles.UI
             {
                 string path = dialog.FileName;
                 Progress.Show(true);
-                var projects = await ImportAsync(path);
+                List<Project> projects = null;
+                await Task.Run(() => projects = Import(path));
                 Progress.Close();
                 await new MessageDialog().ShowAsync("导入成功", "导出");
                 projects.ForEach(p => Projects.Add(p));
@@ -111,7 +119,7 @@ namespace ClassifyFiles.UI
             {
                 string path = dialog.FileName;
                 Progress.Show(true);
-                await ExportAllAsync(path);
+                await Task.Run(() => ExportAll(path));
                 Progress.Close();
                 await new MessageDialog().ShowAsync("导出成功", "导出");
             }
@@ -131,7 +139,7 @@ namespace ClassifyFiles.UI
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            Configs.AutoAddFiles = false;   
+            Configs.AutoAddFiles = false;
         }
     }
 }

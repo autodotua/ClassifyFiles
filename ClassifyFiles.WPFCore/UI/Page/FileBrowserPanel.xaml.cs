@@ -22,6 +22,7 @@ using ClassifyFiles.UI.Panel;
 using System.Text.RegularExpressions;
 using System.Windows.Data;
 using System.Globalization;
+using System.Collections.ObjectModel;
 
 namespace ClassifyFiles.UI.Page
 {
@@ -83,7 +84,16 @@ namespace ClassifyFiles.UI.Page
             }
             else
             {
-                await SetFilesAsync(() => GetFilesByClassAsync(classPanel.SelectedUIClass.Class.ID), FileCollectionType.Class);
+                await SetFilesAsync(() =>
+                {
+                    var fileClasses = GetFilesWithClassesByClass(classPanel.SelectedUIClass.Class);
+                    var uiFiles = fileClasses.Select(p => new UIFile(p.Key)
+                    {
+                        Classes = new ObservableCollection<Class>(p.Value),
+                        classesLoaded = true,
+                    }).ToList();
+                    return uiFiles;
+                }, FileCollectionType.Class);
             }
         }
 
@@ -100,7 +110,8 @@ namespace ClassifyFiles.UI.Page
             }
             else if (e.UIFiles != null)//说明是由软件内部拖放过来的
             {
-                var files = await AddFilesToClassAsync(e.UIFiles.Select(p => p.File), e.Class);
+                IReadOnlyList<File> files = null;
+                await Task.Run(() => files= AddFilesToClass(e.UIFiles.Select(p => p.File), e.Class));
                 if (currentFileCollectionType == FileCollectionType.NoClass)
                 {
                     //如果当前显示的是没有被分类的文件，那么当拖放之后，自然就不再是没有分类的文件了，所以要从列表中删去
@@ -108,7 +119,7 @@ namespace ClassifyFiles.UI.Page
                 }
                 foreach (var file in e.UIFiles)
                 {
-                    await file.LoadAsync(null);
+                    await file.LoadClassesAsync(null);
                 }
                 await classPanel.UpdateUIClassesAsync();
             }
@@ -120,20 +131,22 @@ namespace ClassifyFiles.UI.Page
         /// <summary>
         /// 设置FileViewer的文件
         /// </summary>
-        /// <param name="func">用于获取文件的异步函数</param>
+        /// <param name="filesWithClassesFunc">用于获取文件的异步函数</param>
         /// <returns></returns>
-        private async Task SetFilesAsync(Func<Task<List<File>>> func, FileCollectionType type)
+        private async Task SetFilesAsync(
+              Func<List<UIFile>> getUIFiles,
+              FileCollectionType type
+          )
         {
             currentFileCollectionType = type;
             GetProgress().Show(true);
             Debug.WriteLine("Set Files, Project Hashcode is " + Project.GetHashCode()
             + ", Class is " + (classPanel.SelectedUIClass == null ? "null" : classPanel.SelectedUIClass.Class.Name));
-            List<File> files = await func();
             List<UIFile> uiFiles = null;
-
+            await Task.Delay(1);
             await Task.Run(() =>
             {
-                uiFiles = files.Select(p => new UIFile(p)).ToList();
+                uiFiles = getUIFiles();
                 rawFiles = uiFiles;
                 if (FilterPattern.Length > 0)
                 {
@@ -254,7 +267,16 @@ namespace ClassifyFiles.UI.Page
             ignoreClassChanged = true;
             classPanel.SelectedUIClass = null;
             ignoreClassChanged = false;
-            await SetFilesAsync(() => GetFilesByProjectAsync(Project.ID), FileCollectionType.All);
+            await SetFilesAsync(() =>
+            {
+                var fileClasses = GetFilesWithClassesByProject(Project);
+                var uiFiles = fileClasses.Select(p => new UIFile(p.Key)
+                {
+                    Classes = new ObservableCollection<Class>(p.Value),
+                    classesLoaded = true,
+                }).ToList();
+                return uiFiles;
+            }, FileCollectionType.All);
         }
 
         /// <summary>
@@ -267,7 +289,15 @@ namespace ClassifyFiles.UI.Page
             ignoreClassChanged = true;
             classPanel.SelectedUIClass = null;
             ignoreClassChanged = false;
-            await SetFilesAsync(() => GetNoClassesFilesByProjectAsync(Project.ID), FileCollectionType.NoClass);
+            await SetFilesAsync(() =>
+            {
+                var files = GetNoClassesFilesByProject(Project);
+                return files.Select(p => new UIFile(p)
+                {
+                    Classes = new ObservableCollection<Class>(),
+                    classesLoaded = true
+                }).ToList();
+            }, FileCollectionType.NoClass);
         }
 
         public FileCollectionType currentFileCollectionType = FileCollectionType.None;

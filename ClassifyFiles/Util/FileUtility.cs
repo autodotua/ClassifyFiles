@@ -3,7 +3,6 @@ using FzLib.Basic;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -437,19 +436,18 @@ namespace ClassifyFiles.Util
         {
             return new FI(file.GetAbsolutePath());
         }
-        public async static Task Export(string distFolder,
+        public  static void Export(string distFolder,
                                          Project project,
                                          ExportFormat format,
                                          Action<string, string> exportMethod,
                                          string splitter = "-",
                                          Action<File> afterExportAFile = null)
         {
-            var classes = await ClassUtility.GetClassesAsync(project);
+            var classes =  ClassUtility.GetClasses(project);
             foreach (var c in classes)
             {
-                var files = await FileClassUtility.GetFilesByClassAsync(c.ID);
-                await Task.Run(() =>
-                {
+                var files = FileClassUtility.GetFilesByClass(c);
+             
                     string folder = P.Combine(distFolder, GetValidFileName(c.Name));
                     if (!Dir.Exists(folder))
                     {
@@ -502,7 +500,6 @@ namespace ClassifyFiles.Util
                             ExportSub(root, folder);
                             break;
                     }
-                });
             }
 
         }
@@ -530,88 +527,74 @@ namespace ClassifyFiles.Util
             } while (F.Exists(P.Combine(dir, newName)));
             return newName;
         }
-        public static async Task SaveFilesAsync(IEnumerable<File> files)
+        public static bool  SaveFiles(IEnumerable<File> files)
         {
             files.ForEach(p => db.Entry(p).State = EntityState.Modified);
-            await db.SaveChangesAsync();
+            return SaveChanges() > 0;
         }
 
-        public async static Task DeleteFilesRecordAsync(IEnumerable<File> files)
+        public  static void DeleteFilesRecord(IEnumerable<File> files)
         {
             foreach (var file in files)
             {
                 db.Entry(file).State = EntityState.Deleted;
             }
-            await SaveChangesAsync();
+             SaveChanges();
         }
-        public static Task DeleteThumbnailsAsync(int projectID)
+        public static void DeleteThumbnails(int projectID)
         {
-            return Task.Run(() =>
+            var files = db.Files.Where(p => p.ProjectID == projectID).AsEnumerable();
+
+            foreach (var file in files)
             {
-                var files = db.Files.Where(p => p.ProjectID == projectID).AsEnumerable();
-
-                foreach (var file in files)
+                if (file.ThumbnailGUID != null && file.ThumbnailGUID.Length > 0)
                 {
-                    if (file.ThumbnailGUID != null && file.ThumbnailGUID.Length > 0)
+                    string path = GetThumbnailPath(file.ThumbnailGUID);
+                    if (F.Exists(path))
                     {
-                        string path = GetThumbnailPath(file.ThumbnailGUID);
-                        if (F.Exists(path))
+                        try
                         {
-                            try
-                            {
-                                F.Delete(path);
-                            }
-                            catch (Exception ex)
-                            {
-
-                            }
+                            F.Delete(path);
                         }
-                        file.ThumbnailGUID = null;
-                        db.Entry(file).State = EntityState.Modified;
-                    }
-                    else if (file.ThumbnailGUID != null && file.ThumbnailGUID.Length == 0)
-                    {
-                        file.ThumbnailGUID = null;
-                        db.Entry(file).State = EntityState.Modified;
-                    }
-                    if (file.IconGUID != null && file.IconGUID.Length > 0)
-                    {
-                        string path = GetIconPath(file.IconGUID);
-                        if (F.Exists(path))
+                        catch (Exception ex)
                         {
-                            try
-                            {
-                                F.Delete(path);
-                            }
-                            catch (Exception ex)
-                            {
 
-                            }
                         }
-                        file.IconGUID = null;
-                        db.Entry(file).State = EntityState.Modified;
                     }
-                    else if (file.IconGUID != null && file.IconGUID.Length == 0)
-                    {
-                        file.IconGUID = null;
-                        db.Entry(file).State = EntityState.Modified;
-                    }
+                    file.ThumbnailGUID = null;
+                    db.Entry(file).State = EntityState.Modified;
                 }
-                db.SaveChanges();
-                //db.Database.ExecuteSqlRaw("VACUUM;");
-            });
+                else if (file.ThumbnailGUID != null && file.ThumbnailGUID.Length == 0)
+                {
+                    file.ThumbnailGUID = null;
+                    db.Entry(file).State = EntityState.Modified;
+                }
+                if (file.IconGUID != null && file.IconGUID.Length > 0)
+                {
+                    string path = GetIconPath(file.IconGUID);
+                    if (F.Exists(path))
+                    {
+                        try
+                        {
+                            F.Delete(path);
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                    file.IconGUID = null;
+                    db.Entry(file).State = EntityState.Modified;
+                }
+                else if (file.IconGUID != null && file.IconGUID.Length == 0)
+                {
+                    file.IconGUID = null;
+                    db.Entry(file).State = EntityState.Modified;
+                }
+            }
+            db.SaveChanges();
 
         }
-    }
-
-    public enum ExportFormat
-    {
-        [Description("文件名")]
-        FileName,
-        [Description("路径")]
-        Path,
-        [Description("树型")]
-        Tree
     }
 
 

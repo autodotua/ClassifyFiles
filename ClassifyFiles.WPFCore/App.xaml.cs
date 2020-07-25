@@ -69,44 +69,31 @@ namespace ClassifyFiles.WPFCore
 
         private async void UnhandledException_UnhandledExceptionCatched(object sender, FzLib.Program.Runtime.UnhandledExceptionEventArgs e)
         {
-
-            try
+            await Task.Run(() =>
             {
-                await LogUtility.AddLogAsync(e.Exception.Message, e.Exception.ToString());
-            }
-            catch (Exception ex)
-            {
+                try
+                {
+                    LogUtility.AddLog(e.Exception.Message, e.Exception.ToString());
+                }
+                catch (Exception ex)
+                {
 
-            }
+                }
+            });
             if (!e.Exception.Source.StartsWith("Microsoft.EntityFrameworkCore"))
             {
 
                 await Dispatcher.Invoke(async () =>
-            {
-                try
                 {
-                    //Window win = new Window()
-                    //{
-                    //    AllowsTransparency = true,
-                    //    WindowStyle = WindowStyle.None,
-                    //    ShowInTaskbar = false,
-                    //    Title = "错误",
-                    //    Topmost = true,
-                    //    Background = Brushes.Transparent,
-                    //    WindowStartupLocation = WindowStartupLocation.CenterScreen
-                    //};
-                    //WindowHelper.SetUseModernWindowStyle(win, true);
-                    //ThemeManager.SetIsThemeAware(win, true);
-                    //SetTheme(win);
-                    //win.Show();
-                    await new ErrorDialog().ShowAsync(e.Exception, "程序发生错误");
-                    //win.Close();
-                }
-                catch
-                {
-                    
-                }
-            });
+                    try
+                    {
+                        await new ErrorDialog().ShowAsync(e.Exception, "程序发生错误");
+                    }
+                    catch
+                    {
+
+                    }
+                });
             }
         }
 
