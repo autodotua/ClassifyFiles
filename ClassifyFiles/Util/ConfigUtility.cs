@@ -9,21 +9,25 @@ namespace ClassifyFiles.Util
     {
         public static int GetInt(string key, int defaultValue)
         {
+            using var db = GetNewDb();
             string value = (db.Configs.FirstOrDefault(p => p.Key == key))?.Value;
             return value == null ? defaultValue : int.Parse(value);
         }
         public static long GetLong(string key, long defaultValue)
         {
+            using var db = GetNewDb();
             string value = (db.Configs.FirstOrDefault(p => p.Key == key))?.Value;
             return value == null ? defaultValue : long.Parse(value);
         }
         public static double GetDouble(string key, double defaultValue)
         {
+            using var db = GetNewDb();
             string value = (db.Configs.FirstOrDefault(p => p.Key == key))?.Value;
             return value == null ? defaultValue : double.Parse(value);
         }
         public static bool GetBool(string key, bool defaultValue)
         {
+            using var db = GetNewDb();
             string value = (db.Configs.FirstOrDefault(p => p.Key == key))?.Value;
             return value == null ? defaultValue : bool.Parse(value);
         }

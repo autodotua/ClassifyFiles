@@ -824,7 +824,7 @@ namespace ClassifyFiles.UI.Panel
         private async void MenuDelete_Click(object sender, RoutedEventArgs e)
         {
             var files = GetSelectedFiles();
-            GetProgress().Show(false);
+            GetProgress().Show();
             await Task.Run(() =>
             FileUtility.DeleteFilesRecord(files.Select(p => p.File)));
             foreach (var file in files)
@@ -840,7 +840,7 @@ namespace ClassifyFiles.UI.Panel
 
         private async void ChkTag_Click(object sender, RoutedEventArgs e)
         {
-            GetProgress().Show(false);
+            GetProgress().Show();
             await Task.Delay(100);
             var files = GetSelectedFiles();
             CheckBox chk = sender as CheckBox;

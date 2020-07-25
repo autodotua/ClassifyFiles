@@ -66,7 +66,8 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(SelectedUIClass));
                 if (value != null)
                 {
-                    Configs.LastClassID = value.Class.ID;
+                    Task.Run(() =>
+                    Configs.LastClassID = value.Class.ID);
                 }
 
                 SelectedClassChanged?.Invoke(this, new SelectedClassChangedEventArgs(oldValue?.Class, value?.Class));

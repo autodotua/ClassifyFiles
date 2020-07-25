@@ -89,7 +89,7 @@ namespace ClassifyFiles.UI.Page
             if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
             {
                 string path = dialog.FileName;
-                GetProgress().Show(true);
+                GetProgress().Show();
                 await Task.Run(() =>
                 {
                     FileUtility.Export(path, Project, ExportFormat, LinkUtility.CreateLink, Splitter, ShowProgressMessage);
@@ -110,7 +110,7 @@ namespace ClassifyFiles.UI.Page
             if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
             {
                 string path = dialog.FileName;
-                GetProgress().Show(true);
+                GetProgress().Show();
                 await Task.Run(() =>
                 {
                     FileUtility.Export(path, Project, ExportFormat, (from, to) => System.IO.File.Copy(from, to, true),
@@ -132,7 +132,7 @@ namespace ClassifyFiles.UI.Page
             if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
             {
                 string path = dialog.FileName;
-                GetProgress().Show(true);
+                GetProgress().Show();
                 await Task.Run(() => ExportProject(path, Project));
                 GetProgress().Close();
                 await new MessageDialog().ShowAsync("导出成功", "导出");
@@ -157,7 +157,7 @@ namespace ClassifyFiles.UI.Page
         private async void DeleteFiles_Click(object sender, RoutedEventArgs e)
         {
             flyoutDeleteFiles.Hide();
-            GetProgress().Show(true);
+            GetProgress().Show();
             await Task.Run(() =>
             {
                 DeleteFilesOfProject(Project);
@@ -170,17 +170,17 @@ namespace ClassifyFiles.UI.Page
         private async void CheckButton_Click(object sender, RoutedEventArgs e)
         {
             //无用
-            GetProgress().Show(true);
+            GetProgress().Show();
             await Task.Run(() => Check(Project));
             GetProgress().Close();
         }
 
         private async void DeleteThumbnails_Click(object sender, RoutedEventArgs e)
         {
-            GetProgress().Show(true);
+            GetProgress().Show();
             await Task.Run(() =>
             {
-                FileUtility.DeleteThumbnails(Project.ID);
+                FileUtility.DeleteThumbnails(Project);
             });
             FileIcon.ClearCaches();
             GetProgress().Close();
@@ -190,7 +190,7 @@ namespace ClassifyFiles.UI.Page
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
             flyoutDeleteFileClasses.Hide();
-            GetProgress().Show(true); await Task.Run(() =>
+            GetProgress().Show(); await Task.Run(() =>
             {
                 DeleteAllFileClasses(Project);
             });

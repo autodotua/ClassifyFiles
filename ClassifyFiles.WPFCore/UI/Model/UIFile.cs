@@ -58,24 +58,29 @@ namespace ClassifyFiles.UI.Model
                 this.Notify(nameof(File));
             }
         }
-        public bool classesLoaded = false;
         public UIFileDisplay Display { get; set; }
         public System.IO.FileInfo FileInfo { get; private set; }
         public async Task LoadClassesAsync(AppDbContext db = null,bool force=false)
         {
-            if (!classesLoaded || force)
+            if (Classes!=null || force)
             {
-                classesLoaded = true;
                 IEnumerable<Class> classes=null;
                 await Task.Run(() =>
                 {
-                    if (db == null)
+                    try
                     {
-                        classes = GetClassesOfFile(File);
+                        if (db == null)
+                        {
+                            classes = GetClassesOfFile(File);
+                        }
+                        else
+                        {
+                            classes = GetClassesOfFile(db, File);
+                        }
                     }
-                    else
+                    catch(Exception ex)
                     {
-                        classes = GetClassesOfFile(db, File);
+                        classes = Array.Empty<Class>();
                     }
                 });
                 Classes = new ObservableCollection<Class>(classes);

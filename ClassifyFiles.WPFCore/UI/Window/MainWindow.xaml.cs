@@ -95,6 +95,7 @@ namespace ClassifyFiles.UI
 
         public async Task DeleteSelectedProjectAsync()
         {
+            Progress.Show();
             List<Project> projects = null;
             await Task.Run(() => {
                 DeleteProject(SelectedProject);
@@ -109,6 +110,7 @@ namespace ClassifyFiles.UI
             SelectedProject = Projects[0];
             RadioButton_Checked(btnModeView, null);
 
+            Progress.Close();
         }
         FileBrowserPanel fileBrowserPanel = new FileBrowserPanel();
         ClassSettingPanel classSettingPanel = new ClassSettingPanel();
@@ -145,7 +147,7 @@ namespace ClassifyFiles.UI
             frame.Navigate(mainPage);
             if (mainPage != null)
             {
-                Progress.Show(true);
+                Progress.Show();
                 try
                 {
                     await mainPage.LoadAsync(SelectedProject);
@@ -180,8 +182,6 @@ namespace ClassifyFiles.UI
             SettingWindow win = new SettingWindow(Projects) { Owner = this };
             win.ShowDialog();
         }
-
-
 
         private async void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
@@ -229,10 +229,12 @@ namespace ClassifyFiles.UI
 
         private async void AddProjectButton_Click(object sender, RoutedEventArgs e)
         {
+            Progress.Show();
             Project project = null;
             await Task.Run(() => project= AddProject());
             Projects.Add(project);
             SelectedProject = project;
+            Progress.Close();
         }
     }
 }

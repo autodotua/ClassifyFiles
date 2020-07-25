@@ -125,7 +125,19 @@ namespace ClassifyFiles.Util
                     //所以提前先把IconGUID的值给了
                     file.IconGUID = guid;
                     //其他文件，同一个格式的用同一个图标
-                    if (F.Exists(iconPath) || workingIconExts.ContainsKey(guid))
+                    if (workingIconExts.ContainsKey(guid) && !F.Exists(iconPath))
+                    {
+                        //防止一起生成Icon的时候，后来的那些直接返回，然后UI那边读取了，发现没有，就直接不显示了
+                        for (int i = 0; i < 20; i++)
+                        {
+                            if (F.Exists(iconPath))
+                            {
+                                break;
+                            }
+                            System.Threading.Thread.Sleep(1);
+                        }
+                    }
+                    else if (F.Exists(iconPath) || workingIconExts.ContainsKey(guid))
                     {
                     }
                     else
@@ -436,70 +448,70 @@ namespace ClassifyFiles.Util
         {
             return new FI(file.GetAbsolutePath());
         }
-        public  static void Export(string distFolder,
+        public static void Export(string distFolder,
                                          Project project,
                                          ExportFormat format,
                                          Action<string, string> exportMethod,
                                          string splitter = "-",
                                          Action<File> afterExportAFile = null)
         {
-            var classes =  ClassUtility.GetClasses(project);
+            var classes = ClassUtility.GetClasses(project);
             foreach (var c in classes)
             {
                 var files = FileClassUtility.GetFilesByClass(c);
-             
-                    string folder = P.Combine(distFolder, GetValidFileName(c.Name));
-                    if (!Dir.Exists(folder))
-                    {
-                        Dir.CreateDirectory(folder);
-                    }
-                    switch (format)
-                    {
-                        case ExportFormat.FileName:
-                            foreach (var file in files)
+
+                string folder = P.Combine(distFolder, GetValidFileName(c.Name));
+                if (!Dir.Exists(folder))
+                {
+                    Dir.CreateDirectory(folder);
+                }
+                switch (format)
+                {
+                    case ExportFormat.FileName:
+                        foreach (var file in files)
+                        {
+                            string newName = GetUniqueFileName(file.Name, folder);
+                            string newPath = P.Combine(folder, newName);
+                            exportMethod(file.GetAbsolutePath(), newPath);
+                            afterExportAFile?.Invoke(file);
+                        }
+                        break;
+                    case ExportFormat.Path:
+                        foreach (var file in files)
+                        {
+                            string newName = P.Combine(folder, file.Name).Replace(":", splitter).Replace("\\", splitter).Replace("/", splitter);
+                            newName = GetUniqueFileName(newName, folder);
+                            string newPath = P.Combine(folder, newName);
+                            exportMethod(file.GetAbsolutePath(), newPath);
+                            afterExportAFile?.Invoke(file);
+                        }
+                        break;
+                    case ExportFormat.Tree:
+                        var tree = GetFileTree(files);
+                        File root = new File();
+                        root.SubFiles = tree.SubFiles;
+                        void ExportSub(File file, string currentFolder)
+                        {
+                            if (file.IsFolder)//是目录
+                            {
+                                foreach (var sub in file.SubFiles)
+                                {
+                                    string newFolder = P.Combine(currentFolder, file.Dir);
+                                    Dir.CreateDirectory(newFolder);
+                                    ExportSub(sub, newFolder);
+                                }
+                            }
+                            else
                             {
                                 string newName = GetUniqueFileName(file.Name, folder);
-                                string newPath = P.Combine(folder, newName);
+                                string newPath = P.Combine(currentFolder, newName);
                                 exportMethod(file.GetAbsolutePath(), newPath);
                                 afterExportAFile?.Invoke(file);
                             }
-                            break;
-                        case ExportFormat.Path:
-                            foreach (var file in files)
-                            {
-                                string newName = P.Combine(folder, file.Name).Replace(":", splitter).Replace("\\", splitter).Replace("/", splitter);
-                                newName = GetUniqueFileName(newName, folder);
-                                string newPath = P.Combine(folder, newName);
-                                exportMethod(file.GetAbsolutePath(), newPath);
-                                afterExportAFile?.Invoke(file);
-                            }
-                            break;
-                        case ExportFormat.Tree:
-                            var tree = GetFileTree(files);
-                            File root = new File();
-                            root.SubFiles = tree.SubFiles;
-                            void ExportSub(File file, string currentFolder)
-                            {
-                                if (file.IsFolder)//是目录
-                                {
-                                    foreach (var sub in file.SubFiles)
-                                    {
-                                        string newFolder = P.Combine(currentFolder, file.Dir);
-                                        Dir.CreateDirectory(newFolder);
-                                        ExportSub(sub, newFolder);
-                                    }
-                                }
-                                else
-                                {
-                                    string newName = GetUniqueFileName(file.Name, folder);
-                                    string newPath = P.Combine(currentFolder, newName);
-                                    exportMethod(file.GetAbsolutePath(), newPath);
-                                    afterExportAFile?.Invoke(file);
-                                }
-                            }
-                            ExportSub(root, folder);
-                            break;
-                    }
+                        }
+                        ExportSub(root, folder);
+                        break;
+                }
             }
 
         }
@@ -527,23 +539,23 @@ namespace ClassifyFiles.Util
             } while (F.Exists(P.Combine(dir, newName)));
             return newName;
         }
-        public static bool  SaveFiles(IEnumerable<File> files)
+        public static bool SaveFiles(IEnumerable<File> files)
         {
             files.ForEach(p => db.Entry(p).State = EntityState.Modified);
             return SaveChanges() > 0;
         }
 
-        public  static void DeleteFilesRecord(IEnumerable<File> files)
+        public static void DeleteFilesRecord(IEnumerable<File> files)
         {
             foreach (var file in files)
             {
                 db.Entry(file).State = EntityState.Deleted;
             }
-             SaveChanges();
+            SaveChanges();
         }
-        public static void DeleteThumbnails(int projectID)
+        public static void DeleteThumbnails(Project project)
         {
-            var files = db.Files.Where(p => p.ProjectID == projectID).AsEnumerable();
+            var files = db.Files.Where(p => p.ProjectID == project.ID).AsEnumerable();
 
             foreach (var file in files)
             {

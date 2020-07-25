@@ -37,7 +37,7 @@ namespace ClassifyFiles.UI
             }
         }
         public bool Showing { get; private set; }
-        public void Show(bool overlay)
+        public void Show()
         {
             if(Showing)
             {
@@ -46,7 +46,7 @@ namespace ClassifyFiles.UI
             Showing = true;
             canClose = false;
             Message = "";
-            grdOverlay.Opacity = overlay ? 0.75 : 0;
+            grdOverlay.Opacity = 0.75;
             ring.IsActive = true;
             Opacity = 0;
             Visibility = Visibility.Visible;

@@ -71,7 +71,7 @@ namespace ClassifyFiles.UI
         private async void DeleteProjects_Click(object sender, RoutedEventArgs e)
         {
             flyoutDeleteProjects.Hide();
-            Progress.Show(true);
+            Progress.Show();
             Project project = null;
             await Task.Run(() =>
             {
@@ -97,7 +97,7 @@ namespace ClassifyFiles.UI
             if (dialog.ShowDialog(this) == CommonFileDialogResult.Ok)
             {
                 string path = dialog.FileName;
-                Progress.Show(true);
+                Progress.Show();
                 List<Project> projects = null;
                 await Task.Run(() => projects = Import(path));
                 Progress.Close();
@@ -118,7 +118,7 @@ namespace ClassifyFiles.UI
             if (dialog.ShowDialog(this) == CommonFileDialogResult.Ok)
             {
                 string path = dialog.FileName;
-                Progress.Show(true);
+                Progress.Show();
                 await Task.Run(() => ExportAll(path));
                 Progress.Close();
                 await new MessageDialog().ShowAsync("导出成功", "导出");

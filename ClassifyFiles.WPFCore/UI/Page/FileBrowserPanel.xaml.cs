@@ -90,7 +90,6 @@ namespace ClassifyFiles.UI.Page
                     var uiFiles = fileClasses.Select(p => new UIFile(p.Key)
                     {
                         Classes = new ObservableCollection<Class>(p.Value),
-                        classesLoaded = true,
                     }).ToList();
                     return uiFiles;
                 }, FileCollectionType.Class);
@@ -139,7 +138,7 @@ namespace ClassifyFiles.UI.Page
           )
         {
             currentFileCollectionType = type;
-            GetProgress().Show(true);
+            GetProgress().Show();
             Debug.WriteLine("Set Files, Project Hashcode is " + Project.GetHashCode()
             + ", Class is " + (classPanel.SelectedUIClass == null ? "null" : classPanel.SelectedUIClass.Class.Name));
             List<UIFile> uiFiles = null;
@@ -163,7 +162,7 @@ namespace ClassifyFiles.UI.Page
         private List<UIFile> rawFiles = null;
         private async Task ApplyFilterAsync()
         {
-            GetProgress().Show(true);
+            GetProgress().Show();
 
             IList<UIFile> files = rawFiles;
             if (rawFiles != null)
@@ -273,7 +272,6 @@ namespace ClassifyFiles.UI.Page
                 var uiFiles = fileClasses.Select(p => new UIFile(p.Key)
                 {
                     Classes = new ObservableCollection<Class>(p.Value),
-                    classesLoaded = true,
                 }).ToList();
                 return uiFiles;
             }, FileCollectionType.All);
@@ -295,7 +293,6 @@ namespace ClassifyFiles.UI.Page
                 return files.Select(p => new UIFile(p)
                 {
                     Classes = new ObservableCollection<Class>(),
-                    classesLoaded = true
                 }).ToList();
             }, FileCollectionType.NoClass);
         }
@@ -479,7 +476,7 @@ namespace ClassifyFiles.UI.Page
                 await new ErrorDialog().ShowAsync("请先设置根目录地址！", "错误");
                 return;
             }
-            GetProgress().Show(true);
+            GetProgress().Show();
             if (new UpdateFilesDialog(Project) { Owner = Window.GetWindow(this) }.ShowDialog() == true)
             {
                 classPanel.SelectedUIClass = null;
@@ -543,7 +540,7 @@ namespace ClassifyFiles.UI.Page
             {
                 return;
             }
-            GetProgress().Show(true);
+            GetProgress().Show();
             SortType type = (SortType)(sender as FrameworkElement).Tag;
             await filesViewer.SortAsync(type);
             Configs.SortType = (int)type;
