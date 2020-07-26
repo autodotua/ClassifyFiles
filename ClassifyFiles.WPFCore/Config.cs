@@ -14,14 +14,6 @@ namespace ClassifyFiles
 {
     public static class Configs
     {
-        public static void InitializeAllValues()
-        {
-            var a = Theme;
-            var b = AutoThumbnails;
-            var c = ShowExplorerIcon;
-            var d = showThumbnail;
-            var e = RefreshThreadCount;
-        }
 
         private static int? theme = null;
         public static int Theme

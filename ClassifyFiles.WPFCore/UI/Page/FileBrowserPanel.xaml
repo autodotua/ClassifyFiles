@@ -223,10 +223,10 @@
                                     <m:ToggleSwitch
                                         x:Name="swtIcons" Header="显示资源管理器图标"
                                         IsOn="{Binding ShowExplorerIcon}" />
+                                    <m:ToggleSwitch Header="显示文件扩展名" IsOn="{Binding ShowFileExtension}" />
                                     <m:ToggleSwitch
                                         x:Name="swtGroup" Header="按目录进行分组"
                                         IsOn="{Binding GroupByDir}" />
-                                    <m:ToggleSwitch Header="显示文件扩展名" IsOn="{Binding ShowFileExtension}" />
                                 </m:SimpleStackPanel>
                             </GroupBox>
                             <GroupBox Grid.Column="2" Header="图标视图">
@@ -302,7 +302,7 @@
             <m:AppBarButton
                 x:Name="btnAddFile"
                 Click="BtnAddFile_Click" Icon="Add"
-                IsEnabled="{Binding ElementName=classPanel,Path=SelectedUIClass, Converter={StaticResource nn2b}}"
+                IsEnabled="{Binding ElementName=classPanel, Path=SelectedUIClass, Converter={StaticResource nn2b}}"
                 Label="添加文件" />
             <m:AppBarButton
                 x:Name="btnRefresh"

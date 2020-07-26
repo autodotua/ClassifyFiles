@@ -23,6 +23,8 @@ namespace ClassifyFiles.Util
             return new AppDbContext(DbPath);
         }
         const string dbReplacedMessage = "由于保存出错，数据库上下文被替换，更改已丢失";
+        public static bool IgnoreDbSavingError { get; set; } = true;
+        public static event UnhandledExceptionEventHandler DbSavingException;
         public async static Task ReplaceDbContextAsync()
         {
             await db.DisposeAsync();
@@ -46,12 +48,28 @@ namespace ClassifyFiles.Util
                 {
 
                 }
+                if (!IgnoreDbSavingError)
+                {
+                    throw;
+                }
+                DbSavingException?.Invoke(null, new UnhandledExceptionEventArgs(ex, false));
                 return 0;
+            }
+        }
+        public static int SaveChanges(AppDbContext db)
+        {
+            try
+            {
+                return db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw;
             }
         }
         public static void Zip()
         {
-             db.Database.ExecuteSqlRaw("VACUUM;");
+            db.Database.ExecuteSqlRaw("VACUUM;");
         }
         public static void CancelChanges()
         {

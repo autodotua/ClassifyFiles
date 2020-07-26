@@ -33,7 +33,7 @@ namespace ClassifyFiles.Util
         }
         public static string GetString(string key, string defaultValue)
         {
-            using var db= GetNewDb();
+            using var db = GetNewDb();
             string value = (db.Configs.FirstOrDefault(p => p.Key == key))?.Value;
             return value ?? defaultValue;
         }
@@ -43,7 +43,7 @@ namespace ClassifyFiles.Util
             Config config = db.Configs.FirstOrDefault(p => p.Key == key);
             if (config != null)
             {
-                if(config.ToString()==value.ToString())
+                if (config.ToString() == value.ToString())
                 {
                     return;
                 }
@@ -53,11 +53,11 @@ namespace ClassifyFiles.Util
             else
             {
                 config = new Config(key, value.ToString());
-                db.Configs.Add(config);
+                var result = db.Configs.Add(config);
             }
 
-            SaveChanges();
-
+            SaveChanges(db);
+            var a = db.Configs.FirstOrDefault(p => p.Key == key); ;
         }
     }
 }

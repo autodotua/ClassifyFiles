@@ -36,7 +36,14 @@ namespace ClassifyFiles.UI.Component
         {
             InitializeComponent();
         }
-        public static bool StaticEnableCache { get; set; } = true;
+        /// <summary>
+        /// 是否启用缓存的全局开关
+        /// </summary>
+        /// <remarks>
+        /// 因为比较容易出错，而且对性能提升不大，所以禁用了
+        /// 可能对减少内存有点作用
+        /// </remarks>
+        public static bool StaticEnableCache { get; set; } = false;
         public bool EnableCache { get; set; } = true;
         public bool DisplayRawImage { get; set; } = false;
         public bool Square { get; set; } = true;

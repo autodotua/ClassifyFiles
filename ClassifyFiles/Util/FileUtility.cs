@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using static ClassifyFiles.Util.DbUtility;
 using Dir = System.IO.Directory;
 using F = System.IO.File;
+using D = System.IO.Directory;
 using FI = System.IO.FileInfo;
 using P = System.IO.Path;
 
@@ -424,6 +425,7 @@ namespace ClassifyFiles.Util
                         {
                             sub = getNewItem(new File() { Dir = path, Project = project });
                             getSubFiles(current).Add(sub);
+                            setParent(sub, current);
                             current = sub;
                         }
                     }
@@ -606,6 +608,38 @@ namespace ClassifyFiles.Util
             }
             db.SaveChanges();
 
+        }
+
+        public static (int DeleteFromDb,int DeleteFromDisk,int RemainsCount) OptimizeThumbnails()
+        {
+            int deletedFromDb = 0;
+            var files = D.EnumerateFiles(ThumbnailFolderPath).ToDictionary(p => P.GetFileNameWithoutExtension(p));
+            foreach (var dbFile in db.Files)
+            {
+                if (dbFile.ThumbnailGUID != null)
+                {
+                    if (dbFile.ThumbnailGUID.Length == 0)//重置缩略图状态
+                    {
+                        dbFile.ThumbnailGUID = null;
+                        db.Entry(dbFile).State = EntityState.Modified;
+                    }
+                    else if (files.ContainsKey(dbFile.ThumbnailGUID))
+                    {
+                        files.Remove(dbFile.ThumbnailGUID);
+                    }
+                    else//没有物理文件
+                    {
+                        deletedFromDb++;
+                        dbFile.ThumbnailGUID = null;
+                        db.Entry(dbFile).State = EntityState.Modified;
+                    }
+                }
+            }
+            int deletedFromDisk = files.Count;
+            files.Values.ForEach(p => F.Delete(p));//删除孤立的缩略图文件
+            SaveChanges();
+            int remainsCount = db.Files.Where(p => p.ThumbnailGUID != null).Count();
+            return (deletedFromDb, deletedFromDisk, remainsCount);
         }
     }
 

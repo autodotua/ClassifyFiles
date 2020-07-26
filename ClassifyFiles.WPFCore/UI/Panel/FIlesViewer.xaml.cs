@@ -484,6 +484,7 @@ namespace ClassifyFiles.UI.Panel
             grdAppBar.Children.OfType<AppBarToggleButton>().ForEach(p => p.IsChecked = false);
             (sender as AppBarToggleButton).IsChecked = true;
             CurrentFileView = (FileView)type;
+            await Task.Delay(1);//让UI先响应
             await RefreshFileViewAsync();
         }
 
@@ -532,14 +533,14 @@ namespace ClassifyFiles.UI.Panel
                 FilesContent = FindResource("lvwDetailFiles") as ListView;
             }
 
-
-            Configs.LastViewType = (int)CurrentFileView;
             ViewTypeChanged?.Invoke(this, new EventArgs());
 
             if (selectedFile != null)
             {
                 await SelectFileAsync(selectedFile);
             }
+            await Task.Run(() =>
+            Configs.LastViewType = (int)CurrentFileView);
         }
 
 
@@ -897,6 +898,8 @@ namespace ClassifyFiles.UI.Panel
         }
 
         #endregion
+
+
     }
 
 }

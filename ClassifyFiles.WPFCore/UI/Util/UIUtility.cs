@@ -1,4 +1,5 @@
-﻿using System.Windows.Media;
+﻿using System.Collections.Generic;
+using System.Windows.Media;
 
 namespace ClassifyFiles.UI.Util
 {
@@ -24,6 +25,28 @@ namespace ClassifyFiles.UI.Util
                 }
             }
             return child as T;
+        }
+        public static List<T> GetVisualChilds<T>(this Visual referenceVisual) where T : Visual
+        {
+            List<T> results = new List<T>();
+            Get(referenceVisual);
+            void Get(Visual visual)
+            {
+                Visual child = null;
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(visual); i++)
+                {
+                    child = VisualTreeHelper.GetChild(visual, i) as Visual;
+                    if (child != null && child is T t)
+                    {
+                        results.Add(t);
+                    }
+                    if (child != null)
+                    {
+                        Get(child);
+                    }
+                }
+            }
+            return results;
         }
     }
 }

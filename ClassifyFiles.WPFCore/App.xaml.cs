@@ -37,31 +37,12 @@ namespace ClassifyFiles.WPFCore
             {
                 Directory.CreateDirectory("thumb");
             }
-            Configs.InitializeAllValues();
 
             FileUtility.FFMpegPath = "exe/ffmpeg.exe";
             Current = this;
             SplashWindow.TryShow();
             MainWindow win = new MainWindow();
             MainWindow = win;
-#if (!DEBUG)
-            //UnhandledException.RegistAll();
-
-            //FzLib.Program.Runtime.SingleInstance singleInstance = new FzLib.Program.Runtime.SingleInstance(Assembly.GetExecutingAssembly().FullName);
-            //if (await singleInstance.CheckAndOpenWindow(this, this))
-            //{
-            //    return;
-            //}
-#endif
-
-            //FzLib.Program.App.SetWorkingDirectoryToAppPath();
-
-            //InitializeTheme();
-
-            //SetTheme();
-
-            //SetCulture();
-
             win.Show();
             SplashWindow.TryClose();
 

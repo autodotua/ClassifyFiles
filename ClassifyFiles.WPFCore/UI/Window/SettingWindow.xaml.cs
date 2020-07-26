@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
@@ -20,9 +21,11 @@ namespace ClassifyFiles.UI
     public partial class SettingWindow : WindowBase
     {
         public ObservableCollection<Project> Projects { get; }
+        public static SettingWindow Current { get; private set; }
 
         public SettingWindow(ObservableCollection<Project> projects)
         {
+            Current = this;
             InitializeComponent();
 
             int theme = Configs.Theme;
@@ -50,6 +53,7 @@ namespace ClassifyFiles.UI
 
         private void WindowBase_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            Current = null;
         }
         private void ThemeRButton_Click(object sender, RoutedEventArgs e)
         {
@@ -140,6 +144,23 @@ namespace ClassifyFiles.UI
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             Configs.AutoAddFiles = false;
+        }
+
+        private async void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            //由于删除缩略图可能会影响正在显示的缩略图，因此先关闭窗体
+            App.Current.Windows.Cast<Window>().Where(p => p != this).ForEach(p => p.Close());
+            Progress.Show();
+            (int DeleteFromDb, int DeleteFromDisk, int RemainsCount) result=(-1,-1,-1);
+           await Task.Run(() => result = FileUtility.OptimizeThumbnails());
+            App.Current.MainWindow = new MainWindow();
+            App.Current.MainWindow.Show();
+            BringToFront();
+            Progress.Close();
+            await new MessageDialog().ShowAsync($"修复成功，{Environment.NewLine}" +
+                $"从数据库中删除了{result.DeleteFromDb}张缩略图，{Environment.NewLine}" +
+                $"从磁盘中删除了{result.DeleteFromDisk}张缩略图，{Environment.NewLine}" +
+                $"现存{result.RemainsCount}张缩略图，{Environment.NewLine}", "修复缩略图");
         }
     }
 }

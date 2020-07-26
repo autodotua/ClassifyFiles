@@ -61,7 +61,7 @@ namespace ClassifyFiles.UI
                 {
                     if (value.ID != Configs.LastProjectID)
                     {
-                        Configs.LastProjectID = value.ID;
+                        Task.Run(() => Configs.LastProjectID = value.ID);
                     }
                 }
                 LoadProjectAsync();
@@ -74,7 +74,7 @@ namespace ClassifyFiles.UI
             Projects = new ObservableCollection<Project>(GetProjects());
             if (Projects.Count == 0)
             {
-                Projects.Add(AddProject()) ;
+                Projects.Add(AddProject());
             }
             if (Projects.Any(p => p.ID == Configs.LastProjectID))
             {
@@ -90,6 +90,11 @@ namespace ClassifyFiles.UI
             Width = width * 0.8;
             Height = height * 0.8;
 
+            DbSavingException += async (p1, p2) =>
+            {
+                await new ErrorDialog().ShowAsync(p2.ExceptionObject as Exception, "发生数据库保存错误");
+            };
+
         }
 
 
@@ -97,10 +102,11 @@ namespace ClassifyFiles.UI
         {
             Progress.Show();
             List<Project> projects = null;
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 DeleteProject(SelectedProject);
                 projects = GetProjects();
-                if(projects.Count==0)
+                if (projects.Count == 0)
                 {
                     var newProject = AddProject();
                     projects.Add(newProject);
@@ -147,7 +153,7 @@ namespace ClassifyFiles.UI
             frame.Navigate(mainPage);
             if (mainPage != null)
             {
-                Progress.Show();
+                //Progress.Show();
                 try
                 {
                     await mainPage.LoadAsync(SelectedProject);
@@ -156,7 +162,7 @@ namespace ClassifyFiles.UI
                 {
                     throw ex;
                 }
-                Progress.Close();
+                //Progress.Close();
                 IsHitTestVisible = false;
                 //在动画的时候不让界面能够点击
                 await Task.Delay(Configs.AnimationDuration * 2);
@@ -166,7 +172,6 @@ namespace ClassifyFiles.UI
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
             await LoadProjectAsync();
         }
 
@@ -179,8 +184,15 @@ namespace ClassifyFiles.UI
 
         private void SettingMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            SettingWindow win = new SettingWindow(Projects) { Owner = this };
-            win.ShowDialog();
+            if (SettingWindow.Current == null)
+            {
+                SettingWindow win = new SettingWindow(Projects);
+                win.Show();
+            }
+            else
+            {
+                SettingWindow.Current.BringToFront();
+            }
         }
 
         private async void RadioButton_Checked(object sender, RoutedEventArgs e)
@@ -231,7 +243,7 @@ namespace ClassifyFiles.UI
         {
             Progress.Show();
             Project project = null;
-            await Task.Run(() => project= AddProject());
+            await Task.Run(() => project = AddProject());
             Projects.Add(project);
             SelectedProject = project;
             Progress.Close();
