@@ -83,7 +83,7 @@ namespace ClassifyFiles.UI.Component
             });
             return result;
         }
-        private bool Load()
+        public bool Load()
         {
             FrameworkElement item;
             if (DisplayRawImage)

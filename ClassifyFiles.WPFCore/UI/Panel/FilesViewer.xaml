@@ -73,6 +73,7 @@
         <ToolTip
             x:Key="toolTip" Padding="8"
             BorderThickness="0" Placement="Right"
+            Opened="ToolTip_Opened"
             Visibility="{Binding Path=(root:Configs.ShowToolTip), Mode=OneWay, Converter={StaticResource b2v}}">
             <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
                 <TextBlock
@@ -153,7 +154,8 @@
                 MinWidth="64" Margin="-6,-6"
                 Padding="0,8"
                 HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch">
+                VerticalAlignment="Stretch"
+                Background="Transparent">
                 <StackPanel
                     Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
                     HorizontalAlignment="Stretch"
@@ -180,9 +182,9 @@
         <!--  平铺视图模板  -->
         <DataTemplate x:Key="grdTileView">
             <Grid
-                Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource three}}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
+                Background="Transparent"
                 ToolTip="{StaticResource toolTip}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" />
@@ -190,7 +192,6 @@
                     <ColumnDefinition Width="144" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource half}}" />
                     <RowDefinition Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource half}}" />
                     <RowDefinition Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource half}}" />
                     <RowDefinition Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource half}}" />
@@ -206,11 +207,11 @@
                     Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
                     TextWrapping="Wrap" />
                 <TextBlock
-                    Grid.Row="3" Grid.RowSpan="3"
+                    Grid.Row="3" Grid.RowSpan="2"
                     Grid.Column="2" VerticalAlignment="Top"
                     Foreground="Gray"
                     Style="{StaticResource CaptionTextBlockStyle}"
-                    Text="{Binding Display.DisplayDir, Mode=OneTime}"
+                    Text="{Binding Display.DisplayShortDir, Mode=OneTime}"
                     TextWrapping="Wrap"
                     Visibility="{Binding Display.ShowTileViewPaths, Converter={StaticResource b2v}}" />
                 <!--<component:TagGroup
@@ -221,9 +222,10 @@
                     Orientation="Horizontal"
                     TagMouseDown="Tags_MouseDown" />-->
                 <component:FileIcon
-                    Grid.Row="1" Grid.RowSpan="4"
+                    Grid.Row="0" Grid.RowSpan="5"
                     Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
                     Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
+                    VerticalAlignment="Center"
                     File="{Binding .}" />
             </Grid>
         </DataTemplate>
@@ -233,7 +235,10 @@
             x:Key="listDataTemplate"
             DataType="{x:Type uim:UIFile}"
             ItemsSource="{Binding SubUIFiles}">
-            <Grid Margin="0,4,24,4" ToolTip="{StaticResource toolTip}">
+            <Grid
+                Margin="0,4,24,4"
+                Background="Transparent"
+                ToolTip="{StaticResource toolTip}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="{Binding Path=(root:Configs.IconSize)}" />
                     <ColumnDefinition Width="16" />
@@ -367,6 +372,8 @@
                 <Style BasedOn="{StaticResource {x:Static GridView.GridViewItemContainerStyleKey}}" TargetType="ListViewItem">
                     <Setter Property="VerticalContentAlignment" Value="Center" />
                     <Setter Property="Margin" Value="0,0,16,0" />
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="ToolTip" Value="{StaticResource toolTip}"/>
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.GroupStyle>
@@ -377,7 +384,7 @@
                     <GridViewColumn Width="36" Header="">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Grid ToolTip="{StaticResource toolTip}">
+                                <Grid >
                                     <component:FileIcon
                                         Width="24" Height="24"
                                         File="{Binding .}" />
@@ -385,20 +392,8 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="文件名">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Display.DisplayName}" ToolTip="{StaticResource toolTip}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="文件夹路径">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Display.DisplayDir}" ToolTip="{StaticResource toolTip}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+                    <GridViewColumn Header="文件名" DisplayMemberBinding="{Binding Display.DisplayName}"/>
+                    <GridViewColumn Header="文件夹路径" DisplayMemberBinding="{Binding Display.DisplayDir}"/>
                     <GridViewColumn Width="144" Header="分类">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
