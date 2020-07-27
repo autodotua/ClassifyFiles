@@ -29,6 +29,7 @@ using ClassifyFiles.UI.Event;
 using System.Runtime.InteropServices;
 using ClassifyFiles.Util.Win32;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media.Animation;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -42,7 +43,7 @@ namespace ClassifyFiles.UI.Panel
             DataContext = this;
             InitializeComponent();
             SetGroupEnable(Configs.GroupByDir);
-            treeViewHelper = new TreeViewHelper<UIFile>(
+            treeViewHelper = new TreeViewSelectorHelper<UIFile>(
                 FindResource("treeFiles") as TreeView,
                 p => p.Parent,
                 p => p.SubUIFiles,
@@ -86,7 +87,7 @@ namespace ClassifyFiles.UI.Panel
         }
 
         #region 属性和字段
-        private TreeViewHelper<UIFile> treeViewHelper;
+        private TreeViewSelectorHelper<UIFile> treeViewHelper;
 
         private ItemsControl filesContent;
         public ItemsControl FilesContent
@@ -326,16 +327,22 @@ namespace ClassifyFiles.UI.Panel
             if (FilesContent is ListBox lbx)
             {
                 lbx.SelectedItem = file;
-                lbx.ScrollIntoView(file);
-            }
-            else if (FilesContent is ModernWpf.Controls.ListView lvw)
-            {
-                lvw.SelectedItem = file;
-                lvw.ScrollIntoView(file);
+                if (file != null)
+                {
+                    lbx.ScrollIntoView(file);
+                }
             }
             else if (FilesContent is TreeView tree)
             {
-                await treeViewHelper.SelectItemWhileLoadedAsync(file, FileTree);
+                if (file == null)
+                {
+
+                    await treeViewHelper.ClearSelectionAsync(FileTree);
+                }
+                else
+                {
+                    await treeViewHelper.SelectItemWhileLoadedAsync(file, FileTree);
+                }
             }
         }
 
@@ -581,7 +588,12 @@ namespace ClassifyFiles.UI.Panel
             try
             {
                 UIFile uiFile = GetSelectedFile();
-                File file = GetSelectedFile()?.File;
+                var files = GetSelectedFiles();
+                if (files.Count != 1)
+                {
+                    return;
+                }
+                var file = files[0].File;
                 if (file != null)
                 {
                     if (file.IsFolder && CurrentFileView == FileView.Tree
@@ -621,16 +633,26 @@ namespace ClassifyFiles.UI.Panel
         }
 
         /// <summary>
-        /// 鼠标滚轮事件。当按下Ctrl时滚动滚轮，将能够缩放。
+        /// 鼠标滚轮事件。当按下Ctrl时滚动滚轮，将能够缩放。全面接管滚动，自己写了一个动画滚动
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        private async void ListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && CurrentFileView != FileView.Detail)
             {
                 Configs.IconSize += e.Delta / 30;
                 e.Handled = true;
+            }
+            else
+            {
+                ScrollViewer scr = FilesContent.GetVisualChild<ScrollViewer>();
+                if (scr != null)
+                {
+                    e.Handled = true;
+
+                    await SmoothScrollViewerHelper.HandleMouseWheel(scr, e.Delta);
+                }
             }
         }
 
@@ -897,9 +919,16 @@ namespace ClassifyFiles.UI.Panel
             Clipboard.SetFileDropList(files);
         }
 
+
         #endregion
 
-
+        private async void UserControl_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.D) && Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            {
+                await SelectFileAsync(null);
+            }
+        }
     }
 
 }

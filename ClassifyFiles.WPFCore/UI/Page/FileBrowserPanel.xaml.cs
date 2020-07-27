@@ -316,6 +316,15 @@ namespace ClassifyFiles.UI.Page
         #endregion
 
         #region 显示设置面板
+        public bool ShowFileTime
+        {
+            get => Configs.ShowFileTime;
+            set
+            {
+                Configs.ShowFileTime = value;
+               //filesViewer.Refresh();
+            }
+        }
         public bool ShowClassTags
         {
             get => Configs.ShowClassTags;

@@ -14,6 +14,7 @@
     xmlns:uim="clr-namespace:ClassifyFiles.UI.Model"
     xmlns:wpftk="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
     d:DesignHeight="450" d:DesignWidth="800"
+    PreviewKeyDown="UserControl_PreviewKeyDown"
     mc:Ignorable="d">
     <UserControl.Resources>
         <ui:MagnificationConverter x:Key="mc" />
@@ -25,6 +26,8 @@
         <sys:Double x:Key="two">2.0</sys:Double>
         <sys:Double x:Key="twoFive">2.5</sys:Double>
         <sys:Double x:Key="three">3.0</sys:Double>
+        <sys:Double x:Key="five">5.0</sys:Double>
+        <sys:Double x:Key="eight">8.0</sys:Double>
 
         <!--  公用的右键菜单  -->
         <ContextMenu x:Key="menu" Opened="ContextMenu_Opened" />
@@ -80,10 +83,12 @@
                     TextWrapping="Wrap" />
 
                 <component:FileIcon
+                    MaxWidth="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource eight}}"
+                    MaxHeight="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource eight}}"
                     DisplayRawImage="True"
                     EnableCache="False"
                     File="{Binding ., Mode=OneTime}"
-                    Scale="-360" Square="False"
+                    Square="False"
                     Visibility="{Binding Path=(root:Configs.ShowToolTipImage), Mode=OneWay, Converter={StaticResource b2v}}" />
                 <Grid Margin="8">
                     <Grid.ColumnDefinitions>
@@ -145,29 +150,30 @@
         <!--  图标视图模板  -->
         <DataTemplate x:Key="grdIconView">
             <Border
-                MinWidth="64" Padding="0,8"
+                MinWidth="64" Margin="-6,-6"
+                Padding="0,8"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch">
-                <DockPanel
-                    Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}"
+                <StackPanel
+                    Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
+                    Orientation="Vertical"
                     ToolTip="{StaticResource toolTip}">
+                    <component:FileIcon
+                        Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
+                        Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
+                        File="{Binding .}" />
                     <TextBlock
                         Height="36"
-                        MaxWidth="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}"
+                        MaxWidth="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
                         Margin="0,8,0,0"
                         HorizontalAlignment="Center"
                         DockPanel.Dock="Bottom" LineHeight="16"
                         Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
                         TextWrapping="Wrap"
                         Visibility="{Binding Path=Display.ShowIconViewNames, Converter={StaticResource b2v}}" />
-                    <component:FileIcon
-                        Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
-                        Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
-                        File="{Binding .}"
-                        Scale="2.0" />
-                </DockPanel>
+                </StackPanel>
             </Border>
         </DataTemplate>
 
@@ -193,29 +199,32 @@
 
                 </Grid.RowDefinitions>
                 <TextBlock
-                    Grid.Row="1" Grid.RowSpan="3"
+                    Grid.Row="0" Grid.RowSpan="3"
                     Grid.Column="2"
                     HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
                     Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
                     TextWrapping="Wrap" />
                 <TextBlock
-                    Grid.Row="4" Grid.RowSpan="1"
-                    Grid.Column="2" Foreground="Gray"
+                    Grid.Row="3" Grid.RowSpan="3"
+                    Grid.Column="2" VerticalAlignment="Top"
+                    Foreground="Gray"
                     Style="{StaticResource CaptionTextBlockStyle}"
                     Text="{Binding Display.DisplayDir, Mode=OneTime}"
                     TextWrapping="Wrap"
                     Visibility="{Binding Display.ShowTileViewPaths, Converter={StaticResource b2v}}" />
-                <component:TagGroup
+                <!--<component:TagGroup
                     Grid.RowSpan="99" Grid.ColumnSpan="99"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Bottom"
                     File="{Binding .}"
                     Orientation="Horizontal"
-                    TagMouseDown="Tags_MouseDown" />
+                    TagMouseDown="Tags_MouseDown" />-->
                 <component:FileIcon
                     Grid.Row="1" Grid.RowSpan="4"
-                    File="{Binding .}"
-                    Scale="2.0" />
+                    Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
+                    Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
+                    File="{Binding .}" />
             </Grid>
         </DataTemplate>
 
@@ -231,6 +240,8 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="16" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="16" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
@@ -250,6 +261,22 @@
                     Grid.Row="1" Grid.Column="2"
                     Grid.ColumnSpan="3" FontWeight="Bold"
                     Text="{Binding Display.DisplayName}" />
+                <TextBlock
+                    Grid.Row="1" Grid.Column="6"
+                    HorizontalAlignment="Right"
+                    Foreground="{DynamicResource SystemControlBackgroundBaseMediumLowBrush}"
+                    Visibility="{Binding Path=(root:Configs.ShowFileTime), Converter={StaticResource b2v}}">
+                    <Run FontWeight="Bold">创建时间：</Run>
+                    <Run Text="{Binding Display.DisplayCreationTime, Mode=OneWay}" />
+                </TextBlock>
+                <TextBlock
+                    Grid.Row="3" Grid.Column="6"
+                    HorizontalAlignment="Right"
+                    Foreground="{DynamicResource SystemControlBackgroundBaseMediumLowBrush}"
+                    Visibility="{Binding Path=(root:Configs.ShowFileTime), Converter={StaticResource b2v}}">
+                    <Run FontWeight="Bold">修改时间：</Run>
+                    <Run Text="{Binding Display.DisplayLastWriteTime, Mode=OneWay}" />
+                </TextBlock>
                 <TextBlock
                     Grid.Row="3" Grid.Column="2"
                     Width="108"
@@ -322,7 +349,7 @@
             PreviewMouseRightButtonDown="TreeFiles_PreviewMouseRightButtonDown"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-            VirtualizingPanel.ScrollUnit="Pixel"/>
+            VirtualizingPanel.ScrollUnit="Pixel" />
 
 
 
@@ -351,7 +378,9 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid ToolTip="{StaticResource toolTip}">
-                                    <component:FileIcon File="{Binding .}" Scale="-24" />
+                                    <component:FileIcon
+                                        Width="24" Height="24"
+                                        File="{Binding .}" />
                                 </Grid>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>

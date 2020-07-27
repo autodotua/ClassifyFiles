@@ -92,7 +92,10 @@ namespace ClassifyFiles.UI
 
             DbSavingException += async (p1, p2) =>
             {
-                await new ErrorDialog().ShowAsync(p2.ExceptionObject as Exception, "发生数据库保存错误");
+                await Dispatcher.Invoke(async () =>
+                {
+                    await new ErrorDialog().ShowAsync(p2.ExceptionObject as Exception, "发生数据库保存错误");
+                });
             };
 
         }

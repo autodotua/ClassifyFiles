@@ -106,7 +106,7 @@ namespace ClassifyFiles
             get => Get(ref iconSize, GetDouble, 32d, nameof(IconSize));
             set
             {
-                if(value < 16 || value > 256)
+                if (value < 16 || value > 256)
                 {
                     return;
                 }
@@ -132,6 +132,12 @@ namespace ClassifyFiles
             get => Get(ref showFileExtension, GetBool, true, nameof(ShowFileExtension));
             set => Set(ref showFileExtension, value, nameof(ShowFileExtension));
         }
+        private static bool? showFileTime = null;
+        public static bool ShowFileTime
+        {
+            get => Get(ref showFileTime, GetBool, true, nameof(ShowFileTime));
+            set => Set(ref showFileTime, value, nameof(ShowFileTime));
+        }
         private static bool? showToolTip = null;
         public static bool ShowToolTip
         {
@@ -143,13 +149,13 @@ namespace ClassifyFiles
         {
             get => Get(ref showToolTipImage, GetBool, true, nameof(ShowToolTipImage));
             set => Set(ref showToolTipImage, value, nameof(ShowToolTipImage));
-        }   
+        }
         private static bool? autoAddFiles = null;
         public static bool AutoAddFiles
         {
             get => Get(ref autoAddFiles, GetBool, false, nameof(AutoAddFiles));
             set => Set(ref autoAddFiles, value, nameof(AutoAddFiles));
-        }        
+        }
         private static string addFilesOptionJson = null;
         public static string AddFilesOptionJson
         {
@@ -165,7 +171,7 @@ namespace ClassifyFiles
                 field = dbGet(key, defultValue);
             }
             return field.Value;
-        }    
+        }
         private static T Get<T>(ref T field, Func<string, T, T> dbGet, T defultValue, string key) where T : class
         {
             if (field == null)
@@ -182,7 +188,7 @@ namespace ClassifyFiles
             field = value;
             ConfigUtility.Set(key, value);
             StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(key));
-        }  
+        }
         private static void Set<T>(ref T field, T value, string key) where T : class
         {
             field = value;

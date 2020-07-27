@@ -62,15 +62,6 @@ namespace ClassifyFiles.UI.Component
                 SetValue(FileProperty, value);
             }
         }
-        public static readonly DependencyProperty ScaleProperty =
-            DependencyProperty.Register("Scale", typeof(double), typeof(FileIcon), new PropertyMetadata(1.0));
-
-        public double Scale
-        {
-            get => (double)GetValue(ScaleProperty); //UseLargeIcon;
-            set => SetValue(ScaleProperty, value);
-        }
-
         private static ConcurrentDictionary<int, FrameworkElement> caches = new ConcurrentDictionary<int, FrameworkElement>();
         public static void ClearCaches()
         {
@@ -159,38 +150,6 @@ namespace ClassifyFiles.UI.Component
         }
 
 
-        private void BindingSize()
-        {
-            //由于静态属性的绑定实在是感觉有问题，反正是单向绑定，那就手动使用初值设置+接受事件进行修改就好了
-            if (Scale < 0)
-            {
-                view.Width = -Scale;
-                if (Square)
-                {
-                    view.Height = -Scale;
-                }
-            }
-            else
-            {
-
-                Set();
-                Configs.StaticPropertyChanged += (p1, p2) =>
-                {
-                    if (p2.PropertyName == nameof(Configs.IconSize))
-                    {
-                        Set();
-                    }
-                };
-            }
-            void Set()
-            {
-                view.Width = Configs.IconSize * Scale;
-                if (Square)
-                {
-                    view.Height = Configs.IconSize * Scale;
-                }
-            }
-        }
 
         private async void UserControlBase_Loaded(object sender, RoutedEventArgs e)
         {
@@ -203,7 +162,6 @@ namespace ClassifyFiles.UI.Component
                     Tasks.Enqueue(RefreshIcon);
                 }
             }
-            BindingSize();
         }
 
         public static TaskQueue Tasks { get; private set; } = new TaskQueue();

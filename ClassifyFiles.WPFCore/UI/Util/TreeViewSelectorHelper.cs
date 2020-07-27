@@ -1,6 +1,7 @@
 ﻿using ClassifyFiles.UI.Model;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -8,12 +9,16 @@ using System.Windows.Controls.Primitives;
 
 namespace ClassifyFiles.UI.Util
 {
-    public class TreeViewHelper<TModel>
+    /// <summary>
+    /// 树状图选择帮助类。不支持虚拟化的树状图！
+    /// </summary>
+    /// <typeparam name="TModel"></typeparam>
+    public class TreeViewSelectorHelper<TModel>
     {
-        public TreeViewHelper(TreeView treeView,
+        public TreeViewSelectorHelper(TreeView treeView,
             Func<TModel, TModel> getParent,
             Func<TModel, IList<TModel>> getSubItems,
-             Action<TModel,TModel> setParent)
+             Action<TModel, TModel> setParent)
         {
             TreeView = treeView;
             GetParent = getParent;
@@ -105,12 +110,30 @@ namespace ClassifyFiles.UI.Util
             await SelectItemAsync(node, rootNodes);
         }
 
-        public async Task SelectItemAsync(TModel node, IList<TModel> rootNodes)
+        public async Task<bool> ClearSelectionAsync(IList<TModel> rootNodes)
+        {
+            if (TreeView.SelectedItem == null)
+            {
+                return false;
+            }
+            var treeViewItem = await GetItemAsync((TModel)TreeView.SelectedItem, rootNodes); if (treeViewItem != null)
+            {
+                treeViewItem.IsSelected = false;
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> SelectItemAsync(TModel node, IList<TModel> rootNodes)
         {
             var treeViewItem = await GetItemAsync(node, rootNodes);
-            treeViewItem.IsSelected = true;
-            treeViewItem.BringIntoView();
-            return;
+            if (treeViewItem != null)
+            {
+                treeViewItem.IsSelected = true;
+                treeViewItem.BringIntoView();
+                return true;
+            }
+            return false;
         }
 
         public async Task<TreeViewItem> GetItemAsync(TModel node, IList<TModel> rootNodes)
@@ -120,7 +143,7 @@ namespace ClassifyFiles.UI.Util
             while (!rootNodes.Contains(node))
             {
                 nodes.Push(node);
-                if(GetParent(node)==null)
+                if (GetParent(node) == null)
                 {
                     throw new Exception("树型数据有误");
                 }
@@ -130,13 +153,19 @@ namespace ClassifyFiles.UI.Util
 
             while (true)
             {
+                var a = treeViewItem.ItemContainerGenerator.Items.OfType<TreeViewItem>().FirstOrDefault(p => p.DataContext .Equals(node));
                 treeViewItem = treeViewItem.ItemContainerGenerator
                        .ContainerFromItem(node) as TreeViewItem;
+                if(treeViewItem==null)
+                {
+                    return null;
+                }
                 if (nodes.Count == 0)
                 {
                     return treeViewItem as TreeViewItem;
                 }
                 node = nodes.Pop();
+                treeViewItem.BringIntoView();
                 (treeViewItem as TreeViewItem).IsExpanded = true;
                 while (treeViewItem.ItemContainerGenerator.Status != GeneratorStatus.ContainersGenerated)
                 {
@@ -160,7 +189,7 @@ namespace ClassifyFiles.UI.Util
                 var items = GetSubItems(GetParent(node));
                 items.Remove(node);
                 SetParent(node, default);
-                if (items.Count>0)
+                if (items.Count > 0)
                 {
                     await SelectItemAsync(items[0], rootNodes);
                 }

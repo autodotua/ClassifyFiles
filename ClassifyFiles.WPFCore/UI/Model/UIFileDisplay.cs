@@ -74,23 +74,32 @@ namespace ClassifyFiles.UI.Model
             {
                 if (File.IsFolder)
                 {
-                    return new System.IO.DirectoryInfo(File.Dir).Name;
+                    return new DirectoryInfo(File.Dir).Name;
                 }
 
                 if (Configs.ShowFileExtension)
                 {
                     return File.Name;
                 }
-                return System.IO.Path.GetFileNameWithoutExtension(File.Name);
+                return Path.GetFileNameWithoutExtension(File.Name);
             }
         }
         public string DisplayLastWriteTime
         {
             get
             {
-                if (FileInfo.Exists)
+                if (!File.IsFolder && FileInfo.Exists)
                 {
                     return FileInfo.LastWriteTime.ToString();
+                }
+                else if (File.IsFolder)
+                {
+                    DirectoryInfo dir = new DirectoryInfo(File.GetAbsolutePath());
+                    if (dir.Exists)
+                    {
+                        return dir.LastWriteTime.ToString();
+                    }
+                    return "未知";
                 }
                 else
                 {
@@ -102,9 +111,18 @@ namespace ClassifyFiles.UI.Model
         {
             get
             {
-                if (FileInfo.Exists)
+                if (!File.IsFolder && FileInfo.Exists)
                 {
                     return FileInfo.CreationTime.ToString();
+                }
+                else if (File.IsFolder)
+                {
+                    DirectoryInfo dir = new DirectoryInfo(File.GetAbsolutePath());
+                    if (dir.Exists)
+                    {
+                        return dir.CreationTime.ToString();
+                    }
+                    return "未知";
                 }
                 else
                 {
@@ -135,7 +153,7 @@ namespace ClassifyFiles.UI.Model
                         return bitmapImage;
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                 }
                 return null;
