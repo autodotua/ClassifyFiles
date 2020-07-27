@@ -122,30 +122,22 @@ namespace ClassifyFiles.Util
                 {
                     string guid = GetGuidFromString(ext).ToString();
                     var iconPath = GetIconPath(guid);
-                    //这里在实时更新时，可能会因为多个线程一起尝试写入同一个文件（同一个扩展名文件相同）文件导致异常。
-                    //所以提前先把IconGUID的值给了
-                    file.IconGUID = guid;
                     //其他文件，同一个格式的用同一个图标
-                    if (workingIconExts.ContainsKey(guid) && !F.Exists(iconPath))
-                    {
-                        //防止一起生成Icon的时候，后来的那些直接返回，然后UI那边读取了，发现没有，就直接不显示了
-                        for (int i = 0; i < 20; i++)
-                        {
-                            if (F.Exists(iconPath))
-                            {
-                                break;
-                            }
-                            System.Threading.Thread.Sleep(1);
-                        }
-                    }
-                    else if (F.Exists(iconPath) || workingIconExts.ContainsKey(guid))
+                    if (F.Exists(iconPath))
                     {
                     }
                     else
                     {
-                        workingIconExts.TryAdd(guid, null);
-                        GetFileIcon(path).Save(iconPath, ImageFormat.Png);
+                        string tempPath = P.GetTempFileName();
+
+                        GetFileIcon(path).Save(tempPath, ImageFormat.Png);
+                        try
+                        {
+                            F.Move(tempPath, iconPath);
+                        }
+                        catch { }
                     }
+                    file.IconGUID = guid;
                 }
             }
             catch (Exception ex)
@@ -155,7 +147,6 @@ namespace ClassifyFiles.Util
             return false;
         }
 
-        private static System.Collections.Concurrent.ConcurrentDictionary<string, object> workingIconExts = new System.Collections.Concurrent.ConcurrentDictionary<string, object>();
         private static Guid GetGuidFromString(string str)
         {
             using MD5 md5 = MD5.Create();
@@ -555,6 +546,34 @@ namespace ClassifyFiles.Util
             }
             SaveChanges();
         }
+        public static void DeleteAllThumbnails()
+        {
+            foreach (var file in db.Files)
+            {
+                if (file.ThumbnailGUID != null)
+                {
+                    file.ThumbnailGUID = null;
+                    db.Entry(file).State = EntityState.Modified;
+                }
+                if (file.IconGUID != null)
+                {
+                    file.IconGUID = null;
+                    db.Entry(file).State = EntityState.Modified;
+                }
+            }
+            foreach (var file in D.EnumerateFiles(ThumbnailFolderPath))
+            {
+                try
+                {
+                    F.Delete(file);
+                }
+                catch
+                {
+
+                }
+            }
+          int  changes=  SaveChanges();
+        }
         public static void DeleteThumbnails(Project project)
         {
             var files = db.Files.Where(p => p.ProjectID == project.ID).AsEnumerable();
@@ -585,23 +604,6 @@ namespace ClassifyFiles.Util
                 }
                 if (file.IconGUID != null && file.IconGUID.Length > 0)
                 {
-                    string path = GetIconPath(file.IconGUID);
-                    if (F.Exists(path))
-                    {
-                        try
-                        {
-                            F.Delete(path);
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
-                    }
-                    file.IconGUID = null;
-                    db.Entry(file).State = EntityState.Modified;
-                }
-                else if (file.IconGUID != null && file.IconGUID.Length == 0)
-                {
                     file.IconGUID = null;
                     db.Entry(file).State = EntityState.Modified;
                 }
@@ -610,36 +612,59 @@ namespace ClassifyFiles.Util
 
         }
 
-        public static (int DeleteFromDb,int DeleteFromDisk,int RemainsCount) OptimizeThumbnails()
+        public static (int DeleteFromDb,
+            int DeleteFromDisk,
+            int RemainsCount,
+            List<string> FailedFiles) OptimizeThumbnailsAndIcons()
         {
             int deletedFromDb = 0;
             var files = D.EnumerateFiles(ThumbnailFolderPath).ToDictionary(p => P.GetFileNameWithoutExtension(p));
             foreach (var dbFile in db.Files)
             {
-                if (dbFile.ThumbnailGUID != null)
+                Check(dbFile, dbFile.ThumbnailGUID, () => dbFile.ThumbnailGUID = null);
+                Check(dbFile, dbFile.IconGUID, () => dbFile.IconGUID = null);
+            }
+
+            void Check(File item, string guid, Action setNull)
+            {
+                if (guid != null)
                 {
-                    if (dbFile.ThumbnailGUID.Length == 0)//重置缩略图状态
+                    if (guid.Length == 0)//重置缩略图状态
                     {
-                        dbFile.ThumbnailGUID = null;
-                        db.Entry(dbFile).State = EntityState.Modified;
+                        setNull();
+                        db.Entry(item).State = EntityState.Modified;
                     }
-                    else if (files.ContainsKey(dbFile.ThumbnailGUID))
+                    else if (files.ContainsKey(guid))
                     {
-                        files.Remove(dbFile.ThumbnailGUID);
+                        files.Remove(guid);
                     }
                     else//没有物理文件
                     {
                         deletedFromDb++;
-                        dbFile.ThumbnailGUID = null;
-                        db.Entry(dbFile).State = EntityState.Modified;
+                        setNull();
+                        db.Entry(item).State = EntityState.Modified;
                     }
                 }
             }
+
             int deletedFromDisk = files.Count;
-            files.Values.ForEach(p => F.Delete(p));//删除孤立的缩略图文件
+
+            List<string> failedFiles = new List<string>();
+            foreach (var file in files.Values)
+            {
+                //删除孤立的缩略图文件
+                try
+                {
+                    F.Delete(file);
+                }
+                catch (Exception ex)
+                {
+                    failedFiles.Add(file);
+                }
+            }
             SaveChanges();
             int remainsCount = db.Files.Where(p => p.ThumbnailGUID != null).Count();
-            return (deletedFromDb, deletedFromDisk, remainsCount);
+            return (deletedFromDb, deletedFromDisk, remainsCount, failedFiles);
         }
     }
 

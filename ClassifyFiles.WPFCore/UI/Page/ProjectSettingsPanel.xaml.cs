@@ -48,7 +48,7 @@ namespace ClassifyFiles.UI.Page
 
         private void WindowBase_Loaded(object sender, RoutedEventArgs e)
         {
-
+            SmoothScrollViewerHelper.Regist(scr);
         }
 
         public override async Task LoadAsync(Project project)
@@ -180,11 +180,18 @@ namespace ClassifyFiles.UI.Page
             GetProgress().Show();
             await Task.Run(() =>
             {
-                FileUtility.DeleteThumbnails(Project);
+                try
+                {
+                    FileUtility.DeleteThumbnails(Project);
+                }
+                catch(Exception ex)
+                {
+
+                }
             });
             FileIcon.ClearCaches();
             GetProgress().Close();
-            await new MessageDialog().ShowAsync("删除成功", "删除缩略图");
+            await new MessageDialog().ShowAsync("删除成功，部分物理文件可能无法删除，请从设置中进行修复", "删除缩略图");
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)

@@ -18,6 +18,13 @@ namespace ClassifyFiles.UI.Util
     public static class SmoothScrollViewerHelper
     {
         private static Dictionary<ScrollViewer, double> remainsDeltas = new Dictionary<ScrollViewer, double>();
+        public static void Regist(ScrollViewer scr)
+        {
+            scr.PreviewMouseWheel += async (p1, p2) =>
+             {
+                 await HandleMouseWheel(p1 as ScrollViewer, p2.Delta);
+             };
+        }
         public static async Task HandleMouseWheel(ScrollViewer scr, int delta)
         {
             Debug.Assert(scr != null);

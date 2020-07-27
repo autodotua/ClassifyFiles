@@ -216,7 +216,7 @@
                                 <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
                                     <m:ToggleSwitch
                                         x:Name="swtTags" Header="显示分类标签"
-                                        IsOn="{Binding ShowClassTags}" />  
+                                        IsOn="{Binding ShowClassTags}" />
                                     <m:ToggleSwitch Header="显示创建和修改时间" IsOn="{Binding ShowFileTime}" />
                                     <m:ToggleSwitch
                                         x:Name="swtThumbs" Header="显示缩略图"

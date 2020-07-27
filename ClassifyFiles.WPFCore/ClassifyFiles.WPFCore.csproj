@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="UI\Panel\FilesViewer.xaml-Fz-Laptop.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Images\icon_dark.png" />
     <None Remove="Images\icon_light.png" />
   </ItemGroup>

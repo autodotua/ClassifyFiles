@@ -72,8 +72,9 @@
         <!--  提示框  -->
         <ToolTip
             x:Key="toolTip" Padding="8"
-            BorderThickness="0" Placement="Right"
+            BorderThickness="0"
             Opened="ToolTip_Opened"
+            Placement="Right"
             Visibility="{Binding Path=(root:Configs.ShowToolTip), Mode=OneWay, Converter={StaticResource b2v}}">
             <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
                 <TextBlock
@@ -174,7 +175,7 @@
                         DockPanel.Dock="Bottom" LineHeight="16"
                         Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
                         TextWrapping="Wrap"
-                        Visibility="{Binding Path=Display.ShowIconViewNames, Converter={StaticResource b2v}}" />
+                        Visibility="{Binding Path=(root:Configs.ShowIconViewNames), Converter={StaticResource b2v}}" />
                 </StackPanel>
             </Border>
         </DataTemplate>
@@ -372,8 +373,8 @@
                 <Style BasedOn="{StaticResource {x:Static GridView.GridViewItemContainerStyleKey}}" TargetType="ListViewItem">
                     <Setter Property="VerticalContentAlignment" Value="Center" />
                     <Setter Property="Margin" Value="0,0,16,0" />
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="ToolTip" Value="{StaticResource toolTip}"/>
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="ToolTip" Value="{StaticResource toolTip}" />
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.GroupStyle>
@@ -384,7 +385,7 @@
                     <GridViewColumn Width="36" Header="">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Grid >
+                                <Grid>
                                     <component:FileIcon
                                         Width="24" Height="24"
                                         File="{Binding .}" />
@@ -392,8 +393,8 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="文件名" DisplayMemberBinding="{Binding Display.DisplayName}"/>
-                    <GridViewColumn Header="文件夹路径" DisplayMemberBinding="{Binding Display.DisplayDir}"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Display.DisplayName}" Header="文件名" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Display.DisplayDir}" Header="文件夹路径" />
                     <GridViewColumn Width="144" Header="分类">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>

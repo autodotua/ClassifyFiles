@@ -23,22 +23,33 @@ namespace ClassifyFiles.WPFCore
     /// </summary>
     public partial class App : Application
     {
-        public static new App Current { get; private set; }
-        private void Application_Startup(object sender, StartupEventArgs e)
+
+        public static void UpdateFileUtilitySettings()
         {
-            FileUtility.ThumbnailFolderPath = "thumb";
+            if (Configs.CacheInTempDir)
+            {
+                FileUtility.ThumbnailFolderPath = Path.Combine(Path.GetTempPath(), nameof(ClassifyFiles));
+            }
+            else
+            {
+                FileUtility.ThumbnailFolderPath = "thumb";
+            }
+            if (!Directory.Exists(FileUtility.ThumbnailFolderPath))
+            {
+                Directory.CreateDirectory(FileUtility.ThumbnailFolderPath);
+            }
+            FileUtility.FFMpegPath = "exe/ffmpeg.exe";
             FileUtility.GetFileIcon = path => ExplorerIcon.GetBitmapFromFilePath(path, ExplorerIcon.IconSizeEnum.ExtraLargeIcon);
             FileUtility.GetFolderIcon = path => ExplorerIcon.GetBitmapFromFolderPath(path, ExplorerIcon.IconSizeEnum.ExtraLargeIcon);
 
+        }
+        public static new App Current { get; private set; }
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            UpdateFileUtilitySettings();
             FzLib.Program.Runtime.UnhandledException.RegistAll();
             FzLib.Program.Runtime.UnhandledException.UnhandledExceptionCatched += UnhandledException_UnhandledExceptionCatched;
 
-            if (!Directory.Exists("thumb"))
-            {
-                Directory.CreateDirectory("thumb");
-            }
-
-            FileUtility.FFMpegPath = "exe/ffmpeg.exe";
             Current = this;
             SplashWindow.TryShow();
             MainWindow win = new MainWindow();

@@ -155,6 +155,12 @@ namespace ClassifyFiles
         {
             get => Get(ref autoAddFiles, GetBool, false, nameof(AutoAddFiles));
             set => Set(ref autoAddFiles, value, nameof(AutoAddFiles));
+        }       
+        private static bool? cacheInTempDir = null;
+        public static bool CacheInTempDir
+        {
+            get => Get(ref cacheInTempDir, GetBool, false, nameof(CacheInTempDir));
+            set => Set(ref cacheInTempDir, value, nameof(CacheInTempDir));
         }
         private static string addFilesOptionJson = null;
         public static string AddFilesOptionJson

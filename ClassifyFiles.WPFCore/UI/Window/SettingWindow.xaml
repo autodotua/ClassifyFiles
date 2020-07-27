@@ -10,6 +10,7 @@
     Title="设置" Width="800"
     Height="450"
     Closing="WindowBase_Closing"
+    Loaded="WindowBase_Loaded"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Grid Margin="4">
@@ -18,7 +19,10 @@
             <RowDefinition Height="8" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer
+            x:Name="scr"
+            HorizontalScrollBarVisibility="Disabled"
+            VerticalScrollBarVisibility="Auto">
             <m:SimpleStackPanel
                 Margin="12" Orientation="Vertical"
                 Spacing="12">
@@ -38,15 +42,30 @@
                     </m:SimpleStackPanel>
                 </GroupBox>
 
-                <GroupBox Header="自动生成缩略图">
+                <GroupBox Header="缩略图和缓存">
                     <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
                         <CheckBox
                             x:Name="chkAutoThumbnails"
                             Click="CheckBox_Click"
-                            Content="在浏览时尝试为没有缩略图的对象生成缩略图" />
-                        <TextBlock Foreground="{DynamicResource SystemControlBackgroundBaseMediumBrush}">开启该选项后，在浏览时，若文件没有缩略图，则会自动生成缩略图。</TextBlock>
-                        <TextBlock Foreground="{DynamicResource SystemControlBackgroundBaseMediumBrush}">这能够提升部分体验，但是会降低一些运行速度，增加卡顿。</TextBlock>
-                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="6">
+                            Content="在浏览时尝试为没有缩略图的对象生成缩略图" >
+                            <CheckBox.ToolTip>
+                                <ToolTip>
+                                    <StackPanel>
+                                        <TextBlock>开启该选项后，在浏览时，若文件没有缩略图，则会自动生成缩略图。</TextBlock>
+                                    <TextBlock>这能够提升部分体验，但是会降低一些运行速度，增加卡顿。</TextBlock>
+                                    </StackPanel>
+                                </ToolTip>
+                            </CheckBox.ToolTip>
+                        </CheckBox>
+                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="6" Background="Transparent">
+                            <m:SimpleStackPanel.ToolTip>
+                                <ToolTip>
+                                    <StackPanel>
+                                        <TextBlock >同时获取缩略图的线程数。当该值较小时，获取缩略图的速度会比较慢。若该值过大，则界面将会卡顿严重。</TextBlock>
+                                        <TextBlock >最大线程数不宜超过CPU的核心（线程）数。</TextBlock>
+                                    </StackPanel>
+                                </ToolTip>
+                            </m:SimpleStackPanel.ToolTip>
                             <TextBlock VerticalAlignment="Center">最大并行线程：</TextBlock>
                             <m:NumberBox
                                 x:Name="numThread" Width="128"
@@ -58,8 +77,17 @@
                                 <Run Text="{Binding ProcessorCount, Mode=OneTime}" />
                             </TextBlock>
                         </m:SimpleStackPanel>
-                        <TextBlock Foreground="{DynamicResource SystemControlBackgroundBaseMediumBrush}">同时获取缩略图的线程数。当该值较小时，获取缩略图的速度会比较慢。若该值过大，则界面将会卡顿严重。</TextBlock>
-                        <TextBlock Foreground="{DynamicResource SystemControlBackgroundBaseMediumBrush}">最大线程数不宜超过CPU的核心（线程）数。</TextBlock>
+                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="6" Background="Transparent">
+                            <TextBlock VerticalAlignment="Center">当前缓存位置：</TextBlock>
+                            <TextBlock x:Name="tbkCachePath" VerticalAlignment="Center"></TextBlock>
+                            <Button Click="Button_Click_3">
+                                <TextBlock>
+                                    <Run Text="切换到"/>
+                                    <Run x:Name="runCachePathTo"/>
+                                </TextBlock>
+                            </Button>
+
+                        </m:SimpleStackPanel>
                     </m:SimpleStackPanel>
                 </GroupBox>
 

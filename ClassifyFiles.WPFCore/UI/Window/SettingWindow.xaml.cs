@@ -1,4 +1,6 @@
 ﻿using ClassifyFiles.Data;
+using ClassifyFiles.UI.Component;
+using ClassifyFiles.UI.Util;
 using ClassifyFiles.Util;
 using ClassifyFiles.WPFCore;
 using FzLib.Basic;
@@ -40,6 +42,7 @@ namespace ClassifyFiles.UI
             chkAutoThumbnails.IsChecked = Configs.AutoThumbnails;
             numThread.Value = Configs.RefreshThreadCount;
             Projects = projects;
+            RefreshCacheText();
         }
 
         public int ProcessorCount => Environment.ProcessorCount;
@@ -148,19 +151,75 @@ namespace ClassifyFiles.UI
 
         private async void Button_Click_2(object sender, RoutedEventArgs e)
         {
+            (int DeleteFromDb, int DeleteFromDisk, int RemainsCount, List<string> FailedToDelete) result = (-1, -1, -1, new List<string>());
+
             //由于删除缩略图可能会影响正在显示的缩略图，因此先关闭窗体
-            App.Current.Windows.Cast<Window>().Where(p => p != this).ForEach(p => p.Close());
+            result = await DoSthNeedToCloseOtherWindowsAsync(FileUtility.OptimizeThumbnailsAndIcons);
+            await new MessageDialog().ShowAsync($"修复成功，{Environment.NewLine}" +
+                $"从数据库中删除了{result.DeleteFromDb}张缩略图，{Environment.NewLine}" +
+                $"从磁盘中删除了{result.DeleteFromDisk}张缩略图，{Environment.NewLine}" +
+                $"现存{result.RemainsCount}张缩略图，{Environment.NewLine}" +
+                $"有{result.FailedToDelete.Count}张缩略图删除失败", "修复缩略图");
+        }
+
+        private async Task<T> DoSthNeedToCloseOtherWindowsAsync<T>(Func<T> func)
+        {
             Progress.Show();
-            (int DeleteFromDb, int DeleteFromDisk, int RemainsCount) result=(-1,-1,-1);
-           await Task.Run(() => result = FileUtility.OptimizeThumbnails());
+            App.Current.Windows.Cast<Window>().Where(p => p != this).ForEach(p => p.Close());
+            while(FileIcon.Tasks.IsExcuting)
+            {
+                //等待任务结束
+                await Task.Delay(1);
+            }
+            T result = default;
+            await Task.Run(() =>
+            {
+                result = func();
+            });
             App.Current.MainWindow = new MainWindow();
             App.Current.MainWindow.Show();
             BringToFront();
             Progress.Close();
-            await new MessageDialog().ShowAsync($"修复成功，{Environment.NewLine}" +
-                $"从数据库中删除了{result.DeleteFromDb}张缩略图，{Environment.NewLine}" +
-                $"从磁盘中删除了{result.DeleteFromDisk}张缩略图，{Environment.NewLine}" +
-                $"现存{result.RemainsCount}张缩略图，{Environment.NewLine}", "修复缩略图");
+            return result;
+        }
+
+        private void WindowBase_Loaded(object sender, RoutedEventArgs e)
+        {
+            SmoothScrollViewerHelper.Regist(scr);
+        }
+
+        private async void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            if (await new ConfirmDialog().ShowAsync("更改缓存目录需要删除所有的缓存，是否继续？", "修改缓存目录"))
+            {
+                await DoSthNeedToCloseOtherWindowsAsync(Do);
+                RefreshCacheText();
+                await new MessageDialog().ShowAsync("更改完成。正在浏览的项目可能部分图标会无法显示，建议进行删除缩略图操作", "更改完成");
+            };
+            object Do()
+            {
+                RealtimeIcon.ClearCahces();
+                FileUtility.DeleteAllThumbnails();
+                Configs.CacheInTempDir = !Configs.CacheInTempDir;
+                App.UpdateFileUtilitySettings();
+
+                return null;
+            }
+        }
+
+        private void RefreshCacheText()
+        {
+            if (Configs.CacheInTempDir)
+            {
+                tbkCachePath.Text = "临时目录";
+                runCachePathTo.Text = "程序目录";
+            }
+            else
+            {
+
+                tbkCachePath.Text = "程序目录";
+                runCachePathTo.Text = "临时目录";
+            }
         }
     }
 }

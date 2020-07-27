@@ -51,8 +51,26 @@ namespace ClassifyFiles.UI.Component
             DependencyProperty.Register("File", typeof(UIFile), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
         static void OnFileChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
+            (obj as FileIcon).RegisterEvents();
         }
+        private void RegisterEvents()
+        {
+            File.File.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(Data.File.ThumbnailGUID)
+                || e.PropertyName == nameof(Data.File.IconGUID))
+                {
+                    try
+                    {
+                        Dispatcher.Invoke(() => Load());
+                    }
+                    catch
+                    {
 
+                    }
+                }
+            };
+        }
 
         public UIFile File
         {
@@ -77,10 +95,6 @@ namespace ClassifyFiles.UI.Component
                 file = File;
             });
             bool result = await RealtimeIcon.RefreshIcon(file);
-            Dispatcher.Invoke(() =>
-            {
-                Load();
-            });
             return result;
         }
         public bool Load()

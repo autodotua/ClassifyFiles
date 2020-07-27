@@ -15,7 +15,7 @@
     Loaded="WindowBase_Loaded"
     mc:Ignorable="d">
     <ScrollViewer
-        Padding="8"
+        x:Name="scr" Padding="8"
         HorizontalScrollBarVisibility="Disabled "
         VerticalScrollBarVisibility="Auto">
 

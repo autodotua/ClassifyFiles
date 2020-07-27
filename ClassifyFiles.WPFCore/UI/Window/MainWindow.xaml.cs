@@ -30,6 +30,7 @@ using System.Windows.Media;
 using ClassifyFiles.UI.Page;
 using System.Windows.Media.Imaging;
 using System.IO;
+using ClassifyFiles.UI.Component;
 
 namespace ClassifyFiles.UI
 {
@@ -182,7 +183,7 @@ namespace ClassifyFiles.UI
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-
+            FileIcon.Tasks.Stop();
         }
 
         private void SettingMenuItem_Click(object sender, RoutedEventArgs e)
