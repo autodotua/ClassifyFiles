@@ -69,7 +69,6 @@ namespace ClassifyFiles.UI
             }
         }
 
-
         public MainWindow()
         {
             Projects = new ObservableCollection<Project>(GetProjects());
@@ -101,7 +100,6 @@ namespace ClassifyFiles.UI
 
         }
 
-
         public async Task DeleteSelectedProjectAsync()
         {
             Progress.Show();
@@ -122,6 +120,7 @@ namespace ClassifyFiles.UI
 
             Progress.Close();
         }
+
         FileBrowserPanel fileBrowserPanel = new FileBrowserPanel();
         ClassSettingPanel classSettingPanel = new ClassSettingPanel();
         ProjectSettingsPanel projectSettingsPanel = new ProjectSettingsPanel();
@@ -181,13 +180,14 @@ namespace ClassifyFiles.UI
 
         public ILoadable mainPage = new FileBrowserPanel();
 
-        private void Window_Closing(object sender, CancelEventArgs e)
+        private async void Window_Closing(object sender, CancelEventArgs e)
         {
-            FileIcon.Tasks.Stop();
+            await FileIcon.Tasks.Stop();
         }
 
         private void SettingMenuItem_Click(object sender, RoutedEventArgs e)
         {
+            //确保只有一个SettingWindow
             if (SettingWindow.Current == null)
             {
                 SettingWindow win = new SettingWindow(Projects);
@@ -210,14 +210,8 @@ namespace ClassifyFiles.UI
             {
                 t.IsChecked = btn == t;
             }
-            if (mainPage is ClassSettingPanel)
-            {
-                await (mainPage as ClassSettingPanel).SaveClassAsync();
-            }
-            else if (mainPage is ProjectSettingsPanel)
-            {
-                await SaveChangesAsync();
-            }
+            var lastPage = mainPage;
+
             switch (btn.Name)
             {
                 case nameof(btnModeView):
@@ -233,7 +227,14 @@ namespace ClassifyFiles.UI
                     return;
             }
             await LoadProjectAsync();
-
+            if (lastPage is ClassSettingPanel p)
+            {
+                await p.SaveClassAsync();
+            }
+            else if (lastPage is ProjectSettingsPanel)
+            {
+                await SaveChangesAsync();
+            }
         }
 
         private async Task<int> SaveChangesAsync()

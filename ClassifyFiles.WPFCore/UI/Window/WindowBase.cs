@@ -35,6 +35,9 @@ namespace ClassifyFiles.UI
             IsClosed = true;
         }
 
+        /// <summary>
+        /// 把窗体带到最前面
+        /// </summary>
         public void BringToFront()
         {
             if (!IsVisible)

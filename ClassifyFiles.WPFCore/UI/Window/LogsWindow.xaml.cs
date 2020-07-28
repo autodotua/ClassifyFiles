@@ -35,7 +35,7 @@ namespace ClassifyFiles.UI
         public DateTime DateBegin { get; set; }
         public DateTime DateEnd { get; set; }
 
-        private async void Button_Click_2(object sender, RoutedEventArgs e)
+        private async void OkButton_Click(object sender, RoutedEventArgs e)
         {
             List<Log> logs = null;
             await Task.Run(() => logs = LogUtility.GetLogs(DateBegin, DateEnd));

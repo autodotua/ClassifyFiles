@@ -144,30 +144,6 @@ namespace ClassifyFiles.UI.Model
             }
         }
         public string DisplayDir => File.IsFolder ? File.Dir.Substring(0, File.Dir.Length - DisplayName.Length).Trim('\\') : File.Dir;
-        public int ShortDirMaxLength = 280;
-        public string DisplayShortDir
-        {
-            get
-            {
-
-                string dir = DisplayDir;
-                double totalLength = 0;
-                for (int i = dir.Length - 1; i >= 0; i--)
-                {
-                    FormattedText formattedText = new FormattedText(dir[i].ToString(), CultureInfo.CurrentCulture,
-      FlowDirection.LeftToRight, new Typeface(App.Current.MainWindow.FontFamily, App.Current.MainWindow.FontStyle, App.Current.MainWindow.FontWeight, App.Current.MainWindow.FontStretch), 16, System.Windows.Media.Brushes.Black,
-      VisualTreeHelper.GetDpi(App.Current.MainWindow).PixelsPerDip);
-                    //实测这里数字似乎优点偏大了
-                    if (totalLength + formattedText.Width > ShortDirMaxLength)
-                    {
-                        return "…" + dir.Substring(i);
-                    }
-                    totalLength += formattedText.Width;
-                }
-
-                return dir;
-            }
-        }
         public bool ShowTileViewPaths => Configs.ShowTilePath;
         public const string FileGlyph = "\uED41";
         public const string FolderGlyph = "\uED43";

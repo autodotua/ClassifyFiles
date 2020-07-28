@@ -153,7 +153,7 @@ namespace ClassifyFiles.UI.Util
 
             while (true)
             {
-                var a = treeViewItem.ItemContainerGenerator.Items.OfType<TreeViewItem>().FirstOrDefault(p => p.DataContext .Equals(node));
+                //获取该项对应的视图
                 treeViewItem = treeViewItem.ItemContainerGenerator
                        .ContainerFromItem(node) as TreeViewItem;
                 if(treeViewItem==null)
@@ -162,6 +162,7 @@ namespace ClassifyFiles.UI.Util
                 }
                 if (nodes.Count == 0)
                 {
+                    //说明已经获取到了目标Item
                     return treeViewItem as TreeViewItem;
                 }
                 node = nodes.Pop();

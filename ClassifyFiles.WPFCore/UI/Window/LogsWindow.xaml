@@ -39,7 +39,7 @@
             <DatePicker SelectedDate="{Binding DateBegin}" />
             <TextBlock VerticalAlignment="Center">结束时间：</TextBlock>
             <DatePicker SelectedDate="{Binding DateEnd}" />
-            <Button VerticalAlignment="Center" Click="Button_Click_2">搜索</Button>
+            <Button VerticalAlignment="Center" Click="OkButton_Click">搜索</Button>
 
         </m:SimpleStackPanel>
     </Grid>

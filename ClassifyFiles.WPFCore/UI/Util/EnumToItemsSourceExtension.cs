@@ -5,6 +5,9 @@ using System.Windows.Markup;
 
 namespace ClassifyFiles.UI.Util
 {
+    /// <summary>
+    /// 将枚举中各项的Description特性转换为ItemsSource
+    /// </summary>
     public class EnumToItemsSource : MarkupExtension
     {
         private Type Type { get; }

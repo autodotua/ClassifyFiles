@@ -23,7 +23,7 @@ namespace ClassifyFiles.UI.Dialog
 
         public Project Project { get; }
 
-        private void WindowBase_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (working)
             {

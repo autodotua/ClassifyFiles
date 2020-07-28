@@ -10,6 +10,9 @@ using System.Collections.Generic;
 
 namespace ClassifyFiles.UI.Util
 {
+    /// <summary>
+    /// 处理ItemsControl中将文件拖出去的事件
+    /// </summary>
     public class DragDropFilesHelper
     {
         private ItemsControl list;

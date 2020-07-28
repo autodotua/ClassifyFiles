@@ -54,11 +54,11 @@ namespace ClassifyFiles.UI
         }
 
 
-        private void WindowBase_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             Current = null;
         }
-        private void ThemeRButton_Click(object sender, RoutedEventArgs e)
+        private void ThemeButton_Click(object sender, RoutedEventArgs e)
         {
             int theme = rbtnThemeAuto.IsChecked.Value ?
                 0 : (rbtnThemeLight.IsChecked.Value ? 1 : -1);
@@ -133,23 +133,23 @@ namespace ClassifyFiles.UI
 
         }
 
-        private void numThread_ValueChanged(ModernWpf.Controls.NumberBox sender, ModernWpf.Controls.NumberBoxValueChangedEventArgs args)
+        private void NumThread_ValueChanged(ModernWpf.Controls.NumberBox sender, ModernWpf.Controls.NumberBoxValueChangedEventArgs args)
         {
             Configs.RefreshThreadCount = (int)numThread.Value;
             numThread.Value = (int)numThread.Value;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void OpenLogButton_Click(object sender, RoutedEventArgs e)
         {
             new LogsWindow().Show();
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void ResetAutoAddFilesButton_Click(object sender, RoutedEventArgs e)
         {
             Configs.AutoAddFiles = false;
         }
 
-        private async void Button_Click_2(object sender, RoutedEventArgs e)
+        private async void OptimizeThumbnailsAndIconsButton_Click(object sender, RoutedEventArgs e)
         {
             (int DeleteFromDb, int DeleteFromDisk, int RemainsCount, List<string> FailedToDelete) result = (-1, -1, -1, new List<string>());
 
@@ -162,6 +162,12 @@ namespace ClassifyFiles.UI
                 $"有{result.FailedToDelete.Count}张缩略图删除失败", "修复缩略图");
         }
 
+        /// <summary>
+        /// 执行需要关闭其他窗体的任务
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="func"></param>
+        /// <returns></returns>
         private async Task<T> DoSthNeedToCloseOtherWindowsAsync<T>(Func<T> func)
         {
             Progress.Show();
@@ -183,12 +189,12 @@ namespace ClassifyFiles.UI
             return result;
         }
 
-        private void WindowBase_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             SmoothScrollViewerHelper.Regist(scr);
         }
 
-        private async void Button_Click_3(object sender, RoutedEventArgs e)
+        private async void ChangeThumbnailPositionButton_Click(object sender, RoutedEventArgs e)
         {
             if (await new ConfirmDialog().ShowAsync("更改缓存目录需要删除所有的缓存，是否继续？", "修改缓存目录"))
             {

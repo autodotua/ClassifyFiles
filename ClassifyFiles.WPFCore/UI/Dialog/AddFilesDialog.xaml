@@ -9,7 +9,7 @@
     xmlns:root="clr-namespace:ClassifyFiles"
     Title="添加文件" Width="600"
     Height="390"
-    Closing="WindowBase_Closing"
+    Closing="Window_Closing"
     Loaded="Dialog_Loaded" mc:Ignorable="d">
     <m:SimpleStackPanel
         Margin="8" VerticalAlignment="Center"

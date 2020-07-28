@@ -13,6 +13,7 @@ using System.Windows.Media.Effects;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Collections.Generic;
+using ClassifyFiles.UI.Util;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -149,6 +150,11 @@ namespace ClassifyFiles.UI.Panel
         }
 
         public event EventHandler<ClassFilesDropEventArgs> ClassFilesDrop;
+
+        private void UserControlBase_Loaded(object sender, RoutedEventArgs e)
+        {
+            SmoothScrollViewerHelper.Regist(lbx);
+        }
     }
 
 

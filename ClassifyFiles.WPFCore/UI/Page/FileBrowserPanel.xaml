@@ -20,7 +20,7 @@
     <Grid x:Name="grdMain">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" MaxWidth="600" />
-            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="16" />
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -36,13 +36,15 @@
             PreviewMouseUp="Splitter_PreviewMouseUp" />
         <Label
             Grid.Column="1"
+            HorizontalAlignment="Center"
             VerticalAlignment="Center" Content="⁞"
             FontSize="26" FontWeight="Bold"
             IsHitTestVisible="False" Opacity="0.5" />
         <Grid
             x:Name="grdLeft" Width="200"
-            Margin="8,0,0,0"
-            HorizontalAlignment="Left">
+            Margin="0,-12,0,-8"
+            HorizontalAlignment="Left"
+            Background="Transparent">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="4" />
@@ -71,7 +73,7 @@
                 Padding="10,6"
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Left"
-                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                Background="Transparent"
                 Click="BtnNoClassesFiles_Click"
                 Content="显示没有被分类的文件" />
             <Button
@@ -79,7 +81,7 @@
                 Margin="0,8" Padding="10,6"
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Left"
-                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                Background="Transparent"
                 Click="BtnAllFiles_Click"
                 Content="显示全部文件" />
         </Grid>

@@ -12,7 +12,7 @@
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
     xmlns:uiutil="clr-namespace:ClassifyFiles.UI.Util"
     xmlns:util="clr-namespace:ClassifyFiles.Util;assembly=ClassifyFiles.Core"
-    Loaded="WindowBase_Loaded"
+    Loaded="Window_Loaded"
     mc:Ignorable="d">
     <ScrollViewer
         x:Name="scr" Padding="8"

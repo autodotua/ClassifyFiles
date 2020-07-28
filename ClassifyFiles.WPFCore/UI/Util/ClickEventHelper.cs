@@ -4,6 +4,9 @@ using System.Windows.Input;
 
 namespace ClassifyFiles.UI.Event
 {
+    /// <summary>
+    /// 为没有Click事件的控件添加Click事件
+    /// </summary>
     public class ClickEventHelper
     {
         private DateTime downTime;

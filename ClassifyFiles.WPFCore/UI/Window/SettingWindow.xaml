@@ -9,8 +9,8 @@
     xmlns:root="clr-namespace:ClassifyFiles"
     Title="设置" Width="800"
     Height="450"
-    Closing="WindowBase_Closing"
-    Loaded="WindowBase_Loaded"
+    Closing="Window_Closing"
+    Loaded="Window_Loaded"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Grid Margin="4">
@@ -32,13 +32,13 @@
                         Orientation="Horizontal" Spacing="12">
                         <RadioButton
                             x:Name="rbtnThemeAuto"
-                            Click="ThemeRButton_Click" Content="自动" />
+                            Click="ThemeButton_Click" Content="自动" />
                         <RadioButton
                             x:Name="rbtnThemeLight"
-                            Click="ThemeRButton_Click" Content="亮色" />
+                            Click="ThemeButton_Click" Content="亮色" />
                         <RadioButton
                             x:Name="rbtnThemeDark"
-                            Click="ThemeRButton_Click" Content="暗色" />
+                            Click="ThemeButton_Click" Content="暗色" />
                     </m:SimpleStackPanel>
                 </GroupBox>
 
@@ -73,7 +73,7 @@
                                 x:Name="numThread" Width="128"
                                 VerticalAlignment="Center" Maximum="12"
                                 Minimum="1"
-                                ValueChanged="numThread_ValueChanged" />
+                                ValueChanged="NumThread_ValueChanged" />
                             <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource SystemControlBackgroundBaseMediumBrush}">
                                 <Run>CPU核心数：</Run>
                                 <Run Text="{Binding ProcessorCount, Mode=OneTime}" />
@@ -84,7 +84,7 @@
                             Orientation="Horizontal" Spacing="6">
                             <TextBlock VerticalAlignment="Center">当前缓存位置：</TextBlock>
                             <TextBlock x:Name="tbkCachePath" VerticalAlignment="Center" />
-                            <Button Click="Button_Click_3">
+                            <Button Click="ChangeThumbnailPositionButton_Click">
                                 <TextBlock>
                                     <Run Text="切换到" />
                                     <Run x:Name="runCachePathTo" />
@@ -115,18 +115,18 @@
                         <Button Click="ImportMenu_Click" Content="导入" />
                         <Button Click="ExportMenu_Click" Content="导出" />
                         <Button
-                            Click="Button_Click_2" Content="修复孤立缩略图"
+                            Click="OptimizeThumbnailsAndIconsButton_Click" Content="修复孤立缩略图"
                             ToolTip="将会删除存在于数据库、但不存在于文件系统，或存在于文件系统、但没有对应的数据库文件缩略图的文件" />
                     </m:SimpleStackPanel>
                 </GroupBox>
                 <GroupBox Header="记忆">
                     <Button
-                        Click="Button_Click_1"
+                        Click="ResetAutoAddFilesButton_Click"
                         Content="取消自动添加文件"
                         IsEnabled="{Binding Path=(root:Configs.AutoAddFiles)}" />
                 </GroupBox>
                 <GroupBox Header="日志">
-                    <Button Click="Button_Click" Content="查看日志" />
+                    <Button Click="OpenLogButton_Click" Content="查看日志" />
                 </GroupBox>
                 <GroupBox Header="关于">
                     <m:SimpleStackPanel Orientation="Vertical" Spacing="12">

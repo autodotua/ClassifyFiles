@@ -34,6 +34,7 @@ using static ClassifyFiles.Util.FileProjectUtilty;
 using static ClassifyFiles.Util.ProjectUtility;
 using ClassifyFiles.UI.Component;
 using ClassifyFiles.UI.Util;
+using ClassifyFiles.Util.Win32;
 
 namespace ClassifyFiles.UI.Page
 {
@@ -46,7 +47,7 @@ namespace ClassifyFiles.UI.Page
         }
 
 
-        private void WindowBase_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             SmoothScrollViewerHelper.Regist(scr);
         }

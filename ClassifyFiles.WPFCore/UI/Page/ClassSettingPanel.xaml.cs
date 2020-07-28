@@ -23,6 +23,7 @@ using System.Windows.Markup;
 using System.Diagnostics;
 using ClassifyFiles.UI.Event;
 using ClassifyFiles.UI.Model;
+using ClassifyFiles.UI.Util;
 
 namespace ClassifyFiles.UI.Page
 {
@@ -44,7 +45,7 @@ namespace ClassifyFiles.UI.Page
                 this.Notify(nameof(MatchConditions));
             }
         }
-        private void WindowBase_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             //不知道为什么，Xaml里绑定不上，只好在代码里绑定了
             btnDelete.SetBinding(IsEnabledProperty, new Binding(nameof(classes.SelectedUIClass))
@@ -120,13 +121,17 @@ namespace ClassifyFiles.UI.Page
 
         private async void AddClassInButton_Click(object sender, RoutedEventArgs e)
         {
+            GetProgress().Show();
             await classes.AddAsync();
+            GetProgress().Close();
         }
 
         private async void DeleteClassButton_Click(object sender, RoutedEventArgs e)
         {
+            GetProgress().Show();
             await classes.DeleteSelectedAsync();
             flyDelete.Hide();
+            GetProgress().Close();
         }
 
         private void AddMatchConditionButton_Click(object sender, RoutedEventArgs e)
@@ -136,6 +141,7 @@ namespace ClassifyFiles.UI.Page
 
         private async void SelectedUIClassesChanged(object sender, SelectedClassChangedEventArgs e)
         {
+            GetProgress().Show();
             //加个延时，让UI先反应一下
             await Task.Delay(100);
             Class old = e.OldValue;
@@ -154,6 +160,7 @@ namespace ClassifyFiles.UI.Page
             }
             txtName.Text = classes.SelectedUIClass?.Class.Name;
 
+            GetProgress().Close();
         }
 
         private async void Flyout_Closed(object sender, object e)

@@ -14,6 +14,20 @@ namespace ClassifyFiles.Util
         ConcurrentQueue<Task> tasks = new ConcurrentQueue<Task>();
         public bool IsExcuting { get; private set; } = false;
         bool stopping = false;
+
+        /// <summary>
+        /// 将新的任务加入队列
+        /// </summary>
+        /// <param name="t"></param>
+        /// <remarks>
+        /// 当一个Task需要加入队列时，首先判断是否当前有任务正在执行。
+        /// 如果有正在执行的队列，那么就把任务加入队列。
+        /// 如果没有正在执行的任务，就先执行该任务。
+        /// 执行任务的时候，可能有其他任务加了进来。
+        /// 执行完成后，把队列中的任务都提取出来，然后多线程循环处理开始时队列中的所有任务。
+        /// 在处理这些任务的时候，有可能又有新的任务加了进来，
+        /// 所以需要循环处理，直到队列为空。
+        /// </remarks>
         public async void Enqueue(Task t)
         {
             tasks.Enqueue(t);
@@ -38,6 +52,7 @@ namespace ClassifyFiles.Util
                              }
                              try
                              {
+                                 //执行任务
                                  Stopwatch sw = Stopwatch.StartNew();
                                  t2.Wait();
                                  sw.Stop();
@@ -75,7 +90,7 @@ namespace ClassifyFiles.Util
             }
             IsExcuting = false;
         }
-      private  DateTime lastDbSaveTime = DateTime.MinValue;
+        private DateTime lastDbSaveTime = DateTime.MinValue;
 
         public async Task Stop()
         {

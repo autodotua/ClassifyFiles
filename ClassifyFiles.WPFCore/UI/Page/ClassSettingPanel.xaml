@@ -11,7 +11,7 @@
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
     xmlns:uiuti="clr-namespace:ClassifyFiles.UI.Util"
-    Loaded="WindowBase_Loaded"
+    Loaded="Window_Loaded"
     mc:Ignorable="d">
     <local:ProjectPageBase.Resources>
         <ui:NotFirst2VisibilityConverter x:Key="i2v" />

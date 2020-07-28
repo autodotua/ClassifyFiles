@@ -46,7 +46,7 @@ namespace ClassifyFiles.UI.Dialog
 
         }
 
-        private async void WindowBase_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (working)
             {

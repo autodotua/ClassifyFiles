@@ -49,9 +49,27 @@ namespace ClassifyFiles.UI.Component
         public bool Square { get; set; } = true;
         public static readonly DependencyProperty FileProperty =
             DependencyProperty.Register("File", typeof(UIFile), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
-        static void OnFileChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
+        static async void OnFileChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
         {
-            (obj as FileIcon).RegisterEvents();
+            if ((obj as FileIcon).IsLoaded)
+            {
+
+            }
+            else
+            {
+                await (obj as FileIcon).LoadAsync();
+            }
+        }
+
+        private async Task LoadAsync()
+        {
+            await File.LoadClassesAsync();
+            await LoadImageAsync();
+            if (Configs.AutoThumbnails)
+            {
+                Tasks.Enqueue(RefreshIcon());
+            }
+            RegisterEvents();
         }
         private void RegisterEvents()
         {
@@ -62,7 +80,7 @@ namespace ClassifyFiles.UI.Component
                 {
                     try
                     {
-                        Dispatcher.Invoke(() => LoadAsync());
+                        Dispatcher.Invoke(() => LoadImageAsync());
                     }
                     catch
                     {
@@ -89,6 +107,10 @@ namespace ClassifyFiles.UI.Component
         private static string folderIconPath = null;
         public async Task<bool> RefreshIcon()
         {
+            if (File.File.ThumbnailGUID != null && File.File.IconGUID != null)
+            {
+                return true;
+            }
             UIFile file = null;
             Dispatcher.Invoke(() =>
             {
@@ -97,7 +119,7 @@ namespace ClassifyFiles.UI.Component
             bool result = await RealtimeIcon.RefreshIcon(file);
             return result;
         }
-        public async Task<bool> LoadAsync()
+        public async Task<bool> LoadImageAsync()
         {
             FrameworkElement item;
             if (DisplayBetterImage)
@@ -173,17 +195,8 @@ namespace ClassifyFiles.UI.Component
             return item is Image;
         }
 
-
-
-        private async void UserControlBase_Loaded(object sender, RoutedEventArgs e)
+        private void UserControlBase_Loaded(object sender, RoutedEventArgs e)
         {
-
-            await File.LoadClassesAsync();
-            await LoadAsync();
-            if (Configs.AutoThumbnails)
-            {
-                Tasks.Enqueue(RefreshIcon());
-            }
         }
 
         public static TaskQueue Tasks { get; private set; } = new TaskQueue();

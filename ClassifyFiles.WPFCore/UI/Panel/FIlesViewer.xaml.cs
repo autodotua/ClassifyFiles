@@ -757,6 +757,34 @@ namespace ClassifyFiles.UI.Panel
             await SelectFileAsync(file);
         }
 
+        /// <summary>
+        /// 键盘按下事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void UserControl_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.D) && Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            {
+                await SelectFileAsync(null);
+            }
+        }
+
+        /// <summary>
+        /// 提示框打开事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void ToolTip_Opened(object sender, RoutedEventArgs e)
+        {
+            //光标在Item之间移动的时候ToolTip有几率会显示同一张图，目前还不知道原因
+            ToolTip tt = sender as ToolTip;
+            FileIcon icon = (tt.Content as System.Windows.Controls.Panel).Children.OfType<FileIcon>().First();
+            if ((sender as ToolTip).Visibility == Visibility.Visible && icon.Visibility == Visibility.Visible)
+            {
+                await icon.LoadImageAsync();
+            }
+        }
         #endregion
 
         #region 菜单相关
@@ -922,24 +950,7 @@ namespace ClassifyFiles.UI.Panel
 
         #endregion
 
-        private async void UserControl_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (Keyboard.IsKeyDown(Key.D) && Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
-            {
-                await SelectFileAsync(null);
-            }
-        }
 
-        private async void ToolTip_Opened(object sender, RoutedEventArgs e)
-        {
-            //光标在Item之间移动的时候ToolTip有几率会显示同一张图，目前还不知道原因
-            ToolTip tt = sender as ToolTip;
-            FileIcon icon = (tt.Content as System.Windows.Controls.Panel).Children.OfType<FileIcon>().First();
-            if ((sender as ToolTip).Visibility == Visibility.Visible && icon.Visibility == Visibility.Visible)
-            {
-                await icon.LoadAsync();
-            }
-        }
     }
 
 }

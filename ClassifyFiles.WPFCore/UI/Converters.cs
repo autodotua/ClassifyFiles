@@ -10,12 +10,23 @@ using System.Windows.Markup;
 
 namespace ClassifyFiles.UI
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class FilterLabelConverter : IValueConverter
     {
+        /// <summary>
+        /// 筛选按钮文字转换器
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="targetType"></param>
+        /// <param name="parameter"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             string str = value as string;
-            if (str == "")
+            if (str .Length==0)
             {
                 return "筛选";
             }
@@ -34,6 +45,10 @@ namespace ClassifyFiles.UI
             throw new NotImplementedException();
         }
     }
+
+    /// <summary>
+    /// 倍率转换器
+    /// </summary>
     public class MagnificationConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -46,6 +61,10 @@ namespace ClassifyFiles.UI
             throw new NotImplementedException();
         }
     }
+
+    /// <summary>
+    /// 如果不是第一个，就可见，否则不可见
+    /// </summary>
     public class NotFirst2VisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -59,6 +78,11 @@ namespace ClassifyFiles.UI
         }
 
     }  
+
+
+    /// <summary>
+    /// 绑定源和转换参数相等则为真
+    /// </summary>
     public class Equal2BoolConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -72,6 +96,10 @@ namespace ClassifyFiles.UI
         }
 
     }
+
+    /// <summary>
+    /// 布尔转可见性
+    /// </summary>
     public class Bool2VisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -85,6 +113,10 @@ namespace ClassifyFiles.UI
         }
 
     }
+
+    /// <summary>
+    /// 非空转布尔
+    /// </summary>
     public class IsNotNull2BoolConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -99,6 +131,9 @@ namespace ClassifyFiles.UI
 
     }
 
+    /// <summary>
+    /// 非空转可见性
+    /// </summary>
     public class IsNotNull2VisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -113,6 +148,9 @@ namespace ClassifyFiles.UI
 
     }
 
+    /// <summary>
+    /// 时间间隔转毫秒
+    /// </summary>
     public class TimeSpan2MsConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -160,19 +198,11 @@ namespace ClassifyFiles.UI
             throw new NotSupportedException();
         }
     }
-    //public sealed class LogTypeConverter : IValueConverter
-    //{
-    //    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    //    {
-    //        string type = value as string;
-    //        return Strings.Get(type);
-    //    }
 
-    //    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    //    {
-    //        throw new NotSupportedException();
-    //    }
-    //}
+
+    /// <summary>
+    /// 绑定值减去参数值
+    /// </summary>
     public class ValueMinusConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -185,6 +215,11 @@ namespace ClassifyFiles.UI
             throw new NotImplementedException();
         }
     }
+
+
+    /// <summary>
+    /// 匹配规则转控件的可见性，控件的转换参数为text或time
+    /// </summary>
     public class MatchConditionType2ControlVisibilityConverter : IValueConverter
     {
         private static Dictionary<MatchType, string> MatchConditionTypeWithControlType = new Dictionary<MatchType, string>()

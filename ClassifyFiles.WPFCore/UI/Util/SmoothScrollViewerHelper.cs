@@ -18,6 +18,15 @@ namespace ClassifyFiles.UI.Util
     public static class SmoothScrollViewerHelper
     {
         private static Dictionary<ScrollViewer, double> remainsDeltas = new Dictionary<ScrollViewer, double>();
+        public static void Regist(Control ctrl)
+        {
+            ScrollViewer scr = ctrl.GetVisualChild<ScrollViewer>();
+            if(scr==null)
+            {
+                throw new Exception("Control内没有ScrollViewer");
+            }
+            Regist(scr);
+        }
         public static void Regist(ScrollViewer scr)
         {
             scr.PreviewMouseWheel += async (p1, p2) =>
@@ -28,6 +37,8 @@ namespace ClassifyFiles.UI.Util
         public static async Task HandleMouseWheel(ScrollViewer scr, int delta)
         {
             Debug.Assert(scr != null);
+
+            //如果当前的滚动视图还没有进行过滚动，那么进行注册
             if (!remainsDeltas.ContainsKey(scr))
             {
                 remainsDeltas.Add(scr, 0);
@@ -36,7 +47,7 @@ namespace ClassifyFiles.UI.Util
             remainsDeltas[scr] = remainsDeltas[scr] + delta;
             if (remainsDeltas[scr] != delta)
             {
-
+                //如果滚动正在进行，那么把滚动交给之前的方法即可
                 return;
             }
             while (remainsDeltas[scr] != 0)
@@ -45,6 +56,7 @@ namespace ClassifyFiles.UI.Util
                 scr.ScrollToVerticalOffset(scr.VerticalOffset - remainsDeltas[scr] / 30d * System.Windows.Forms.SystemInformation.MouseWheelScrollLines);
                 remainsDeltas[scr] /= 1.2;
                 await Task.Delay(1);
+                //如果到目标距离不到10了，就直接停止滚动，因为不然的话会永远滚下去
                 if (Math.Abs(remainsDeltas[scr]) < 10)
                 {
                     remainsDeltas[scr] = 0;

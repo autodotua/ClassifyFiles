@@ -56,7 +56,6 @@ namespace ClassifyFiles.WPFCore
             MainWindow = win;
             win.Show();
             SplashWindow.TryClose();
-
         }
 
         private async void UnhandledException_UnhandledExceptionCatched(object sender, FzLib.Program.Runtime.UnhandledExceptionEventArgs e)

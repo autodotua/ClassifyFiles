@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
-namespace ClassifyFiles.UI.Util
+namespace ClassifyFiles.Util.Win32
 {
     public static class LinkUtility
     {
