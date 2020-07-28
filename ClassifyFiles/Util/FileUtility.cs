@@ -61,6 +61,10 @@ namespace ClassifyFiles.Util
                 return false;
             }
             string path = file.GetAbsolutePath();
+            if(!F.Exists(path))
+            {
+                return false;   
+            }
             if (imgExtensions.Contains(P.GetExtension(path).ToLower().Trim('.')))
             {
                 try
@@ -95,6 +99,10 @@ namespace ClassifyFiles.Util
         {
 
             string path = file.GetAbsolutePath();
+            if (!F.Exists(path))
+            {
+                return false;
+            }
             try
             {
 
@@ -437,10 +445,7 @@ namespace ClassifyFiles.Util
             }
             return P.Combine(rootPath, file.Dir, file.Name);
         }
-        public static FI GetFileInfo(this File file)
-        {
-            return new FI(file.GetAbsolutePath());
-        }
+
         public static void Export(string distFolder,
                                          Project project,
                                          ExportFormat format,

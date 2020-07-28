@@ -935,9 +935,9 @@ namespace ClassifyFiles.UI.Panel
             //光标在Item之间移动的时候ToolTip有几率会显示同一张图，目前还不知道原因
             ToolTip tt = sender as ToolTip;
             FileIcon icon = (tt.Content as System.Windows.Controls.Panel).Children.OfType<FileIcon>().First();
-            if (icon.Visibility == Visibility.Visible)
+            if ((sender as ToolTip).Visibility == Visibility.Visible && icon.Visibility == Visibility.Visible)
             {
-                 icon.Load();
+                await icon.LoadAsync();
             }
         }
     }

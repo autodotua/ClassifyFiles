@@ -11,7 +11,6 @@
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Grid Margin="4">
-
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="8" />
@@ -22,7 +21,6 @@
         <ListView
             x:Name="lvw"
             ItemsSource="{Binding Logs}"
-            
             Style="{StaticResource {x:Static GridView.GridViewStyleKey}}">
             <ListView.View>
                 <GridView>
@@ -31,7 +29,9 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <TextBox IsReadOnly="True" Grid.Row="2" Text="{Binding ElementName=lvw, Path=SelectedItem.Details}"/>
+        <TextBox
+            Grid.Row="2" IsReadOnly="True"
+            Text="{Binding ElementName=lvw, Path=SelectedItem.Details}" />
         <m:SimpleStackPanel
             Grid.Row="4" HorizontalAlignment="Right"
             Orientation="Horizontal" Spacing="12">

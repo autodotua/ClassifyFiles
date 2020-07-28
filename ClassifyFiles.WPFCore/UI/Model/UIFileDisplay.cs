@@ -11,6 +11,8 @@ using System.Windows.Media;
 using System.Globalization;
 using System.Windows;
 using ClassifyFiles.WPFCore;
+using System.Drawing;
+using System.Threading.Tasks;
 
 namespace ClassifyFiles.UI.Model
 {
@@ -19,7 +21,7 @@ namespace ClassifyFiles.UI.Model
         public UIFileDisplay(Data.File file)
         {
             File = file;
-            FileInfo = new FileInfo(file.GetAbsolutePath());
+            fileInfo = File.FileInfo;
             if (file.IsFolder)
             {
                 Glyph = FolderGlyph;
@@ -43,7 +45,7 @@ namespace ClassifyFiles.UI.Model
             }
         }
         public Data.File File { get; private set; }
-        public FileInfo FileInfo { get; }
+        public FileInfo fileInfo;
 
         public long? length = null;
         public string Length
@@ -56,11 +58,18 @@ namespace ClassifyFiles.UI.Model
                 }
                 if (length == null)
                 {
-                    try
+                    if (System.IO.File.Exists(File.GetAbsolutePath()))
                     {
-                        length = File.GetFileInfo().Length;
+                        try
+                        {
+                            length = fileInfo.Length;
+                        }
+                        catch
+                        {
+                            length = -1;
+                        }
                     }
-                    catch
+                    else
                     {
                         length = -1;
                     }
@@ -92,9 +101,9 @@ namespace ClassifyFiles.UI.Model
         {
             get
             {
-                if (!File.IsFolder && FileInfo.Exists)
+                if (!File.IsFolder && fileInfo.Exists)
                 {
-                    return FileInfo.LastWriteTime.ToString();
+                    return fileInfo.LastWriteTime.ToString();
                 }
                 else if (File.IsFolder)
                 {
@@ -115,9 +124,9 @@ namespace ClassifyFiles.UI.Model
         {
             get
             {
-                if (!File.IsFolder && FileInfo.Exists)
+                if (!File.IsFolder && fileInfo.Exists)
                 {
-                    return FileInfo.CreationTime.ToString();
+                    return fileInfo.CreationTime.ToString();
                 }
                 else if (File.IsFolder)
                 {
@@ -143,19 +152,19 @@ namespace ClassifyFiles.UI.Model
 
                 string dir = DisplayDir;
                 double totalLength = 0;
-                for(int i=dir.Length-1;i>=0;i--)
+                for (int i = dir.Length - 1; i >= 0; i--)
                 {
                     FormattedText formattedText = new FormattedText(dir[i].ToString(), CultureInfo.CurrentCulture,
-      FlowDirection.LeftToRight, new Typeface(App.Current.MainWindow.FontFamily, App.Current.MainWindow.FontStyle, App.Current.MainWindow.FontWeight, App.Current.MainWindow.FontStretch), 16, Brushes.Black,
+      FlowDirection.LeftToRight, new Typeface(App.Current.MainWindow.FontFamily, App.Current.MainWindow.FontStyle, App.Current.MainWindow.FontWeight, App.Current.MainWindow.FontStretch), 16, System.Windows.Media.Brushes.Black,
       VisualTreeHelper.GetDpi(App.Current.MainWindow).PixelsPerDip);
                     //实测这里数字似乎优点偏大了
-                    if(totalLength + formattedText.Width> ShortDirMaxLength)
+                    if (totalLength + formattedText.Width > ShortDirMaxLength)
                     {
-                        return "…"+ dir.Substring(i);
+                        return "…" + dir.Substring(i);
                     }
                     totalLength += formattedText.Width;
                 }
-               
+
                 return dir;
             }
         }
@@ -168,23 +177,35 @@ namespace ClassifyFiles.UI.Model
         public string Glyph { get; set; } = FileGlyph;
         public Symbol Symbol { get; set; } = Symbol.OpenFile;
 
-        public BitmapImage RawImage
+        public async Task<BitmapImage> GetBetterImageAsync()
         {
-            get
+            if (System.IO.File.Exists(File.GetAbsolutePath()))
             {
-                try
+                BitmapImage bitmapImage = null;
+                await Task.Run(() =>
                 {
-                    if (System.IO.File.Exists(File.GetAbsolutePath()))
+                    try
                     {
-                        var bitmapImage = new BitmapImage(new Uri(File.GetAbsolutePath(), UriKind.Absolute));
-                        return bitmapImage;
+                        Bitmap bitmap = new Bitmap(File.GetAbsolutePath());
+                        if (bitmap.Width * bitmap.Height< 5_000_000)//500万像素以下直接显示
+                        {
+                            bitmapImage = bitmap.ToBitmapImage();
+                        }
+                        else
+                        {
+                            Bitmap resized = new Bitmap(bitmap, new System.Drawing.Size(640, (int)(1.0 * bitmap.Height / bitmap.Width * 640)));
+                            bitmapImage = resized.ToBitmapImage();
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                }
-                return null;
+                    catch
+                    {
+
+                    }
+                        //var bitmapImage = new BitmapImage(new Uri(File.GetAbsolutePath(), UriKind.Absolute));
+                    });
+                return bitmapImage;
             }
+            return null;
         }
 
         public BitmapImage Image

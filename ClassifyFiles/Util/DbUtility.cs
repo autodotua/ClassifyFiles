@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace ClassifyFiles.Util
@@ -32,6 +33,7 @@ namespace ClassifyFiles.Util
         }
         public static int SaveChanges()
         {
+            Debug.WriteLine("db Save Changes");
             try
             {
                 return db.SaveChanges();

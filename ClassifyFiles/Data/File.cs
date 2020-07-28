@@ -1,4 +1,5 @@
-﻿using FzLib.Extension;
+﻿using ClassifyFiles.Util;
+using FzLib.Extension;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -81,6 +82,19 @@ namespace ClassifyFiles.Data
         public override int GetHashCode()
         {
             return (Dir + Name).GetHashCode();
+        }
+
+        private FileInfo fileInfo;
+        public FileInfo FileInfo
+        {
+            get
+            {
+                if (fileInfo == null)
+                {
+                    fileInfo = new FileInfo(this.GetAbsolutePath());
+                }
+                return fileInfo;
+            }
         }
     }
 }

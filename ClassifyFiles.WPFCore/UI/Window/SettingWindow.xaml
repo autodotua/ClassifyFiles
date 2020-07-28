@@ -47,22 +47,24 @@
                         <CheckBox
                             x:Name="chkAutoThumbnails"
                             Click="CheckBox_Click"
-                            Content="在浏览时尝试为没有缩略图的对象生成缩略图" >
+                            Content="在浏览时尝试为没有缩略图的对象生成缩略图">
                             <CheckBox.ToolTip>
                                 <ToolTip>
                                     <StackPanel>
                                         <TextBlock>开启该选项后，在浏览时，若文件没有缩略图，则会自动生成缩略图。</TextBlock>
-                                    <TextBlock>这能够提升部分体验，但是会降低一些运行速度，增加卡顿。</TextBlock>
+                                        <TextBlock>这能够提升部分体验，但是会降低一些运行速度，增加卡顿。</TextBlock>
                                     </StackPanel>
                                 </ToolTip>
                             </CheckBox.ToolTip>
                         </CheckBox>
-                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="6" Background="Transparent">
+                        <m:SimpleStackPanel
+                            Background="Transparent"
+                            Orientation="Horizontal" Spacing="6">
                             <m:SimpleStackPanel.ToolTip>
                                 <ToolTip>
                                     <StackPanel>
-                                        <TextBlock >同时获取缩略图的线程数。当该值较小时，获取缩略图的速度会比较慢。若该值过大，则界面将会卡顿严重。</TextBlock>
-                                        <TextBlock >最大线程数不宜超过CPU的核心（线程）数。</TextBlock>
+                                        <TextBlock>同时获取缩略图的线程数。当该值较小时，获取缩略图的速度会比较慢。若该值过大，则界面将会卡顿严重。</TextBlock>
+                                        <TextBlock>最大线程数不宜超过CPU的核心（线程）数。</TextBlock>
                                     </StackPanel>
                                 </ToolTip>
                             </m:SimpleStackPanel.ToolTip>
@@ -77,13 +79,15 @@
                                 <Run Text="{Binding ProcessorCount, Mode=OneTime}" />
                             </TextBlock>
                         </m:SimpleStackPanel>
-                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="6" Background="Transparent">
+                        <m:SimpleStackPanel
+                            Background="Transparent"
+                            Orientation="Horizontal" Spacing="6">
                             <TextBlock VerticalAlignment="Center">当前缓存位置：</TextBlock>
-                            <TextBlock x:Name="tbkCachePath" VerticalAlignment="Center"></TextBlock>
+                            <TextBlock x:Name="tbkCachePath" VerticalAlignment="Center" />
                             <Button Click="Button_Click_3">
                                 <TextBlock>
-                                    <Run Text="切换到"/>
-                                    <Run x:Name="runCachePathTo"/>
+                                    <Run Text="切换到" />
+                                    <Run x:Name="runCachePathTo" />
                                 </TextBlock>
                             </Button>
 

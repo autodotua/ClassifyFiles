@@ -245,7 +245,7 @@ namespace ClassifyFiles.Util
                     foreach (var c in db.Classes.Where(p => p.ProjectID == args.Project.ID).ToList())
                     {
                         FileClass fc = IncludeAll(db.FileClasses).FirstOrDefault(p => p.Class == c && p.File == f);
-                        bool isMatched = FileUtility.IsMatched(f.GetFileInfo(), c);
+                        bool isMatched = FileUtility.IsMatched(f.FileInfo, c);
                         if (fc == null && isMatched)
                         {
                             //如果匹配并且不存在，那么新增关系

@@ -11,17 +11,17 @@ namespace ClassifyFiles.Util
     {
         public event EventHandler<ProcessStatusChangedEventArgs> ProcessStatusChanged;
 
-        ConcurrentQueue<Func<Task>> tasks = new ConcurrentQueue<Func<Task>>();
+        ConcurrentQueue<Task> tasks = new ConcurrentQueue<Task>();
         public bool IsExcuting { get; private set; } = false;
         bool stopping = false;
-        public async void Enqueue(Func<Task> t)
+        public async void Enqueue(Task t)
         {
             tasks.Enqueue(t);
             if (!IsExcuting)
             {
                 IsExcuting = true;
                 ProcessStatusChanged?.Invoke(this, new ProcessStatusChangedEventArgs(true));
-                await t();
+                await t;
                 while (tasks.Count > 0 && !stopping)
                 {
                     Debug.WriteLine("Task count is " + tasks.Count);
@@ -32,28 +32,37 @@ namespace ClassifyFiles.Util
                         ParallelOptions opt = new ParallelOptions() { MaxDegreeOfParallelism = Configs.RefreshThreadCount };
                         Parallel.ForEach(currentTasks, opt, (t2, e) =>
                          {
-                             Debug.WriteLine("dsd");
                              if (stopping)
                              {
                                  e.Stop();
                              }
                              try
                              {
-                                 t2().Wait();
+                                 Stopwatch sw = Stopwatch.StartNew();
+                                 t2.Wait();
+                                 sw.Stop();
+                                 Debug.WriteLine($"create thumb use {sw.ElapsedMilliseconds} ms");
                              }
                              catch (Exception ex)
                              {
 
                              }
                          });
-
-                        try
+                        if (!stopping)
                         {
-                            DbUtility.SaveChanges();
-                        }
-                        catch (Exception ex)
-                        {
+                            //防止频繁保存数据库
+                            if ((DateTime.Now - lastDbSaveTime).Seconds > 10)
+                            {
+                                lastDbSaveTime = DateTime.Now;
+                                try
+                                {
+                                    DbUtility.SaveChanges();
+                                }
+                                catch (Exception ex)
+                                {
 
+                                }
+                            }
                         }
                     });
                 }
@@ -66,6 +75,7 @@ namespace ClassifyFiles.Util
             }
             IsExcuting = false;
         }
+      private  DateTime lastDbSaveTime = DateTime.MinValue;
 
         public async Task Stop()
         {

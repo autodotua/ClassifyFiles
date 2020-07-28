@@ -1,14 +1,13 @@
-﻿<dialog:ContentDialogBase  xmlns:dialog="clr-namespace:ClassifyFiles.UI.Dialog"
-                    x:Class="ClassifyFiles.UI.MessageDialog"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ClassifyFiles.UI"
-             
-             mc:Ignorable="d" 
-                 xmlns:m="http://schemas.modernwpf.com/2019"
->
+﻿<dialog:ContentDialogBase
+    x:Class="ClassifyFiles.UI.MessageDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dialog="clr-namespace:ClassifyFiles.UI.Dialog"
+    xmlns:local="clr-namespace:ClassifyFiles.UI"
+    xmlns:m="http://schemas.modernwpf.com/2019"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
 
-    <TextBlock Text="{Binding Message}"/>
+    <TextBlock Text="{Binding Message}" />
 </dialog:ContentDialogBase>

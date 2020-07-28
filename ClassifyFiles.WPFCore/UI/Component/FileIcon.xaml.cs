@@ -45,7 +45,7 @@ namespace ClassifyFiles.UI.Component
         /// </remarks>
         public static bool StaticEnableCache { get; set; } = false;
         public bool EnableCache { get; set; } = true;
-        public bool DisplayRawImage { get; set; } = false;
+        public bool DisplayBetterImage { get; set; } = false;
         public bool Square { get; set; } = true;
         public static readonly DependencyProperty FileProperty =
             DependencyProperty.Register("File", typeof(UIFile), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
@@ -62,7 +62,7 @@ namespace ClassifyFiles.UI.Component
                 {
                     try
                     {
-                        Dispatcher.Invoke(() => Load());
+                        Dispatcher.Invoke(() => LoadAsync());
                     }
                     catch
                     {
@@ -97,12 +97,22 @@ namespace ClassifyFiles.UI.Component
             bool result = await RealtimeIcon.RefreshIcon(file);
             return result;
         }
-        public bool Load()
+        public async Task<bool> LoadAsync()
         {
             FrameworkElement item;
-            if (DisplayRawImage)
+            if (DisplayBetterImage)
             {
-                var rawImage = File.Display.RawImage;
+                BitmapImage rawImage = null;
+                if (File.File.FileInfo.Exists)
+                {
+                    item = new Image()
+                    {
+                        Source = rawImage ?? File.Display.Image,
+                    };
+                    main.Content = item;
+                    //先显示缩略图，然后再显示更好的图片
+                    rawImage = await File.Display.GetBetterImageAsync();
+                }
                 item = new Image()
                 {
                     Source = rawImage ?? File.Display.Image,
@@ -169,12 +179,10 @@ namespace ClassifyFiles.UI.Component
         {
 
             await File.LoadClassesAsync();
-            if (!Load())
+            await LoadAsync();
+            if (Configs.AutoThumbnails)
             {
-                if (Configs.AutoThumbnails)
-                {
-                    Tasks.Enqueue(RefreshIcon);
-                }
+                Tasks.Enqueue(RefreshIcon());
             }
         }
 

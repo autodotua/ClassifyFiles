@@ -29,10 +29,6 @@ namespace ClassifyFiles.UI.Model
         public UIFile(File file) : this()
         {
             File = file;
-            if (file.Name.Length + file.Dir.Length > 0)
-            {
-                FileInfo = file.GetFileInfo();
-            }
             SubUIFiles = new ObservableCollection<UIFile>(file.SubFiles.Select(p => new UIFile(p)));
             Display = new UIFileDisplay(file);
 

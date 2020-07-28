@@ -87,7 +87,7 @@
                 <component:FileIcon
                     MaxWidth="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource eight}}"
                     MaxHeight="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource eight}}"
-                    DisplayRawImage="True"
+                    DisplayBetterImage="True"
                     EnableCache="False"
                     File="{Binding ., Mode=OneTime}"
                     Square="False"
@@ -162,7 +162,8 @@
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     Orientation="Vertical"
-                    ToolTip="{StaticResource toolTip}">
+                    ToolTip="{StaticResource toolTip}"
+                    ToolTipService.InitialShowDelay="{DynamicResource ToolTipInitialShowDelay}">
                     <component:FileIcon
                         Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
                         Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
@@ -186,7 +187,8 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
                 Background="Transparent"
-                ToolTip="{StaticResource toolTip}">
+                ToolTip="{StaticResource toolTip}"
+                ToolTipService.InitialShowDelay="{DynamicResource ToolTipInitialShowDelay}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" />
                     <ColumnDefinition Width="8" />
@@ -239,7 +241,8 @@
             <Grid
                 Margin="0,4,24,4"
                 Background="Transparent"
-                ToolTip="{StaticResource toolTip}">
+                ToolTip="{StaticResource toolTip}"
+                ToolTipService.InitialShowDelay="{DynamicResource ToolTipInitialShowDelay}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="{Binding Path=(root:Configs.IconSize)}" />
                     <ColumnDefinition Width="16" />
@@ -375,6 +378,7 @@
                     <Setter Property="Margin" Value="0,0,16,0" />
                     <Setter Property="Background" Value="Transparent" />
                     <Setter Property="ToolTip" Value="{StaticResource toolTip}" />
+                    <Setter Property="ToolTipService.InitialShowDelay" Value="{DynamicResource ToolTipInitialShowDelay}" />
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.GroupStyle>
