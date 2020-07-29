@@ -155,7 +155,7 @@ namespace ClassifyFiles
         {
             get => Get(ref autoAddFiles, GetBool, false, nameof(AutoAddFiles));
             set => Set(ref autoAddFiles, value, nameof(AutoAddFiles));
-        }       
+        }
         private static bool? cacheInTempDir = null;
         public static bool CacheInTempDir
         {
@@ -167,6 +167,18 @@ namespace ClassifyFiles
         {
             get => Get(ref addFilesOptionJson, GetString, "", nameof(AddFilesOptionJson));
             set => Set(ref addFilesOptionJson, value, nameof(AddFilesOptionJson));
+        }
+        private static bool? fileIconUniformToFill = null;
+        public static bool FileIconUniformToFill
+        {
+            get => Get(ref fileIconUniformToFill, GetBool, false, nameof(FileIconUniformToFill));
+            set => Set(ref fileIconUniformToFill, value, nameof(FileIconUniformToFill));
+        }
+        private static bool? treeSimpleTemplate = null;
+        public static bool TreeSimpleTemplate
+        {
+            get => Get(ref treeSimpleTemplate, GetBool, true, nameof(TreeSimpleTemplate));
+            set => Set(ref treeSimpleTemplate, value, nameof(TreeSimpleTemplate));
         }
 
 

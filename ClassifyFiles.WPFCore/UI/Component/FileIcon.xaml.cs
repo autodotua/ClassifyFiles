@@ -46,7 +46,6 @@ namespace ClassifyFiles.UI.Component
         public static bool StaticEnableCache { get; set; } = false;
         public bool EnableCache { get; set; } = true;
         public bool DisplayBetterImage { get; set; } = false;
-        public bool Square { get; set; } = true;
         public static readonly DependencyProperty FileProperty =
             DependencyProperty.Register("File", typeof(UIFile), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
         static async void OnFileChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
@@ -61,6 +60,41 @@ namespace ClassifyFiles.UI.Component
             }
         }
 
+
+        public UIFile File
+        {
+            get => GetValue(FileProperty) as UIFile; //file;
+            set
+            {
+                SetValue(FileProperty, value);
+            }
+        }
+   
+        public Stretch? stretch;
+        public Stretch? Stretch
+        {
+            get => stretch;
+            set
+            {
+                stretch = value;
+                this.Notify(nameof(Stretch),nameof(ActualStretch));
+            }
+        }   
+        public Stretch ActualStretch
+        {
+            get
+            {
+                if(Stretch==null)
+                {
+                    if(Configs.FileIconUniformToFill)
+                    {
+                        return System.Windows.Media.Stretch.UniformToFill;
+                    }
+                    return System.Windows.Media.Stretch.Uniform;
+                }
+                return Stretch.Value;
+            }
+        }
         private async Task LoadAsync()
         {
             await File.LoadClassesAsync();
@@ -73,14 +107,13 @@ namespace ClassifyFiles.UI.Component
         }
         private void RegisterEvents()
         {
-            File.File.PropertyChanged += (s, e) =>
+            File.Display.PropertyChanged += (s, e) =>
             {
-                if (e.PropertyName == nameof(Data.File.ThumbnailGUID)
-                || e.PropertyName == nameof(Data.File.IconGUID))
+                if (e.PropertyName == nameof(UIFileDisplay.Image))
                 {
                     try
                     {
-                        Dispatcher.Invoke(() => LoadImageAsync());
+                        Dispatcher.InvokeAsync(() => LoadImageAsync());
                     }
                     catch
                     {
@@ -90,14 +123,6 @@ namespace ClassifyFiles.UI.Component
             };
         }
 
-        public UIFile File
-        {
-            get => GetValue(FileProperty) as UIFile; //file;
-            set
-            {
-                SetValue(FileProperty, value);
-            }
-        }
         private static ConcurrentDictionary<int, FrameworkElement> caches = new ConcurrentDictionary<int, FrameworkElement>();
         public static void ClearCaches()
         {
@@ -105,6 +130,20 @@ namespace ClassifyFiles.UI.Component
             RealtimeIcon.ClearCahces();
         }
         private static string folderIconPath = null;
+        private object iconContent;
+        public object IconContent
+        {
+            get => iconContent;
+            set
+            {
+                if(value==iconContent)
+                {
+                    return;
+                }
+                iconContent = value;
+                this.Notify(nameof(IconContent));
+            }
+        }
         public async Task<bool> RefreshIcon()
         {
             if (File.File.ThumbnailGUID != null && File.File.IconGUID != null)
@@ -131,7 +170,7 @@ namespace ClassifyFiles.UI.Component
                     {
                         Source = rawImage ?? File.Display.Image,
                     };
-                    main.Content = item;
+                    IconContent = item;
                     //先显示缩略图，然后再显示更好的图片
                     rawImage = await File.Display.GetBetterImageAsync();
                 }
@@ -139,7 +178,7 @@ namespace ClassifyFiles.UI.Component
                 {
                     Source = rawImage ?? File.Display.Image,
                 };
-                main.Content = item;
+                IconContent = item;
                 return true;
             }
             if (File.File.IsFolder && Configs.ShowExplorerIcon)
@@ -169,7 +208,7 @@ namespace ClassifyFiles.UI.Component
                     var img = File.Display.Image;
                     if (img == null)
                     {
-                        if (main.Content is Image)
+                        if (IconContent is Image)
                         {
                             return true;
                         }
@@ -191,7 +230,7 @@ namespace ClassifyFiles.UI.Component
                     }
                 }
             }
-            main.Content = item;
+            IconContent = item;
             return item is Image;
         }
 

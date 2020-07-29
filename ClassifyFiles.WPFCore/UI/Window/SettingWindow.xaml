@@ -51,8 +51,8 @@
                             <CheckBox.ToolTip>
                                 <ToolTip>
                                     <StackPanel>
-                                        <TextBlock>开启该选项后，在浏览时，若文件没有缩略图，则会自动生成缩略图。</TextBlock>
-                                        <TextBlock>这能够提升部分体验，但是会降低一些运行速度，增加卡顿。</TextBlock>
+                                        <TextBlock Width="288" TextWrapping="Wrap">开启该选项后，在浏览时，若文件没有缩略图，则会自动生成缩略图。</TextBlock>
+                                        <TextBlock Width="288" TextWrapping="Wrap">这能够提升部分体验，但是会降低一些运行速度，增加卡顿。</TextBlock>
                                     </StackPanel>
                                 </ToolTip>
                             </CheckBox.ToolTip>
@@ -63,8 +63,8 @@
                             <m:SimpleStackPanel.ToolTip>
                                 <ToolTip>
                                     <StackPanel>
-                                        <TextBlock>同时获取缩略图的线程数。当该值较小时，获取缩略图的速度会比较慢。若该值过大，则界面将会卡顿严重。</TextBlock>
-                                        <TextBlock>最大线程数不宜超过CPU的核心（线程）数。</TextBlock>
+                                        <TextBlock Width="288" TextWrapping="Wrap">同时获取缩略图的线程数。当该值较小时，获取缩略图的速度会比较慢。若该值过大，则界面将会卡顿严重。</TextBlock>
+                                        <TextBlock Width="288" TextWrapping="Wrap">最大线程数不宜超过CPU的核心（线程）数。</TextBlock>
                                     </StackPanel>
                                 </ToolTip>
                             </m:SimpleStackPanel.ToolTip>

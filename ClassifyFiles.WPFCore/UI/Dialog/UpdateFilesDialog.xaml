@@ -7,8 +7,7 @@
     xmlns:m="http://schemas.modernwpf.com/2019"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="更新文件" Width="600"
-    Height="360"
-    Closing="Window_Closing"
+    Height="360" Closing="Window_Closing"
     mc:Ignorable="d">
     <m:SimpleStackPanel
         Margin="8" Orientation="Vertical"

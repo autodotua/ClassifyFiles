@@ -8,9 +8,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
     xmlns:uim="clr-namespace:ClassifyFiles.UI.Model"
-    Loaded="UserControlBase_Loaded" mc:Ignorable="d">
-    <Viewbox x:Name="view">
-
-        <ContentControl x:Name="main" />
+    Loaded="UserControlBase_Loaded"
+    mc:Ignorable="d">
+    <Viewbox x:Name="view" Stretch="{Binding ActualStretch}">
+        <ContentControl Content="{Binding IconContent}" />
     </Viewbox>
 </ui:UserControlBase>

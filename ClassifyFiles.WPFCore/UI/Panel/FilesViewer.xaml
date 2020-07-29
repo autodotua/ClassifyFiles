@@ -89,8 +89,8 @@
                     MaxHeight="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource eight}}"
                     DisplayBetterImage="True"
                     EnableCache="False"
-                    File="{Binding Path=., IsAsync=True, Mode=OneTime}"
-                    Square="False"
+                    File="{Binding Path=., Mode=OneTime}"
+                    Stretch="Uniform"
                     Visibility="{Binding Path=(root:Configs.ShowToolTipImage), Mode=OneWay, Converter={StaticResource b2v}}" />
                 <Grid Margin="8">
                     <Grid.ColumnDefinitions>
@@ -134,7 +134,7 @@
                         Text="{Binding Display.Length}" />
                     <component:TagGroup
                         Grid.Row="6" Grid.Column="2"
-                        File="{Binding Path=., IsAsync=True}" />
+                        File="{Binding Path=.}" />
                     <TextBlock
                         Grid.Row="8" Grid.Column="2"
                         VerticalAlignment="Center"
@@ -167,7 +167,7 @@
                     <component:FileIcon
                         Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
                         Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
-                        File="{Binding Path=., IsAsync=True}" />
+                        File="{Binding Path=.}" />
                     <TextBlock
                         Height="36"
                         MaxWidth="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
@@ -233,9 +233,36 @@
                     Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
                     Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
                     VerticalAlignment="Center"
-                    File="{Binding Path=., IsAsync=True}" />
+                    File="{Binding Path=.}" />
             </Grid>
         </DataTemplate>
+
+        <!--  树状图简单模板  -->
+        <HierarchicalDataTemplate
+            x:Key="treeSimpleDataTemplate"
+            DataType="{x:Type uim:UIFile}"
+            ItemsSource="{Binding SubUIFiles}">
+            <Grid
+                Margin="0,4,24,4"
+                Background="Transparent"
+                ToolTip="{StaticResource toolTip}"
+                ToolTipService.InitialShowDelay="{DynamicResource ToolTipInitialShowDelay}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+             
+                <component:FileIcon
+                    Width="16"
+                    Height="16"
+                    File="{Binding Path=.}" />
+                <TextBlock Grid.Column="2"                   
+                    Text="{Binding Display.DisplayName}"
+                    TextTrimming="CharacterEllipsis" />
+       
+            </Grid>
+        </HierarchicalDataTemplate>
 
         <!--  列表和树状视图模板  -->
         <HierarchicalDataTemplate
@@ -249,7 +276,7 @@
                 ToolTipService.InitialShowDelay="{DynamicResource ToolTipInitialShowDelay}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="{Binding Path=(root:Configs.IconSize)}" />
-                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="16" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="16" />
                     <ColumnDefinition Width="*" />
@@ -269,44 +296,44 @@
                     Grid.RowSpan="99"
                     Width="{Binding Path=(root:Configs.IconSize)}"
                     Height="{Binding Path=(root:Configs.IconSize)}"
-                    File="{Binding Path=., IsAsync=True}" />
+                    File="{Binding Path=.}" />
                 <TextBlock
-                    Grid.Row="1" Grid.Column="2" 
-                    TextTrimming="CharacterEllipsis"
+                    Grid.Row="1" Grid.Column="2"
                     Grid.ColumnSpan="3" FontWeight="Bold"
-                    Text="{Binding Display.DisplayName}" />
-                <TextBlock 
-                    TextTrimming="CharacterEllipsis"
+                    Text="{Binding Display.DisplayName}"
+                    TextTrimming="CharacterEllipsis" />
+                <TextBlock
                     Grid.Row="1" Grid.Column="6"
                     HorizontalAlignment="Right"
                     Foreground="{DynamicResource SystemControlBackgroundBaseMediumLowBrush}"
+                    TextTrimming="CharacterEllipsis"
                     Visibility="{Binding Path=(root:Configs.ShowFileTime), Converter={StaticResource b2v}}">
                     <Run FontWeight="Bold">创建时间：</Run>
                     <Run Text="{Binding Display.DisplayCreationTime, Mode=OneWay}" />
                 </TextBlock>
                 <TextBlock
-                    Grid.Row="3" Grid.Column="6" 
-                    TextTrimming="CharacterEllipsis"
+                    Grid.Row="3" Grid.Column="6"
                     HorizontalAlignment="Right"
                     Foreground="{DynamicResource SystemControlBackgroundBaseMediumLowBrush}"
+                    TextTrimming="CharacterEllipsis"
                     Visibility="{Binding Path=(root:Configs.ShowFileTime), Converter={StaticResource b2v}}">
                     <Run FontWeight="Bold">修改时间：</Run>
                     <Run Text="{Binding Display.DisplayLastWriteTime, Mode=OneWay}" />
                 </TextBlock>
                 <TextBlock
-                    Grid.Row="3" Grid.Column="2" 
+                    Grid.Row="3" Grid.Column="2"
                     Width="108"
                     Foreground="{DynamicResource SystemControlBackgroundBaseMediumHighBrush}"
                     Text="{Binding Display.Length}" />
                 <TextBlock
-                    Grid.Row="3" Grid.Column="4" 
-                    TextTrimming="CharacterEllipsis"
+                    Grid.Row="3" Grid.Column="4"
                     Foreground="{DynamicResource SystemControlBackgroundBaseMediumBrush}"
-                    Text="{Binding Display.DisplayDir}" />
+                    Text="{Binding Display.DisplayDir}"
+                    TextTrimming="CharacterEllipsis" />
                 <!--  横向的标签列表  -->
                 <component:TagGroup
                     Grid.RowSpan="99" Grid.Column="99"
-                    File="{Binding Path=., IsAsync=True}"
+                    File="{Binding Path=.}"
                     TagMouseDown="Tags_MouseDown" />
             </Grid>
         </HierarchicalDataTemplate>
@@ -408,7 +435,7 @@
                                 <Grid>
                                     <component:FileIcon
                                         Width="24" Height="24"
-                                        File="{Binding Path=., IsAsync=True}" />
+                                        File="{Binding Path=.}" />
                                 </Grid>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -418,7 +445,7 @@
                     <GridViewColumn Width="144" Header="分类">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <component:TagGroup File="{Binding Path=., IsAsync=True}" TagMouseDown="Tags_MouseDown" />
+                                <component:TagGroup File="{Binding Path=.}" TagMouseDown="Tags_MouseDown" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

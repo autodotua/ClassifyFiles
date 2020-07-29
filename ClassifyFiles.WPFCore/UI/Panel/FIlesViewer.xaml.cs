@@ -362,6 +362,15 @@ namespace ClassifyFiles.UI.Panel
             {
                 Files = new ObservableCollection<UIFile>(files);
             }
+            if (CurrentFileView == FileView.Tree)
+            {
+                DataTemplate dataTemplate = FindResource(Configs.TreeSimpleTemplate ? "treeSimpleDataTemplate" : "listDataTemplate") as DataTemplate;
+                if (FilesContent.ItemTemplate != dataTemplate)
+                {
+                    FilesContent.ItemTemplate = dataTemplate;
+                }
+
+            }
         }
 
         /// <summary>
@@ -433,8 +442,8 @@ namespace ClassifyFiles.UI.Panel
                           .ThenByDescending(p => p.File.Dir);
                         break;
                 }
-                //在非UI线程里就得把Lazy的全都计算好
-                files = files.ToArray();
+                    //在非UI线程里就得把Lazy的全都计算好
+                    files = files.ToArray();
             });
             Files = new ObservableCollection<UIFile>(files);
             //当排序开启时，一律不支持分组
@@ -534,6 +543,7 @@ namespace ClassifyFiles.UI.Panel
             else if (CurrentFileView == FileView.Tree)
             {
                 FilesContent = FindResource("treeFiles") as TreeView;
+                FilesContent.ItemTemplate = FindResource(Configs.TreeSimpleTemplate ? "treeSimpleDataTemplate" : "listDataTemplate") as DataTemplate;
             }
             else if (CurrentFileView == FileView.Detail)
             {

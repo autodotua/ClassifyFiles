@@ -10,23 +10,28 @@ using System.Windows.Markup;
 
 namespace ClassifyFiles.UI
 {
+    public class String2EnumConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return System.Enum.Parse(parameter.GetType(), value as string);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value.ToString();
+        }
+    }
+
     /// <summary>
-    /// 
+    /// 筛选按钮文字转换器
     /// </summary>
     public class FilterLabelConverter : IValueConverter
     {
-        /// <summary>
-        /// 筛选按钮文字转换器
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="targetType"></param>
-        /// <param name="parameter"></param>
-        /// <param name="culture"></param>
-        /// <returns></returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             string str = value as string;
-            if (str .Length==0)
+            if (str.Length == 0)
             {
                 return "筛选";
             }
@@ -77,7 +82,7 @@ namespace ClassifyFiles.UI
             throw new NotSupportedException();
         }
 
-    }  
+    }
 
 
     /// <summary>

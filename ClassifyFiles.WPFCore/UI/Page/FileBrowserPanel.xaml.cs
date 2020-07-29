@@ -110,7 +110,7 @@ namespace ClassifyFiles.UI.Page
             else if (e.UIFiles != null)//说明是由软件内部拖放过来的
             {
                 IReadOnlyList<File> files = null;
-                await Task.Run(() => files= AddFilesToClass(e.UIFiles.Select(p => p.File), e.Class));
+                await Task.Run(() => files = AddFilesToClass(e.UIFiles.Select(p => p.File), e.Class));
                 if (currentFileCollectionType == FileCollectionType.NoClass)
                 {
                     //如果当前显示的是没有被分类的文件，那么当拖放之后，自然就不再是没有分类的文件了，所以要从列表中删去
@@ -322,7 +322,7 @@ namespace ClassifyFiles.UI.Page
             set
             {
                 Configs.ShowFileTime = value;
-               //filesViewer.Refresh();
+                //filesViewer.Refresh();
             }
         }
         public bool ShowClassTags
@@ -383,6 +383,26 @@ namespace ClassifyFiles.UI.Page
         {
             get => Configs.ShowToolTip;
             set => Configs.ShowToolTip = value;
+        }
+        public bool FileIconUniformToFill
+        {
+            get => Configs.FileIconUniformToFill;
+            set
+            {
+                Configs.FileIconUniformToFill = value;
+                filesViewer.Refresh();
+            }
+        }  public bool TreeSimpleTemplate
+        {
+            get => Configs.TreeSimpleTemplate;
+            set
+            {
+                Configs.TreeSimpleTemplate = value;
+                if (filesViewer.CurrentFileView == FileView.Tree)
+                {
+                    filesViewer.Refresh();
+                }
+            }
         }
         public bool ShowToolTipImage
         {

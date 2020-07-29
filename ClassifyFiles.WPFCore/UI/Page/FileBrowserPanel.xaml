@@ -46,30 +46,19 @@
             HorizontalAlignment="Left"
             Background="Transparent">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="4" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="8" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="8" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="0" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <m:SimpleStackPanel Orientation="Horizontal" Spacing="16">
-                <!--<TextBlock Text="{Binding Project.Name}"   VerticalAlignment="Center"  FontSize="24"/>-->
-
-                <!--<TextBlock Grid.Column="2"
-                      VerticalAlignment="Bottom" Text="{Binding Project.RootPath}"/>-->
-            </m:SimpleStackPanel>
-
             <panel:ClassesPanel
-                x:Name="classPanel" Grid.Row="4"
+                x:Name="classPanel"
                 ClassFilesDrop="ClassPanel_ClassFilesDrop"
                 SelectedClassChanged="SelectedClassChanged" />
 
             <Button
-                x:Name="btnNoClassesFiles" Grid.Row="6"
+                x:Name="btnNoClassesFiles" Grid.Row="2"
                 Padding="10,6"
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Left"
@@ -77,7 +66,7 @@
                 Click="BtnNoClassesFiles_Click"
                 Content="显示没有被分类的文件" />
             <Button
-                x:Name="btnAllFiles" Grid.Row="8"
+                x:Name="btnAllFiles" Grid.Row="4"
                 Margin="0,8" Padding="10,6"
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Left"
@@ -202,7 +191,7 @@
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="32" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
@@ -214,37 +203,47 @@
                                 <RowDefinition Height="8" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <GroupBox Grid.RowSpan="5" Header="通用">
+                            <GroupBox Grid.RowSpan="5" Header="文字">
                                 <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
                                     <m:ToggleSwitch
                                         x:Name="swtTags" Header="显示分类标签"
                                         IsOn="{Binding ShowClassTags}" />
                                     <m:ToggleSwitch Header="显示创建和修改时间" IsOn="{Binding ShowFileTime}" />
+
+                                    <m:ToggleSwitch Header="显示文件扩展名" IsOn="{Binding ShowFileExtension}" />
+                                    <m:ToggleSwitch
+                                        x:Name="swtGroup" Header="按目录进行分组"
+                                        IsOn="{Binding GroupByDir}" />
+                                    <m:ToggleSwitch
+                                        x:Name="swtIconViewNames"
+                                        Header="图标视图显示文件名"
+                                        IsOn="{Binding ShowIconViewNames}" />
+                                    <m:ToggleSwitch
+                                        x:Name="swtShowTilePath"
+                                        Header="平铺视图显示文件夹路径"
+                                        IsOn="{Binding ShowTilePath}" />
+                                    <m:ToggleSwitch
+                                        x:Name="swtTreeSimpleTemplate"
+                                        Header="树状图使用简单视图"
+                                        IsOn="{Binding TreeSimpleTemplate}" />
+                                </m:SimpleStackPanel>
+                            </GroupBox>
+                            <GroupBox Grid.Column="2" Header="图标">
+                                <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
                                     <m:ToggleSwitch
                                         x:Name="swtThumbs" Header="显示缩略图"
                                         IsOn="{Binding ShowThumbnail}" />
                                     <m:ToggleSwitch
                                         x:Name="swtIcons" Header="显示资源管理器图标"
                                         IsOn="{Binding ShowExplorerIcon}" />
-                                    <m:ToggleSwitch Header="显示文件扩展名" IsOn="{Binding ShowFileExtension}" />
                                     <m:ToggleSwitch
-                                        x:Name="swtGroup" Header="按目录进行分组"
-                                        IsOn="{Binding GroupByDir}" />
+                                        x:Name="swtFileIconUniformToFill"
+                                        Header="将图标裁剪为正方形"
+                                        IsOn="{Binding FileIconUniformToFill}" />
+
                                 </m:SimpleStackPanel>
                             </GroupBox>
-                            <GroupBox Grid.Column="2" Header="图标视图">
-                                <m:ToggleSwitch
-                                    x:Name="swtIconViewNames" Header="显示文件名"
-                                    IsOn="{Binding ShowIconViewNames}" />
-                            </GroupBox>
-                            <GroupBox
-                                Grid.Row="2" Grid.Column="2"
-                                Header="平铺视图">
-                                <m:ToggleSwitch
-                                    x:Name="swtShowTilePath"
-                                    Header="显示文件夹路径"
-                                    IsOn="{Binding ShowTilePath}" />
-                            </GroupBox>
+
                             <GroupBox
                                 Grid.Row="4" Grid.Column="2"
                                 Header="提示">
