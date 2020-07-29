@@ -40,8 +40,7 @@ namespace ClassifyFiles.Util
             }
             catch (Exception ex)
             {
-                db = new AppDbContext(DbPath);
-                System.Diagnostics.Debug.WriteLine(dbReplacedMessage);
+                Debug.WriteLine(dbReplacedMessage);
                 try
                 {
                     LogUtility.AddLog(dbReplacedMessage, ex.ToString());

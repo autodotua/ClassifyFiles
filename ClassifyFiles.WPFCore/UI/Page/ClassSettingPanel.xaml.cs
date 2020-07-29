@@ -93,11 +93,12 @@ namespace ClassifyFiles.UI.Page
 
         public async Task SaveClassAsync()
         {
-            if(classes.SelectedUIClass!=null)
+            if (classes.SelectedUIClass != null)
             {
                 await SaveClassAsync(classes.SelectedUIClass.Class);
             }
         }
+
         public async Task SaveClassAsync(Class c)
         {
             await Task.Run(() =>
@@ -124,6 +125,8 @@ namespace ClassifyFiles.UI.Page
             GetProgress().Show();
             await classes.AddAsync();
             GetProgress().Close();
+            btnRename.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+
         }
 
         private async void DeleteClassButton_Click(object sender, RoutedEventArgs e)
@@ -165,9 +168,27 @@ namespace ClassifyFiles.UI.Page
 
         private async void Flyout_Closed(object sender, object e)
         {
+            IsHitTestVisible = false;
             classes.SelectedUIClass.Class.Name = txtName.Text;
             await SaveClassAsync(classes.SelectedUIClass.Class);
 
+            IsHitTestVisible = true;
+        }
+
+
+        private async void classes_ClassDragDroped(object sender, EventArgs e)
+        {
+            GetProgress().Show();
+            await Task.Run(() =>
+            {
+                var cs = classes.UIClasses.ToArray();
+                for (int i = 0; i < cs.Length; i++)
+                {
+                    cs[i].Class.Index = i;
+                }
+                ClassUtility.SaveClasses(cs.Select(p=>p.Class));
+            });
+            GetProgress().Close();
         }
     }
 

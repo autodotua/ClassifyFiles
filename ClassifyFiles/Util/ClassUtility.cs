@@ -17,6 +17,7 @@ namespace ClassifyFiles.Util
 
             List<Class> classes = db.Classes
                 .Where(p => p.Project == project)
+                .OrderBy(p => p.Index)
                 .Include(p => p.MatchConditions)
                 .ToList();
 
@@ -36,7 +37,12 @@ namespace ClassifyFiles.Util
         {
             Debug.WriteLine("db: " + nameof(AddClass));
 
-            Class c = new Class() { Project = project, Name = "未命名类" };
+            int maxIndex = db.Classes
+                .Where(p => p.Project == project)
+                .Max(p => p.Index);
+
+            Class c = new Class() { Project = project, Name = "未命名类", Index = maxIndex + 1 };
+
             db.Classes.Add(c);
             SaveChanges();
             return c;
@@ -52,6 +58,15 @@ namespace ClassifyFiles.Util
         {
             Debug.WriteLine("db: " + nameof(SaveClass));
             db.Entry(c).State = EntityState.Modified;
+            return SaveChanges() > 0;
+        }
+        public static bool SaveClasses(IEnumerable<Class> classes)
+        {
+            Debug.WriteLine("db: " + nameof(SaveClass));
+            foreach (var c in classes)
+            {
+                db.Entry(c).State = EntityState.Modified;
+            }
             return SaveChanges() > 0;
         }
 

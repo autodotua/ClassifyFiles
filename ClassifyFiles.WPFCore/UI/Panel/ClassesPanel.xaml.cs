@@ -75,6 +75,8 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
+        public bool CanReorder { get; set; } = false;
+
         public async Task UpdateUIClassesAsync()
         {
             foreach (var c in UIClasses)
@@ -132,6 +134,10 @@ namespace ClassifyFiles.UI.Panel
                 var files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 ClassFilesDrop?.Invoke(sender, new ClassFilesDropEventArgs(c.Class, files));
             }
+            else
+            {
+                return;
+            }
 
             //开始设置背景渐变动画
             //需要使用非冻结的颜色，因此需要Clone。而且很奇怪，不能加null判断
@@ -154,7 +160,18 @@ namespace ClassifyFiles.UI.Panel
         private void UserControlBase_Loaded(object sender, RoutedEventArgs e)
         {
             SmoothScrollViewerHelper.Regist(lbx);
+            if (CanReorder)
+            {
+                var lbxHelper = new ListBoxHelper<UIClass>(lbx);
+                lbxHelper.EnableDragAndDropItem();
+                lbxHelper.SingleItemDragDroped += (p1, p2) =>
+                {
+                    ClassDragDroped?.Invoke(p1, p2);
+                };
+            }
         }
+
+        public event EventHandler ClassDragDroped;
     }
 
 

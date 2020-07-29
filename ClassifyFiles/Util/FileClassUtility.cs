@@ -244,14 +244,15 @@ namespace ClassifyFiles.Util
                 {
                     foreach (var c in db.Classes.Where(p => p.ProjectID == args.Project.ID).ToList())
                     {
-                        FileClass fc = IncludeAll(db.FileClasses).FirstOrDefault(p => p.Class == c && p.File == f);
+                        FileClass fc = IncludeAll(db.FileClasses)
+                            .FirstOrDefault(p => p.Class == c && p.File == f);
                         bool isMatched = FileUtility.IsMatched(f.FileInfo, c);
                         if (fc == null && isMatched)
                         {
                             //如果匹配并且不存在，那么新增关系
                             db.Add(new FileClass(c, f, false));
                         }
-                        else if (fc != null && !isMatched)
+                        else if (fc != null && !isMatched && !fc.Manual)
                         {
                             //如果存在关系但不匹配，那么应该删除已存在的关系
                             //注意，手动删除的关系并不会走到这一步

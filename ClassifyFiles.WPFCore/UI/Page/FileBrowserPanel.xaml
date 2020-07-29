@@ -42,7 +42,7 @@
             IsHitTestVisible="False" Opacity="0.5" />
         <Grid
             x:Name="grdLeft" Width="200"
-            Margin="0,-12,0,-8"
+            Margin="0,0,0,-8"
             HorizontalAlignment="Left"
             Background="Transparent">
             <Grid.RowDefinitions>

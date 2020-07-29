@@ -104,7 +104,7 @@ namespace ClassifyFiles.UI.Dialog
             {
                 await new ErrorDialog().ShowAsync(ex, "更新失败");
                 working = false;
-                Updated = true;
+                Updated = false;
             }
             Close();
         }

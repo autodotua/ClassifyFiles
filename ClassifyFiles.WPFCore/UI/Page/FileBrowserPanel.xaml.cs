@@ -23,6 +23,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Data;
 using System.Globalization;
 using System.Collections.ObjectModel;
+using ClassifyFiles.UI.Util;
 
 namespace ClassifyFiles.UI.Page
 {
@@ -51,8 +52,8 @@ namespace ClassifyFiles.UI.Page
                 await base.LoadAsync(project);
                 filesViewer.Project = project;
                 await filesViewer.SetFilesAsync(null);
-                await classPanel.LoadAsync(project);
             }
+            await classPanel.LoadAsync(project);
             UpdateAppBarButtonsEnable();
         }
 
@@ -79,8 +80,7 @@ namespace ClassifyFiles.UI.Page
             }
             if (classPanel.SelectedUIClass == null)
             {
-                //这里应该是不需要有任何操作了
-                //await SetFilesAsync(() => GetFilesByProjectAsync(Project.ID));
+                await filesViewer.SetFilesAsync(null);
             }
             else
             {
@@ -103,6 +103,7 @@ namespace ClassifyFiles.UI.Page
         /// <param name="e"></param>
         private async void ClassPanel_ClassFilesDrop(object sender, ClassFilesDropEventArgs e)
         {
+            GetProgress().Show();
             if (e.Files != null)
             {
                 await AddFilesAsync(e.Class, e.Files);
@@ -110,18 +111,20 @@ namespace ClassifyFiles.UI.Page
             else if (e.UIFiles != null)//说明是由软件内部拖放过来的
             {
                 IReadOnlyList<File> files = null;
-                await Task.Run(() => files = AddFilesToClass(e.UIFiles.Select(p => p.File), e.Class));
                 if (currentFileCollectionType == FileCollectionType.NoClass)
                 {
                     //如果当前显示的是没有被分类的文件，那么当拖放之后，自然就不再是没有分类的文件了，所以要从列表中删去
                     await filesViewer.RemoveFilesAsync(e.UIFiles);
                 }
+                await Task.Run(() => files = AddFilesToClass(e.UIFiles.Select(p => p.File), e.Class));
+
                 foreach (var file in e.UIFiles)
                 {
                     await file.LoadClassesAsync(null);
                 }
                 await classPanel.UpdateUIClassesAsync();
             }
+            GetProgress().Close();
         }
 
         #endregion
@@ -392,7 +395,8 @@ namespace ClassifyFiles.UI.Page
                 Configs.FileIconUniformToFill = value;
                 filesViewer.Refresh();
             }
-        }  public bool TreeSimpleTemplate
+        }
+        public bool TreeSimpleTemplate
         {
             get => Configs.TreeSimpleTemplate;
             set
@@ -506,9 +510,12 @@ namespace ClassifyFiles.UI.Page
                 return;
             }
             GetProgress().Show();
-            if (new UpdateFilesDialog(Project) { Owner = Window.GetWindow(this) }.ShowDialog() == true)
+            var dialog = new UpdateFilesDialog(Project) { Owner = Window.GetWindow(this) };
+            dialog.ShowDialog();
+            if (dialog.Updated)
             {
                 classPanel.SelectedUIClass = null;
+                await classPanel.UpdateUIClassesAsync();
             }
             GetProgress().Close();
         }

@@ -726,9 +726,9 @@ namespace ClassifyFiles.UI.Panel
             else if (e.MiddleButton == MouseButtonState.Pressed)
             {
                 TagGroup tg = sender as TagGroup;
-
-                await Task.Run(() => RemoveFilesFromClass(new File[] { tg.File.File }, c));
+                var file = tg.File.File;
                 tg.File.Classes.Remove(c);
+                await Task.Run(() => RemoveFilesFromClass(new File[] { file }, c));
             }
             e.Handled = true;
         }

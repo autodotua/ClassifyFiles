@@ -24,6 +24,10 @@ namespace ClassifyFiles.Data
         public int ProjectID { get; set; }
         public bool Secondary { get; set; } = false;
         public List<MatchCondition> MatchConditions { get; set; } = new List<MatchCondition>();
+        [Required]
+        public int Index { get; set; } = 0;
+
+        public string DisplayNameFormat { get; set; }
 
     }
 }

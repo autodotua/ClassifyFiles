@@ -41,11 +41,8 @@ namespace ClassifyFiles.Util
             return project;
         }
 
-        public static void ExportProject(string path, Project p)
+        public static void ExportProject(string path, Project project)
         {
-            Project project = db.Projects.Where(p => p.ID == p.ID)
-               .Include(p => p.Classes).ThenInclude(p => p.MatchConditions)
-               .FirstOrDefault();
             List<File> files = db.Files.Where(p => p.ProjectID == p.ID).ToList();
             List<FileClass> fcs = new List<FileClass>();
             foreach (var c in project.Classes)

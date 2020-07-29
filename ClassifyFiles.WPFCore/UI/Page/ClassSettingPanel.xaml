@@ -30,7 +30,7 @@
             <ColumnDefinition Width="8" />
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
-        <panel:ClassesPanel x:Name="classes" SelectedClassChanged="SelectedUIClassesChanged" />
+        <panel:ClassesPanel x:Name="classes" CanReorder="True" ClassDragDroped="classes_ClassDragDroped"  SelectedClassChanged="SelectedUIClassesChanged" />
         <GroupBox
             Grid.Column="2" Header="匹配条件"
             IsEnabled="{Binding ElementName=classes, Path=SelectedUIClass, Converter={StaticResource nn2b}}">
@@ -121,7 +121,7 @@
                 x:Name="btnRename" Icon="Rename"
                 Label="重命名分类">
                 <m:AppBarButton.Flyout>
-                    <m:Flyout Closed="Flyout_Closed">
+                    <m:Flyout x:Name="flyRename" Closed="Flyout_Closed">
                         <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
                             <TextBlock>分类名：</TextBlock>
                             <TextBox
