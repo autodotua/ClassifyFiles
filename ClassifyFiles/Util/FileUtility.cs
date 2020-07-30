@@ -35,7 +35,7 @@ namespace ClassifyFiles.Util
         }
         public static string ThumbnailFolderPath { get; set; }
         public static string FFMpegPath { get; set; }
-        public static readonly IReadOnlyList<string> imgExtensions = new List<string>() {
+        private static readonly IReadOnlyList<string> imgExtensions = new List<string>() {
         "jpg",
         "jpeg",
         "png",
@@ -43,16 +43,23 @@ namespace ClassifyFiles.Util
         "tiff",
         "bmp",
         }.AsReadOnly();
-        public static readonly IReadOnlyList<string> videoExtensions = new List<string>() {
+        private static readonly IReadOnlyList<string> videoExtensions = new List<string>() {
         "mp4",
         "mkv",
         "avi",
         }.AsReadOnly();
-        public static readonly IReadOnlyList<string> programExtensions = new List<string>() {
+        private static readonly IReadOnlyList<string> programExtensions = new List<string>() {
         "exe",
         "msi"
         }.AsReadOnly();
-
+        public static bool IsImage(this File file)
+        {
+            return imgExtensions.Contains(file.FileInfo.Extension.RemoveStart(".").ToLower());
+        }
+        public static bool IsImage(this FI file)
+        {
+            return imgExtensions.Contains(file.Extension.RemoveStart(".").ToLower());
+        }
 
         public static bool TryGenerateThumbnail(File file)
         {
@@ -61,9 +68,9 @@ namespace ClassifyFiles.Util
                 return false;
             }
             string path = file.GetAbsolutePath();
-            if(!F.Exists(path))
+            if (!F.Exists(path))
             {
-                return false;   
+                return false;
             }
             if (imgExtensions.Contains(P.GetExtension(path).ToLower().Trim('.')))
             {
@@ -577,7 +584,7 @@ namespace ClassifyFiles.Util
 
                 }
             }
-          int  changes=  SaveChanges();
+            int changes = SaveChanges();
         }
         public static void DeleteThumbnails(Project project)
         {

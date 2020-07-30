@@ -30,6 +30,7 @@ using System.Runtime.InteropServices;
 using ClassifyFiles.Util.Win32;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media.Animation;
+using ClassifyFiles.UI.Dialog;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -79,7 +80,7 @@ namespace ClassifyFiles.UI.Panel
                 Project = Project,
                 Files = Files,
                 FileTree = FileTree,
-                CurrentClass=CurrentClass,
+                CurrentClass = CurrentClass,
                 IsSingleWindow = true
             };
             win.Content = fv;
@@ -152,7 +153,7 @@ namespace ClassifyFiles.UI.Panel
         /// </summary>
         /// <param name="files"></param>
         /// <returns></returns>
-        public async Task SetFilesAsync(IEnumerable<UIFile> files,Class currentClass)
+        public async Task SetFilesAsync(IEnumerable<UIFile> files, Class currentClass)
         {
             CurrentClass = currentClass;
             this.Notify(nameof(CurrentClass));
@@ -447,8 +448,8 @@ namespace ClassifyFiles.UI.Panel
                           .ThenByDescending(p => p.File.Dir);
                         break;
                 }
-                    //在非UI线程里就得把Lazy的全都计算好
-                    files = files.ToArray();
+                //在非UI线程里就得把Lazy的全都计算好
+                files = files.ToArray();
             });
             Files = new ObservableCollection<UIFile>(files);
             //当排序开启时，一律不支持分组
@@ -842,6 +843,15 @@ namespace ClassifyFiles.UI.Panel
 
             if (files.Count == 1)
             {
+                if (files[0].File.IsImage())
+                {
+                    MenuItem menuShowExifs = new MenuItem() { Header = "查看Exif信息属性" };
+                    menuShowExifs.Click += (p1, p2) =>
+                        new ImageExifDialog(files[0].File.GetAbsolutePath()) { Owner = Window.GetWindow(this) }.ShowDialog();
+                    menu.Items.Add(menuShowExifs);
+
+                }
+
                 MenuItem menuShowProperties = new MenuItem() { Header = "属性" };
                 menuShowProperties.Click += (p1, p2) =>
                     FileProperty.ShowFileProperties(files[0].File.GetAbsolutePath());

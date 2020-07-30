@@ -19,6 +19,8 @@ using System.Reflection;
 using System.Management.Automation;
 using System.Collections.Concurrent;
 
+using static ClassifyFiles.Util.FileUtility;
+
 namespace ClassifyFiles.UI.Converter
 {
     public class DisplayNameConverter : IMultiValueConverter
@@ -36,8 +38,7 @@ namespace ClassifyFiles.UI.Converter
         private static Dictionary<string, int> exifCode;
         private static ConcurrentDictionary<string, ExifSubIfdDirectory> fileExifSubIfdDirectory = new ConcurrentDictionary<string, ExifSubIfdDirectory>();
         private static Regex r = new Regex(":", RegexOptions.Compiled);
-        private static Regex rExif = new Regex(@"\{Exif\-(?<Name>.+)\}", RegexOptions.Compiled);
-        private static Regex rNullable = new Regex(@"(?<First>\{Exif\-(?<Name>.+)\})??(?<Second>\{Exif\-(?<Name>.+)\})", RegexOptions.Compiled);
+        private static Regex rPsExifType = new Regex(@"\$Exif_(?<Type>[0-9]+)", RegexOptions.Compiled);
 
         private ExifSubIfdDirectory GetExif(string path)
         {
@@ -80,6 +81,39 @@ namespace ClassifyFiles.UI.Converter
             return exif.GetString(exifCode[name]);
         }
 
+        private string GetValue(FileInfo file, string key)
+        {
+            switch (key)
+            {
+                case "":
+                    return "";
+                case nameof(FileInfo.Name):
+                    return Path.GetFileNameWithoutExtension(file.Name);
+                case nameof(FileInfo.Extension):
+                    return file.Extension.RemoveStart(".");
+            }
+            if (!file.Exists)
+            {
+                //接下来的操作都需要有文件的存在
+                return null;
+            }
+            switch (key)
+            {
+                case nameof(FileInfo.CreationTime):
+                    return file.CreationTime.ToString();
+                case nameof(FileInfo.LastWriteTime):
+                    return file.LastWriteTime.ToString();
+                case nameof(FileInfo.DirectoryName):
+                    return file.Directory.Name;
+            }
+            if (key.StartsWith("Exif-") && file.IsImage())
+            {
+                string exifKey = key.Substring(5);
+                return GetExifValue(file, exifKey);
+            }
+            return null;
+
+        }
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             if (values[0].Equals(DependencyProperty.UnsetValue))
@@ -96,15 +130,15 @@ namespace ClassifyFiles.UI.Converter
                 2 => c.DisplayProperty2,
                 3 => c.DisplayProperty3
             };
-            if (display.File.IsFolder ||  string.IsNullOrEmpty(format))
+            if (display.File.IsFolder || string.IsNullOrEmpty(format))
             {
-                return (int)parameter==0? display.DefaultDisplayName:"";
+                return (int)parameter == 0 ? display.DefaultDisplayName : "";
             }
-       
+
             string result;
             if (format.StartsWith("ps:"))
             {
-                result = ConvertByPs(format,display.FileInfo, c);
+                result = ConvertByPs(format, display.FileInfo, c);
             }
             else
             {
@@ -122,17 +156,32 @@ namespace ClassifyFiles.UI.Converter
             ps.AddScript($"$CreationTime='{file.CreationTime}'");
             ps.AddScript($"$LastWriteTime='{file.LastWriteTime}'");
             ps.AddScript($"$DirectoryName='{file.Directory.Name}'");
-            var exif = GetExif(file.FullName);
-            string ext = file.Extension.RemoveStart(".");
-            if (exif != null && FileUtility.imgExtensions.Contains(ext.ToLower()))
+
+            if (file.IsImage())
             {
-                foreach (var code in exifCode)
+                var exif = GetExif(file.FullName);
+
+                if (exif != null)
                 {
-                    if (exif.ContainsTag(code.Value))
+                    foreach (var code in exifCode)
                     {
-                        ps.AddScript($"$Exif_{code.Key}=\"{exif.GetDescription(code.Value)}\"");
+                        if (exif.ContainsTag(code.Value))
+                        {
+                            ps.AddScript($"$Exif_{code.Key}='{exif.GetDescription(code.Value)}'");
+                        }
+                    }
+
+                    foreach (Match match in rPsExifType.Matches(format))
+                    {
+                        int code = int.Parse(match.Groups["Type"].Value);
+                        Tag tag = exif.Tags.FirstOrDefault(p => p.Type == code);
+                        if (tag != null)
+                        {
+                            ps.AddScript($"{match.Value}='{tag.Description}'");
+                        }
                     }
                 }
+
             }
             foreach (var line in format.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
             {
@@ -153,7 +202,7 @@ namespace ClassifyFiles.UI.Converter
             }
             return null;
         }
-        private string Convert(string format,FileInfo file, Class c)
+        private string Convert(string format, FileInfo file, Class c)
         {
             string name = file.Name;
             string path = file.FullName;
@@ -215,39 +264,6 @@ namespace ClassifyFiles.UI.Converter
             return result.ToString();
         }
 
-        private string GetValue(FileInfo file, string key)
-        {
-            switch (key)
-            {
-                case "":
-                    return "";
-                case nameof(FileInfo.Name):
-                    return Path.GetFileNameWithoutExtension(file.Name);
-                case nameof(FileInfo.Extension):
-                    return file.Extension.RemoveStart(".");
-            }
-            if (!file.Exists)
-            {
-                //接下来的操作都需要有文件的存在
-                return null;
-            }
-            switch (key)
-            {
-                case nameof(FileInfo.CreationTime):
-                    return file.CreationTime.ToString();
-                case nameof(FileInfo.LastWriteTime):
-                    return file.LastWriteTime.ToString();
-                case nameof(FileInfo.DirectoryName):
-                    return file.Directory.Name;
-            }
-            if (key.StartsWith("Exif-") && FileUtility.imgExtensions.Contains(file.Extension.RemoveStart(".").ToLower()))
-            {
-                string exifKey = key.Substring(5);
-                return GetExifValue(file, exifKey);
-            }
-            return null;
-
-        }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {

@@ -7,22 +7,22 @@
     xmlns:m="http://schemas.modernwpf.com/2019"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:root="clr-namespace:ClassifyFiles"
-    Title="添加文件" Width="600"
-    Height="500"
-    mc:Ignorable="d">
+    Title="文件名显示格式帮助" Width="600"
+    Height="500" mc:Ignorable="d">
     <local:DialogWindowBase.Resources>
         <Style TargetType="{x:Type TableCell}">
-            <Setter Property="BorderBrush" Value="Gray"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="8,2"/>
+            <Setter Property="BorderBrush" Value="Gray" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="8,2" />
         </Style>
         <Style TargetType="{x:Type Table}">
-            <Setter Property="CellSpacing" Value="0"/>
+            <Setter Property="CellSpacing" Value="0" />
         </Style>
     </local:DialogWindowBase.Resources>
-    <ScrollViewer
-        Margin="8">
-        <RichTextBox IsReadOnly="True" BorderThickness="0" Margin="0,0,16,0">
+    <ScrollViewer Margin="8">
+        <RichTextBox
+            Margin="0,0,16,0" BorderThickness="0"
+            IsReadOnly="True">
             <FlowDocument>
                 <Paragraph FontSize="20" TextAlignment="Center">
                     文件名显示格式帮助
@@ -32,19 +32,21 @@
                 </Paragraph>
                 <Paragraph FontSize="16" FontWeight="Bold">
                     语法
-
-                </Paragraph>     
+                </Paragraph>
                 <Paragraph FontSize="16" FontWeight="Bold">
                     文件文件常规属性
-
                 </Paragraph>
-                <Table >
+                <Table>
                     <TableRowGroup>
-                        <TableRow >
-                            <TableCell >
+                        <TableRow>
+                            <TableCell>
                                 <Paragraph>Name</Paragraph>
-                            </TableCell><TableCell><Paragraph>文件名，不包含扩展名</Paragraph></TableCell></TableRow>       
-                        
+                            </TableCell>
+                            <TableCell>
+                                <Paragraph>文件名，不包含扩展名</Paragraph>
+                            </TableCell>
+                        </TableRow>
+
                         <TableRow>
                             <TableCell>
                                 <Paragraph>Extension</Paragraph>
@@ -53,7 +55,7 @@
                                 <Paragraph>文件扩展名</Paragraph>
                             </TableCell>
                         </TableRow>
-                        
+
                         <TableRow>
                             <TableCell>
                                 <Paragraph>DirectoryName</Paragraph>
@@ -62,7 +64,7 @@
                                 <Paragraph>文件的目录名</Paragraph>
                             </TableCell>
                         </TableRow>
-                        
+
                         <TableRow>
                             <TableCell>
                                 <Paragraph>CreationTime</Paragraph>
@@ -71,7 +73,7 @@
                                 <Paragraph>文件的创建时间</Paragraph>
                             </TableCell>
                         </TableRow>
-                        
+
                         <TableRow>
                             <TableCell>
                                 <Paragraph>LastWriteTime</Paragraph>
@@ -80,22 +82,22 @@
                                 <Paragraph>文件的修改时间</Paragraph>
                             </TableCell>
                         </TableRow>
-                        
-                        
+
+
                     </TableRowGroup>
                 </Table>
                 <Paragraph FontSize="16" FontWeight="Bold">
                     图片文件Exif属性
-
                 </Paragraph>
-                <Paragraph>Exif属性需要加上“Exif-”前缀。由于Exif属性众多，因此大部分属性只列举其名称。                </Paragraph>
+                <Paragraph>Exif属性需要加上“Exif-”前缀。由于Exif属性众多，因此大部分属性只列举其名称。</Paragraph>
                 <Table>
-                    <TableRowGroup>    <TableRow>
-                    <TableCell>
+                    <TableRowGroup>
+                        <TableRow>
+                            <TableCell>
                                 <Paragraph>SecurityClassification</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -103,7 +105,7 @@
                                 <Paragraph>ImageHistory</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -111,7 +113,7 @@
                                 <Paragraph>SubjectLocationTiffEp</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -119,7 +121,7 @@
                                 <Paragraph>ExposureIndexTiffEp</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -127,7 +129,7 @@
                                 <Paragraph>StandardIdTiffEp</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -135,7 +137,7 @@
                                 <Paragraph>Makernote</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -143,7 +145,7 @@
                                 <Paragraph>FocalPlaneYResolutionTiffEp</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -151,7 +153,7 @@
                                 <Paragraph>UserComment</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -159,7 +161,7 @@
                                 <Paragraph>SubsecondTimeOriginal</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -167,7 +169,7 @@
                                 <Paragraph>SubsecondTimeDigitized</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -175,7 +177,7 @@
                                 <Paragraph>WinTitle</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -183,7 +185,7 @@
                                 <Paragraph>WinComment</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -191,7 +193,7 @@
                                 <Paragraph>WinAuthor</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -199,7 +201,7 @@
                                 <Paragraph>WinKeywords</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -207,7 +209,7 @@
                                 <Paragraph>WinSubject</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -215,7 +217,7 @@
                                 <Paragraph>SubsecondTime</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -223,7 +225,7 @@
                                 <Paragraph>FlashpixVersion</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -231,7 +233,7 @@
                                 <Paragraph>FocalPlaneXResolutionTiffEp</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -239,7 +241,7 @@
                                 <Paragraph>SpatialFreqResponseTiffEp</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -255,7 +257,7 @@
                                 <Paragraph>TimeZoneOriginal</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -263,7 +265,7 @@
                                 <Paragraph>TimeZoneDigitized</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -271,7 +273,7 @@
                                 <Paragraph>ComponentsConfiguration</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -295,7 +297,7 @@
                                 <Paragraph>Aperture</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -303,7 +305,7 @@
                                 <Paragraph>Noise</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -311,7 +313,7 @@
                                 <Paragraph>BrightnessValue</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -319,7 +321,7 @@
                                 <Paragraph>MaxAperture</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -327,7 +329,7 @@
                                 <Paragraph>SubjectDistance</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -335,7 +337,7 @@
                                 <Paragraph>MeteringMode</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -343,7 +345,7 @@
                                 <Paragraph>WhiteBalance</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -367,7 +369,7 @@
                                 <Paragraph>FlashEnergyTiffEp</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -399,7 +401,7 @@
                                 <Paragraph>ExifImageHeight</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -415,7 +417,7 @@
                                 <Paragraph>DeviceSettingDescription</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -423,7 +425,7 @@
                                 <Paragraph>SubjectDistanceRange</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -431,7 +433,7 @@
                                 <Paragraph>ImageUniqueId</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -439,7 +441,7 @@
                                 <Paragraph>CameraOwnerName</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -447,7 +449,7 @@
                                 <Paragraph>BodySerialNumber</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -455,7 +457,7 @@
                                 <Paragraph>LensSpecification</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -463,7 +465,7 @@
                                 <Paragraph>Saturation</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -471,7 +473,7 @@
                                 <Paragraph>LensMake</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -479,7 +481,7 @@
                                 <Paragraph>LensSerialNumber</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -487,7 +489,7 @@
                                 <Paragraph>Gamma</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -495,7 +497,7 @@
                                 <Paragraph>PrintImageMatchingInfo</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -503,7 +505,7 @@
                                 <Paragraph>PanasonicTitle</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -511,7 +513,7 @@
                                 <Paragraph>PanasonicTitle2</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -519,7 +521,7 @@
                                 <Paragraph>Padding</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -527,7 +529,7 @@
                                 <Paragraph>Lens</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -535,7 +537,7 @@
                                 <Paragraph>LensModel</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -543,7 +545,7 @@
                                 <Paragraph>Contrast</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -551,7 +553,7 @@
                                 <Paragraph>GainControl</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -559,7 +561,7 @@
                                 <Paragraph>SceneCaptureType</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -567,7 +569,7 @@
                                 <Paragraph>RelatedSoundFile</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -575,7 +577,7 @@
                                 <Paragraph>FlashEnergy</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -583,7 +585,7 @@
                                 <Paragraph>SpatialFreqResponse</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -591,7 +593,7 @@
                                 <Paragraph>FocalPlaneXResolution</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -599,7 +601,7 @@
                                 <Paragraph>FocalPlaneYResolution</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -607,7 +609,7 @@
                                 <Paragraph>FocalPlaneResolutionUnit</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -615,7 +617,7 @@
                                 <Paragraph>SubjectLocation</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -623,7 +625,7 @@
                                 <Paragraph>ExposureIndex</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -647,7 +649,7 @@
                                 <Paragraph>SceneType</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -655,7 +657,7 @@
                                 <Paragraph>CfaPattern</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -663,7 +665,7 @@
                                 <Paragraph>CustomRendered</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -727,7 +729,7 @@
                                 <Paragraph>SubIfdOffset</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -735,7 +737,7 @@
                                 <Paragraph>YResolution</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -743,7 +745,7 @@
                                 <Paragraph>PlanarConfiguration</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -751,7 +753,7 @@
                                 <Paragraph>PageName</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -759,7 +761,7 @@
                                 <Paragraph>ResolutionUnit</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -767,7 +769,7 @@
                                 <Paragraph>PageNumber</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -775,7 +777,7 @@
                                 <Paragraph>TransferFunction</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -783,7 +785,7 @@
                                 <Paragraph>Software</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -791,7 +793,7 @@
                                 <Paragraph>XResolution</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -799,7 +801,7 @@
                                 <Paragraph>DateTime</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -807,7 +809,7 @@
                                 <Paragraph>HostComputer</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -815,7 +817,7 @@
                                 <Paragraph>Predictor</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -823,7 +825,7 @@
                                 <Paragraph>WhitePoint</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -831,7 +833,7 @@
                                 <Paragraph>PrimaryChromaticities</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -839,7 +841,7 @@
                                 <Paragraph>TileWidth</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -847,7 +849,7 @@
                                 <Paragraph>TileLength</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -855,7 +857,7 @@
                                 <Paragraph>TileOffsets</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -863,7 +865,7 @@
                                 <Paragraph>Artist</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -871,7 +873,7 @@
                                 <Paragraph>TileByteCounts</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -879,7 +881,7 @@
                                 <Paragraph>MaxSampleValue</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -887,7 +889,7 @@
                                 <Paragraph>StripByteCounts</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -895,7 +897,7 @@
                                 <Paragraph>SubfileType</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -903,7 +905,7 @@
                                 <Paragraph>ImageWidth</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -911,7 +913,7 @@
                                 <Paragraph>ImageHeight</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -919,7 +921,7 @@
                                 <Paragraph>BitsPerSample</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -927,7 +929,7 @@
                                 <Paragraph>Compression</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -935,7 +937,7 @@
                                 <Paragraph>PhotometricInterpretation</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -943,7 +945,7 @@
                                 <Paragraph>Thresholding</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -951,7 +953,7 @@
                                 <Paragraph>MinSampleValue</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -959,7 +961,7 @@
                                 <Paragraph>FillOrder</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -967,7 +969,7 @@
                                 <Paragraph>ImageDescription</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -975,7 +977,7 @@
                                 <Paragraph>Make</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -983,7 +985,7 @@
                                 <Paragraph>Model</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -991,7 +993,7 @@
                                 <Paragraph>StripOffsets</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -999,7 +1001,7 @@
                                 <Paragraph>Orientation</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1007,7 +1009,7 @@
                                 <Paragraph>SamplesPerPixel</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1015,7 +1017,7 @@
                                 <Paragraph>RowsPerStrip</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1023,7 +1025,7 @@
                                 <Paragraph>DocumentName</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1031,7 +1033,7 @@
                                 <Paragraph>SelfTimerMode</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1039,7 +1041,7 @@
                                 <Paragraph>TransferRange</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1047,7 +1049,7 @@
                                 <Paragraph>JpegTables</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1071,7 +1073,7 @@
                                 <Paragraph>IptcNaa</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1079,7 +1081,7 @@
                                 <Paragraph>PhotoshopSettings</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1087,7 +1089,7 @@
                                 <Paragraph>InterColorProfile</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1095,7 +1097,7 @@
                                 <Paragraph>ExposureProgram</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1103,7 +1105,7 @@
                                 <Paragraph>SpectralSensitivity</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1111,7 +1113,7 @@
                                 <Paragraph>Copyright</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1127,7 +1129,7 @@
                                 <Paragraph>Interlace</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1135,7 +1137,7 @@
                                 <Paragraph>TimeZoneOffsetTiffEp</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1143,7 +1145,7 @@
                                 <Paragraph>SelfTimerModeTiffEp</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1151,7 +1153,7 @@
                                 <Paragraph>SensitivityType</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1159,7 +1161,7 @@
                                 <Paragraph>StandardOutputSensitivity</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1167,7 +1169,7 @@
                                 <Paragraph>RecommendedExposureIndex</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1175,7 +1177,7 @@
                                 <Paragraph>TimeZoneOffset</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1183,7 +1185,7 @@
                                 <Paragraph>OptoElectricConversionFunction</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1191,7 +1193,7 @@
                                 <Paragraph>BatteryLevel</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1199,7 +1201,7 @@
                                 <Paragraph>CfaPattern2</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1207,7 +1209,7 @@
                                 <Paragraph>CfaRepeatPatternDim</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1215,7 +1217,7 @@
                                 <Paragraph>JpegProc</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1223,7 +1225,7 @@
                                 <Paragraph>JpegRestartInterval</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1231,7 +1233,7 @@
                                 <Paragraph>JpegLosslessPredictors</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1239,7 +1241,7 @@
                                 <Paragraph>JpegPointTransforms</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1247,7 +1249,7 @@
                                 <Paragraph>JpegQTables</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1255,7 +1257,7 @@
                                 <Paragraph>JpegDcTables</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1263,7 +1265,7 @@
                                 <Paragraph>JpegAcTables</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1271,7 +1273,7 @@
                                 <Paragraph>YCbCrCoefficients</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1279,7 +1281,7 @@
                                 <Paragraph>YCbCrSubsampling</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1287,7 +1289,7 @@
                                 <Paragraph>YCbCrPositioning</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1295,7 +1297,7 @@
                                 <Paragraph>ReferenceBlackWhite</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1303,7 +1305,7 @@
                                 <Paragraph>StripRowCounts</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1311,7 +1313,7 @@
                                 <Paragraph>ApplicationNotes</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1319,7 +1321,7 @@
                                 <Paragraph>RelatedImageFileFormat</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1327,7 +1329,7 @@
                                 <Paragraph>RelatedImageWidth</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1335,7 +1337,7 @@
                                 <Paragraph>RelatedImageHeight</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1343,7 +1345,7 @@
                                 <Paragraph>Rating</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
@@ -1351,16 +1353,16 @@
                                 <Paragraph>NewSubfileType</Paragraph>
                             </TableCell>
                             <TableCell>
-                                <Paragraph></Paragraph>
+                                <Paragraph />
                             </TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell>
                                 <Paragraph>InteropVersion</Paragraph>
                             </TableCell>
-                    <TableCell>
-                            <Paragraph></Paragraph>
-                        </TableCell>
+                            <TableCell>
+                                <Paragraph />
+                            </TableCell>
                         </TableRow>
                     </TableRowGroup>
                 </Table>

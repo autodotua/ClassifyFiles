@@ -60,6 +60,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="UI\Dialog\ImageExifDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="UI\Dialog\DisplayNameHelpDialog.xaml">
       <SubType>Designer</SubType>
     </Page>
