@@ -21,18 +21,19 @@ namespace ClassifyFiles.Util
         }
         public static List<Class> GetClassesOfFile(AppDbContext db, File file)
         {
-            //Debug.WriteLine("db: " + nameof(GetClassesOfFileAsync));
+            Debug.WriteLine("db begin: " + nameof(GetClassesOfFile));
             return db.FileClasses
                 .Where(p => p.FileID == file.ID && !p.Disabled)
                 .IncludeAll()
                 .OrderBy(p => p.Class.Name)
                 .Select(p => p.Class)
                 .ToList();
+            Debug.WriteLine("db end: " + nameof(GetClassesOfFile));
         }
 
         public static List<File> GetFilesByClass(Class c)
         {
-            Debug.WriteLine("db: " + nameof(GetFilesByClass));
+            Debug.WriteLine("db begin: " + nameof(GetFilesByClass));
             return db.FileClasses
                  .Where(p => p.ClassID == c.ID)
                  .Where(p => p.Disabled == false)
@@ -45,7 +46,7 @@ namespace ClassifyFiles.Util
         }
         public static Dictionary<File, Class[]> GetFilesWithClassesByClass(Class c)
         {
-            Debug.WriteLine("db: " + nameof(GetFilesWithClassesByClass));
+            Debug.WriteLine("db begin: " + nameof(GetFilesWithClassesByClass));
             var tempFiles = (from f in db.Files
                              join fc in db.FileClasses on f.ID equals fc.FileID
                              select fc)
@@ -53,11 +54,13 @@ namespace ClassifyFiles.Util
                              .ThenInclude(p => p.Project)
                              .Include(p => p.Class)
                              .ToList();
-            return tempFiles
+            var result= tempFiles
                  .GroupBy(p => p.File)
                  .Where(p => p.Any(p => p.ClassID == c.ID))
                  .ToDictionary(p => p.Key, p => p.Select(q => q.Class).ToArray());
 
+            Debug.WriteLine("db end: " + nameof(GetFilesWithClassesByClass));
+            return result;
         }
         public static IQueryable<FileClass> IncludeAll(this IQueryable<FileClass> fileClassQueryable)
         {
@@ -66,6 +69,7 @@ namespace ClassifyFiles.Util
 
         public static IReadOnlyList<File> AddFilesToClass(UpdateFilesArgs args)
         {
+            Debug.WriteLine("db begin: " + nameof(AddFilesToClass));
             List<File> fs = new List<File>();
 
             if (args.Files.Any(p => !p.StartsWith(args.Project.RootPath)))
@@ -122,6 +126,8 @@ namespace ClassifyFiles.Util
                 }
             }
             SaveChanges();
+            Debug.WriteLine("db end: " + nameof(AddFilesToClass));
+
             return fs.AsReadOnly();
 
         }
@@ -134,15 +140,18 @@ namespace ClassifyFiles.Util
 
         public static void DeleteAllFileClasses(Project project)
         {
+            Debug.WriteLine("db begin: " + nameof(DeleteAllFileClasses));
             foreach (var fc in db.FileClasses.Where(p => p.File.ProjectID == project.ID).AsEnumerable())
             {
                 db.Entry(fc).State = EntityState.Deleted;
             }
             SaveChanges();
+            Debug.WriteLine("db end: " + nameof(DeleteAllFileClasses));
         }
 
         public static IReadOnlyList<File> AddFilesToClass(IEnumerable<File> files, Class c)
         {
+            Debug.WriteLine("db begin: " + nameof(AddFilesToClass));
             List<File> addedFiles = new List<File>();
             foreach (var file in files)
             {
@@ -153,10 +162,12 @@ namespace ClassifyFiles.Util
                 }
             }
             SaveChanges();
+            Debug.WriteLine("db end: " + nameof(AddFilesToClass));
             return addedFiles.AsReadOnly();
         }
         public static bool RemoveFilesFromClass(IEnumerable<File> files, Class c)
         {
+            Debug.WriteLine("db begin: " + nameof(RemoveFilesFromClass));
             foreach (var file in files)
             {
                 var existed = db.FileClasses
@@ -168,10 +179,14 @@ namespace ClassifyFiles.Util
                     db.Entry(existed).State = EntityState.Modified;
                 }
             }
-            return SaveChanges() > 0;
+            bool result= SaveChanges() > 0;
+            Debug.WriteLine("db end: " + nameof(RemoveFilesFromClass));
+            return result;
         }
         public static void UpdateFilesOfClasses(UpdateFilesArgs args)
         {
+            Debug.WriteLine("db begin: " + nameof(UpdateFilesOfClasses));
+
             //dbFiles只在需要刷新物理文件时用到，但是因为有两个作用域，所以写在了外层
             HashSet<File> dbFiles = null;//= new HashSet<File>(Queryable.Where(DbUtility.db.Files, (System.Linq.Expressions.Expression<Func<File, bool>>)(p => (bool)(p.Project == args.Project))));
 
@@ -271,6 +286,7 @@ namespace ClassifyFiles.Util
                 }
             }
             db.SaveChanges();
+            Debug.WriteLine("db end: " + nameof(UpdateFilesOfClasses));
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using ClassifyFiles.Data;
 using ClassifyFiles.UI.Model;
 using ClassifyFiles.UI.Panel;
+using ClassifyFiles.UI.Util;
 using ClassifyFiles.Util;
 using ClassifyFiles.Util.Win32;
 using ClassifyFiles.Util.Win32.Shell;
@@ -127,7 +128,7 @@ namespace ClassifyFiles.UI.Component
         public static void ClearCaches()
         {
             caches.Clear();
-            RealtimeIcon.ClearCahces();
+            RealtimeUpdate.ClearCahces();
         }
         private static string folderIconPath = null;
         private object iconContent;
@@ -146,16 +147,16 @@ namespace ClassifyFiles.UI.Component
         }
         public async Task<bool> RefreshIcon()
         {
-            if (File.File.ThumbnailGUID != null && File.File.IconGUID != null)
-            {
-                return true;
-            }
+            //if (File.File.ThumbnailGUID != null && File.File.IconGUID != null)
+            //{
+            //    return true;
+            //}
             UIFile file = null;
             Dispatcher.Invoke(() =>
             {
                 file = File;
             });
-            bool result = await RealtimeIcon.RefreshIcon(file);
+            bool result = await RealtimeUpdate.UpdateDisplay(file);
             return result;
         }
         public async Task<bool> LoadImageAsync()

@@ -2,6 +2,7 @@
     x:Class="ClassifyFiles.UI.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="clr-namespace:ClassifyFiles.UI.Converter"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:ClassifyFiles.UI"
     xmlns:m="http://schemas.modernwpf.com/2019"
@@ -12,10 +13,10 @@
     m:TitleBar.ExtendViewIntoTitleBar="True"
     Closing="Window_Closing"
     Loaded="Window_Loaded"
-    WindowStartupLocation="CenterScreen" 
+    WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <local:WindowBase.Resources>
-        <local:IsNotNull2BoolConverter x:Key="nn2b" />
+        <c:IsNotNull2BoolConverter x:Key="nn2b" />
     </local:WindowBase.Resources>
     <Grid x:Name="outGrd">
         <Grid.RowDefinitions>
@@ -25,48 +26,61 @@
             <RowDefinition Height="0" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid Grid.Row="1"  Background="{DynamicResource SystemControlBackgroundListLowBrush}"/>
+        <Grid Grid.Row="1" Background="{DynamicResource SystemControlBackgroundListLowBrush}" />
         <Grid x:Name="grdTitle" Background="{DynamicResource SystemControlBackgroundListLowBrush}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="8"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="8"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="144"/>
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="144" />
             </Grid.ColumnDefinitions>
-            <Viewbox Width="20" Stretch="Uniform" HorizontalAlignment="Left"  Grid.Column="1">
-                <Canvas Name="svg41" Width="33.866666" Height="33.866666">
+            <Viewbox
+                Grid.Column="1" Width="20"
+                HorizontalAlignment="Left"
+                Stretch="Uniform">
+                <Canvas
+                    Name="svg41" Width="33.866666"
+                    Height="33.866666">
                     <Canvas.RenderTransform>
-                        <TranslateTransform X="0" Y="-2"/>
+                        <TranslateTransform X="0" Y="-2" />
                     </Canvas.RenderTransform>
-                    <Canvas.Resources/>
-                    <!--Unknown tag: sodipodi:namedview-->
-                    <!--Unknown tag: metadata-->
+                    <Canvas.Resources />
+                    <!--  Unknown tag: sodipodi:namedview  -->
+                    <!--  Unknown tag: metadata  -->
                     <Canvas Name="layer1">
                         <Canvas Name="g74">
                             <Canvas.RenderTransform>
-                                <MatrixTransform Matrix="0.03307292 0 0 0.03307292 0.20839214 0.22521878"/>
+                                <MatrixTransform Matrix="0.03307292 0 0 0.03307292 0.20839214 0.22521878" />
                             </Canvas.RenderTransform>
-                            <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path55" Fill="#FF1296DB">
+                            <Path
+                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                Name="path55" Fill="#FF1296DB">
                                 <Path.Data>
-                                    <PathGeometry Figures="m 119.04643 488.74657 h 261.98364 v 44.82106 H 119.04643 Z m 528.69022 0 h 261.98364 v 44.82106 H 647.73665 Z" FillRule="NonZero"/>
+                                    <PathGeometry Figures="m 119.04643 488.74657 h 261.98364 v 44.82106 H 119.04643 Z m 528.69022 0 h 261.98364 v 44.82106 H 647.73665 Z" FillRule="NonZero" />
                                 </Path.Data>
                             </Path>
-                            <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path57" Fill="#FF1296DB">
+                            <Path
+                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                Name="path57" Fill="#FF1296DB">
                                 <Path.Data>
-                                    <PathGeometry Figures="m 880.9144 512.02919 v 257.38355 c 0 20.91204 -17.01376 37.9258 -37.92579 37.9258 H 181.00896 c -20.91325 0 -37.92701 -17.01376 -37.92701 -37.9258 V 512.02919 H 98.260894 v 257.38355 c 0 45.70046 37.047616 82.74685 82.748066 82.74685 h 661.97965 c 45.70045 0 82.74685 -37.04761 82.74685 -82.74685 V 512.02919 Z" FillRule="NonZero"/>
+                                    <PathGeometry Figures="m 880.9144 512.02919 v 257.38355 c 0 20.91204 -17.01376 37.9258 -37.92579 37.9258 H 181.00896 c -20.91325 0 -37.92701 -17.01376 -37.92701 -37.9258 V 512.02919 H 98.260894 v 257.38355 c 0 45.70046 37.047616 82.74685 82.748066 82.74685 h 661.97965 c 45.70045 0 82.74685 -37.04761 82.74685 -82.74685 V 512.02919 Z" FillRule="NonZero" />
                                 </Path.Data>
                             </Path>
-                            <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path59" Fill="#FF1296DB">
+                            <Path
+                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                Name="path59" Fill="#FF1296DB">
                                 <Path.Data>
-                                    <PathGeometry Figures="m 627.47899 488.74657 v 66.59424 c 0 20.91203 -17.01376 37.92579 -37.92701 37.92579 H 434.44437 c -20.91204 0 -37.92701 -17.01376 -37.92701 -37.92579 V 488.74657 H 351.6963 v 66.59424 c 0 45.70045 37.04762 82.74685 82.74807 82.74685 h 155.10761 c 45.70045 0 82.74807 -37.04762 82.74807 -82.74685 V 488.74657 Z M 279.59947 405.02302 h 465.5126 v 44.82106 h -465.5126 z m 36.37135 -74.49904 h 392.77112 v 44.82106 H 315.97082 Z m 34.0567 -74.50026 h 324.65771 v 44.82105 H 350.02752 Z" FillRule="NonZero"/>
+                                    <PathGeometry Figures="m 627.47899 488.74657 v 66.59424 c 0 20.91203 -17.01376 37.92579 -37.92701 37.92579 H 434.44437 c -20.91204 0 -37.92701 -17.01376 -37.92701 -37.92579 V 488.74657 H 351.6963 v 66.59424 c 0 45.70045 37.04762 82.74685 82.74807 82.74685 h 155.10761 c 45.70045 0 82.74807 -37.04762 82.74807 -82.74685 V 488.74657 Z M 279.59947 405.02302 h 465.5126 v 44.82106 h -465.5126 z m 36.37135 -74.49904 h 392.77112 v 44.82106 H 315.97082 Z m 34.0567 -74.50026 h 324.65771 v 44.82105 H 350.02752 Z" FillRule="NonZero" />
                                 </Path.Data>
                             </Path>
-                            <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path61" Fill="#FF1296DB">
+                            <Path
+                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                Name="path61" Fill="#FF1296DB">
                                 <Path.Data>
-                                    <PathGeometry Figures="m 150.38711 512.02919 137.90169 -233.61684 0.39895 -0.67627 0.37584 -0.68964 c 12.44164 -22.86908 22.78028 -40.13097 32.80147 -50.04268 7.1142 -7.03515 13.0644 -9.5298 22.7365 -9.5298 H 694.0112 c 14.00095 0 26.71992 4.22668 51.99851 57.39771 l 0.51693 1.0886 0.57531 1.05941 127.64089 235.00829 h 51.006 L 786.48975 255.62842 C 762.97481 206.1647 739.71286 172.65412 694.0112 172.65412 H 344.60156 c -45.70045 0 -67.34105 32.29427 -94.91117 82.9743 L 98.339954 512.02919 Z" FillRule="NonZero"/>
+                                    <PathGeometry Figures="m 150.38711 512.02919 137.90169 -233.61684 0.39895 -0.67627 0.37584 -0.68964 c 12.44164 -22.86908 22.78028 -40.13097 32.80147 -50.04268 7.1142 -7.03515 13.0644 -9.5298 22.7365 -9.5298 H 694.0112 c 14.00095 0 26.71992 4.22668 51.99851 57.39771 l 0.51693 1.0886 0.57531 1.05941 127.64089 235.00829 h 51.006 L 786.48975 255.62842 C 762.97481 206.1647 739.71286 172.65412 694.0112 172.65412 H 344.60156 c -45.70045 0 -67.34105 32.29427 -94.91117 82.9743 L 98.339954 512.02919 Z" FillRule="NonZero" />
                                 </Path.Data>
                             </Path>
                         </Canvas>
@@ -74,10 +88,11 @@
                 </Canvas>
             </Viewbox>
             <TextBlock
-                Grid.Column="3" Margin="0,6"  FontSize="13"
+                Grid.Column="3" Margin="0,6"
+                FontSize="13"
                 Text="{Binding Title}" />
             <StackPanel
-                Grid.Column="5" 
+                Grid.Column="5"
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
                 <m:TitleBarButton
@@ -92,8 +107,8 @@
             </StackPanel>
         </Grid>
         <TabControl
-            x:Name="tab" Grid.Row="2" Padding="0"
-            Grid.RowSpan="99"
+            x:Name="tab" Grid.Row="2"
+            Grid.RowSpan="99" Padding="0"
             Background="{DynamicResource SystemControlBackgroundListLowBrush}"
             ClipToBounds="True"
             ItemsSource="{Binding Projects}"
@@ -113,7 +128,7 @@
                         x:Name="cmdBarPanel"
                         Background="Transparent"
                         DefaultLabelPosition="Right">
-                        <m:AppBarToggleButton 
+                        <m:AppBarToggleButton
                             x:Name="btnModeView" Grid.Column="0"
                             Background="Transparent"
                             Checked="RadioButton_Checked"

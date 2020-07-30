@@ -31,6 +31,7 @@ using ClassifyFiles.UI.Page;
 using System.Windows.Media.Imaging;
 using System.IO;
 using ClassifyFiles.UI.Component;
+using System.Threading;
 
 namespace ClassifyFiles.UI
 {
@@ -65,7 +66,8 @@ namespace ClassifyFiles.UI
                         Task.Run(() => Configs.LastProjectID = value.ID);
                     }
                 }
-                LoadProjectAsync();
+              
+                LoadPanelAsync();
             }
         }
 
@@ -98,6 +100,8 @@ namespace ClassifyFiles.UI
                 });
             };
 
+            mainPage = fileBrowserPanel;
+            frame.Content = mainPage;
         }
 
         public async Task DeleteSelectedProjectAsync()
@@ -114,9 +118,10 @@ namespace ClassifyFiles.UI
                     projects.Add(newProject);
                 }
             });
+            await Task.Delay(1000);
             Projects = new ObservableCollection<Project>(projects);
             SelectedProject = Projects[0];
-            RadioButton_Checked(btnModeView, null);
+            //RadioButton_Checked(btnModeView, null);
 
             Progress.Close();
         }
@@ -126,37 +131,28 @@ namespace ClassifyFiles.UI
         ProjectSettingsPanel projectSettingsPanel = new ProjectSettingsPanel();
 
         System.Windows.Controls.Page emptyPage = new System.Windows.Controls.Page();
-        private async Task LoadProjectAsync()
+
+        private async Task NavigateToAsync(object view)
         {
-            if (frame.Content == mainPage)
+            if (frame.Content == view)
             {
                 //两次页面不同，才能够有动画
-                RenderTargetBitmap renderTargetBitmap =
-       new RenderTargetBitmap((int)(mainPage as FrameworkElement).ActualWidth,
-       (int)(mainPage as FrameworkElement).ActualHeight,
-       96, 96, PixelFormats.Pbgra32);
-                renderTargetBitmap.Render(mainPage as Visual);
-                PngBitmapEncoder pngImage = new PngBitmapEncoder();
-                pngImage.Frames.Add(BitmapFrame.Create(renderTargetBitmap));
-                using MemoryStream ms = new MemoryStream();
-                pngImage.Save(ms);
-                var imageSource = new BitmapImage();
-                imageSource.BeginInit();
-                imageSource.StreamSource = ms;
-                imageSource.EndInit();
-
                 emptyPage.Content = new Image();
-                (emptyPage.Content as Image).Source = imageSource;
+                (emptyPage.Content as Image).Source = ImageUtility.CreateScreenshotOfFrameworkElement(mainPage as FrameworkElement);
                 //首先设置Content，这个是没有动画的
                 //但是如果直接来，那么画面会先黑一下，效果不好
                 //所以先给页面截一张图，放到空白的Page上，然后再进行设置和动画
                 frame.Content = emptyPage;
-                await Task.Delay(1);
+                await Task.Delay(100);
             }
-            frame.Navigate(mainPage);
+            frame.Navigate(view);
+        }
+        private async Task LoadPanelAsync()
+        {
             if (mainPage != null)
             {
-                //Progress.Show();
+                await NavigateToAsync(mainPage);
+                Progress.Show();
                 try
                 {
                     await mainPage.LoadAsync(SelectedProject);
@@ -165,20 +161,17 @@ namespace ClassifyFiles.UI
                 {
                     throw ex;
                 }
-                //Progress.Close();
-                IsHitTestVisible = false;
-                //在动画的时候不让界面能够点击
-                await Task.Delay(Configs.AnimationDuration * 2);
-                IsHitTestVisible = true;
+                Progress.Close();
+               
             }
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            await LoadProjectAsync();
+            await LoadPanelAsync();
         }
 
-        public ILoadable mainPage = new FileBrowserPanel();
+        public ILoadable mainPage;
 
         private async void Window_Closing(object sender, CancelEventArgs e)
         {
@@ -205,36 +198,32 @@ namespace ClassifyFiles.UI
             {
                 return;
             }
+            Progress.Show();
             ToggleButton btn = sender as ToggleButton;
             foreach (var t in cmdBarPanel.PrimaryCommands.OfType<ToggleButton>())
             {
                 t.IsChecked = btn == t;
             }
-            var lastPage = mainPage;
-
-            switch (btn.Name)
+            ILoadable page = btn.Name switch
             {
-                case nameof(btnModeView):
-                    mainPage = fileBrowserPanel;// new FileBrowserPanel();
-                    break;
-                case nameof(btnModeClasses):
-                    mainPage = classSettingPanel; // new ClassSettingPanel();
-                    break;
-                case nameof(btnModeProjectSettings):
-                    mainPage = projectSettingsPanel;// new ProjectSettingsPanel();
-                    break;
-                case null:
-                    return;
-            }
-            await LoadProjectAsync();
-            if (lastPage is ClassSettingPanel p)
+                nameof(btnModeView) => fileBrowserPanel,
+                nameof(btnModeClasses) => classSettingPanel,
+                nameof(btnModeProjectSettings) => projectSettingsPanel,
+                _ => throw new Exception()
+            };
+            if (mainPage is ClassSettingPanel p)
             {
                 await p.SaveClassAsync();
             }
-            else if (lastPage is ProjectSettingsPanel)
+            else if (mainPage is ProjectSettingsPanel)
             {
                 await SaveChangesAsync();
             }
+
+            mainPage = page;
+            await LoadPanelAsync();
+
+            Progress.Close();
         }
 
         private async Task<int> SaveChangesAsync()

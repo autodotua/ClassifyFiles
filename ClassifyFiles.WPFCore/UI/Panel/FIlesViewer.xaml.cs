@@ -79,6 +79,7 @@ namespace ClassifyFiles.UI.Panel
                 Project = Project,
                 Files = Files,
                 FileTree = FileTree,
+                CurrentClass=CurrentClass,
                 IsSingleWindow = true
             };
             win.Content = fv;
@@ -99,6 +100,8 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(FilesContent));
             }
         }
+
+        public Class CurrentClass { get; private set; }
 
         private Project project;
         /// <summary>
@@ -149,8 +152,10 @@ namespace ClassifyFiles.UI.Panel
         /// </summary>
         /// <param name="files"></param>
         /// <returns></returns>
-        public async Task SetFilesAsync(IEnumerable<UIFile> files)
+        public async Task SetFilesAsync(IEnumerable<UIFile> files,Class currentClass)
         {
+            CurrentClass = currentClass;
+            this.Notify(nameof(CurrentClass));
             if (files == null || !files.Any())
             {
                 //如果为空

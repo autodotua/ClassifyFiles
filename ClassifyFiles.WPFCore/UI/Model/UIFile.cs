@@ -58,7 +58,7 @@ namespace ClassifyFiles.UI.Model
         public System.IO.FileInfo FileInfo { get; private set; }
         public async Task LoadClassesAsync(AppDbContext db = null,bool force=false)
         {
-            if (Classes!=null || force)
+            if (Classes==null || force)
             {
                 IEnumerable<Class> classes=null;
                 await Task.Run(() =>
@@ -96,6 +96,7 @@ namespace ClassifyFiles.UI.Model
                 this.Notify(nameof(Classes));
             }
         }
+        public Class Class { get; set; }
         public override string ToString()
         {
             return File.Name + (string.IsNullOrEmpty(File.Dir) ? "" : $" （{File.Dir}）");

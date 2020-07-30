@@ -8,8 +8,6 @@ using System.Windows.Media.Imaging;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Media;
-using System.Globalization;
-using System.Windows;
 using ClassifyFiles.WPFCore;
 using System.Drawing;
 using System.Threading.Tasks;
@@ -21,7 +19,7 @@ namespace ClassifyFiles.UI.Model
         public UIFileDisplay(Data.File file)
         {
             File = file;
-            fileInfo = File.FileInfo;
+            FileInfo = File.FileInfo;
             if (file.IsFolder)
             {
                 Glyph = FolderGlyph;
@@ -45,7 +43,7 @@ namespace ClassifyFiles.UI.Model
             }
         }
         public Data.File File { get; private set; }
-        public FileInfo fileInfo;
+        public FileInfo FileInfo { get; private set; }
 
         public long? length = null;
         public string Length
@@ -62,7 +60,7 @@ namespace ClassifyFiles.UI.Model
                     {
                         try
                         {
-                            length = fileInfo.Length;
+                            length = FileInfo.Length;
                         }
                         catch
                         {
@@ -81,7 +79,54 @@ namespace ClassifyFiles.UI.Model
                 return FzLib.Basic.Number.ByteToFitString(length.Value);
             }
         }
+        private string displayName;
         public string DisplayName
+        {
+            get
+            {
+                if (displayName == null)
+                {
+                    return DefaultDisplayName;
+                }
+                return displayName;
+            }
+            set
+            {
+                displayName = value;
+                this.Notify(nameof(DisplayName));
+            }
+        }
+        private string displayProperty1 = null;
+        public string DisplayProperty1
+        {
+            get => displayProperty1;
+            set
+            {
+                displayProperty1 = value;
+                this.Notify(nameof(DisplayProperty1));
+            }
+        }
+        private string displayProperty2 = null;
+        public string DisplayProperty2
+        {
+            get => displayProperty2;
+            set
+            {
+                displayProperty2 = value;
+                this.Notify(nameof(DisplayProperty2));
+            }
+        }
+        private string displayProperty3 = null;
+        public string DisplayProperty3
+        {
+            get => displayProperty3;
+            set
+            {
+                displayProperty3 = value;
+                this.Notify(nameof(DisplayProperty3));
+            }
+        }
+        public string DefaultDisplayName
         {
             get
             {
@@ -101,9 +146,9 @@ namespace ClassifyFiles.UI.Model
         {
             get
             {
-                if (!File.IsFolder && fileInfo.Exists)
+                if (!File.IsFolder && FileInfo.Exists)
                 {
-                    return fileInfo.LastWriteTime.ToString();
+                    return FileInfo.LastWriteTime.ToString();
                 }
                 else if (File.IsFolder)
                 {
@@ -124,9 +169,9 @@ namespace ClassifyFiles.UI.Model
         {
             get
             {
-                if (!File.IsFolder && fileInfo.Exists)
+                if (!File.IsFolder && FileInfo.Exists)
                 {
-                    return fileInfo.CreationTime.ToString();
+                    return FileInfo.CreationTime.ToString();
                 }
                 else if (File.IsFolder)
                 {
@@ -143,7 +188,7 @@ namespace ClassifyFiles.UI.Model
                 }
             }
         }
-        public string DisplayDir => File.IsFolder ? File.Dir.Substring(0, File.Dir.Length - DisplayName.Length).Trim('\\') : File.Dir;
+        public string DisplayDir => File.IsFolder ? File.Dir.Substring(0, File.Dir.Length - DefaultDisplayName.Length).Trim('\\') : File.Dir;
         public bool ShowTileViewPaths => Configs.ShowTilePath;
         public const string FileGlyph = "\uED41";
         public const string FolderGlyph = "\uED43";
@@ -163,7 +208,7 @@ namespace ClassifyFiles.UI.Model
                     try
                     {
                         Bitmap bitmap = new Bitmap(File.GetAbsolutePath());
-                        if (bitmap.Width * bitmap.Height< 5_000_000)//500万像素以下直接显示
+                        if (bitmap.Width * bitmap.Height < 5_000_000)//500万像素以下直接显示
                         {
                             bitmapImage = bitmap.ToBitmapImage();
                         }
@@ -177,8 +222,8 @@ namespace ClassifyFiles.UI.Model
                     {
 
                     }
-                        //var bitmapImage = new BitmapImage(new Uri(File.GetAbsolutePath(), UriKind.Absolute));
-                    });
+                    //var bitmapImage = new BitmapImage(new Uri(File.GetAbsolutePath(), UriKind.Absolute));
+                });
                 return bitmapImage;
             }
             return null;

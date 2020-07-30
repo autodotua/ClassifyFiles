@@ -13,13 +13,14 @@ namespace ClassifyFiles.Util
 
         public static List<Class> GetClasses(Project project)
         {
-            Debug.WriteLine("db: " + nameof(GetClasses));
+            Debug.WriteLine("db begin: " + nameof(GetClasses));
 
             List<Class> classes = db.Classes
                 .Where(p => p.Project == project)
                 .OrderBy(p => p.Index)
                 .Include(p => p.MatchConditions)
                 .ToList();
+            Debug.WriteLine("db end: " + nameof(GetClasses));
 
             return classes;
         }
@@ -35,9 +36,11 @@ namespace ClassifyFiles.Util
 
         public static Class AddClass(Project project)
         {
-            Debug.WriteLine("db: " + nameof(AddClass));
+            Debug.WriteLine("db begin: " + nameof(AddClass));
 
             int maxIndex = db.Classes
+                .Where(p => p.Project == project).Count()==0?0: 
+                db.Classes
                 .Where(p => p.Project == project)
                 .Max(p => p.Index);
 
@@ -45,29 +48,38 @@ namespace ClassifyFiles.Util
 
             db.Classes.Add(c);
             SaveChanges();
+            Debug.WriteLine("db end: " + nameof(AddClass));
             return c;
         }
         public static bool DeleteClass(Class c)
         {
-            Debug.WriteLine("db: " + nameof(DeleteClass));
+            Debug.WriteLine("db begin: " + nameof(DeleteClass));
             db.Entry(c).State = EntityState.Deleted;
-            return SaveChanges() > 0;
+            bool result= SaveChanges() > 0;
+
+            Debug.WriteLine("db end: " + nameof(DeleteClass));
+            return result;
         }
 
         public static bool SaveClass(Class c)
         {
-            Debug.WriteLine("db: " + nameof(SaveClass));
+            Debug.WriteLine("db begin: " + nameof(SaveClass));
             db.Entry(c).State = EntityState.Modified;
-            return SaveChanges() > 0;
+            bool result= SaveChanges() > 0;
+            Debug.WriteLine("db end: " + nameof(SaveClass));
+
+            return result;
         }
         public static bool SaveClasses(IEnumerable<Class> classes)
         {
-            Debug.WriteLine("db: " + nameof(SaveClass));
+            Debug.WriteLine("db begin: " + nameof(SaveClass));
             foreach (var c in classes)
             {
                 db.Entry(c).State = EntityState.Modified;
             }
-            return SaveChanges() > 0;
+            bool result= SaveChanges() > 0;
+            Debug.WriteLine("db end: " + nameof(SaveClass));
+            return result;
         }
 
         public static int GetClassesCount(Project project)

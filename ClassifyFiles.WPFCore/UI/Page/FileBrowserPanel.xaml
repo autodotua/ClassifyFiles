@@ -11,11 +11,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
+    xmlns:c="clr-namespace:ClassifyFiles.UI.Converter"
     mc:Ignorable="d">
     <local:ProjectPageBase.Resources>
-        <ui:IsNotNull2BoolConverter x:Key="nn2b" />
-        <ui:Equal2BoolConverter x:Key="e2b" />
-        <ui:FilterLabelConverter x:Key="flc" />
+        <c:IsNotNull2BoolConverter x:Key="nn2b" />
+        <c:Equal2BoolConverter x:Key="e2b" />
+        <c:FilterLabelConverter x:Key="flc" />
     </local:ProjectPageBase.Resources>
     <Grid x:Name="grdMain">
         <Grid.ColumnDefinitions>

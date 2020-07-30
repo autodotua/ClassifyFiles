@@ -24,6 +24,8 @@ using System.Diagnostics;
 using ClassifyFiles.UI.Event;
 using ClassifyFiles.UI.Model;
 using ClassifyFiles.UI.Util;
+using ClassifyFiles.UI.Converter;
+using ClassifyFiles.UI.Dialog;
 
 namespace ClassifyFiles.UI.Page
 {
@@ -53,23 +55,23 @@ namespace ClassifyFiles.UI.Page
                 ElementName = nameof(classes),
                 Converter = new IsNotNull2BoolConverter()
             });
-            btnRename.SetBinding(IsEnabledProperty, new Binding(nameof(classes.SelectedUIClass))
-            {
-                ElementName = nameof(classes),
-                Converter = new IsNotNull2BoolConverter()
-            });
+            //btnRename.SetBinding(IsEnabledProperty, new Binding(nameof(classes.SelectedUIClass))
+            //{
+            //    ElementName = nameof(classes),
+            //    Converter = new IsNotNull2BoolConverter()
+            //});
             btnAddMatchCondition.SetBinding(IsEnabledProperty, new Binding(nameof(classes.SelectedUIClass))
             {
                 ElementName = nameof(classes),
                 Converter = new IsNotNull2BoolConverter()
             });
             //但是最后一个无论如何都还是绑定不上
-            txtName.SetBinding(TextBox.TextProperty,
-                new Binding($"{nameof(classes.SelectedUIClass)}.{nameof(UIClass.Class)}.{nameof(Class.Name)}")
-                {
-                    ElementName = nameof(classes),
-                    Mode = BindingMode.TwoWay
-                });
+            //txtName.SetBinding(TextBox.TextProperty,
+            //    new Binding($"{nameof(classes.SelectedUIClass)}.{nameof(UIClass.Class)}.{nameof(Class.Name)}")
+            //    {
+            //        ElementName = nameof(classes),
+            //        Mode = BindingMode.TwoWay
+            //    });
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -125,7 +127,7 @@ namespace ClassifyFiles.UI.Page
             GetProgress().Show();
             await classes.AddAsync();
             GetProgress().Close();
-            btnRename.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            //btnRename.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
 
         }
 
@@ -161,7 +163,7 @@ namespace ClassifyFiles.UI.Page
                 MatchConditions = new ObservableCollection<MatchCondition>
                     (classes.SelectedUIClass.Class.MatchConditions.OrderBy(p => p.Index));
             }
-            txtName.Text = classes.SelectedUIClass?.Class.Name;
+            //txtName.Text = classes.SelectedUIClass?.Class.Name;
 
             GetProgress().Close();
         }
@@ -169,7 +171,7 @@ namespace ClassifyFiles.UI.Page
         private async void Flyout_Closed(object sender, object e)
         {
             IsHitTestVisible = false;
-            classes.SelectedUIClass.Class.Name = txtName.Text;
+            //classes.SelectedUIClass.Class.Name = txtName.Text;
             await SaveClassAsync(classes.SelectedUIClass.Class);
 
             IsHitTestVisible = true;
@@ -189,6 +191,11 @@ namespace ClassifyFiles.UI.Page
                 ClassUtility.SaveClasses(cs.Select(p=>p.Class));
             });
             GetProgress().Close();
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            new DisplayNameHelpDialog() { Owner = Window.GetWindow(this) }.ShowDialog();
         }
     }
 

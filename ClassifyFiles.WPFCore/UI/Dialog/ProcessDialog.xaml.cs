@@ -37,9 +37,12 @@ namespace ClassifyFiles.UI
             }
         }
         public bool Showing { get; private set; }
+
+        private int showCount = 0;
         public void Show()
         {
-            if(Showing)
+            showCount++;
+            if (Showing)
             {
                 return;
             }
@@ -56,6 +59,10 @@ namespace ClassifyFiles.UI
 
         public void Close()
         {
+            if (--showCount > 0)
+            {
+                return;
+            }
             canClose = true;
             ring.IsActive = false;
             DoubleAnimation ani = new DoubleAnimation(0, Configs.AnimationDuration);

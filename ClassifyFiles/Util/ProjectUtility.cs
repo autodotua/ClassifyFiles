@@ -13,27 +13,27 @@ namespace ClassifyFiles.Util
     {
         public static List<Project> GetProjects()
         {
-            Debug.WriteLine("db: " + nameof(GetProjects));
+            Debug.WriteLine("db begin: " + nameof(GetProjects));
 
             return db.Projects.ToList();
         }
         public static bool UpdateProject(Project project)
         {
-            Debug.WriteLine("db: " + nameof(UpdateProject));
+            Debug.WriteLine("db begin: " + nameof(UpdateProject));
 
             db.Entry(project).State = EntityState.Modified;
             return SaveChanges() > 0;
         }
         public static bool DeleteProject(Project project)
         {
-            Debug.WriteLine("db: " + nameof(DeleteProject));
+            Debug.WriteLine("db begin: " + nameof(DeleteProject));
 
             db.Entry(project).State = EntityState.Deleted;
             return SaveChanges() > 0;
         }
         public static Project AddProject()
         {
-            Debug.WriteLine("db: " + nameof(AddProject));
+            Debug.WriteLine("db begin: " + nameof(AddProject));
 
             Project project = new Project() { Name = "未命名" };
             db.Projects.Add(project);

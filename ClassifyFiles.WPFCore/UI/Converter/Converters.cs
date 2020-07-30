@@ -8,8 +8,29 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace ClassifyFiles.UI
+namespace ClassifyFiles.UI.Converter
 {
+    public class Null2ZeroConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+            {
+                return 0;
+            }
+            if (parameter is string str)
+            {
+                return double.Parse(str);
+            }
+            return parameter;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class String2EnumConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

@@ -19,9 +19,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MetadataExtractor" Version="2.4.3" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.0.3" />
     <PackageReference Include="ModernWpfUI" Version="0.9.1" />
     <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+    <PackageReference Include="System.Management.Automation" Version="7.0.3" />
     <PackageReference Include="VirtualizingWrapPanel" Version="1.5.0" />
   </ItemGroup>
 
@@ -57,6 +60,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="UI\Dialog\DisplayNameHelpDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="UI\Dialog\ConfirmDialog.xaml">
       <SubType>Designer</SubType>
     </Page>

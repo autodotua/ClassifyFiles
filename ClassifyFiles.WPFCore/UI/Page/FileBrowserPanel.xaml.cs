@@ -51,7 +51,7 @@ namespace ClassifyFiles.UI.Page
             {
                 await base.LoadAsync(project);
                 filesViewer.Project = project;
-                await filesViewer.SetFilesAsync(null);
+                await filesViewer.SetFilesAsync(null,null);
             }
             await classPanel.LoadAsync(project);
             UpdateAppBarButtonsEnable();
@@ -80,7 +80,7 @@ namespace ClassifyFiles.UI.Page
             }
             if (classPanel.SelectedUIClass == null)
             {
-                await filesViewer.SetFilesAsync(null);
+                await filesViewer.SetFilesAsync(null,null);
             }
             else
             {
@@ -146,6 +146,7 @@ namespace ClassifyFiles.UI.Page
             + ", Class is " + (classPanel.SelectedUIClass == null ? "null" : classPanel.SelectedUIClass.Class.Name));
             List<UIFile> uiFiles = null;
             await Task.Delay(1);
+            Class c= classPanel.SelectedUIClass?.Class;
             await Task.Run(() =>
             {
                 uiFiles = getUIFiles();
@@ -155,8 +156,9 @@ namespace ClassifyFiles.UI.Page
                     Regex r = new Regex(FilterPattern);
                     uiFiles = uiFiles.Where(p => r.IsMatch(p.File.Name)).ToList();
                 }
+                uiFiles.ForEach(p => p.Class = c);
             });
-            await filesViewer.SetFilesAsync(uiFiles);
+            await filesViewer.SetFilesAsync(uiFiles, c);
 
             await classPanel.UpdateUIClassesAsync();
             await ApplyDirs();
@@ -182,7 +184,7 @@ namespace ClassifyFiles.UI.Page
                 {
                     files = rawFiles;
                 }
-                await filesViewer.SetFilesAsync(files);
+                await filesViewer.SetFilesAsync(files, classPanel.SelectedUIClass?.Class);
                 await ApplyDirs();
             }
             GetProgress().Close();

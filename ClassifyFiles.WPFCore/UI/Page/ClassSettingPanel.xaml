@@ -2,6 +2,7 @@
     x:Class="ClassifyFiles.UI.Page.ClassSettingPanel"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="clr-namespace:ClassifyFiles.UI.Converter"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:data="clr-namespace:ClassifyFiles.Data;assembly=ClassifyFiles.Core"
     xmlns:local="clr-namespace:ClassifyFiles.UI.Page"
@@ -11,13 +12,12 @@
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
     xmlns:uiuti="clr-namespace:ClassifyFiles.UI.Util"
-    Loaded="Window_Loaded"
-    mc:Ignorable="d">
+    Loaded="Window_Loaded" mc:Ignorable="d">
     <local:ProjectPageBase.Resources>
-        <ui:NotFirst2VisibilityConverter x:Key="i2v" />
-        <ui:IsNotNull2BoolConverter x:Key="nn2b" />
-        <ui:IsNotNull2VisibilityConverter x:Key="nn2v" />
-        <ui:MatchConditionType2ControlVisibilityConverter x:Key="mt2v" />
+        <c:NotFirst2VisibilityConverter x:Key="i2v" />
+        <c:IsNotNull2BoolConverter x:Key="nn2b" />
+        <c:IsNotNull2VisibilityConverter x:Key="nn2v" />
+        <c:MatchConditionType2ControlVisibilityConverter x:Key="mt2v" />
     </local:ProjectPageBase.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -30,78 +30,186 @@
             <ColumnDefinition Width="8" />
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
-        <panel:ClassesPanel x:Name="classes" CanReorder="True" ClassDragDroped="classes_ClassDragDroped"  SelectedClassChanged="SelectedUIClassesChanged" />
-        <GroupBox
-            Grid.Column="2" Header="匹配条件"
+        <panel:ClassesPanel
+            x:Name="classes" CanReorder="True"
+            ClassDragDroped="classes_ClassDragDroped"
+            SelectedClassChanged="SelectedUIClassesChanged" />
+
+        <Grid
+            Grid.Column="2" Margin="0,0,12,0"
             IsEnabled="{Binding ElementName=classes, Path=SelectedUIClass, Converter={StaticResource nn2b}}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="8" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <ItemsControl x:Name="lst" ItemsSource="{Binding MatchConditions}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Margin="0,4">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="88" />
-                                    <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="164" />
-                                    <ColumnDefinition Width="16" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="8" />
-                                </Grid.ColumnDefinitions>
-                                <Grid.Resources />
-                                <ComboBox
-                                    VerticalAlignment="Bottom"
-                                    DisplayMemberPath="DisplayName"
-                                    ItemsSource="{uiuti:EnumToItemsSource {x:Type data:Logic}}"
-                                    SelectedValue="{Binding ConnectionLogic}"
-                                    SelectedValuePath="Value"
-                                    Visibility="{Binding Index, Converter={StaticResource i2v}}" />
-                                <ComboBox
-                                    Grid.Column="2"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Bottom"
-                                    DisplayMemberPath="DisplayName"
-                                    ItemsSource="{uiuti:EnumToItemsSource {x:Type data:MatchType}}"
-                                    SelectedValue="{Binding Type}"
-                                    SelectedValuePath="Value" />
-                                <CheckBox
-                                    Grid.Column="4" Margin="0,0,-12,0"
-                                    VerticalAlignment="Bottom" Content="取反"
-                                    IsChecked="{Binding Not}" />
-                                <TextBox
-                                    Grid.Column="6"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Bottom"
-                                    Text="{Binding Value}"
-                                    Visibility="{Binding Type, Converter={StaticResource mt2v}, ConverterParameter=text}" />
-                                <DatePicker
-                                    Grid.Column="6"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Bottom"
-                                    Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                    Visibility="{Binding Type, Converter={StaticResource mt2v}, ConverterParameter=time}" />
-                                <Button
-                                    Grid.Column="8"
-                                    Click="RemoveMatchConditionButton_Click"
-                                    Tag="{Binding .}">
-                                    <m:SymbolIcon Symbol="Delete" />
-                                </Button>
-                            </Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <GroupBox Header="基本设置">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.ColumnSpan="999">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Style="{DynamicResource BodyTextBlockStyle}"
+                            Text="分类名：" />
 
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                        <TextBox Grid.Column="2" Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.Name}" />
+                        <Button Grid.Column="4" Click="Button_Click_1">
+                            <m:FontIcon Glyph="&#xF142;" />
+                        </Button>
+                    </Grid>
+                    <TextBlock
+                        Grid.Row="2"
+                        Style="{DynamicResource BodyTextBlockStyle}"
+                        Text="文件名显示格式：" />
 
-            </Grid>
-        </GroupBox>
+                    <TextBox
+                        Grid.Row="4" MaxHeight="72"
+                        AcceptsReturn="True" AcceptsTab="True"
+                        Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.DisplayNameFormat}" />
+
+                    <TextBlock
+                        Grid.Row="6" VerticalAlignment="Center"
+                        Style="{DynamicResource BodyTextBlockStyle}"
+                        Text="第一附加属性：" />
+                    <TextBox
+                        Grid.Row="6" Width="200"
+                        Margin="108,0,0,0"
+                        HorizontalAlignment="Left"
+                        Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.DisplayProperty1Name}" />
+
+                    <TextBox
+                        Grid.Row="8" MaxHeight="72"
+                        AcceptsReturn="True" AcceptsTab="True"
+                        Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.DisplayProperty1}" />
+                    <TextBlock
+                        Grid.Row="2" Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Style="{DynamicResource BodyTextBlockStyle}"
+                        Text="第二附加属性：" />
+                    <TextBox
+                        Grid.Row="2" Grid.Column="2"
+                        Width="200" Margin="108,0,0,0"
+                        HorizontalAlignment="Left"
+                        Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.DisplayProperty2Name}" />
+
+                    <TextBox
+                        Grid.Row="4" Grid.Column="2"
+                        MaxHeight="72" AcceptsReturn="True"
+                        AcceptsTab="True"
+                        Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.DisplayProperty2}" />
+
+                    <TextBlock
+                        Grid.Row="6" Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Style="{DynamicResource BodyTextBlockStyle}"
+                        Text="第三附加属性：" />
+                    <TextBox
+                        Grid.Row="6" Grid.Column="2"
+                        Width="200" Margin="108,0,0,0"
+                        HorizontalAlignment="Left"
+                        Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.DisplayProperty3Name}" />
+
+                    <TextBox
+                        Grid.Row="8" Grid.Column="2"
+                        MaxHeight="72" AcceptsReturn="True"
+                        AcceptsTab="True"
+                        Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.DisplayProperty3}" />
+
+
+
+
+                </Grid>
+            </GroupBox>
+            <GroupBox Grid.Row="2" Header="匹配条件">
+
+                <ScrollViewer>
+                    <ItemsControl x:Name="lst" ItemsSource="{Binding MatchConditions}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="88" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="164" />
+                                        <ColumnDefinition Width="16" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="8" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.Resources />
+                                    <ComboBox
+                                        VerticalAlignment="Bottom"
+                                        DisplayMemberPath="DisplayName"
+                                        ItemsSource="{uiuti:EnumToItemsSource {x:Type data:Logic}}"
+                                        SelectedValue="{Binding ConnectionLogic}"
+                                        SelectedValuePath="Value"
+                                        Visibility="{Binding Index, Converter={StaticResource i2v}}" />
+                                    <ComboBox
+                                        Grid.Column="2"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Bottom"
+                                        DisplayMemberPath="DisplayName"
+                                        ItemsSource="{uiuti:EnumToItemsSource {x:Type data:MatchType}}"
+                                        SelectedValue="{Binding Type}"
+                                        SelectedValuePath="Value" />
+                                    <CheckBox
+                                        Grid.Column="4" Margin="0,0,-12,0"
+                                        VerticalAlignment="Bottom" Content="取反"
+                                        IsChecked="{Binding Not}" />
+                                    <TextBox
+                                        Grid.Column="6"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Bottom"
+                                        Text="{Binding Value}"
+                                        Visibility="{Binding Type, Converter={StaticResource mt2v}, ConverterParameter=text}" />
+                                    <DatePicker
+                                        Grid.Column="6"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Bottom"
+                                        Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        Visibility="{Binding Type, Converter={StaticResource mt2v}, ConverterParameter=time}" />
+                                    <Button
+                                        Grid.Column="8"
+                                        Click="RemoveMatchConditionButton_Click"
+                                        Tag="{Binding .}">
+                                        <m:SymbolIcon Symbol="Delete" />
+                                    </Button>
+                                </Grid>
+
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </GroupBox>
+        </Grid>
         <m:CommandBar
             Grid.Row="2" Grid.ColumnSpan="999"
             DefaultLabelPosition="Right">
@@ -117,19 +225,7 @@
                     </m:Flyout>
                 </m:AppBarButton.Flyout>
             </m:AppBarButton>
-            <m:AppBarButton
-                x:Name="btnRename" Icon="Rename"
-                Label="重命名分类">
-                <m:AppBarButton.Flyout>
-                    <m:Flyout x:Name="flyRename" Closed="Flyout_Closed">
-                        <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
-                            <TextBlock>分类名：</TextBlock>
-                            <TextBox
-                                x:Name="txtName" Width="200"/>
-                        </m:SimpleStackPanel>
-                    </m:Flyout>
-                </m:AppBarButton.Flyout>
-            </m:AppBarButton>
+
             <m:AppBarSeparator />
             <m:AppBarButton
                 x:Name="btnAddMatchCondition"

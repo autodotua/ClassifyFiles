@@ -28,6 +28,12 @@ namespace ClassifyFiles.Data
         public int Index { get; set; } = 0;
 
         public string DisplayNameFormat { get; set; }
+        public string DisplayProperty1Name { get; set; }
+        public string DisplayProperty1 { get; set; }
+        public string DisplayProperty2Name { get; set; }
+        public string DisplayProperty2 { get; set; }
+        public string DisplayProperty3Name { get; set; }
+        public string DisplayProperty3 { get; set; }
 
     }
 }

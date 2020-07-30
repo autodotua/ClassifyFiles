@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:app="clr-namespace:ClassifyFiles"
+    xmlns:c="clr-namespace:ClassifyFiles.UI.Converter"
     xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:ClassifyFiles.UI.Panel"
@@ -13,15 +14,18 @@
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
     xmlns:uim="clr-namespace:ClassifyFiles.UI.Model"
     xmlns:wpftk="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
-    d:DesignHeight="450" d:DesignWidth="800"
+    x:Name="root" d:DesignHeight="450"
+    d:DesignWidth="800"
     PreviewKeyDown="UserControl_PreviewKeyDown"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <ui:MagnificationConverter x:Key="mc" />
-        <ui:NotFirst2VisibilityConverter x:Key="i2v" />
-        <ui:Bool2VisibilityConverter x:Key="b2v" />
-        <ui:IsNotNull2BoolConverter x:Key="nn2b" />
-        <ui:IsNotNull2VisibilityConverter x:Key="nn2v" />
+        <c:MagnificationConverter x:Key="mc" />
+        <c:NotFirst2VisibilityConverter x:Key="i2v" />
+        <c:Bool2VisibilityConverter x:Key="b2v" />
+        <c:IsNotNull2BoolConverter x:Key="nn2b" />
+        <c:IsNotNull2VisibilityConverter x:Key="nn2v" />
+        <c:Null2ZeroConverter x:Key="n2z" />
+
         <sys:Double x:Key="half">0.5</sys:Double>
         <sys:Double x:Key="two">2.0</sys:Double>
         <sys:Double x:Key="twoFive">2.5</sys:Double>
@@ -174,7 +178,7 @@
                         Margin="0,8,0,0"
                         HorizontalAlignment="Center"
                         DockPanel.Dock="Bottom" LineHeight="16"
-                        Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
+                        Text="{Binding Display.DisplayName}"
                         TextTrimming="CharacterEllipsis"
                         TextWrapping="Wrap"
                         Visibility="{Binding Path=(root:Configs.ShowIconViewNames), Converter={StaticResource b2v}}" />
@@ -208,7 +212,7 @@
                     Grid.Column="2"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
-                    Text="{Binding Path=Display.DisplayName, Mode=OneTime}"
+                    Text="{Binding Display.DisplayName}"
                     TextWrapping="Wrap" />
                 <TextBlock
                     Grid.Row="3" Grid.RowSpan="2"
@@ -221,13 +225,7 @@
                     TextTrimming="CharacterEllipsis"
                     TextWrapping="Wrap"
                     Visibility="{Binding Display.ShowTileViewPaths, Converter={StaticResource b2v}}" />
-                <!--<component:TagGroup
-                    Grid.RowSpan="99" Grid.ColumnSpan="99"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Bottom"
-                    File="{Binding Path=. ,IsAsync=True}"
-                    Orientation="Horizontal"
-                    TagMouseDown="Tags_MouseDown" />-->
+
                 <component:FileIcon
                     Grid.Row="0" Grid.RowSpan="5"
                     Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
@@ -252,15 +250,15 @@
                     <ColumnDefinition Width="16" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-             
+
                 <component:FileIcon
-                    Width="16"
-                    Height="16"
+                    Width="16" Height="16"
                     File="{Binding Path=.}" />
-                <TextBlock Grid.Column="2"                   
+                <TextBlock
+                    Grid.Column="2"
                     Text="{Binding Display.DisplayName}"
                     TextTrimming="CharacterEllipsis" />
-       
+
             </Grid>
         </HierarchicalDataTemplate>
 
@@ -424,6 +422,13 @@
                     <Setter Property="ToolTipService.InitialShowDelay" Value="{DynamicResource ToolTipInitialShowDelay}" />
                 </Style>
             </ListView.ItemContainerStyle>
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Margin="0,0,0,20" Orientation="Vertical">
+                        <!--<ItemsPresenter/>-->
+                    </VirtualizingStackPanel>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
             <ListView.GroupStyle>
                 <GroupStyle ContainerStyle="{StaticResource groupStyle}" />
             </ListView.GroupStyle>
@@ -441,6 +446,18 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn DisplayMemberBinding="{Binding Display.DisplayName}" Header="文件名" />
+                    <GridViewColumn
+                        Width="{Binding Path=CurrentClass, Mode=OneWay, Converter={StaticResource n2z}, ConverterParameter=200}"
+                        DisplayMemberBinding="{Binding Display.DisplayProperty1}"
+                        Header="{Binding Path=CurrentClass.DisplayProperty1Name}" />
+                    <GridViewColumn
+                        Width="{Binding Path=CurrentClass, Mode=OneWay, Converter={StaticResource n2z}, ConverterParameter=200}"
+                        DisplayMemberBinding="{Binding Display.DisplayProperty2}"
+                        Header="{Binding Path=CurrentClass.DisplayProperty2Name}" />
+                    <GridViewColumn
+                        Width="{Binding Path=CurrentClass, Mode=OneWay, Converter={StaticResource n2z}, ConverterParameter=200}"
+                        DisplayMemberBinding="{Binding Display.DisplayProperty3}"
+                        Header="{Binding Path=CurrentClass.DisplayProperty3Name}" />
                     <GridViewColumn DisplayMemberBinding="{Binding Display.DisplayDir}" Header="文件夹路径" />
                     <GridViewColumn Width="144" Header="分类">
                         <GridViewColumn.CellTemplate>

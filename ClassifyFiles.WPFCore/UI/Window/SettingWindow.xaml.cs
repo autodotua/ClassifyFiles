@@ -204,7 +204,7 @@ namespace ClassifyFiles.UI
             };
             object Do()
             {
-                RealtimeIcon.ClearCahces();
+                RealtimeUpdate.ClearCahces();
                 FileUtility.DeleteAllThumbnails();
                 Configs.CacheInTempDir = !Configs.CacheInTempDir;
                 App.UpdateFileUtilitySettings();

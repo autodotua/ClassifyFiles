@@ -14,7 +14,7 @@
                 <ui:IntellisenseResources Source="/ModernWpf;component/DesignTime/DesignTimeResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <sys:Int32 x:Key="ToolTipInitialShowDelay">1000</sys:Int32>
-   
+
         </ResourceDictionary>
     </Application.Resources>
 

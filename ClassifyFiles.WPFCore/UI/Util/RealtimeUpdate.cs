@@ -1,4 +1,5 @@
 ﻿using ClassifyFiles.UI.Model;
+using ClassifyFiles.Util;
 using ClassifyFiles.Util.Win32.Shell;
 using System;
 using System.Collections.Concurrent;
@@ -6,12 +7,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClassifyFiles.Util
+namespace ClassifyFiles.UI.Util
 {
     /// <summary>
     /// 实时图标/缩略图生成
     /// </summary>
-    public static class RealtimeIcon
+    public static class RealtimeUpdate
     {
         private static ConcurrentDictionary<int, UIFile> generatedThumbnails = new ConcurrentDictionary<int, UIFile>();
         private static ConcurrentDictionary<int, UIFile> generatedIcons = new ConcurrentDictionary<int, UIFile>();
@@ -21,7 +22,7 @@ namespace ClassifyFiles.Util
             generatedIcons.Clear();
             generatedIcons.Clear();
         }
-        public static async Task<bool> RefreshIcon(UIFile file)
+        public static async Task<bool> UpdateDisplay(UIFile file)
         {
             bool result = false;
             await Task.Run(() =>
@@ -53,8 +54,33 @@ namespace ClassifyFiles.Util
                         }
                     }
                 }
+                System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
+
+                if (file.Class != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(file.Class.DisplayNameFormat) && file.Display.DisplayName == null)
+                    {
+                        file.Display.DisplayName = displayNameConverter.Convert(new object[] { file.Display, file.Class }, null, 0, null) as string ?? "";
+                    }
+                    if (!string.IsNullOrWhiteSpace(file.Class.DisplayProperty1) && file.Display.DisplayProperty1 == null)
+                    {
+                        file.Display.DisplayProperty1 = displayNameConverter.Convert(new object[] { file.Display, file.Class }, null, 1, null) as string??"";
+                    }
+                    if (!string.IsNullOrWhiteSpace(file.Class.DisplayProperty2) && file.Display.DisplayProperty2 == null)
+                    {
+                        file.Display.DisplayProperty2 = displayNameConverter.Convert(new object[] { file.Display, file.Class }, null, 2, null) as string ?? "";
+                    }
+                    if (!string.IsNullOrWhiteSpace(file.Class.DisplayProperty3) && file.Display.DisplayProperty3 == null)
+                    {
+                        file.Display.DisplayProperty3 = displayNameConverter.Convert(new object[] { file.Display, file.Class }, null, 3, null) as string ?? "";
+                    }
+                };
+                sw.Stop();
+                System.Diagnostics.Debug.WriteLine("use " + sw.ElapsedMilliseconds);
             });
             return result;
         }
+
+        private static ClassifyFiles.UI.Converter.DisplayNameConverter displayNameConverter = new UI.Converter.DisplayNameConverter();
     }
 }
