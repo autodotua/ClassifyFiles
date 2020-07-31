@@ -738,7 +738,11 @@ namespace ClassifyFiles.UI.Panel
         /// <param name="e"></param>
         private async void Tags_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            Class c = (e.Source as ContentPresenter).Content as Class;
+            if(!(e.Source is ContentPresenter cp))
+            {
+                return;
+            }
+            Class c = cp.Content as Class;
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 ClickTag?.Invoke(this, new ClickTagEventArgs(c));

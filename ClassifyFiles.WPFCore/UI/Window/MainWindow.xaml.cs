@@ -66,7 +66,7 @@ namespace ClassifyFiles.UI
                         Task.Run(() => Configs.LastProjectID = value.ID);
                     }
                 }
-              
+
                 LoadPanelAsync();
             }
         }
@@ -162,7 +162,6 @@ namespace ClassifyFiles.UI
                     throw ex;
                 }
                 Progress.Close();
-               
             }
         }
 
@@ -171,11 +170,33 @@ namespace ClassifyFiles.UI
             await LoadPanelAsync();
         }
 
-        public ILoadable mainPage;
-
-        private async void Window_Closing(object sender, CancelEventArgs e)
+        private ILoadable mainPage;
+        private bool closing = false;
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
+            //退出前还要做一些工作，暂时先隐藏窗体，暂缓退出
+            if (closing)
+            {
+                return;
+            }
+            e.Cancel = true;
+            closing = true;
+            Visibility = Visibility.Collapsed;
+            BeforeClosing();
+        }
+
+        public async Task BeforeClosing()
+        {
+            if (mainPage is ClassSettingPanel p)
+            {
+                await p.SaveClassesAsync();
+            }
+            else if (mainPage is ProjectSettingsPanel)
+            {
+                await SaveChangesAsync();
+            }
             await FileIcon.Tasks.Stop();
+            Close();
         }
 
         private void SettingMenuItem_Click(object sender, RoutedEventArgs e)
@@ -213,7 +234,7 @@ namespace ClassifyFiles.UI
             };
             if (mainPage is ClassSettingPanel p)
             {
-                await p.SaveClassAsync();
+                await p.SaveClassesAsync();
             }
             else if (mainPage is ProjectSettingsPanel)
             {

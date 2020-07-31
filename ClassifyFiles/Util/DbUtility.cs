@@ -23,7 +23,7 @@ namespace ClassifyFiles.Util
         {
             return new AppDbContext(DbPath);
         }
-        const string dbReplacedMessage = "由于保存出错，数据库上下文被替换，更改已丢失";
+        const string dbReplacedMessage = "数据库保存出错";
         public static bool IgnoreDbSavingError { get; set; } = true;
         public static event UnhandledExceptionEventHandler DbSavingException;
         public async static Task ReplaceDbContextAsync()
@@ -36,7 +36,10 @@ namespace ClassifyFiles.Util
             Debug.WriteLine("db Save Changes");
             try
             {
-                return db.SaveChanges();
+                lock (db)
+                {
+                    return db.SaveChanges();
+                }
             }
             catch (Exception ex)
             {

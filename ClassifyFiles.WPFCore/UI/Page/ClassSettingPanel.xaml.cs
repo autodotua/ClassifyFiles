@@ -93,32 +93,34 @@ namespace ClassifyFiles.UI.Page
             await classes.LoadAsync(project);
         }
 
-        public async Task SaveClassAsync()
+        private void ApplyMatchConditions(Class c)
         {
-            if (classes.SelectedUIClass != null)
-            {
-                await SaveClassAsync(classes.SelectedUIClass.Class);
+           
+                foreach (var m in c.MatchConditions)
+                {
+                    if (m.Value == null)
+                    {
+                        Debug.Assert(false);
+                        m.Value = "";
+                    }
+                }
+                c.MatchConditions.Clear();
+                c.MatchConditions.AddRange(MatchConditions);
             }
-        }
-
-        public async Task SaveClassAsync(Class c)
+        public async Task SaveClassesAsync()
         {
             await Task.Run(() =>
             {
-                if (c != null)
+                if (classes.SelectedUIClass != null)
                 {
-                    foreach (var m in c.MatchConditions)
-                    {
-                        if (m.Value == null)
-                        {
-                            Debug.Assert(false);
-                            m.Value = "";
-                        }
-                    }
-                    c.MatchConditions.Clear();
-                    c.MatchConditions.AddRange(MatchConditions);
-                    ClassUtility.SaveClass(c);
+                    ApplyMatchConditions(classes.SelectedUIClass.Class);
                 }
+                var cs = classes.UIClasses.ToArray();
+                for (int i = 0; i < cs.Length; i++)
+                {
+                    cs[i].Class.Index = i;
+                }
+                ClassUtility.SaveClasses(cs.Select(p => p.Class));
             });
         }
 
@@ -144,15 +146,12 @@ namespace ClassifyFiles.UI.Page
             MatchConditions.Add(new MatchCondition() { Index = MatchConditions.Count });
         }
 
-        private async void SelectedUIClassesChanged(object sender, SelectedClassChangedEventArgs e)
+        private void SelectedUIClassesChanged(object sender, SelectedClassChangedEventArgs e)
         {
-            GetProgress().Show();
-            //加个延时，让UI先反应一下
-            await Task.Delay(100);
             Class old = e.OldValue;
             if (old != null && e.NewValue != null)
             {
-                await SaveClassAsync(old);
+                ApplyMatchConditions(old);
             }
             if (classes.SelectedUIClass == null)
             {
@@ -163,34 +162,12 @@ namespace ClassifyFiles.UI.Page
                 MatchConditions = new ObservableCollection<MatchCondition>
                     (classes.SelectedUIClass.Class.MatchConditions.OrderBy(p => p.Index));
             }
-            //txtName.Text = classes.SelectedUIClass?.Class.Name;
-
-            GetProgress().Close();
         }
 
-        private async void Flyout_Closed(object sender, object e)
-        {
-            IsHitTestVisible = false;
-            //classes.SelectedUIClass.Class.Name = txtName.Text;
-            await SaveClassAsync(classes.SelectedUIClass.Class);
-
-            IsHitTestVisible = true;
-        }
 
 
         private async void classes_ClassDragDroped(object sender, EventArgs e)
         {
-            GetProgress().Show();
-            await Task.Run(() =>
-            {
-                var cs = classes.UIClasses.ToArray();
-                for (int i = 0; i < cs.Length; i++)
-                {
-                    cs[i].Class.Index = i;
-                }
-                ClassUtility.SaveClasses(cs.Select(p=>p.Class));
-            });
-            GetProgress().Close();
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)

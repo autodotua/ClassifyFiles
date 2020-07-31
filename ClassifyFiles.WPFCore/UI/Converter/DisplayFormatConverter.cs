@@ -190,7 +190,7 @@ namespace ClassifyFiles.UI.Converter
                 result = "";
             }
             sw.Stop();
-            Debug.WriteLine("convert use " + sw.ElapsedMilliseconds);
+            Debug.WriteLineIf(DebugSwitch.DisplayValueConvertTime,"convert use " + sw.ElapsedMilliseconds);
             return result;
 
         }
