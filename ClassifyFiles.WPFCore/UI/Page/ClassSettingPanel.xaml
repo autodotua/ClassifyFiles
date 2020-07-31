@@ -83,14 +83,15 @@
                         </Button>
                     </Grid>
                     <TextBlock
-                        Grid.Row="2"
+                        Grid.Row="2" VerticalAlignment="Center"
                         Style="{DynamicResource BodyTextBlockStyle}"
                         Text="文件名显示格式：" />
 
                     <TextBox
                         Grid.Row="4" MaxHeight="72"
                         AcceptsReturn="True" AcceptsTab="True"
-                        Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.DisplayNameFormat}" />
+                        Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.DisplayNameFormat}"
+                        TextWrapping="Wrap" />
 
                     <TextBlock
                         Grid.Row="6" VerticalAlignment="Center"
@@ -105,7 +106,8 @@
                     <TextBox
                         Grid.Row="8" MaxHeight="72"
                         AcceptsReturn="True" AcceptsTab="True"
-                        Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.DisplayProperty1}" />
+                        Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.DisplayProperty1}"
+                        TextWrapping="Wrap" />
                     <TextBlock
                         Grid.Row="2" Grid.Column="2"
                         VerticalAlignment="Center"
@@ -121,7 +123,8 @@
                         Grid.Row="4" Grid.Column="2"
                         MaxHeight="72" AcceptsReturn="True"
                         AcceptsTab="True"
-                        Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.DisplayProperty2}" />
+                        Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.DisplayProperty2}"
+                        TextWrapping="Wrap" />
 
                     <TextBlock
                         Grid.Row="6" Grid.Column="2"
@@ -138,10 +141,8 @@
                         Grid.Row="8" Grid.Column="2"
                         MaxHeight="72" AcceptsReturn="True"
                         AcceptsTab="True"
-                        Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.DisplayProperty3}" />
-
-
-
+                        Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.DisplayProperty3}"
+                        TextWrapping="Wrap" />
 
                 </Grid>
             </GroupBox>

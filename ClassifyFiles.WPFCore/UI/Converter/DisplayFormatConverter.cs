@@ -23,9 +23,9 @@ using static ClassifyFiles.Util.FileUtility;
 
 namespace ClassifyFiles.UI.Converter
 {
-    public class DisplayNameConverter : IMultiValueConverter
+    public class DisplayFormatConverter : IMultiValueConverter
     {
-        static DisplayNameConverter()
+        static DisplayFormatConverter()
         {
             FieldInfo[] fieldInfos = typeof(ExifDirectoryBase).GetFields(
                 BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
@@ -35,11 +35,24 @@ namespace ClassifyFiles.UI.Converter
                 .ToDictionary(p => p.Name.Substring(3), p => (int)p.GetRawConstantValue());
         }
 
+        /// <summary>
+        /// 预定义的Exif文字表示对应编号
+        /// </summary>
         private static Dictionary<string, int> exifCode;
+        /// <summary>
+        /// 文件对应的Exif信息
+        /// </summary>
         private static ConcurrentDictionary<string, ExifSubIfdDirectory> fileExifSubIfdDirectory = new ConcurrentDictionary<string, ExifSubIfdDirectory>();
-        private static Regex r = new Regex(":", RegexOptions.Compiled);
+        /// <summary>
+        /// 以ID号定义的Exif变量
+        /// </summary>
         private static Regex rPsExifType = new Regex(@"\$Exif_(?<Type>[0-9]+)", RegexOptions.Compiled);
 
+        /// <summary>
+        /// 获取一个文件的Exif信息
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         private ExifSubIfdDirectory GetExif(string path)
         {
             if (fileExifSubIfdDirectory.TryGetValue(path, out ExifSubIfdDirectory exif))
@@ -63,6 +76,12 @@ namespace ClassifyFiles.UI.Converter
             }
         }
 
+        /// <summary>
+        /// 获取Exif值
+        /// </summary>
+        /// <param name="fileInfo"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private string GetExifValue(FileInfo fileInfo, string name)
         {
             if (!exifCode.ContainsKey(name))
@@ -81,6 +100,12 @@ namespace ClassifyFiles.UI.Converter
             return exif.GetString(exifCode[name]);
         }
 
+        /// <summary>
+        /// 获取某个属性值
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
         private string GetValue(FileInfo file, string key)
         {
             switch (key)
@@ -114,6 +139,8 @@ namespace ClassifyFiles.UI.Converter
             return null;
 
         }
+
+        ConcurrentDictionary<string, PSCommand> powershells = new ConcurrentDictionary<string, PSCommand>();
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             if (values[0].Equals(DependencyProperty.UnsetValue))
@@ -147,42 +174,65 @@ namespace ClassifyFiles.UI.Converter
             return result;
 
         }
-
+        public void ClearCache()
+        {
+            powershells.Clear();
+        }
+        /// <summary>
+        /// 通过Powershell语法进行值的转换
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="file"></param>
+        /// <param name="c"></param>
+        /// <returns></returns>
         public string ConvertByPs(string format, FileInfo file, Class c)
         {
-            PowerShell ps = PowerShell.Create();
-            ps.AddScript($"$Name='{Path.GetFileNameWithoutExtension(file.Name)}'");
-            ps.AddScript($"$Extension='{file.Extension.RemoveStart(".")}'");
-            ps.AddScript($"$CreationTime='{file.CreationTime}'");
-            ps.AddScript($"$LastWriteTime='{file.LastWriteTime}'");
-            ps.AddScript($"$DirectoryName='{file.Directory.Name}'");
-
-            if (file.IsImage())
+        using    PowerShell ps = PowerShell.Create();
+            string key = file.FullName + c.ID;
+            if (powershells.ContainsKey(key))
             {
-                var exif = GetExif(file.FullName);
-
-                if (exif != null)
-                {
-                    foreach (var code in exifCode)
-                    {
-                        if (exif.ContainsTag(code.Value))
-                        {
-                            ps.AddScript($"$Exif_{code.Key}='{exif.GetDescription(code.Value)}'");
-                        }
-                    }
-
-                    foreach (Match match in rPsExifType.Matches(format))
-                    {
-                        int code = int.Parse(match.Groups["Type"].Value);
-                        Tag tag = exif.Tags.FirstOrDefault(p => p.Type == code);
-                        if (tag != null)
-                        {
-                            ps.AddScript($"{match.Value}='{tag.Description}'");
-                        }
-                    }
-                }
-
+                ps.Commands = powershells[key];
             }
+            else
+            {
+
+                ps.AddScript($"$Name='{Path.GetFileNameWithoutExtension(file.Name)}'");
+                ps.AddScript($"$Extension='{file.Extension.RemoveStart(".")}'");
+                ps.AddScript($"$CreationTime='{file.CreationTime}'");
+                ps.AddScript($"$LastWriteTime='{file.LastWriteTime}'");
+                ps.AddScript($"$DirectoryName='{file.Directory.Name}'");
+
+                if (file.IsImage())
+                {
+                    var exif = GetExif(file.FullName);
+
+                    if (exif != null)
+                    {
+                        foreach (var code in exifCode)
+                        {
+                            if (exif.ContainsTag(code.Value))
+                            {
+                                ps.AddScript($"$Exif_{code.Key}='{exif.GetDescription(code.Value)}'");
+                            }
+                        }
+
+                        //以数字定义的值
+                        foreach (Match match in rPsExifType.Matches(format))
+                        {
+                            int code = int.Parse(match.Groups["Type"].Value);
+                            Tag tag = exif.Tags.FirstOrDefault(p => p.Type == code);
+                            if (tag != null)
+                            {
+                                ps.AddScript($"{match.Value}='{tag.Description}'");
+                            }
+                        }
+                    }
+
+                }
+                powershells.TryAdd(key, ps.Commands);
+            }
+
+            //支持多行输入，每行作为一个命令
             foreach (var line in format.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
             {
                 ps.AddScript(line.Trim().RemoveStart("ps:"));
@@ -202,6 +252,14 @@ namespace ClassifyFiles.UI.Converter
             }
             return null;
         }
+
+        /// <summary>
+        /// 通过简单语法进行值的转换
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="file"></param>
+        /// <param name="c"></param>
+        /// <returns></returns>
         private string Convert(string format, FileInfo file, Class c)
         {
             string name = file.Name;
@@ -215,11 +273,13 @@ namespace ClassifyFiles.UI.Converter
             bool ignoreNext = false;//是否忽略下一个左大括号，用于在两个问号之后
             for (int i = 0; i < format.Length; i++)
             {
-                char ch = format[i];
+                char ch = format[i];//当前字符
                 if (!hasLeft && ch == '{' && !ignoreNext)
                 {
+                    //如果没有左大括号，并且当前为左大括号，没并且不忽略下一个括号组
                     if (i > 0)
                     {
+                        //不是第一个的话，就要把前面的纯文本加进去
                         result.Append(format[lastIndex..i]);
                         lastIndex = i;
                     }
@@ -227,23 +287,26 @@ namespace ClassifyFiles.UI.Converter
                 }
                 else if (ch == '}' && ignoreNext)
                 {
+                    //如果是右大括号并且忽略括号组，那么忽略结束，纯文本开始
                     ignoreNext = false;
                     lastIndex = i + 1;
                     continue;
                 }
                 else if (hasLeft && ch == '}')
                 {
-
+                    //如果具有左大括号并且当前为右大括号，那么变量结束
                     hasLeft = false;
                     string value = GetValue(file, format[(lastIndex + 1)..i]);
                     if (value == null)
                     {
+                        //没有获取到值，查看是否后面跟着??{，如果有的话那么就不显示，显示后面的
                         if (i + 3 < format.Length && format[i + 1] == '?' && format[i + 2] == '?' && format[i + 3] == '{')
                         {
                             i += 2;
                         }
                         else
                         {
+                            //否则显示原文
                             result.Append(format[lastIndex..(i + 1)]);
                         }
                         lastIndex = i + 1;
@@ -251,6 +314,7 @@ namespace ClassifyFiles.UI.Converter
                     else
                     {
                         result.Append(value);
+                        //如果后面跟着??{，那么后面的直接忽略
                         if (i + 3 < format.Length && format[i + 1] == '?' && format[i + 2] == '?' && format[i + 3] == '{')
                         {
                             i += 2;

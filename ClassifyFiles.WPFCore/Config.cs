@@ -180,6 +180,12 @@ namespace ClassifyFiles
             get => Get(ref treeSimpleTemplate, GetBool, true, nameof(TreeSimpleTemplate));
             set => Set(ref treeSimpleTemplate, value, nameof(TreeSimpleTemplate));
         }
+        private static bool? smoothScroll = null;
+        public static bool SmoothScroll
+        {
+            get => Get(ref smoothScroll, GetBool, true, nameof(SmoothScroll));
+            set => Set(ref smoothScroll, value, nameof(SmoothScroll));
+        }
 
 
         private static T Get<T>(ref T? field, Func<string, T, T> dbGet, T defultValue, string key) where T : struct

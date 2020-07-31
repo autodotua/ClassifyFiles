@@ -19,9 +19,9 @@ namespace ClassifyFiles.UI.Dialog
     /// <summary>
     /// LogsWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class ImageExifDialog : DialogWindowBase
+    public partial class FileMetadataDialog : DialogWindowBase
     {
-        public ImageExifDialog(string path)
+        public FileMetadataDialog(string path)
         {
             InitializeComponent();
             Path = path;
@@ -29,27 +29,36 @@ namespace ClassifyFiles.UI.Dialog
 
         public string Path { get; }
 
-        private async void DialogWindowBase_Loaded(object sender, RoutedEventArgs e)
-        {
-            var metadatas = ImageMetadataReader.ReadMetadata(Path);
-            ExifSubIfdDirectory dir = metadatas.OfType<ExifSubIfdDirectory>().FirstOrDefault();
-            if (dir == null)
-            {
-                await new MessageDialog().ShowAsync("找不到Exif信息", "文件Exif信息");
-                return;
-            }
-            lvw.ItemsSource = dir.Tags;
-        }
-
         private void ListViewItem_PreviewMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             Clipboard.SetText("");
         }
 
-        private  void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
             Clipboard.SetText(((sender as Button).Tag as MetadataExtractor.Tag).Type.ToString());
             (sender as Button).Content = "√";
+        }
+
+        private async void DialogWindowBase_ContentRendered(object sender, EventArgs e)
+        {
+            if (!System.IO.File.Exists(Path))
+            {
+                await new MessageDialog().ShowAsync("找不到文件", "文件元数据");
+                Close();
+                return;
+            }
+            try
+            {
+                IReadOnlyList<MetadataExtractor.Directory> metadatas = ImageMetadataReader.ReadMetadata(Path);
+                items.ItemsSource = metadatas;
+            }
+            catch (Exception ex)
+            {
+                await new ErrorDialog().ShowAsync(ex, "获取文件元数据错误");
+                Close();
+                return;
+            }
         }
     }
 }

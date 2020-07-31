@@ -1,4 +1,5 @@
-﻿using ModernWpf.Controls;
+﻿using ClassifyFiles.WPFCore;
+using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,6 +13,7 @@ namespace ClassifyFiles.UI.Dialog
         public ContentDialogBase()
         {
             DataContext = this;
+            Owner = App.CurrentWindow;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -39,6 +39,7 @@ namespace ClassifyFiles.UI.Panel
     /// </summary>
     public partial class FilesViewer : UserControl, INotifyPropertyChanged
     {
+        public static FilesViewer Main { get; private set; }
         public FilesViewer()
         {
             DataContext = this;
@@ -67,9 +68,6 @@ namespace ClassifyFiles.UI.Panel
         private bool IsSingleWindow { get; set; } = false;
         public Window ShowAsWindow()
         {
-            //由于本来一个文件只会同时显示一个图标，所以可以用缓存
-            //但是开启独立窗口后，一个文件可能同时会有多个显示，因此需要禁用缓存
-            FileIcon.StaticEnableCache = false;
             WindowBase win = new WindowBase()
             {
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,
@@ -357,7 +355,7 @@ namespace ClassifyFiles.UI.Panel
         /// </summary>
         public void Refresh()
         {
-            FileIcon.ClearCaches();
+            RealtimeUpdate.ClearCahces();
             var files = Files;
             Files = null;
             if (files == null || !files.Any())
@@ -575,7 +573,13 @@ namespace ClassifyFiles.UI.Panel
         #endregion
 
         #region 事件处理
-
+        private void Panel_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (Window.GetWindow(this) is MainWindow)
+            {
+                Main = this;
+            }
+        }
         /// <summary>
         /// 任务队列状态改变事件
         /// </summary>
@@ -583,7 +587,17 @@ namespace ClassifyFiles.UI.Panel
         /// <param name="e"></param>
         private void TaskQueue_ProcessStatusChanged(object sender, ProcessStatusChangedEventArgs e)
         {
-            progress.IsActive = e.IsRunning;
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    progress.IsActive = e.IsRunning;
+                });
+            }
+            catch
+            {
+
+            }
         }
 
         /// <summary>
@@ -657,13 +671,13 @@ namespace ClassifyFiles.UI.Panel
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && CurrentFileView != FileView.Detail)
             {
-                Configs.IconSize += e.Delta / 30;
                 e.Handled = true;
+                Configs.IconSize += e.Delta / 30;
             }
             else
             {
                 ScrollViewer scr = FilesContent.GetVisualChild<ScrollViewer>();
-                if (scr != null)
+                if (scr != null && SmoothScroll)
                 {
                     e.Handled = true;
 
@@ -843,14 +857,11 @@ namespace ClassifyFiles.UI.Panel
 
             if (files.Count == 1)
             {
-                if (files[0].File.IsImage())
-                {
-                    MenuItem menuShowExifs = new MenuItem() { Header = "查看Exif信息属性" };
-                    menuShowExifs.Click += (p1, p2) =>
-                        new ImageExifDialog(files[0].File.GetAbsolutePath()) { Owner = Window.GetWindow(this) }.ShowDialog();
-                    menu.Items.Add(menuShowExifs);
+                MenuItem menuShowExifs = new MenuItem() { Header = "查看文件元数据" };
+                menuShowExifs.Click += (p1, p2) =>
+                    new FileMetadataDialog(files[0].File.GetAbsolutePath()) { Owner = Window.GetWindow(this) }.ShowDialog();
+                menu.Items.Add(menuShowExifs);
 
-                }
 
                 MenuItem menuShowProperties = new MenuItem() { Header = "属性" };
                 menuShowProperties.Click += (p1, p2) =>
@@ -971,6 +982,7 @@ namespace ClassifyFiles.UI.Panel
             }
             Clipboard.SetFileDropList(files);
         }
+
 
 
         #endregion

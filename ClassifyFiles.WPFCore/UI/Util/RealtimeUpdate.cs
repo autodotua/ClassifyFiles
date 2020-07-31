@@ -1,4 +1,5 @@
 ﻿using ClassifyFiles.UI.Model;
+using ClassifyFiles.UI.Panel;
 using ClassifyFiles.Util;
 using ClassifyFiles.Util.Win32.Shell;
 using System;
@@ -22,10 +23,11 @@ namespace ClassifyFiles.UI.Util
             generatedIcons.Clear();
             generatedIcons.Clear();
         }
-        public static async Task<bool> UpdateDisplay(UIFile file)
+        public static bool UpdateDisplay(UIFile file)
         {
             bool result = false;
-            await Task.Run(() =>
+
+            if (Configs.AutoThumbnails)
             {
                 if (Configs.ShowThumbnail)
                 {
@@ -54,17 +56,19 @@ namespace ClassifyFiles.UI.Util
                         }
                     }
                 }
-                System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
-
-                if (file.Class != null)
+            }
+            if (file.Class != null)
+            {
+                if (!string.IsNullOrWhiteSpace(file.Class.DisplayNameFormat))
                 {
-                    if (!string.IsNullOrWhiteSpace(file.Class.DisplayNameFormat) && file.Display.DisplayName == null)
-                    {
-                        file.Display.DisplayName = displayNameConverter.Convert(new object[] { file.Display, file.Class }, null, 0, null) as string ?? "";
-                    }
+                    file.Display.DisplayName = displayNameConverter.Convert(new object[] { file.Display, file.Class }, null, 0, null) as string ?? "";
+                }
+                if (FilesViewer.Main != null && FilesViewer.Main.CurrentFileView == ClassifyFiles.Enum.FileView.Detail)
+                {
+                    //只有详细视图会显示下面的内容
                     if (!string.IsNullOrWhiteSpace(file.Class.DisplayProperty1) && file.Display.DisplayProperty1 == null)
                     {
-                        file.Display.DisplayProperty1 = displayNameConverter.Convert(new object[] { file.Display, file.Class }, null, 1, null) as string??"";
+                        file.Display.DisplayProperty1 = displayNameConverter.Convert(new object[] { file.Display, file.Class }, null, 1, null) as string ?? "";
                     }
                     if (!string.IsNullOrWhiteSpace(file.Class.DisplayProperty2) && file.Display.DisplayProperty2 == null)
                     {
@@ -74,13 +78,11 @@ namespace ClassifyFiles.UI.Util
                     {
                         file.Display.DisplayProperty3 = displayNameConverter.Convert(new object[] { file.Display, file.Class }, null, 3, null) as string ?? "";
                     }
-                };
-                sw.Stop();
-                System.Diagnostics.Debug.WriteLine("use " + sw.ElapsedMilliseconds);
-            });
+                }
+            };
             return result;
         }
 
-        private static ClassifyFiles.UI.Converter.DisplayNameConverter displayNameConverter = new UI.Converter.DisplayNameConverter();
+        private static ClassifyFiles.UI.Converter.DisplayFormatConverter displayNameConverter = new UI.Converter.DisplayFormatConverter();
     }
 }

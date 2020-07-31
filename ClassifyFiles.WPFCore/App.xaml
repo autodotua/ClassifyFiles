@@ -14,7 +14,7 @@
                 <ui:IntellisenseResources Source="/ModernWpf;component/DesignTime/DesignTimeResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <sys:Int32 x:Key="ToolTipInitialShowDelay">1000</sys:Int32>
-
+            <sys:Boolean x:Key="AutoHideScrollBars">True</sys:Boolean>
         </ResourceDictionary>
     </Application.Resources>
 

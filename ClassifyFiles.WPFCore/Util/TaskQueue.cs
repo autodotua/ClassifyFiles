@@ -11,7 +11,7 @@ namespace ClassifyFiles.Util
     {
         public event EventHandler<ProcessStatusChangedEventArgs> ProcessStatusChanged;
 
-        ConcurrentQueue<Task> tasks = new ConcurrentQueue<Task>();
+        ConcurrentQueue<Action> tasks = new ConcurrentQueue<Action>();
         public bool IsExcuting { get; private set; } = false;
         bool stopping = false;
 
@@ -28,21 +28,22 @@ namespace ClassifyFiles.Util
         /// 在处理这些任务的时候，有可能又有新的任务加了进来，
         /// 所以需要循环处理，直到队列为空。
         /// </remarks>
-        public async void Enqueue(Task t)
+        public  Task Enqueue(Action t)
         {
-            tasks.Enqueue(t);
-            if (!IsExcuting)
+            return Task.Run(() =>
             {
-                IsExcuting = true;
-                ProcessStatusChanged?.Invoke(this, new ProcessStatusChangedEventArgs(true));
-                await t;
-                while (tasks.Count > 0 && !stopping)
+                tasks.Enqueue(t);
+                if (!IsExcuting)
                 {
-                    Debug.WriteLine("Task count is " + tasks.Count);
-                    var currentTasks = tasks.ToArray();
-                    tasks.Clear();
-                    await Task.Run(() =>
+                    IsExcuting = true;
+                    ProcessStatusChanged?.Invoke(this, new ProcessStatusChangedEventArgs(true));
+                    t();
+                    while (tasks.Count > 0 && !stopping)
                     {
+                        Debug.WriteLine("Task count is " + tasks.Count);
+
+                        var currentTasks = tasks.ToArray();
+                        tasks.Clear();
                         ParallelOptions opt = new ParallelOptions() { MaxDegreeOfParallelism = Configs.RefreshThreadCount };
                         Parallel.ForEach(currentTasks, opt, (t2, e) =>
                          {
@@ -54,7 +55,7 @@ namespace ClassifyFiles.Util
                              {
                                  //执行任务
                                  Stopwatch sw = Stopwatch.StartNew();
-                                 t2.Wait();
+                                 t2();
                                  sw.Stop();
                                  Debug.WriteLine($"create thumb use {sw.ElapsedMilliseconds} ms");
                              }
@@ -62,33 +63,34 @@ namespace ClassifyFiles.Util
                              {
 
                              }
-                         });
-                        if (!stopping)
-                        {
-                            //防止频繁保存数据库
-                            if ((DateTime.Now - lastDbSaveTime).Seconds > 10)
-                            {
-                                lastDbSaveTime = DateTime.Now;
-                                try
-                                {
-                                    DbUtility.SaveChanges();
-                                }
-                                catch (Exception ex)
-                                {
 
-                                }
-                            }
-                        }
-                    });
+                             if (!stopping)
+                             {
+                                 //防止频繁保存数据库
+                                 if ((DateTime.Now - lastDbSaveTime).Seconds > 10)
+                                 {
+                                     lastDbSaveTime = DateTime.Now;
+                                     try
+                                     {
+                                         DbUtility.SaveChanges();
+                                     }
+                                     catch (Exception ex)
+                                     {
+
+                                     }
+                                 }
+                             }
+                         });
+                    }
+                    stopping = false;
+                    ProcessStatusChanged?.Invoke(this, new ProcessStatusChangedEventArgs(false));
                 }
-                stopping = false;
-                ProcessStatusChanged?.Invoke(this, new ProcessStatusChangedEventArgs(false));
-            }
-            else
-            {
-                tasks.Enqueue(t);
-            }
-            IsExcuting = false;
+                else
+                {
+                    tasks.Enqueue(t);
+                }
+                IsExcuting = false;
+            });
         }
         private DateTime lastDbSaveTime = DateTime.MinValue;
 

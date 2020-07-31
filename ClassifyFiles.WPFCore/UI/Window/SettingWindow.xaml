@@ -42,6 +42,10 @@
                     </m:SimpleStackPanel>
                 </GroupBox>
 
+                <GroupBox Header="显示">
+                    <CheckBox Content="平滑滚动" IsChecked="{Binding Path=(root:Configs.SmoothScroll)}"/>
+                </GroupBox>
+
                 <GroupBox Header="缩略图和缓存">
                     <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
                         <CheckBox
@@ -119,15 +123,18 @@
                             ToolTip="将会删除存在于数据库、但不存在于文件系统，或存在于文件系统、但没有对应的数据库文件缩略图的文件" />
                     </m:SimpleStackPanel>
                 </GroupBox>
+                
                 <GroupBox Header="记忆">
                     <Button
                         Click="ResetAutoAddFilesButton_Click"
                         Content="取消自动添加文件"
                         IsEnabled="{Binding Path=(root:Configs.AutoAddFiles)}" />
                 </GroupBox>
+                
                 <GroupBox Header="日志">
                     <Button Click="OpenLogButton_Click" Content="查看日志" />
                 </GroupBox>
+                
                 <GroupBox Header="关于">
                     <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
                         <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">

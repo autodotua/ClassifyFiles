@@ -23,6 +23,13 @@ namespace ClassifyFiles.WPFCore
     /// </summary>
     public partial class App : Application
     {
+        public static Window CurrentWindow
+        {
+            get
+            {
+               return Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
+            }
+        }
 
         public static void UpdateFileUtilitySettings()
         {

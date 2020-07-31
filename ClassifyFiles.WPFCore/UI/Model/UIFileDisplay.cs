@@ -41,6 +41,11 @@ namespace ClassifyFiles.UI.Model
                     }
                 };
             }
+
+            PropertyChanged += (p1, p2) =>
+            {
+                System.Diagnostics.Debug.WriteLine("Display Prop Changed： " + p2.PropertyName);
+            };
         }
         public Data.File File { get; private set; }
         public FileInfo FileInfo { get; private set; }

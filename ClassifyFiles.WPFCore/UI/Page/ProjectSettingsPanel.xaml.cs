@@ -190,7 +190,7 @@ namespace ClassifyFiles.UI.Page
 
                 }
             });
-            FileIcon.ClearCaches();
+            RealtimeUpdate.ClearCahces();
             GetProgress().Close();
             await new MessageDialog().ShowAsync("删除成功，部分物理文件可能无法删除，请从设置中进行修复", "删除缩略图");
         }

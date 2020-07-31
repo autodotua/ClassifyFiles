@@ -31,7 +31,11 @@ namespace ClassifyFiles.UI.Util
         {
             scr.PreviewMouseWheel += async (p1, p2) =>
              {
-                 await HandleMouseWheel(p1 as ScrollViewer, p2.Delta);
+                 if (Configs.SmoothScroll)
+                 {
+                     p2.Handled = true;
+                     await HandleMouseWheel(p1 as ScrollViewer, p2.Delta);
+                 }
              };
         }
         public static async Task HandleMouseWheel(ScrollViewer scr, int delta)

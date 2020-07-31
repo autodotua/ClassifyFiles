@@ -37,15 +37,7 @@ namespace ClassifyFiles.UI.Component
         {
             InitializeComponent();
         }
-        /// <summary>
-        /// 是否启用缓存的全局开关
-        /// </summary>
-        /// <remarks>
-        /// 因为比较容易出错，而且对性能提升不大，所以禁用了
-        /// 可能对减少内存有点作用
-        /// </remarks>
-        public static bool StaticEnableCache { get; set; } = false;
-        public bool EnableCache { get; set; } = true;
+
         public bool DisplayBetterImage { get; set; } = false;
         public static readonly DependencyProperty FileProperty =
             DependencyProperty.Register("File", typeof(UIFile), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
@@ -70,7 +62,7 @@ namespace ClassifyFiles.UI.Component
                 SetValue(FileProperty, value);
             }
         }
-   
+
         public Stretch? stretch;
         public Stretch? Stretch
         {
@@ -78,16 +70,16 @@ namespace ClassifyFiles.UI.Component
             set
             {
                 stretch = value;
-                this.Notify(nameof(Stretch),nameof(ActualStretch));
+                this.Notify(nameof(Stretch), nameof(ActualStretch));
             }
-        }   
+        }
         public Stretch ActualStretch
         {
             get
             {
-                if(Stretch==null)
+                if (Stretch == null)
                 {
-                    if(Configs.FileIconUniformToFill)
+                    if (Configs.FileIconUniformToFill)
                     {
                         return System.Windows.Media.Stretch.UniformToFill;
                     }
@@ -100,11 +92,8 @@ namespace ClassifyFiles.UI.Component
         {
             await File.LoadClassesAsync();
             await LoadImageAsync();
-            if (Configs.AutoThumbnails)
-            {
-                Tasks.Enqueue(RefreshIcon());
-            }
             RegisterEvents();
+            await Tasks.Enqueue(RefreshIcon);
         }
         private void RegisterEvents()
         {
@@ -124,12 +113,6 @@ namespace ClassifyFiles.UI.Component
             };
         }
 
-        private static ConcurrentDictionary<int, FrameworkElement> caches = new ConcurrentDictionary<int, FrameworkElement>();
-        public static void ClearCaches()
-        {
-            caches.Clear();
-            RealtimeUpdate.ClearCahces();
-        }
         private static string folderIconPath = null;
         private object iconContent;
         public object IconContent
@@ -137,7 +120,7 @@ namespace ClassifyFiles.UI.Component
             get => iconContent;
             set
             {
-                if(value==iconContent)
+                if (value == iconContent)
                 {
                     return;
                 }
@@ -145,19 +128,14 @@ namespace ClassifyFiles.UI.Component
                 this.Notify(nameof(IconContent));
             }
         }
-        public async Task<bool> RefreshIcon()
+        public async void RefreshIcon()
         {
-            //if (File.File.ThumbnailGUID != null && File.File.IconGUID != null)
-            //{
-            //    return true;
-            //}
             UIFile file = null;
             Dispatcher.Invoke(() =>
             {
                 file = File;
             });
-            bool result = await RealtimeUpdate.UpdateDisplay(file);
-            return result;
+            bool result = RealtimeUpdate.UpdateDisplay(file);
         }
         public async Task<bool> LoadImageAsync()
         {
@@ -196,40 +174,24 @@ namespace ClassifyFiles.UI.Component
             }
             else
             {
-                if (File.File.IsFolder == false
-                    && EnableCache
-                    && StaticEnableCache
-                && caches.ContainsKey(File.File.ID)
-                && !(File.Display.Image != null && caches[File.File.ID] is FontIcon))
+                var img = File.Display.Image;
+                if (img == null)
                 {
-                    item = caches[File.File.ID];
+                    if (IconContent is Image)
+                    {
+                        return true;
+                    }
+                    item = new FontIcon() { Glyph = File.Display.Glyph };
                 }
                 else
                 {
-                    var img = File.Display.Image;
-                    if (img == null)
+                    item = new Image()
                     {
-                        if (IconContent is Image)
-                        {
-                            return true;
-                        }
-                        item = new FontIcon() { Glyph = File.Display.Glyph };
-                    }
-                    else
-                    {
-                        item = new Image()
-                        {
-                            Source = img,
-                        };
-                    }
-                    item.HorizontalAlignment = HorizontalAlignment.Center;
-                    item.VerticalAlignment = VerticalAlignment.Center;
-
-                    if (File.File.IsFolder == false && EnableCache)
-                    {
-                        caches.TryAdd(File.File.ID, item);
-                    }
+                        Source = img,
+                    };
                 }
+                item.HorizontalAlignment = HorizontalAlignment.Center;
+                item.VerticalAlignment = VerticalAlignment.Center;
             }
             IconContent = item;
             return item is Image;

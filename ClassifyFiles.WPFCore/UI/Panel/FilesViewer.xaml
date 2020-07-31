@@ -16,6 +16,7 @@
     xmlns:wpftk="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
     x:Name="root" d:DesignHeight="450"
     d:DesignWidth="800"
+    Loaded="Panel_Loaded"
     PreviewKeyDown="UserControl_PreviewKeyDown"
     mc:Ignorable="d">
     <UserControl.Resources>
@@ -92,7 +93,6 @@
                     MaxWidth="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource eight}}"
                     MaxHeight="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource eight}}"
                     DisplayBetterImage="True"
-                    EnableCache="False"
                     File="{Binding Path=., Mode=OneTime}"
                     Stretch="Uniform"
                     Visibility="{Binding Path=(root:Configs.ShowToolTipImage), Mode=OneWay, Converter={StaticResource b2v}}" />
@@ -402,7 +402,7 @@
 
 
         <!--  详细信息视图  -->
-        <ListView
+        <ListView m:ScrollViewerHelper.AutoHideScrollBars="True"
             x:Key="lvwDetailFiles"
             ContextMenu="{StaticResource menu}"
             ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
@@ -422,13 +422,12 @@
                     <Setter Property="ToolTipService.InitialShowDelay" Value="{DynamicResource ToolTipInitialShowDelay}" />
                 </Style>
             </ListView.ItemContainerStyle>
-            <ListView.ItemsPanel>
+            <!--<ListView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel Margin="0,0,0,20" Orientation="Vertical">
-                        <!--<ItemsPresenter/>-->
                     </VirtualizingStackPanel>
                 </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
+            </ListView.ItemsPanel>-->
             <ListView.GroupStyle>
                 <GroupStyle ContainerStyle="{StaticResource groupStyle}" />
             </ListView.GroupStyle>
