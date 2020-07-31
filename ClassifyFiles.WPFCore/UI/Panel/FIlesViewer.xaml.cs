@@ -301,12 +301,13 @@ namespace ClassifyFiles.UI.Panel
         /// <returns></returns>
         private IReadOnlyList<UIFile> GetSelectedFiles()
         {
-            return FilesContent switch
+            var result= FilesContent switch
             {
-                ListBox lvw => lvw.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
-                TreeView t => new List<UIFile>() { t.SelectedItem as UIFile }.AsReadOnly(),
-                _ => new List<UIFile>().AsReadOnly(),
+                ListBox lvw => lvw.SelectedItems.Cast<UIFile>(),
+                TreeView t => new List<UIFile>() { t.SelectedItem as UIFile },
+                _ => new List<UIFile>()
             };
+            return result.Where(p => p != null).ToList().AsReadOnly();
         }
 
         /// <summary>
@@ -677,7 +678,7 @@ namespace ClassifyFiles.UI.Panel
             else
             {
                 ScrollViewer scr = FilesContent.GetVisualChild<ScrollViewer>();
-                if (scr != null && SmoothScroll)
+                if (scr != null && Configs.SmoothScroll)
                 {
                     e.Handled = true;
 
@@ -985,9 +986,13 @@ namespace ClassifyFiles.UI.Panel
 
 
 
+
         #endregion
 
+        private void ContentControl_PreviewTouchMove(object sender, TouchEventArgs e)
+        {
 
+        }
     }
 
 }

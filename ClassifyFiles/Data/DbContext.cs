@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,12 +20,14 @@ namespace ClassifyFiles.Data
         public AppDbContext(string dbPath) :
             base()
         {
+            Debug.WriteLine("db begin create");
             DbPath = dbPath;
             if (!created)
             {
                 created = true;
                 Database.EnsureCreated();
             }
+            Debug.WriteLine("db end create");
         }
 
         public DbSet<Log> Logs { get; set; }

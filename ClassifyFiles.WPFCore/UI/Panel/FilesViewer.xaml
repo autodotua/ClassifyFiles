@@ -475,7 +475,7 @@
         <!--#endregion-->
 
     </UserControl.Resources>
-    <Grid Margin="8,4,0,0" PreviewMouseWheel="ListBox_PreviewMouseWheel">
+    <Grid Margin="8,4,0,0" >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="4" />
@@ -559,7 +559,7 @@
             </Grid>
         </Grid>
 
-        <ContentControl Grid.Row="4" Content="{Binding FilesContent}" />
+        <ContentControl PreviewTouchMove="ContentControl_PreviewTouchMove" PreviewMouseWheel="ListBox_PreviewMouseWheel" Grid.Row="4" Content="{Binding FilesContent}" />
 
     </Grid>
 </UserControl>
