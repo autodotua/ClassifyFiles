@@ -27,6 +27,8 @@
         <c:IsNotNull2VisibilityConverter x:Key="nn2v" />
         <c:Null2ZeroConverter x:Key="n2z" />
 
+        <sys:Double x:Key="iconViewMinWidth">72</sys:Double>
+
         <sys:Double x:Key="half">0.5</sys:Double>
         <sys:Double x:Key="two">2.0</sys:Double>
         <sys:Double x:Key="twoFive">2.5</sys:Double>
@@ -156,8 +158,7 @@
         <!--  图标视图模板  -->
         <DataTemplate x:Key="grdIconView">
             <Border
-                MinWidth="64" Margin="-6,-6"
-                Padding="0,8"
+                Margin="-6,-6" Padding="0,4"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 Background="Transparent">
@@ -173,12 +174,13 @@
                         Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
                         File="{Binding Path=.}" />
                     <TextBlock
+                        Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
                         Height="36"
-                        MaxWidth="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
                         Margin="0,8,0,0"
                         HorizontalAlignment="Center"
                         DockPanel.Dock="Bottom" LineHeight="16"
                         Text="{Binding Display.DisplayName}"
+                        TextAlignment="Center"
                         TextTrimming="CharacterEllipsis"
                         TextWrapping="Wrap"
                         Visibility="{Binding Path=(root:Configs.ShowIconViewNames), Converter={StaticResource b2v}}" />
@@ -357,6 +359,9 @@
                         SpacingMode="Uniform" />
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
+            <ListView.ItemContainerStyle>
+                <Style BasedOn="{StaticResource DefaultListBoxItemStyle}" TargetType="{x:Type ListBoxItem}" />
+            </ListView.ItemContainerStyle>
             <ListView.GroupStyle>
                 <GroupStyle ContainerStyle="{StaticResource groupStyle}" />
             </ListView.GroupStyle>
@@ -402,8 +407,9 @@
 
 
         <!--  详细信息视图  -->
-        <ListView m:ScrollViewerHelper.AutoHideScrollBars="True"
+        <ListView
             x:Key="lvwDetailFiles"
+            m:ScrollViewerHelper.AutoHideScrollBars="True"
             ContextMenu="{StaticResource menu}"
             ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
             PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
@@ -422,12 +428,6 @@
                     <Setter Property="ToolTipService.InitialShowDelay" Value="{DynamicResource ToolTipInitialShowDelay}" />
                 </Style>
             </ListView.ItemContainerStyle>
-            <!--<ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel Margin="0,0,0,20" Orientation="Vertical">
-                    </VirtualizingStackPanel>
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>-->
             <ListView.GroupStyle>
                 <GroupStyle ContainerStyle="{StaticResource groupStyle}" />
             </ListView.GroupStyle>
@@ -475,7 +475,7 @@
         <!--#endregion-->
 
     </UserControl.Resources>
-    <Grid Margin="8,4,0,0" >
+    <Grid Margin="8,4,0,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="4" />
@@ -559,7 +559,11 @@
             </Grid>
         </Grid>
 
-        <ContentControl PreviewTouchMove="ContentControl_PreviewTouchMove" PreviewMouseWheel="ListBox_PreviewMouseWheel" Grid.Row="4" Content="{Binding FilesContent}" />
+        <ContentControl
+            Grid.Row="4"
+            Content="{Binding FilesContent}"
+            PreviewMouseWheel="ListBox_PreviewMouseWheel"
+            PreviewTouchMove="ContentControl_PreviewTouchMove" />
 
     </Grid>
 </UserControl>

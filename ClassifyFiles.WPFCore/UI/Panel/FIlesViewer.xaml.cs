@@ -162,15 +162,20 @@ namespace ClassifyFiles.UI.Panel
             }
             else
             {
-                if (Configs.SortType == 0)
+                ObservableCollection<UIFile> uiFiles = null;
+                await Task.Run(() =>
                 {
-                    //如果使用默认排序（已经在数据库那边排了）
-                    Files = new ObservableCollection<UIFile>(files);
-                }
-                else
-                {
-                    await SortAsync((SortType)Configs.SortType, files);
-                }
+                    if (Configs.SortType == 0)
+                    {
+                        //如果使用默认排序（已经在数据库那边排了）
+                        uiFiles = new ObservableCollection<UIFile>(files);
+                    }
+                    else
+                    {
+                        uiFiles = GetSortedFiles((SortType)Configs.SortType, files);
+                    }
+                });
+                Files = uiFiles;
             }
             FileTree = await GetFileTreeAsync();
         }
@@ -301,7 +306,7 @@ namespace ClassifyFiles.UI.Panel
         /// <returns></returns>
         private IReadOnlyList<UIFile> GetSelectedFiles()
         {
-            var result= FilesContent switch
+            var result = FilesContent switch
             {
                 ListBox lvw => lvw.SelectedItems.Cast<UIFile>(),
                 TreeView t => new List<UIFile>() { t.SelectedItem as UIFile },
@@ -377,82 +382,65 @@ namespace ClassifyFiles.UI.Panel
 
             }
         }
-
-        /// <summary>
-        /// 排序
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="rawFiles"></param>
-        /// <returns></returns>
-        public async Task SortAsync(SortType type, IEnumerable<UIFile> rawFiles = null)
+        private ObservableCollection<UIFile> GetSortedFiles(SortType type, IEnumerable<UIFile> rawFiles = null)
         {
             IEnumerable<UIFile> files = null;
-            if (rawFiles == null)
+            switch (type)
             {
-                rawFiles = Files;
+                case SortType.Default:
+                    files = rawFiles
+                        .OrderBy(p => p.File.Dir)
+                        .ThenBy(p => p.File.Name);
+                    break;
+                case SortType.NameUp:
+                    files = rawFiles
+                        .OrderBy(p => p.File.Name)
+                        .ThenBy(p => p.File.Dir);
+                    break;
+                case SortType.NameDown:
+                    files = rawFiles
+                       .OrderByDescending(p => p.File.Name)
+                       .ThenByDescending(p => p.File.Dir);
+                    break;
+                case SortType.LengthUp:
+                    files = rawFiles
+                      .OrderBy(p => GetFileInfoValue(p, nameof(FI.Length)))
+                      .ThenBy(p => p.File.Name)
+                      .ThenBy(p => p.File.Dir);
+                    break;
+                case SortType.LengthDown:
+                    files = rawFiles
+                      .OrderByDescending(p => GetFileInfoValue(p, nameof(FI.Length)))
+                      .ThenByDescending(p => p.File.Name)
+                      .ThenByDescending(p => p.File.Dir);
+                    break;
+                case SortType.LastWriteTimeUp:
+                    files = rawFiles
+                      .OrderBy(p => GetFileInfoValue(p, nameof(FI.LastWriteTime)))
+                      .ThenBy(p => p.File.Name)
+                      .ThenBy(p => p.File.Dir);
+                    break;
+                case SortType.LastWriteTimeDown:
+                    files = rawFiles
+                      .OrderByDescending(p => GetFileInfoValue(p, nameof(FI.LastWriteTime)))
+                      .ThenByDescending(p => p.File.Name)
+                      .ThenByDescending(p => p.File.Dir);
+                    break;
+                case SortType.CreationTimeUp:
+                    files = rawFiles
+                      .OrderBy(p => GetFileInfoValue(p, nameof(FI.CreationTime)))
+                      .ThenBy(p => p.File.Name)
+                      .ThenBy(p => p.File.Dir);
+                    break;
+                case SortType.CreationTimeDown:
+                    files = rawFiles
+                      .OrderByDescending(p => GetFileInfoValue(p, nameof(FI.CreationTime)))
+                      .ThenByDescending(p => p.File.Name)
+                      .ThenByDescending(p => p.File.Dir);
+                    break;
             }
-            await Task.Run(() =>
-            {
-                switch (type)
-                {
-                    case SortType.Default:
-                        files = rawFiles
-                            .OrderBy(p => p.File.Dir)
-                            .ThenBy(p => p.File.Name);
-                        break;
-                    case SortType.NameUp:
-                        files = rawFiles
-                            .OrderBy(p => p.File.Name)
-                            .ThenBy(p => p.File.Dir);
-                        break;
-                    case SortType.NameDown:
-                        files = rawFiles
-                           .OrderByDescending(p => p.File.Name)
-                           .ThenByDescending(p => p.File.Dir);
-                        break;
-                    case SortType.LengthUp:
-                        files = rawFiles
-                          .OrderBy(p => GetFileInfoValue(p, nameof(FI.Length)))
-                          .ThenBy(p => p.File.Name)
-                          .ThenBy(p => p.File.Dir);
-                        break;
-                    case SortType.LengthDown:
-                        files = rawFiles
-                          .OrderByDescending(p => GetFileInfoValue(p, nameof(FI.Length)))
-                          .ThenByDescending(p => p.File.Name)
-                          .ThenByDescending(p => p.File.Dir);
-                        break;
-                    case SortType.LastWriteTimeUp:
-                        files = rawFiles
-                          .OrderBy(p => GetFileInfoValue(p, nameof(FI.LastWriteTime)))
-                          .ThenBy(p => p.File.Name)
-                          .ThenBy(p => p.File.Dir);
-                        break;
-                    case SortType.LastWriteTimeDown:
-                        files = rawFiles
-                          .OrderByDescending(p => GetFileInfoValue(p, nameof(FI.LastWriteTime)))
-                          .ThenByDescending(p => p.File.Name)
-                          .ThenByDescending(p => p.File.Dir);
-                        break;
-                    case SortType.CreationTimeUp:
-                        files = rawFiles
-                          .OrderBy(p => GetFileInfoValue(p, nameof(FI.CreationTime)))
-                          .ThenBy(p => p.File.Name)
-                          .ThenBy(p => p.File.Dir);
-                        break;
-                    case SortType.CreationTimeDown:
-                        files = rawFiles
-                          .OrderByDescending(p => GetFileInfoValue(p, nameof(FI.CreationTime)))
-                          .ThenByDescending(p => p.File.Name)
-                          .ThenByDescending(p => p.File.Dir);
-                        break;
-                }
-                //在非UI线程里就得把Lazy的全都计算好
-                files = files.ToArray();
-            });
-            Files = new ObservableCollection<UIFile>(files);
-            //当排序开启时，一律不支持分组
-            SetGroupEnable(false);
+            //在非UI线程里就得把Lazy的全都计算好
+            return new ObservableCollection<UIFile>(files);
 
             //若文件不存在，直接访问FileInfo属性会报错，因此需要加一层try
             static long GetFileInfoValue(UIFile file, string name)
@@ -472,6 +460,28 @@ namespace ClassifyFiles.UI.Panel
                     return 0;
                 }
             }
+        }
+
+        /// <summary>
+        /// 排序
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="rawFiles"></param>
+        /// <returns></returns>
+        public async Task SortAsync(SortType type, IEnumerable<UIFile> rawFiles = null)
+        {
+            ObservableCollection<UIFile> files = null;
+            if (rawFiles == null)
+            {
+                rawFiles = Files;
+            }
+            await Task.Run(() =>
+            {
+                files = GetSortedFiles(type, rawFiles);
+            });
+            Files = files;
+            //当排序开启时，一律不支持分组
+            SetGroupEnable(false);
         }
 
         #endregion
@@ -738,7 +748,7 @@ namespace ClassifyFiles.UI.Panel
         /// <param name="e"></param>
         private async void Tags_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if(!(e.Source is ContentPresenter cp))
+            if (!(e.Source is ContentPresenter cp))
             {
                 return;
             }

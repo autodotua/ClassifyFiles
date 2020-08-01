@@ -171,16 +171,10 @@ namespace ClassifyFiles.UI
         }
 
         private ILoadable mainPage;
-        private bool closing = false;
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             //退出前还要做一些工作，暂时先隐藏窗体，暂缓退出
-            if (closing)
-            {
-                return;
-            }
             e.Cancel = true;
-            closing = true;
             Visibility = Visibility.Collapsed;
             BeforeClosing();
         }
@@ -196,7 +190,7 @@ namespace ClassifyFiles.UI
                 await SaveChangesAsync();
             }
             await FileIcon.Tasks.Stop();
-            Close();
+            Application.Current.Shutdown();
         }
 
         private void SettingMenuItem_Click(object sender, RoutedEventArgs e)

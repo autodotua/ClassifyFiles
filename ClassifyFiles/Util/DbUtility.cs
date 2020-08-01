@@ -33,12 +33,13 @@ namespace ClassifyFiles.Util
         }
         public static int SaveChanges()
         {
-            Debug.WriteLine("db Save Changes");
+            Debug.WriteLine("db begin Save Changes");
+            int result = -1;
             try
             {
                 lock (db)
                 {
-                    return db.SaveChanges();
+                    result= db.SaveChanges();
                 }
             }
             catch (Exception ex)
@@ -57,8 +58,9 @@ namespace ClassifyFiles.Util
                     throw;
                 }
                 DbSavingException?.Invoke(null, new UnhandledExceptionEventArgs(ex, false));
-                return 0;
             }
+            Debug.WriteLine("db end Save Changes");
+            return result;
         }
         public static int SaveChanges(AppDbContext db)
         {

@@ -57,7 +57,6 @@ namespace ClassifyFiles.Util
             }
 
             SaveChanges(db);
-            var a = db.Configs.FirstOrDefault(p => p.Key == key); ;
         }
     }
 }

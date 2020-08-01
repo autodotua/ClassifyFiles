@@ -24,6 +24,7 @@ using System.Windows.Data;
 using System.Globalization;
 using System.Collections.ObjectModel;
 using ClassifyFiles.UI.Util;
+using FzLib.Basic;
 
 namespace ClassifyFiles.UI.Page
 {
@@ -51,7 +52,7 @@ namespace ClassifyFiles.UI.Page
             {
                 await base.LoadAsync(project);
                 filesViewer.Project = project;
-                await filesViewer.SetFilesAsync(null,null);
+                await filesViewer.SetFilesAsync(null, null);
             }
             await classPanel.LoadAsync(project);
             UpdateAppBarButtonsEnable();
@@ -80,7 +81,7 @@ namespace ClassifyFiles.UI.Page
             }
             if (classPanel.SelectedUIClass == null)
             {
-                await filesViewer.SetFilesAsync(null,null);
+                await filesViewer.SetFilesAsync(null, null);
             }
             else
             {
@@ -135,7 +136,7 @@ namespace ClassifyFiles.UI.Page
         /// </summary>
         /// <param name="filesWithClassesFunc">用于获取文件的异步函数</param>
         /// <returns></returns>
-        private async Task SetFilesAsync(
+        private async Task<bool> SetFilesAsync(
               Func<List<UIFile>> getUIFiles,
               FileCollectionType type
           )
@@ -144,32 +145,46 @@ namespace ClassifyFiles.UI.Page
             GetProgress().Show();
             Debug.WriteLine("Set Files, Project Hashcode is " + Project.GetHashCode()
             + ", Class is " + (classPanel.SelectedUIClass == null ? "null" : classPanel.SelectedUIClass.Class.Name));
-            List<UIFile> uiFiles = null;
+            IEnumerable<UIFile> uiFiles = null;
             await Task.Delay(1);
-            Class c= classPanel.SelectedUIClass?.Class;
+            Class c = classPanel.SelectedUIClass?.Class;
+            bool result = false;
             await Task.Run(() =>
             {
-                uiFiles = getUIFiles();
+                try
+                {
+                    uiFiles = getUIFiles();
+                }
+                catch (Exception ex)
+                {
+                     Dispatcher.Invoke( () =>
+                     {
+                          new ErrorDialog().ShowAsync(ex, "查询文件失败");
+                     });
+                    return;
+                }
                 rawFiles = uiFiles;
                 if (FilterPattern.Length > 0)
                 {
                     Regex r = new Regex(FilterPattern);
-                    uiFiles = uiFiles.Where(p => r.IsMatch(p.File.Name)).ToList();
+                    uiFiles = uiFiles.Where(p => r.IsMatch(p.File.Name));
                 }
                 uiFiles.ForEach(p => p.Class = c);
+                result = true;
             });
             await filesViewer.SetFilesAsync(uiFiles, c);
 
             await classPanel.UpdateUIClassesAsync();
             await ApplyDirs();
             GetProgress().Close();
+            return result;
         }
-        private List<UIFile> rawFiles = null;
+        private IEnumerable<UIFile> rawFiles = null;
         private async Task ApplyFilterAsync()
         {
             GetProgress().Show();
 
-            IList<UIFile> files = rawFiles;
+            IEnumerable<UIFile> files = rawFiles;
             if (rawFiles != null)
             {
                 if (FilterPattern.Length > 0)
@@ -177,7 +192,7 @@ namespace ClassifyFiles.UI.Page
                     await Task.Run(() =>
                     {
                         Regex r = new Regex(FilterPattern);
-                        files = files.Where(p => r.IsMatch(p.File.Name)).ToList();
+                        files = files.Where(p => r.IsMatch(p.File.Name));
                     });
                 }
                 else

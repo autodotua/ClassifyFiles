@@ -103,22 +103,20 @@ namespace ClassifyFiles.Util
                             }
                         });
 #endif
-
-
-                        if (!stopping)
+                    }
+                    if (!stopping)
+                    {
+                        //防止频繁保存数据库
+                        if ((DateTime.Now - lastDbSaveTime).Seconds > 10)
                         {
-                            //防止频繁保存数据库
-                            if ((DateTime.Now - lastDbSaveTime).Seconds > 10)
+                            lastDbSaveTime = DateTime.Now;
+                            try
                             {
-                                lastDbSaveTime = DateTime.Now;
-                                try
-                                {
-                                    DbUtility.SaveChanges();
-                                }
-                                catch (Exception ex)
-                                {
+                                DbUtility.SaveChanges();
+                            }
+                            catch (Exception ex)
+                            {
 
-                                }
                             }
                         }
                     }

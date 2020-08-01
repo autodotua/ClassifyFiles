@@ -44,20 +44,21 @@ namespace ClassifyFiles.Util
                  .Select(p => p.File)
                  .ToList();
         }
-        public static Dictionary<File, Class[]> GetFilesWithClassesByClass(Class c)
+        public static IEnumerable<KeyValuePair<File, IEnumerable<Class>>> GetFilesWithClassesByClass(Class c)
         {
             Debug.WriteLine("db begin: " + nameof(GetFilesWithClassesByClass));
-            var tempFiles = (from f in db.Files
-                             join fc in db.FileClasses on f.ID equals fc.FileID
-                             select fc)
-                             .Include(p => p.File)
-                             .ThenInclude(p => p.Project)
-                             .Include(p => p.Class)
-                             .ToList();
-            var result= tempFiles
-                 .GroupBy(p => p.File)
-                 .Where(p => p.Any(p => p.ClassID == c.ID))
-                 .ToDictionary(p => p.Key, p => p.Select(q => q.Class).ToArray());
+
+            var result = db.FileClasses
+                .Where(p => p.File.Project == c.Project)
+                .Where(p=>!p.Disabled)
+                .IncludeAll()//需要包含FileClass.File
+                .AsEnumerable()//需要内存分组
+                .GroupBy(p => p.File)//按文件分组
+                .Where(p => p.Any(q => q.ClassID == c.ID))//获取拥有该类的FileClass
+                .Select(p =>  KeyValuePair.Create(p.Key, p.Select(q => q.Class)));
+                //因为最后需要转换为UIFile，所以这里不需要直接转换成Dictionary
+            
+            //.ToDictionary(p => p.Key, p => p.Select(q => q.Class).ToArray());
 
             Debug.WriteLine("db end: " + nameof(GetFilesWithClassesByClass));
             return result;
@@ -179,7 +180,7 @@ namespace ClassifyFiles.Util
                     db.Entry(existed).State = EntityState.Modified;
                 }
             }
-            bool result= SaveChanges() > 0;
+            bool result = SaveChanges() > 0;
             Debug.WriteLine("db end: " + nameof(RemoveFilesFromClass));
             return result;
         }
