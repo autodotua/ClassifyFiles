@@ -97,7 +97,10 @@ namespace ClassifyFiles.Util
 
         public static void SetObjectModified(object obj)
         {
-            db.Entry(obj).State = EntityState.Modified;
+            lock (db)
+            {
+                db.Entry(obj).State = EntityState.Modified;
+            }
         }
     }
 }

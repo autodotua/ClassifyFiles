@@ -52,6 +52,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="0" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="12" />
             </Grid.RowDefinitions>
             <panel:ClassesPanel
                 x:Name="classPanel"

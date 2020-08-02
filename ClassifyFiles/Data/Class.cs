@@ -27,6 +27,23 @@ namespace ClassifyFiles.Data
         [Required]
         public int Index { get; set; } = 0;
 
+        private string groupName;
+        public string GroupName
+        {
+            get => string.IsNullOrEmpty(groupName)?null:groupName;
+            set
+            {
+                if(string.IsNullOrEmpty(value))
+                {
+                    groupName = null;
+                }
+                else
+                {
+                    groupName = value;
+                }
+                this.Notify(nameof(GroupName));
+            }
+        }
         public string DisplayNameFormat { get; set; }
         public string DisplayProperty1Name { get; set; }
         public string DisplayProperty1 { get; set; }

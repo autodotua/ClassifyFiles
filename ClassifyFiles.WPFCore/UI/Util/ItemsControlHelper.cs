@@ -147,17 +147,27 @@ namespace ClassifyFiles.UI.Util
                 TModel item = (TModel)e.Data.GetData(typeof(TModel));
                 //index为放置时鼠标下元素项的索引  
                 int index = GetCurrentIndex(new GetPositionDelegate(e.GetPosition));
-                if (index > -1)
+                ObservableCollection<TModel> source = null;
+                if (index > -1 && View.ItemsSource is ObservableCollection<TModel> o)
+                {
+                    source = o;
+                }
+                else if (index > -1 && View.ItemsSource is System.Windows.Data.ListCollectionView lcv)
+                {
+                    //需要支持分组情况下的列表
+                    source = lcv.SourceCollection as ObservableCollection<TModel>;
+                }
+                if (source != null)
                 {
                     //拖动元素集合的第一个元素索引  
-                    int oldIndex = (View.ItemsSource as ObservableCollection<TModel>).IndexOf(item);
+                    int oldIndex = source.IndexOf(item);
                     if (oldIndex == index)
                     {
                         return;
                     }
                     //下边那个循环要求数据源必须为ObservableCollection<T>类型，T为对象  
 
-                    (View.ItemsSource as ObservableCollection<TModel>).Move(oldIndex, index);
+                    source.Move(oldIndex, index);
                     SingleItemDragDroped?.Invoke(this, new SingleItemDragDropedEventArgs(oldIndex, index));
                     // lvw.SelectedItems.Clear();
                     //ListView.SelectedIndex = index;

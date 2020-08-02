@@ -44,6 +44,8 @@ namespace ClassifyFiles.UI.Panel
         {
             DataContext = this;
             InitializeComponent();
+            EventManager.RegisterClassHandler(typeof(TreeViewItem), Mouse.MouseDownEvent, new MouseButtonEventHandler(ListViewItem_PreviewMouseRightButtonDown), true);
+
             SetGroupEnable(Configs.GroupByDir);
             treeViewHelper = new TreeViewSelectorHelper<UIFile>(
                 FindResource("treeFiles") as TreeView,
@@ -1003,10 +1005,20 @@ namespace ClassifyFiles.UI.Panel
 
         #endregion
 
-        private void ContentControl_PreviewTouchMove(object sender, TouchEventArgs e)
+        private async void ListViewItem_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
+            UIFile file = (sender as FrameworkElement).DataContext as UIFile;
+            if (!GetSelectedFiles().Contains(file))
+            {
+                await SelectFileAsync(file);
+            }
 
+            ContextMenu menu = FindResource("menu") as ContextMenu;
+            menu.PlacementTarget = sender as FrameworkElement;
+            menu.Placement = PlacementMode.Mouse;
+            menu.IsOpen = true;
         }
+
     }
 
 }

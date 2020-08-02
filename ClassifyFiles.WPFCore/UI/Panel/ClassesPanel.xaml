@@ -14,11 +14,45 @@
     mc:Ignorable="d">
     <UserControl.Resources>
         <c:Bool2VisibilityConverter x:Key="b2v" />
+        <c:IsNotNull2VisibilityConverter x:Key="nn2v" />
+
     </UserControl.Resources>
     <Grid>
+        <Grid.Resources>
+
+            <!--  分组项的样式  -->
+            <Style x:Key="groupStyle" TargetType="{x:Type GroupItem}">
+                <Setter Property="Margin" Value="0,8,0,4" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type GroupItem}">
+                            <m:SimpleStackPanel Orientation="Vertical" Spacing="4">
+                                <TextBlock
+                                    FontSize="16" FontWeight="Bold"
+                                    Text="{Binding Path=Name}"
+                                    TextAlignment="Center"
+                                    Visibility="{Binding Path=Name, Converter={StaticResource nn2v}}" />
+                                <ItemsPresenter />
+                            </m:SimpleStackPanel>
+
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!--  带分组的数据源  -->
+            <CollectionViewSource
+                x:Key="listDetailItemsSource"
+                IsLiveGroupingRequested="True"
+                Source="{Binding UIClasses}">
+                <CollectionViewSource.GroupDescriptions>
+                    <PropertyGroupDescription PropertyName="Class.GroupName" />
+                </CollectionViewSource.GroupDescriptions>
+            </CollectionViewSource>
+        </Grid.Resources>
         <ListBox
             x:Name="lbx" Background="Transparent"
-            ItemsSource="{Binding UIClasses}"
+            ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
             ScrollViewer.CanContentScroll="False"
             SelectedItem="{Binding SelectedUIClass}">
             <ListBox.Resources>
@@ -28,6 +62,9 @@
                     <EventSetter Event="Drop" Handler="ListBoxItem_Drop" />
                 </Style>
             </ListBox.Resources>
+            <ListBox.GroupStyle>
+                <GroupStyle ContainerStyle="{StaticResource groupStyle}" />
+            </ListBox.GroupStyle>
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <m:SimpleStackPanel Orientation="Vertical" Spacing="0">

@@ -37,7 +37,11 @@
         <sys:Double x:Key="eight">8.0</sys:Double>
 
         <!--  公用的右键菜单  -->
-        <ContextMenu x:Key="menu" Opened="ContextMenu_Opened" />
+        <ContextMenu x:Key="menu" Opened="ContextMenu_Opened">
+            <ContextMenu.Resources>
+                <Style BasedOn="{StaticResource DefaultContextMenuStyle}" TargetType="{x:Type ContextMenu}" />
+            </ContextMenu.Resources>
+        </ContextMenu>
 
         <!--  分组项的样式  -->
         <Style x:Key="groupStyle" TargetType="{x:Type GroupItem}">
@@ -175,8 +179,7 @@
                         File="{Binding Path=.}" />
                     <TextBlock
                         Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
-                        Height="36"
-                        Margin="0,8,0,0"
+                        Height="36" Margin="0,8,0,0"
                         HorizontalAlignment="Center"
                         DockPanel.Dock="Bottom" LineHeight="16"
                         Text="{Binding Display.DisplayName}"
@@ -343,7 +346,6 @@
         <!--  图标和平铺视图  -->
         <ListView
             x:Key="grdFiles"
-            ContextMenu="{StaticResource menu}"
             ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
             PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
             VirtualizingPanel.CacheLength="2"
@@ -360,7 +362,9 @@
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
             <ListView.ItemContainerStyle>
-                <Style BasedOn="{StaticResource DefaultListBoxItemStyle}" TargetType="{x:Type ListBoxItem}" />
+                <Style BasedOn="{StaticResource DefaultListBoxItemStyle}" TargetType="{x:Type ListBoxItem}">
+                    <EventSetter Event="PreviewMouseRightButtonDown" Handler="ListViewItem_PreviewMouseRightButtonDown" />
+                </Style>
             </ListView.ItemContainerStyle>
             <ListView.GroupStyle>
                 <GroupStyle ContainerStyle="{StaticResource groupStyle}" />
@@ -370,7 +374,6 @@
         <!--  列表视图  -->
         <m:ListView
             x:Key="lvwFiles"
-            ContextMenu="{StaticResource menu}"
             ItemTemplate="{StaticResource listDataTemplate}"
             ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
             PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
@@ -383,6 +386,7 @@
             <m:ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type m:ListViewItem}">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <EventSetter Event="PreviewMouseRightButtonDown" Handler="ListViewItem_PreviewMouseRightButtonDown" />
                 </Style>
             </m:ListView.ItemContainerStyle>
             <m:ListView.GroupStyle>
@@ -402,7 +406,14 @@
             VirtualizingPanel.CacheLengthUnit="Page"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-            VirtualizingPanel.ScrollUnit="Pixel" />
+            VirtualizingPanel.ScrollUnit="Pixel">
+            <TreeView.ItemContainerStyle>
+                <Style BasedOn="{StaticResource DefaultTreeViewItemStyle}" TargetType="{x:Type TreeViewItem}">
+                    <!--  以下代码无效  -->
+                    <EventSetter Event="PreviewMouseRightButtonDown" Handler="ListViewItem_PreviewMouseRightButtonDown" />
+                </Style>
+            </TreeView.ItemContainerStyle>
+        </TreeView>
 
 
 
@@ -410,7 +421,6 @@
         <ListView
             x:Key="lvwDetailFiles"
             m:ScrollViewerHelper.AutoHideScrollBars="True"
-            ContextMenu="{StaticResource menu}"
             ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
             PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
             SelectionMode="Extended"
@@ -426,6 +436,7 @@
                     <Setter Property="Background" Value="Transparent" />
                     <Setter Property="ToolTip" Value="{StaticResource toolTip}" />
                     <Setter Property="ToolTipService.InitialShowDelay" Value="{DynamicResource ToolTipInitialShowDelay}" />
+                    <EventSetter Event="PreviewMouseRightButtonDown" Handler="ListViewItem_PreviewMouseRightButtonDown" />
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.GroupStyle>
@@ -562,8 +573,7 @@
         <ContentControl
             Grid.Row="4"
             Content="{Binding FilesContent}"
-            PreviewMouseWheel="ListBox_PreviewMouseWheel"
-            PreviewTouchMove="ContentControl_PreviewTouchMove" />
+            PreviewMouseWheel="ListBox_PreviewMouseWheel" />
 
     </Grid>
 </UserControl>

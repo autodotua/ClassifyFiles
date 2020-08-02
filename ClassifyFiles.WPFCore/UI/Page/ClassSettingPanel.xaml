@@ -32,7 +32,6 @@
         </Grid.ColumnDefinitions>
         <panel:ClassesPanel
             x:Name="classes" CanReorder="True"
-            ClassDragDroped="classes_ClassDragDroped"
             SelectedClassChanged="SelectedUIClassesChanged" />
 
         <Grid
@@ -41,13 +40,55 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="8" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="8" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <GroupBox Header="基本设置">
+                <Grid Grid.ColumnSpan="999">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Style="{DynamicResource BodyTextBlockStyle}"
+                        Text="分类名：" />
+
+                    <TextBox Grid.Column="2" Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.Name}" />
+                    <TextBlock
+                        Grid.Column="4"
+                        VerticalAlignment="Center"
+                        Style="{DynamicResource BodyTextBlockStyle}"
+                        Text="组别：" />
+
+                    <TextBox
+                        Grid.Column="6"
+                        LostFocus="TextBox_LostFocus"
+                        Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.GroupName}" />
+
+                </Grid>
+
+            </GroupBox>
+            <GroupBox Grid.Row="2">
+                <GroupBox.Header>
+                    <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock FontSize="{StaticResource GroupBoxHeaderFontSize}" Text="显示格式" />
+                        <Button
+                            Grid.Column="99" Padding="8,0"
+                            VerticalAlignment="Stretch"
+                            Click="Button_Click_1" Content="?" Focusable="False"/>
+                    </m:SimpleStackPanel>
+                </GroupBox.Header>
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="8" />
+                        <RowDefinition Height="0" />
+                        <RowDefinition Height="0" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="8" />
                         <RowDefinition Height="Auto" />
@@ -64,24 +105,6 @@
                         <ColumnDefinition Width="16" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <Grid Grid.ColumnSpan="999">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="8" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="8" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            Style="{DynamicResource BodyTextBlockStyle}"
-                            Text="分类名：" />
-
-                        <TextBox Grid.Column="2" Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.Name}" />
-                        <Button Grid.Column="4" Click="Button_Click_1">
-                            <m:FontIcon Glyph="&#xF142;" />
-                        </Button>
-                    </Grid>
                     <TextBlock
                         Grid.Row="2" VerticalAlignment="Center"
                         Style="{DynamicResource BodyTextBlockStyle}"
@@ -146,7 +169,7 @@
 
                 </Grid>
             </GroupBox>
-            <GroupBox Grid.Row="2" Header="匹配条件">
+            <GroupBox Grid.Row="99" Header="匹配条件">
 
                 <ScrollViewer>
                     <ItemsControl x:Name="lst" ItemsSource="{Binding MatchConditions}">

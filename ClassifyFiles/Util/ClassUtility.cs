@@ -17,7 +17,8 @@ namespace ClassifyFiles.Util
 
             List<Class> classes = db.Classes
                 .Where(p => p.Project == project)
-                .OrderBy(p => p.Index)
+                .OrderBy(p=>p.GroupName)
+                .ThenBy(p => p.Index)
                 .Include(p => p.MatchConditions)
                 .ToList();
             Debug.WriteLine("db end: " + nameof(GetClasses));

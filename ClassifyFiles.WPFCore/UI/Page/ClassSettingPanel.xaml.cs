@@ -146,8 +146,16 @@ namespace ClassifyFiles.UI.Page
             MatchConditions.Add(new MatchCondition() { Index = MatchConditions.Count });
         }
 
-        private void SelectedUIClassesChanged(object sender, SelectedClassChangedEventArgs e)
+        private async void SelectedUIClassesChanged(object sender, SelectedClassChangedEventArgs e)
         {
+            if (needToSelectedClass != null && classes.UIClasses.Contains(needToSelectedClass))
+            {
+                UIClass c = needToSelectedClass;
+                needToSelectedClass = null;
+                await Task.Delay(1);
+                classes.SelectedUIClass = c;
+                return;
+            }
             Class old = e.OldValue;
             if (old != null && e.NewValue != null)
             {
@@ -164,15 +172,16 @@ namespace ClassifyFiles.UI.Page
             }
         }
 
-
-
-        private async void classes_ClassDragDroped(object sender, EventArgs e)
-        {
-        }
-
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             new DisplayNameHelpDialog() { Owner = Window.GetWindow(this) }.ShowDialog();
+        }
+
+        private UIClass needToSelectedClass = null;
+        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            //分组修改后，会取消选择，需要手动重新选择
+            needToSelectedClass = classes.SelectedUIClass;
         }
     }
 
