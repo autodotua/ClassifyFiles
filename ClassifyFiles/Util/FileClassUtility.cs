@@ -14,6 +14,7 @@ namespace ClassifyFiles.Util
 {
     public static class FileClassUtility
     {
+        private const int CallbackUpdateMs = 200;
         public static List<Class> GetClassesOfFile(File file)
         {
             using var db = GetNewDb();
@@ -22,13 +23,14 @@ namespace ClassifyFiles.Util
         public static List<Class> GetClassesOfFile(AppDbContext db, File file)
         {
             Debug.WriteLine("db begin: " + nameof(GetClassesOfFile));
-            return db.FileClasses
-                .Where(p => p.FileID == file.ID && !p.Disabled)
+            var result = db.FileClasses
+                .Where(p => p.FileID == file.ID && p.Status != FileClassStatus.Disabled)
                 .IncludeAll()
                 .OrderBy(p => p.Class.Name)
                 .Select(p => p.Class)
                 .ToList();
             Debug.WriteLine("db end: " + nameof(GetClassesOfFile));
+            return result;
         }
 
         public static List<File> GetFilesByClass(Class c)
@@ -36,7 +38,7 @@ namespace ClassifyFiles.Util
             Debug.WriteLine("db begin: " + nameof(GetFilesByClass));
             return db.FileClasses
                  .Where(p => p.ClassID == c.ID)
-                 .Where(p => p.Disabled == false)
+                 .Where(p => p.Status != FileClassStatus.Disabled)
                  .IncludeAll()
                  .OrderBy(p => p.File.Dir)
                  .ThenBy(p => p.File.Name)
@@ -50,14 +52,14 @@ namespace ClassifyFiles.Util
 
             var result = db.FileClasses
                 .Where(p => p.File.Project == c.Project)
-                .Where(p=>!p.Disabled)
+                .Where(p => p.Status != FileClassStatus.Disabled)
                 .IncludeAll()//需要包含FileClass.File
                 .AsEnumerable()//需要内存分组
                 .GroupBy(p => p.File)//按文件分组
                 .Where(p => p.Any(q => q.ClassID == c.ID))//获取拥有该类的FileClass
-                .Select(p =>  KeyValuePair.Create(p.Key, p.Select(q => q.Class)));
-                //因为最后需要转换为UIFile，所以这里不需要直接转换成Dictionary
-            
+                .Select(p => KeyValuePair.Create(p.Key, p.Select(q => q.Class)));
+            //因为最后需要转换为UIFile，所以这里不需要直接转换成Dictionary
+
             //.ToDictionary(p => p.Key, p => p.Select(q => q.Class).ToArray());
 
             Debug.WriteLine("db end: " + nameof(GetFilesWithClassesByClass));
@@ -79,6 +81,7 @@ namespace ClassifyFiles.Util
             }
             int index = 0;
             int count = args.Files.Count;
+            DateTime lastCallbackTime = DateTime.MinValue;
             foreach (var path in args.Files)
             {
                 File f = new File(new FI(path), args.Project);
@@ -100,15 +103,15 @@ namespace ClassifyFiles.Util
                 {
                     var existedFileClass = db.FileClasses.FirstOrDefault(p => p.Class == args.Class && p.File == existedFile);
                     //如果文件已存在，就搜索一下是否存在关系，存在关系就不需要继续了
-                    if (existedFileClass != null && !existedFileClass.Disabled)
+                    if (existedFileClass != null && existedFileClass.Status != FileClassStatus.Disabled)
                     {
                         goto next;
                     }
                     //存在但被禁用
-                    if (existedFileClass != null && existedFileClass.Disabled)
+                    if (existedFileClass != null && existedFileClass.Status == FileClassStatus.Disabled)
                     {
                         fs.Add(existedFile);
-                        existedFileClass.Disabled = false;
+                        existedFileClass.Status = FileClassStatus.Auto;
                         db.Entry(existedFileClass).State = EntityState.Modified;
                         goto next;
                     }
@@ -117,9 +120,11 @@ namespace ClassifyFiles.Util
                 db.FileClasses.Add(new FileClass(args.Class, f, true));
                 fs.Add(f);
             next:
-                if (args.Callback != null)
+                index++;
+                if (args.Callback != null && (DateTime.Now - lastCallbackTime).TotalMilliseconds > CallbackUpdateMs)
                 {
-                    if (!args.Callback((++index * 1.0) / count, f))
+                    lastCallbackTime = DateTime.Now;
+                    if (!args.Callback(index * 1.0 / count, f))
                     {
                         db.SaveChanges();
                         return null;
@@ -172,12 +177,19 @@ namespace ClassifyFiles.Util
             foreach (var file in files)
             {
                 var existed = db.FileClasses
-                    .FirstOrDefault(p => p.File == file && p.Class == c && !p.Disabled);
+                    .FirstOrDefault(p => p.File == file && p.Class == c && p.Status != FileClassStatus.Disabled);
                 var test = db.FileClasses.Where(p => p.FileID == file.ID).ToList();
                 if (existed != null)
                 {
-                    existed.Disabled = true;
-                    db.Entry(existed).State = EntityState.Modified;
+                    //如果是手动添加的，那么直接删除记录
+                    if (existed.Status == FileClassStatus.AddManully)
+                    {
+                        db.Entry(existed).State = EntityState.Deleted;
+                    }
+                    else
+                    {
+                        db.Entry(existed).State = EntityState.Modified;
+                    }
                 }
             }
             bool result = SaveChanges() > 0;
@@ -222,6 +234,7 @@ namespace ClassifyFiles.Util
             //现在数据库中该项目的所有文件应该都存在相对应的物理文件
             int index = 0;
             int count = files.Count;
+            DateTime lastCallbackTime = DateTime.MinValue;
             foreach (var file in files)
             {
                 File f = null;// new File(file, args.Project);
@@ -268,7 +281,7 @@ namespace ClassifyFiles.Util
                             //如果匹配并且不存在，那么新增关系
                             db.Add(new FileClass(c, f, false));
                         }
-                        else if (fc != null && !isMatched && !fc.Manual)
+                        else if (fc != null && !isMatched && fc.Status != FileClassStatus.AddManully)
                         {
                             //如果存在关系但不匹配，那么应该删除已存在的关系
                             //注意，手动删除的关系并不会走到这一步
@@ -277,9 +290,12 @@ namespace ClassifyFiles.Util
                         //其他情况，既不需要增加，也不需要删除
                     }
                 }
-                if (args.Callback != null)
+                index++;
+                if (args.Callback != null && (DateTime.Now - lastCallbackTime).TotalMilliseconds > CallbackUpdateMs)
                 {
-                    if (!args.Callback((++index * 1.0) / count, f))
+
+                    lastCallbackTime = DateTime.Now;
+                    if (!args.Callback(index * 1.0 / count, f))
                     {
                         db.SaveChanges();
                         return;

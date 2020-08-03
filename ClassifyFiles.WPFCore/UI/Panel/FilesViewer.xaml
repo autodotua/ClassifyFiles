@@ -457,15 +457,15 @@
                     </GridViewColumn>
                     <GridViewColumn DisplayMemberBinding="{Binding Display.DisplayName}" Header="文件名" />
                     <GridViewColumn
-                        Width="{Binding Path=CurrentClass, Mode=OneWay, Converter={StaticResource n2z}, ConverterParameter=200}"
+                        Width="{Binding Path=CurrentClass, Mode=OneWay, Converter={StaticResource n2z}, ConverterParameter=1}"
                         DisplayMemberBinding="{Binding Display.DisplayProperty1}"
                         Header="{Binding Path=CurrentClass.DisplayProperty1Name}" />
                     <GridViewColumn
-                        Width="{Binding Path=CurrentClass, Mode=OneWay, Converter={StaticResource n2z}, ConverterParameter=200}"
+                        Width="{Binding Path=CurrentClass, Mode=OneWay, Converter={StaticResource n2z}, ConverterParameter=2}"
                         DisplayMemberBinding="{Binding Display.DisplayProperty2}"
                         Header="{Binding Path=CurrentClass.DisplayProperty2Name}" />
                     <GridViewColumn
-                        Width="{Binding Path=CurrentClass, Mode=OneWay, Converter={StaticResource n2z}, ConverterParameter=200}"
+                        Width="{Binding Path=CurrentClass, Mode=OneWay, Converter={StaticResource n2z}, ConverterParameter=3}"
                         DisplayMemberBinding="{Binding Display.DisplayProperty3}"
                         Header="{Binding Path=CurrentClass.DisplayProperty3Name}" />
                     <GridViewColumn DisplayMemberBinding="{Binding Display.DisplayDir}" Header="文件夹路径" />
@@ -477,8 +477,8 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn DisplayMemberBinding="{Binding Display.Length}" Header="大小" />
-                    <GridViewColumn DisplayMemberBinding="{Binding FileInfo.LastWriteTime}" Header="修改时间" />
-                    <GridViewColumn DisplayMemberBinding="{Binding FileInfo.CreationTime}" Header="创建时间" />
+                    <GridViewColumn DisplayMemberBinding="{Binding File.FileInfo.LastWriteTime}" Header="修改时间" />
+                    <GridViewColumn DisplayMemberBinding="{Binding File.FileInfo.CreationTime}" Header="创建时间" />
                 </GridView>
             </ListView.View>
         </ListView>

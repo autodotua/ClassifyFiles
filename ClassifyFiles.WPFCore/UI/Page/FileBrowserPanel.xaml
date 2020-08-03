@@ -50,8 +50,6 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="8" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="0" />
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="12" />
             </Grid.RowDefinitions>
             <panel:ClassesPanel
@@ -60,21 +58,20 @@
                 SelectedClassChanged="SelectedClassChanged" />
 
             <Button
-                x:Name="btnNoClassesFiles" Grid.Row="2"
-                Padding="10,6"
-                HorizontalAlignment="Stretch"
-                HorizontalContentAlignment="Left"
-                Background="Transparent"
-                Click="BtnNoClassesFiles_Click"
-                Content="显示没有被分类的文件" />
-            <Button
-                x:Name="btnAllFiles" Grid.Row="4"
+                x:Name="btnMorFiles" Grid.Row="2"
                 Margin="0,8" Padding="10,6"
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Left"
-                Background="Transparent"
-                Click="BtnAllFiles_Click"
-                Content="显示全部文件" />
+                Background="Transparent" Content="更多">
+                <m:FlyoutService.Flyout>
+                    <m:MenuFlyout>
+                        <MenuItem Header="被强制从某一类中移除的文件"  Click="BtnDisabledClassFiles_Click"/>
+                        <MenuItem Header="被强制设置为某一类的文件" Click="BtnManualClassFiles_Click" />
+                        <MenuItem Header="没有被分类的文件"  Click="BtnNoClassesFiles_Click" />
+                        <MenuItem Header="全部文件"   Click="BtnAllFiles_Click" />
+                    </m:MenuFlyout>
+                </m:FlyoutService.Flyout>
+            </Button>
         </Grid>
 
 

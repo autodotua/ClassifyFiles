@@ -81,6 +81,24 @@ namespace ClassifyFiles.Data
             modelBuilder.Entity<Config>()
                  .HasIndex(p => p.Key);
 
+
+            modelBuilder.Entity<FileClass>()
+                .Property(e => e.Status)
+           .HasConversion(
+               v => (int)v,
+               v => (FileClassStatus)v);
+            modelBuilder.Entity<MatchCondition>()
+                .Property(e => e.ConnectionLogic)
+           .HasConversion(
+               v => (int)v,
+               v => (Logic)v);
+
+            modelBuilder.Entity<MatchCondition>()
+                .Property(e => e.Type)
+           .HasConversion(
+               v => (int)v,
+               v => (MatchType)v);
+
         }
         private void InsertTestDatas()
         {

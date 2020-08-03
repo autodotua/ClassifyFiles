@@ -31,7 +31,7 @@ namespace ClassifyFiles.Util
             using var db = GetNewDb();
             return db.FileClasses
                 .Where(p => p.Class == c)
-                .Where(p => !p.Disabled)
+                .Where(p => p.Status!=FileClassStatus.Disabled)
                 .Count();
         }
 

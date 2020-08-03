@@ -148,14 +148,17 @@ namespace ClassifyFiles.UI.Panel
 
         #region 文件相关
 
+        public FileCollectionType FileCollectionType { get; private set; }
+
         /// <summary>
         /// 设置文件
         /// </summary>
         /// <param name="files"></param>
         /// <returns></returns>
-        public async Task SetFilesAsync(IEnumerable<UIFile> files, Class currentClass)
+        public async Task SetFilesAsync(IEnumerable<UIFile> files, Class currentClass,FileCollectionType type)
         {
             CurrentClass = currentClass;
+            FileCollectionType = FileCollectionType;
             this.Notify(nameof(CurrentClass));
             if (files == null || !files.Any())
             {
@@ -451,9 +454,9 @@ namespace ClassifyFiles.UI.Panel
                 {
                     return name switch
                     {
-                        nameof(FI.Length) => file.FileInfo.Length,
-                        nameof(FI.LastWriteTime) => file.FileInfo.LastWriteTime.Ticks,
-                        nameof(FI.CreationTime) => file.FileInfo.CreationTime.Ticks,
+                        nameof(FI.Length) => file.File.FileInfo.Length,
+                        nameof(FI.LastWriteTime) => file.File.FileInfo.LastWriteTime.Ticks,
+                        nameof(FI.CreationTime) => file.File.FileInfo.CreationTime.Ticks,
                         _ => throw new NotImplementedException(),
                     };
                 }
@@ -867,9 +870,16 @@ namespace ClassifyFiles.UI.Panel
 
             if (!IsSingleWindow)
             {
-                MenuItem menuDelete = new MenuItem() { Header = "删除记录", ToolTip = "这不会删除磁盘上的文件，仅仅删除记录" };
+                MenuItem menuDelete = new MenuItem() { Header = "删除文件", ToolTip = "这不会删除磁盘上的文件，仅仅删除记录" };
                 menuDelete.Click += MenuDelete_Click;
                 menu.Items.Add(menuDelete);
+
+                if(FileCollectionType== FileCollectionType.Disabled || FileCollectionType== FileCollectionType.Manual)
+                {
+                    MenuItem menuRecover = new MenuItem() { Header = "恢复为正常状态", ToolTip = "这将使文件被再次自动分类，剔除手动的任何成分" };
+                    menuRecover.Click += MenuRecover_Click; ;
+                    menu.Items.Add(menuRecover);
+                }
             }
 
             if (files.Count == 1)
@@ -885,7 +895,7 @@ namespace ClassifyFiles.UI.Panel
                     FileProperty.ShowFileProperties(files[0].File.GetAbsolutePath());
                 menu.Items.Add(menuShowProperties);
             }
-
+            var classesMenus = new List<CheckBox>();
             if (!IsSingleWindow)
             {
                 menu.Items.Add(new Separator());
@@ -919,10 +929,61 @@ namespace ClassifyFiles.UI.Panel
                         Tag = tag
                     };
                     chk.Click += ChkTag_Click;
-                    menu.Items.Add(chk);
+                    classesMenus.Add(chk);
+                }
+                int maxClassesMenuCount = 6;
+                if (CurrentClass != null && classesMenus.Count > maxClassesMenuCount)
+                {
+                    if (classesMenus.All(p => (p.Tag as Class).GroupName == CurrentClass.GroupName))
+                    {
+                        AddWithoutDiscrimination();
+                    }
+                    else
+                    {
+                        var sameGroup = classesMenus.Where(p => (p.Tag as Class).GroupName == CurrentClass.GroupName);
+                        var otherGroup = classesMenus.Where(p => (p.Tag as Class).GroupName != CurrentClass.GroupName);
+                        sameGroup.ForEach(p => menu.Items.Add(p));
+                        MenuItem menuItem = new MenuItem() { Header = "其它分类" };
+                        otherGroup.ForEach(p => menuItem.Items.Add(p));
+                        menu.Items.Add(menuItem);
+                    }
+                }
+                else
+                {
+                    AddWithoutDiscrimination();
+                }
+                void AddWithoutDiscrimination()
+                {
+                    if (classesMenus.Count <= maxClassesMenuCount)
+                    {
+                        classesMenus.ForEach(p => menu.Items.Add(p));
+                    }
+                    else
+                    {
+                        MenuItem menuItem = new MenuItem() { Header = "分类" };
+                        classesMenus.ForEach(p => menuItem.Items.Add(p));
+                        menu.Items.Add(menuItem);
+                    }
                 }
             }
 
+        }
+
+        private async void MenuRecover_Click(object sender, RoutedEventArgs e)
+        {
+            var files = GetSelectedFiles();
+            GetProgress().Show();
+            await Task.Run(() =>
+            FileUtility.DeleteFilesRecord(files.Select(p => p.File)));
+            foreach (var file in files)
+            {
+                Files.Remove(file);
+            }
+            if (CurrentFileView == FileView.Tree && GetSelectedFile() != null)
+            {
+                await treeViewHelper.RemoveItemAsync(files[0], FileTree);
+            }
+            GetProgress().Close();
         }
 
         private async void MenuDelete_Click(object sender, RoutedEventArgs e)

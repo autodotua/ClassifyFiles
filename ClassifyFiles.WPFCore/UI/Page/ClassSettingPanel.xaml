@@ -60,7 +60,7 @@
                         Style="{DynamicResource BodyTextBlockStyle}"
                         Text="分类名：" />
 
-                    <TextBox Grid.Column="2" Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.Name}" />
+                    <TextBox Grid.Column="2" Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.Name, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock
                         Grid.Column="4"
                         VerticalAlignment="Center"

@@ -18,11 +18,17 @@ namespace ClassifyFiles.UI.Converter
             {
                 return 0;
             }
-            if (parameter is string str)
+            Class c = value as Class;
+            switch (parameter as string)
             {
-                return double.Parse(str);
+                case "1":
+                    return c.DisplayProperty1 == null ? 0 : 200;
+                case "2":
+                    return c.DisplayProperty2 == null ? 0 : 200;
+                case "3":
+                    return c.DisplayProperty3 == null ? 0 : 200;
             }
-            return parameter;
+            throw new Exception();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

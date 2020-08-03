@@ -22,7 +22,6 @@ namespace ClassifyFiles.Data
         public Project Project { get; set; }
         [Required]
         public int ProjectID { get; set; }
-        public bool Secondary { get; set; } = false;
         public List<MatchCondition> MatchConditions { get; set; } = new List<MatchCondition>();
         [Required]
         public int Index { get; set; } = 0;

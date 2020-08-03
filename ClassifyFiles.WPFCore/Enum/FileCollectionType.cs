@@ -5,6 +5,8 @@
         None,
         Class,
         All,
+        Manual,
+        Disabled,
         NoClass
     }
 

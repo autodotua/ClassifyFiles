@@ -52,7 +52,7 @@ namespace ClassifyFiles.UI.Page
             {
                 await base.LoadAsync(project);
                 filesViewer.Project = project;
-                await filesViewer.SetFilesAsync(null, null);
+                await filesViewer.SetFilesAsync(null, null,FileCollectionType.None);
             }
             await classPanel.LoadAsync(project);
             UpdateAppBarButtonsEnable();
@@ -81,7 +81,7 @@ namespace ClassifyFiles.UI.Page
             }
             if (classPanel.SelectedUIClass == null)
             {
-                await filesViewer.SetFilesAsync(null, null);
+                await filesViewer.SetFilesAsync(null, null,FileCollectionType.None);
             }
             else
             {
@@ -157,10 +157,10 @@ namespace ClassifyFiles.UI.Page
                 }
                 catch (Exception ex)
                 {
-                     Dispatcher.Invoke( () =>
-                     {
-                          new ErrorDialog().ShowAsync(ex, "查询文件失败");
-                     });
+                    Dispatcher.Invoke(() =>
+                   {
+                       new ErrorDialog().ShowAsync(ex, "查询文件失败");
+                   });
                     return;
                 }
                 rawFiles = uiFiles;
@@ -172,7 +172,7 @@ namespace ClassifyFiles.UI.Page
                 uiFiles.ForEach(p => p.Class = c);
                 result = true;
             });
-            await filesViewer.SetFilesAsync(uiFiles, c);
+            await filesViewer.SetFilesAsync(uiFiles, c,type);
 
             await classPanel.UpdateUIClassesAsync();
             await ApplyDirs();
@@ -199,7 +199,7 @@ namespace ClassifyFiles.UI.Page
                 {
                     files = rawFiles;
                 }
-                await filesViewer.SetFilesAsync(files, classPanel.SelectedUIClass?.Class);
+                await filesViewer.SetFilesAsync(files, classPanel.SelectedUIClass?.Class, filesViewer.FileCollectionType);
                 await ApplyDirs();
             }
             GetProgress().Close();
@@ -276,6 +276,22 @@ namespace ClassifyFiles.UI.Page
             btnSort.IsEnabled = filesViewer.CurrentFileView != FileView.Tree;
         }
 
+
+
+        private async Task SetSpecialFiles(Func<Project, IEnumerable<KeyValuePair<File, IEnumerable<Class>>>> func, FileCollectionType type)
+        {
+            ignoreClassChanged = true;
+            classPanel.SelectedUIClass = null;
+            ignoreClassChanged = false;
+            await SetFilesAsync(() =>
+            {
+                var files = func(Project);
+                return files.Select(p => new UIFile(p.Key)
+                {
+                    Classes = new ObservableCollection<Class>(),
+                }).ToList();
+            }, type);
+        }
         /// <summary>
         /// 单击全部文件按钮
         /// </summary>
@@ -283,18 +299,17 @@ namespace ClassifyFiles.UI.Page
         /// <param name="e"></param>
         private async void BtnAllFiles_Click(object sender, RoutedEventArgs e)
         {
-            ignoreClassChanged = true;
-            classPanel.SelectedUIClass = null;
-            ignoreClassChanged = false;
-            await SetFilesAsync(() =>
-            {
-                var fileClasses = GetFilesWithClassesByProject(Project);
-                var uiFiles = fileClasses.Select(p => new UIFile(p.Key)
-                {
-                    Classes = new ObservableCollection<Class>(p.Value),
-                }).ToList();
-                return uiFiles;
-            }, FileCollectionType.All);
+            await SetSpecialFiles( GetFilesWithClassesByProject, FileCollectionType.All);
+        }
+
+        private async void BtnManualClassFiles_Click(object sender, RoutedEventArgs e)
+        {
+            await SetSpecialFiles(GetManualFilesWithClassesByProject, FileCollectionType.Manual);
+        }
+
+        private async void BtnDisabledClassFiles_Click(object sender, RoutedEventArgs e)
+        {
+            await SetSpecialFiles(GetDisabledFilesWithClassesByProject, FileCollectionType.Disabled);
         }
 
         /// <summary>
@@ -309,11 +324,12 @@ namespace ClassifyFiles.UI.Page
             ignoreClassChanged = false;
             await SetFilesAsync(() =>
             {
-                var files = GetNoClassesFilesByProject(Project);
-                return files.Select(p => new UIFile(p)
+                var fileClasses = GetNoClassesFilesByProject(Project);
+                var uiFiles = fileClasses.Select(p => new UIFile(p)
                 {
                     Classes = new ObservableCollection<Class>(),
                 }).ToList();
+                return uiFiles;
             }, FileCollectionType.NoClass);
         }
 
@@ -725,6 +741,7 @@ namespace ClassifyFiles.UI.Page
             }
         }
         #endregion
+
 
     }
 

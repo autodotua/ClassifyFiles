@@ -47,6 +47,7 @@ namespace ClassifyFiles.Util
         "mp4",
         "mkv",
         "avi",
+        "mov"
         }.AsReadOnly();
         private static readonly IReadOnlyList<string> programExtensions = new List<string>() {
         "exe",
@@ -191,7 +192,7 @@ namespace ClassifyFiles.Util
         {
             string guid = Guid.NewGuid().ToString();
             var thumbnail = GetThumbnailPath(guid);
-            var cmd = "  -itsoffset -1  -i " + '"' + video + '"' + " -vcodec mjpeg -vframes 1 -an -f rawvideo -s 320x240 " + '"' + thumbnail + '"';
+            var cmd = "  -itsoffset -1  -i " + '"' + video + '"' + " -vcodec mjpeg -vframes 1 -an -f rawvideo -vf scale=480:-1 " + '"' + thumbnail + '"';
 
             var startInfo = new ProcessStartInfo
             {
@@ -555,6 +556,26 @@ namespace ClassifyFiles.Util
             foreach (var file in files)
             {
                 db.Entry(file).State = EntityState.Deleted;
+            }
+            SaveChanges();
+        }
+        public static void RecoverFiles(IEnumerable<File> files)
+        {
+            foreach (var file in files)
+            {
+                foreach (var fc in db.FileClasses.Where(p => p.Status != FileClassStatus.Auto))
+                {
+                    if (fc.Status != FileClassStatus.AddManully)
+                    {
+                        db.Entry(fc).State = EntityState.Deleted;
+                    }
+                    else if (fc.Status != FileClassStatus.Disabled)
+                    {
+                        fc.Status = FileClassStatus.Auto;
+                        db.Entry(fc).State = EntityState.Modified;
+                    }
+                }
+
             }
             SaveChanges();
         }
