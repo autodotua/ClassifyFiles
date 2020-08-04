@@ -17,46 +17,65 @@ namespace ClassifyFiles.UI.Util
     {
         private static ConcurrentDictionary<int, UIFile> generatedThumbnails = new ConcurrentDictionary<int, UIFile>();
         private static ConcurrentDictionary<int, UIFile> generatedIcons = new ConcurrentDictionary<int, UIFile>();
+        private static ConcurrentDictionary<int, UIFile> generatedWin10Icons = new ConcurrentDictionary<int, UIFile>();
 
         public static void ClearCahces()
         {
             generatedIcons.Clear();
             generatedIcons.Clear();
         }
-        public static bool UpdateDisplay(UIFile file)
-        {
-            bool result = false;
 
-            if (Configs.AutoThumbnails)
+        public static void UpdateFileIcon(UIFile file)
+        {
+            if (!Configs.AutoThumbnails)
             {
-                if (Configs.ShowThumbnail)
+                return;
+            }
+            if (Configs.ThumbnailStrategy == ThumbnailStrategy.Win10Icon)
+            {  //本来是null为没有生成，""为生成失败，后来感觉这样容易出问题，所以干脆生成失败的也再试一次好了
+                if (!generatedWin10Icons.ContainsKey(file.File.ID)
+                && string.IsNullOrEmpty(file.File.ThumbnailGUID))
+                {
+                    //generatedWin10Icons.TryAdd(file.File.ID, file);
+                    if (FileIconUtility.TryGenerateWin10Icon(file.File))
+                    {
+                        DbUtility.SetObjectModified(file.File);
+                    }
+                }
+            }
+            else
+            {
+                if (Configs.ThumbnailStrategy == ThumbnailStrategy.MediaThumbnailPrefer)
                 {
                     //本来是null为没有生成，""为生成失败，后来感觉这样容易出问题，所以干脆生成失败的也再试一次好了
                     if (!generatedThumbnails.ContainsKey(file.File.ID)
                     && string.IsNullOrEmpty(file.File.ThumbnailGUID))
                     {
-                        generatedThumbnails.TryAdd(file.File.ID, file);
-                        if (FileUtility.TryGenerateThumbnail(file.File))
+                        // generatedThumbnails.TryAdd(file.File.ID, file);
+                        if (FileIconUtility.TryGenerateThumbnail(file.File))
                         {
-                            result = true;
                             DbUtility.SetObjectModified(file.File);
                         }
                     }
                 }
-                if (Configs.ShowExplorerIcon)
+                if (Configs.ThumbnailStrategy == ThumbnailStrategy.MediaThumbnailPrefer
+                    || Configs.ThumbnailStrategy == ThumbnailStrategy.WindowsExplorerIcon)
                 {
                     if (!generatedIcons.ContainsKey(file.File.ID
                         ) && string.IsNullOrEmpty(file.File.IconGUID))
                     {
-                        generatedIcons.TryAdd(file.File.ID, file);
-                        if (FileUtility.TryGenerateExplorerIcon(file.File))
+                        // generatedIcons.TryAdd(file.File.ID, file);
+                        if (FileIconUtility.TryGenerateExplorerIcon(file.File))
                         {
-                            result = true;
                             DbUtility.SetObjectModified(file.File);
                         }
                     }
                 }
             }
+        }
+
+        public static void UpdateDisplay(UIFile file)
+        {
             if (file.Class != null)
             {
                 if (!string.IsNullOrWhiteSpace(file.Class.DisplayNameFormat))
@@ -80,9 +99,8 @@ namespace ClassifyFiles.UI.Util
                     }
                 }
             };
-            return result;
         }
 
-        private static ClassifyFiles.UI.Converter.DisplayFormatConverter displayNameConverter = new UI.Converter.DisplayFormatConverter();
+        private static readonly Converter.DisplayFormatConverter displayNameConverter = new UI.Converter.DisplayFormatConverter();
     }
 }

@@ -25,6 +25,7 @@ using System.Globalization;
 using System.Collections.ObjectModel;
 using ClassifyFiles.UI.Util;
 using FzLib.Basic;
+using Windows.Storage;
 
 namespace ClassifyFiles.UI.Page
 {
@@ -370,21 +371,13 @@ namespace ClassifyFiles.UI.Page
                 filesViewer.Refresh();
             }
         }
-        public bool ShowThumbnail
+
+        public ThumbnailStrategy ThumbnailStrategy
         {
-            get => Configs.ShowThumbnail;
+            get => Configs.ThumbnailStrategy;
             set
             {
-                Configs.ShowThumbnail = value;
-                filesViewer.Refresh();
-            }
-        }
-        public bool ShowExplorerIcon
-        {
-            get => Configs.ShowExplorerIcon;
-            set
-            {
-                Configs.ShowExplorerIcon = value;
+                Configs.ThumbnailStrategy = value;
                 filesViewer.Refresh();
             }
         }
@@ -709,14 +702,16 @@ namespace ClassifyFiles.UI.Page
         /// <param name="to"></param>
         private void StartAnimation(double to)
         {
+            //暂时固定宽度，不然会卡顿
+            filesViewer.Width = filesViewer.ActualWidth;
             DoubleAnimation ani = new DoubleAnimation(to, Configs.AnimationDuration * 2)
             {
                 EasingFunction = new CubicEase() { EasingMode = EasingMode.EaseInOut },
-                //FillBehavior = FillBehavior.Stop
             };
             ani.Completed += (p1, p2) =>
             {
-                isAnimating = false;
+                filesViewer.Width = double.NaN;
+                    isAnimating = false;
                 grdSplitter.IsEnabled = true;
                 //grdLeft.Width = to;
                 //本来是写了上面注释掉的部分的，后来发现反正改变宽度都是用动画，那么就无所谓了

@@ -16,8 +16,11 @@
         <m:SimpleStackPanel
             x:Name="stkSettings"
             Orientation="Vertical" Spacing="8">
-            <CheckBox x:Name="chkIncludeThumbnails" IsChecked="True">生成缩略图</CheckBox>
-            <CheckBox x:Name="chkIncludeExplorerIcons" IsChecked="True">生成资源管理器图标</CheckBox>
+            <CheckBox
+                x:Name="chkIncludeThumbnails"
+                Content="生成缩略图" IsChecked="True">
+                <CheckBox.ToolTip>不建议开启，会大幅降低速度。</CheckBox.ToolTip>
+            </CheckBox>
             <TextBlock>对于文件夹：</TextBlock>
             <RadioButton
                 x:Name="rbtnFolderAsFile" Margin="12,0"

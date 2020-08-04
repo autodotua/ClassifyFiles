@@ -82,7 +82,8 @@
                         <Button
                             Grid.Column="99" Padding="8,0"
                             VerticalAlignment="Stretch"
-                            Click="Button_Click_1" Content="?" Focusable="False"/>
+                            Click="Button_Click_1" Content="?"
+                            Focusable="False" />
                     </m:SimpleStackPanel>
                 </GroupBox.Header>
                 <Grid>

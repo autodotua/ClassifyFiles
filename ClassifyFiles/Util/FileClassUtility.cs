@@ -89,14 +89,15 @@ namespace ClassifyFiles.Util
                 //文件不存在的话，需要首先新增文件
                 if (existedFile == null)
                 {
-                    if (args.IncludeThumbnails)
-                    {
-                        FileUtility.TryGenerateThumbnail(f);
-                    }
-                    if (args.IncludeExplorerIcons)
-                    {
-                        FileUtility.TryGenerateExplorerIcon(f);
-                    }
+                    args.GenerateThumbnailsMethod?.Invoke(f);
+                    //if (args.IncludeThumbnails)
+                    //{
+                    //    FileUtility.TryGenerateThumbnail(f);
+                    //}
+                    //if (args.IncludeExplorerIcons)
+                    //{
+                    //    FileUtility.TryGenerateExplorerIcon(f);
+                    //}
                     db.Files.Add(f);
                 }
                 else
@@ -256,14 +257,15 @@ namespace ClassifyFiles.Util
                         }
                         f = newF;
                     }
-                    if (args.IncludeThumbnails)
-                    {
-                        FileUtility.TryGenerateThumbnail(f);
-                    }
-                    if (args.IncludeExplorerIcons)
-                    {
-                        FileUtility.TryGenerateExplorerIcon(f);
-                    }
+                    args.GenerateThumbnailsMethod?.Invoke(f);
+                    //if (args.IncludeThumbnails)
+                    //{
+                    //    FileUtility.TryGenerateThumbnail(f);
+                    //}
+                    //if (args.IncludeExplorerIcons)
+                    //{
+                    //    FileUtility.TryGenerateExplorerIcon(f);
+                    //}
                 }
                 else
                 {
@@ -271,7 +273,7 @@ namespace ClassifyFiles.Util
                 }
                 if (args.Reclassify)
                 {
-                    foreach (var c in db.Classes.Where(p => p.ProjectID == args.Project.ID).ToList())
+                    foreach (var c in db.Classes.Where(p => p.ProjectID == args.Project.ID).AsEnumerable())
                     {
                         FileClass fc = IncludeAll(db.FileClasses)
                             .FirstOrDefault(p => p.Class == c && p.File == f);
@@ -302,6 +304,7 @@ namespace ClassifyFiles.Util
                     }
                 }
             }
+            
             db.SaveChanges();
             Debug.WriteLine("db end: " + nameof(UpdateFilesOfClasses));
         }

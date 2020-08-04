@@ -11,6 +11,7 @@ using System.Windows.Media;
 using ClassifyFiles.WPFCore;
 using System.Drawing;
 using System.Threading.Tasks;
+using Windows.Storage;
 
 namespace ClassifyFiles.UI.Model
 {
@@ -35,7 +36,15 @@ namespace ClassifyFiles.UI.Model
 
                 file.PropertyChanged += (p1, p2) =>
                 {
-                    if (p2.PropertyName == nameof(file.ThumbnailGUID) || p2.PropertyName == nameof(file.IconGUID))
+                    if (p2.PropertyName == nameof(file.ThumbnailGUID) && !string.IsNullOrEmpty(file.ThumbnailGUID))
+                    {
+                        this.Notify(nameof(Image));
+                    }
+                    else if (p2.PropertyName == nameof(file.IconGUID) && !string.IsNullOrEmpty(file.IconGUID))
+                    {
+                        this.Notify(nameof(Image));
+                    }
+                    else if (p2.PropertyName == nameof(file.Win10IconGUID) && !string.IsNullOrEmpty(file.Win10IconGUID))
                     {
                         this.Notify(nameof(Image));
                     }
@@ -236,54 +245,85 @@ namespace ClassifyFiles.UI.Model
             }
             return null;
         }
-
         public BitmapImage Image
         {
             get
             {
-                if (Configs.ShowThumbnail)
+                if (File.IsFolder)
                 {
-                    if (!string.IsNullOrEmpty(File.ThumbnailGUID))
+                    if (Configs.ThumbnailStrategy != ThumbnailStrategy.None)
                     {
-                        try
+                        return FileIconUtility.GetFolderIcon();
+                    }
+                    return null;
+                }
+
+                if (Configs.ThumbnailStrategy == ThumbnailStrategy.Win10Icon)
+                {//需要提取方法
+                    try
+                    {
+                        string path = FileIconUtility.GetWin10IconPath(File.Win10IconGUID);
+                        if (System.IO.File.Exists(FileIconUtility.GetWin10IconPath(File.Win10IconGUID)))
                         {
-                            string path = FileUtility.GetThumbnailPath(File.ThumbnailGUID);
-                            if (System.IO.File.Exists(FileUtility.GetThumbnailPath(File.ThumbnailGUID)))
-                            {
-                                return new BitmapImage(new Uri(path, UriKind.Absolute));
-                            }
-                            else
-                            {
-                                File.ThumbnailGUID = null;
-                            }
+                            return new BitmapImage(new Uri(path, UriKind.Absolute));
                         }
-                        catch (Exception ex)
+                        else
                         {
+                            File.Win10IconGUID = null;
                         }
                     }
-                }
-                if (Configs.ShowExplorerIcon)
-                {
-                    if (!string.IsNullOrEmpty(File.IconGUID))
+                    catch (Exception ex)
                     {
-                        try
+                    }
+                    return null;
+                }
+                else
+                {
+                    if (Configs.ThumbnailStrategy == ThumbnailStrategy.MediaThumbnailPrefer)
+                    {
+                        if (!string.IsNullOrEmpty(File.ThumbnailGUID))
                         {
-                            string path = FileUtility.GetIconPath(File.IconGUID);
-                            if (System.IO.File.Exists(FileUtility.GetIconPath(File.IconGUID)))
+                            try
                             {
-                                return new BitmapImage(new Uri(path, UriKind.Absolute));
+                                string path = FileIconUtility.GetThumbnailPath(File.ThumbnailGUID);
+                                if (System.IO.File.Exists(FileIconUtility.GetThumbnailPath(File.ThumbnailGUID)))
+                                {
+                                    return new BitmapImage(new Uri(path, UriKind.Absolute));
+                                }
+                                else
+                                {
+                                    File.ThumbnailGUID = null;
+                                }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                File.IconGUID = null;
                             }
-                        }
-                        catch (Exception ex)
-                        {
                         }
                     }
+                    if (Configs.ThumbnailStrategy == ThumbnailStrategy.WindowsExplorerIcon
+                        || Configs.ThumbnailStrategy == ThumbnailStrategy.MediaThumbnailPrefer)
+                    {
+                        if (!string.IsNullOrEmpty(File.IconGUID))
+                        {
+                            try
+                            {
+                                string path = FileIconUtility.GetExplorerIconPath(File.IconGUID);
+                                if (System.IO.File.Exists(FileIconUtility.GetExplorerIconPath(File.IconGUID)))
+                                {
+                                    return new BitmapImage(new Uri(path, UriKind.Absolute));
+                                }
+                                else
+                                {
+                                    File.IconGUID = null;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                            }
+                        }
+                    }
+                    return null;
                 }
-                return null;
             }
         }
     }

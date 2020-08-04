@@ -87,8 +87,7 @@ namespace ClassifyFiles.UI.Dialog
                 Project = Project,
                 Research = chkResearch.IsChecked.Value,
                 Reclassify = chkReclassify.IsChecked.Value,
-                IncludeThumbnails = chkIncludeThumbnails.IsChecked.Value,
-                IncludeExplorerIcons = chkIncludeExplorerIcons.IsChecked.Value,
+                GenerateThumbnailsMethod = chkIncludeThumbnails.IsChecked.Value ? FileIconUtility.TryGenerateAllFileIcons : (Action<File>)null,
                 DeleteNonExistentItems = chkDeleteNonExistentItems.IsChecked.Value,
                 Callback = Callback
             };

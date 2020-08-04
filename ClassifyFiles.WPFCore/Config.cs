@@ -44,19 +44,19 @@ namespace ClassifyFiles
             get => Get(ref refreshThreadCount, GetInt, 4, nameof(RefreshThreadCount));
             set => Set(ref refreshThreadCount, value, nameof(RefreshThreadCount));
         }
-        private static bool? showExplorerIcon = null;
-        public static bool ShowExplorerIcon
-        {
-            get => Get(ref showExplorerIcon, GetBool, false, nameof(ShowExplorerIcon));
-            set => Set(ref showExplorerIcon, value, nameof(ShowExplorerIcon));
-        }
+        //private static bool? showExplorerIcon = null;
+        //public static bool ShowExplorerIcon
+        //{
+        //    get => Get(ref showExplorerIcon, GetBool, false, nameof(ShowExplorerIcon));
+        //    set => Set(ref showExplorerIcon, value, nameof(ShowExplorerIcon));
+        //}
 
-        private static bool? showThumbnail = null;
-        public static bool ShowThumbnail
-        {
-            get => Get(ref showThumbnail, GetBool, true, nameof(ShowThumbnail));
-            set => Set(ref showThumbnail, value, nameof(ShowThumbnail));
-        }
+        //private static bool? showThumbnail = null;
+        //public static bool ShowThumbnail
+        //{
+        //    get => Get(ref showThumbnail, GetBool, true, nameof(ShowThumbnail));
+        //    set => Set(ref showThumbnail, value, nameof(ShowThumbnail));
+        //}
 
         private static bool? showIconViewNames = null;
         public static bool ShowIconViewNames
@@ -94,6 +94,14 @@ namespace ClassifyFiles
         }
 
         private static int? sortType = null;
+        
+        public static ThumbnailStrategy ThumbnailStrategy
+        {
+            get => (ThumbnailStrategy)Get(ref thumbnailStrategy, GetInt, 3, nameof(ThumbnailStrategy));
+            set => Set(ref thumbnailStrategy, (int)value, nameof(ThumbnailStrategy));
+        }
+
+        private static int? thumbnailStrategy = null;
 
         public static int SortType
         {
@@ -221,5 +229,17 @@ namespace ClassifyFiles
         }
 
         public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
+    }
+
+    public enum ThumbnailStrategy
+    {
+        [Description("默认图标")]
+        None,
+        [Description("资源管理器图标")]
+        WindowsExplorerIcon,
+        [Description("优先显示多媒体缩略图")]
+        MediaThumbnailPrefer,
+        [Description("Windows10的缩略图API")]
+        Win10Icon
     }
 }

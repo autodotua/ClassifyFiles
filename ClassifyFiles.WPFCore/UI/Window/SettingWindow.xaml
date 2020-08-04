@@ -43,7 +43,9 @@
                 </GroupBox>
 
                 <GroupBox Header="显示">
-                    <CheckBox Content="平滑滚动" IsChecked="{Binding Path=(root:Configs.SmoothScroll)}"/>
+                    <CheckBox Content="平滑滚动" IsChecked="{Binding Path=(root:Configs.SmoothScroll)}">
+                        <CheckBox.ToolTip>开启后将会启动像素级滚动。当列表项过多（超过10000项）时，开启该选项可能反而会降低使用体验。</CheckBox.ToolTip>
+                    </CheckBox>
                 </GroupBox>
 
                 <GroupBox Header="缩略图和缓存">
@@ -84,8 +86,8 @@
                             </TextBlock>
                         </m:SimpleStackPanel>
                         <m:SimpleStackPanel
-                            Background="Transparent"
-                            Orientation="Horizontal" Spacing="6">
+                            Background="Transparent" VerticalAlignment="Center"
+                            Orientation="Horizontal" Spacing="12">
                             <TextBlock VerticalAlignment="Center">当前缓存位置：</TextBlock>
                             <TextBlock x:Name="tbkCachePath" VerticalAlignment="Center" />
                             <Button Click="ChangeThumbnailPositionButton_Click">
@@ -94,6 +96,7 @@
                                     <Run x:Name="runCachePathTo" />
                                 </TextBlock>
                             </Button>
+                            <Button Click="Button_Click">  打开</Button>
 
                         </m:SimpleStackPanel>
                     </m:SimpleStackPanel>

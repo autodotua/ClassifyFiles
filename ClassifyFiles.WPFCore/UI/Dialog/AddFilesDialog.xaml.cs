@@ -41,7 +41,6 @@ namespace ClassifyFiles.UI.Dialog
                     rbtnFolderImportFiles.IsChecked = true;
                     break;
             }
-            chkIncludeExplorerIcons.IsChecked = obj.IncludeExplorerIcons.Value;
             chkIncludeThumbnails.IsChecked = obj.IncludeThumbnails.Value;
 
         }
@@ -136,13 +135,13 @@ namespace ClassifyFiles.UI.Dialog
                     }
                 }
             }
+
             UpdateFilesArgs args = new UpdateFilesArgs()
             {
                 Project = Class.Project,
                 Class = Class,
                 Files = files,
-                IncludeThumbnails = chkIncludeThumbnails.IsChecked.Value,
-                IncludeExplorerIcons = chkIncludeExplorerIcons.IsChecked.Value,
+                GenerateThumbnailsMethod = chkIncludeThumbnails.IsChecked.Value ? FileIconUtility.TryGenerateAllFileIcons : (Action<File>)null,
                 Callback = Callback
             };
             working = true;
@@ -170,7 +169,6 @@ namespace ClassifyFiles.UI.Dialog
             {
                 FolderMode = rbtnFolderAsFile.IsChecked.Value ? 1 :
                 (rbtnFolderIgnore.IsChecked.Value ? 2 : 3),
-                IncludeExplorerIcons = chkIncludeExplorerIcons.IsChecked.Value,
                 IncludeThumbnails = chkIncludeThumbnails.IsChecked.Value
             });
             Configs.AddFilesOptionJson = json;

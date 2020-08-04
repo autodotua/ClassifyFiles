@@ -183,7 +183,7 @@ namespace ClassifyFiles.UI.Page
             {
                 try
                 {
-                    FileUtility.DeleteThumbnails(Project);
+                    FileUtility.DeleteThumbnails(Project,file=>FileIconUtility.GetThumbnailPath(file.ThumbnailGUID));
                 }
                 catch(Exception ex)
                 {

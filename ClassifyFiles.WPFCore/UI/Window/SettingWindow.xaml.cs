@@ -154,7 +154,7 @@ namespace ClassifyFiles.UI
             (int DeleteFromDb, int DeleteFromDisk, int RemainsCount, List<string> FailedToDelete) result = (-1, -1, -1, new List<string>());
 
             //由于删除缩略图可能会影响正在显示的缩略图，因此先关闭窗体
-            result = await DoSthNeedToCloseOtherWindowsAsync(FileUtility.OptimizeThumbnailsAndIcons);
+            result = await DoSthNeedToCloseOtherWindowsAsync(()=> FileUtility.OptimizeThumbnailsAndIcons(FileIconUtility.ThumbnailFolderPath));
             await new MessageDialog().ShowAsync($"修复成功，{Environment.NewLine}" +
                 $"从数据库中删除了{result.DeleteFromDb}张缩略图，{Environment.NewLine}" +
                 $"从磁盘中删除了{result.DeleteFromDisk}张缩略图，{Environment.NewLine}" +
@@ -205,9 +205,9 @@ namespace ClassifyFiles.UI
             object Do()
             {
                 RealtimeUpdate.ClearCahces();
-                FileUtility.DeleteAllThumbnails();
+                FileUtility.DeleteAllThumbnails(FileIconUtility.ThumbnailFolderPath);
                 Configs.CacheInTempDir = !Configs.CacheInTempDir;
-                App.UpdateFileUtilitySettings();
+                FileIconUtility.UpdateSettings();
 
                 return null;
             }
@@ -226,6 +226,11 @@ namespace ClassifyFiles.UI
                 tbkCachePath.Text = "程序目录";
                 runCachePathTo.Text = "临时目录";
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("explorer.exe", FileIconUtility.ThumbnailFolderPath);
         }
     }
 }

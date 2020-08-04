@@ -11,7 +11,9 @@
     xmlns:m="http://schemas.modernwpf.com/2019"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
+    xmlns:root="clr-namespace:ClassifyFiles"
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
+    xmlns:uiuti="clr-namespace:ClassifyFiles.UI.Util"
     mc:Ignorable="d">
     <local:ProjectPageBase.Resources>
         <c:IsNotNull2BoolConverter x:Key="nn2b" />
@@ -65,10 +67,10 @@
                 Background="Transparent" Content="更多">
                 <m:FlyoutService.Flyout>
                     <m:MenuFlyout>
-                        <MenuItem Header="被强制从某一类中移除的文件"  Click="BtnDisabledClassFiles_Click"/>
-                        <MenuItem Header="被强制设置为某一类的文件" Click="BtnManualClassFiles_Click" />
-                        <MenuItem Header="没有被分类的文件"  Click="BtnNoClassesFiles_Click" />
-                        <MenuItem Header="全部文件"   Click="BtnAllFiles_Click" />
+                        <MenuItem Click="BtnDisabledClassFiles_Click" Header="被强制从某一类中移除的文件" />
+                        <MenuItem Click="BtnManualClassFiles_Click" Header="被强制设置为某一类的文件" />
+                        <MenuItem Click="BtnNoClassesFiles_Click" Header="没有被分类的文件" />
+                        <MenuItem Click="BtnAllFiles_Click" Header="全部文件" />
                     </m:MenuFlyout>
                 </m:FlyoutService.Flyout>
             </Button>
@@ -229,12 +231,15 @@
                             </GroupBox>
                             <GroupBox Grid.Column="2" Header="图标">
                                 <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
-                                    <m:ToggleSwitch
-                                        x:Name="swtThumbs" Header="显示缩略图"
-                                        IsOn="{Binding ShowThumbnail}" />
-                                    <m:ToggleSwitch
-                                        x:Name="swtIcons" Header="显示资源管理器图标"
-                                        IsOn="{Binding ShowExplorerIcon}" />
+                                    <TextBlock>缩略图显示策略</TextBlock>
+                                    <ComboBox
+                                        Width="200"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Bottom"
+                                        DisplayMemberPath="DisplayName"
+                                        ItemsSource="{uiuti:EnumToItemsSource {x:Type root:ThumbnailStrategy}}"
+                                        SelectedValue="{Binding ThumbnailStrategy}"
+                                        SelectedValuePath="Value" />
                                     <m:ToggleSwitch
                                         x:Name="swtFileIconUniformToFill"
                                         Header="将图标裁剪为正方形"

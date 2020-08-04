@@ -32,29 +32,11 @@ namespace ClassifyFiles.WPFCore
             }
         }
 
-        public static void UpdateFileUtilitySettings()
-        {
-            if (Configs.CacheInTempDir)
-            {
-                FileUtility.ThumbnailFolderPath = Path.Combine(Path.GetTempPath(), nameof(ClassifyFiles));
-            }
-            else
-            {
-                FileUtility.ThumbnailFolderPath = "thumb";
-            }
-            if (!Directory.Exists(FileUtility.ThumbnailFolderPath))
-            {
-                Directory.CreateDirectory(FileUtility.ThumbnailFolderPath);
-            }
-            FileUtility.FFMpegPath = "exe/ffmpeg.exe";
-            FileUtility.GetFileIcon = path => ExplorerIcon.GetBitmapFromFilePath(path, ExplorerIcon.IconSizeEnum.ExtraLargeIcon);
-            FileUtility.GetFolderIcon = path => ExplorerIcon.GetBitmapFromFolderPath(path, ExplorerIcon.IconSizeEnum.ExtraLargeIcon);
-
-        }
+       
         public static new App Current { get; private set; }
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            UpdateFileUtilitySettings();
+            FileIconUtility.UpdateSettings();
             FzLib.Program.Runtime.UnhandledException.RegistAll();
             FzLib.Program.Runtime.UnhandledException.UnhandledExceptionCatched += UnhandledException_UnhandledExceptionCatched;
 

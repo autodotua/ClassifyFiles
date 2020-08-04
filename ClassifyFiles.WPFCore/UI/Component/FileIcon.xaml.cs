@@ -92,11 +92,6 @@ namespace ClassifyFiles.UI.Component
         {
             await File.LoadClassesAsync();
             await LoadImageAsync();
-            RegisterEvents();
-            await Tasks.Enqueue(RefreshIcon);
-        }
-        private void RegisterEvents()
-        {
             File.Display.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(UIFileDisplay.Image))
@@ -111,6 +106,8 @@ namespace ClassifyFiles.UI.Component
                     }
                 }
             };
+            await Tasks.Enqueue(RefreshIcon);
+            await Tasks.Enqueue(RefreshTexts);
         }
 
         private static string folderIconPath = null;
@@ -128,14 +125,23 @@ namespace ClassifyFiles.UI.Component
                 this.Notify(nameof(IconContent));
             }
         }
-        public async void RefreshIcon()
+        public void RefreshIcon()
         {
             UIFile file = null;
             Dispatcher.Invoke(() =>
             {
                 file = File;
             });
-            bool result = RealtimeUpdate.UpdateDisplay(file);
+            RealtimeUpdate.UpdateFileIcon(file);
+        }
+        public void RefreshTexts()
+        {
+            UIFile file = null;
+            Dispatcher.Invoke(() =>
+            {
+                file = File;
+            });
+            RealtimeUpdate.UpdateDisplay(file);
         }
         public async Task<bool> LoadImageAsync()
         {
@@ -160,7 +166,10 @@ namespace ClassifyFiles.UI.Component
                 IconContent = item;
                 return true;
             }
-            if (File.File.IsFolder && Configs.ShowExplorerIcon)
+            if (File.File.IsFolder &&(
+                Configs.ThumbnailStrategy == ThumbnailStrategy.MediaThumbnailPrefer
+                ||Configs.ThumbnailStrategy == ThumbnailStrategy.WindowsExplorerIcon
+                ))
             {
                 if (folderIconPath == null)
                 {

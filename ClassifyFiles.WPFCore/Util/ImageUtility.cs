@@ -15,7 +15,7 @@ namespace ClassifyFiles.Util
         public static BitmapImage ToBitmapImage(this Bitmap bitmap)
         {
             using var memory = new MemoryStream();
-            bitmap.Save(memory, ImageFormat.Jpeg);
+            bitmap.Save(memory, ImageFormat.Png);
             memory.Position = 0;
 
             var bitmapImage = new BitmapImage();

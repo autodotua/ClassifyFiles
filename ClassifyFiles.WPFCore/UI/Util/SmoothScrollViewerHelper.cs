@@ -41,6 +41,7 @@ namespace ClassifyFiles.UI.Util
         public static async Task HandleMouseWheel(ScrollViewer scr, int delta)
         {
             Debug.Assert(scr != null);
+            Debug.WriteLineIf(DebugSwitch.ScorllInfo, "Scroll Happened");
 
             //如果当前的滚动视图还没有进行过滚动，那么进行注册
             if (!remainsDeltas.ContainsKey(scr))
@@ -56,16 +57,19 @@ namespace ClassifyFiles.UI.Util
             }
             while (remainsDeltas[scr] != 0)
             {
-
+                //Debug.WriteLineIf(DebugSwitch.ScorllInfo, "Scroll delta remains " + remainsDeltas[scr]); ;
                 scr.ScrollToVerticalOffset(scr.VerticalOffset - remainsDeltas[scr] / 30d * System.Windows.Forms.SystemInformation.MouseWheelScrollLines);
                 remainsDeltas[scr] /= 1.2;
                 await Task.Delay(1);
                 //如果到目标距离不到10了，就直接停止滚动，因为不然的话会永远滚下去
-                if (Math.Abs(remainsDeltas[scr]) < 10)
+                if (Math.Abs(remainsDeltas[scr]) < 1)
                 {
                     remainsDeltas[scr] = 0;
                 }
             }
+
+            Debug.WriteLineIf(DebugSwitch.ScorllInfo, "Scroll End\r\n");
+
         }
     }
 }

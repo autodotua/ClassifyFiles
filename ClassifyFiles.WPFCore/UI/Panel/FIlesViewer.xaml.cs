@@ -44,7 +44,6 @@ namespace ClassifyFiles.UI.Panel
         {
             DataContext = this;
             InitializeComponent();
-            EventManager.RegisterClassHandler(typeof(TreeViewItem), Mouse.MouseDownEvent, new MouseButtonEventHandler(ListViewItem_PreviewMouseRightButtonDown), true);
 
             SetGroupEnable(Configs.GroupByDir);
             treeViewHelper = new TreeViewSelectorHelper<UIFile>(
@@ -155,7 +154,7 @@ namespace ClassifyFiles.UI.Panel
         /// </summary>
         /// <param name="files"></param>
         /// <returns></returns>
-        public async Task SetFilesAsync(IEnumerable<UIFile> files, Class currentClass,FileCollectionType type)
+        public async Task SetFilesAsync(IEnumerable<UIFile> files, Class currentClass, FileCollectionType type)
         {
             CurrentClass = currentClass;
             FileCollectionType = FileCollectionType;
@@ -450,6 +449,10 @@ namespace ClassifyFiles.UI.Panel
             //若文件不存在，直接访问FileInfo属性会报错，因此需要加一层try
             static long GetFileInfoValue(UIFile file, string name)
             {
+                if (!file.File.FileInfo.Exists)
+                {
+                    return 0;
+                }
                 try
                 {
                     return name switch
@@ -692,6 +695,9 @@ namespace ClassifyFiles.UI.Panel
             }
             else
             {
+                //当列表项太多的时候，鼠标滚轮事件会触发不及时。
+                //几万个文件的时候，第一次触发以后会等平滑滚动结束以后才触发第二次。
+                //目前没有找到解决方案。
                 ScrollViewer scr = FilesContent.GetVisualChild<ScrollViewer>();
                 if (scr != null && Configs.SmoothScroll)
                 {
@@ -874,7 +880,7 @@ namespace ClassifyFiles.UI.Panel
                 menuDelete.Click += MenuDelete_Click;
                 menu.Items.Add(menuDelete);
 
-                if(FileCollectionType== FileCollectionType.Disabled || FileCollectionType== FileCollectionType.Manual)
+                if (FileCollectionType == FileCollectionType.Disabled || FileCollectionType == FileCollectionType.Manual)
                 {
                     MenuItem menuRecover = new MenuItem() { Header = "恢复为正常状态", ToolTip = "这将使文件被再次自动分类，剔除手动的任何成分" };
                     menuRecover.Click += MenuRecover_Click; ;

@@ -22,19 +22,6 @@ namespace ClassifyFiles.Util
 {
     public static class FileUtility
     {
-        public static Func<string, Bitmap> GetFileIcon { get; set; }
-        public static Func<string, Bitmap> GetFolderIcon { get; set; }
-        private static EncoderParameters encParams;
-        private static ImageCodecInfo encoder;
-        static FileUtility()
-        {
-            encParams = new EncoderParameters(1);
-            encParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 50L);
-            encoder = ImageCodecInfo.GetImageEncoders()
-                           .First(c => c.FormatID == ImageFormat.Jpeg.Guid);
-        }
-        public static string ThumbnailFolderPath { get; set; }
-        public static string FFMpegPath { get; set; }
         private static readonly IReadOnlyList<string> imgExtensions = new List<string>() {
         "jpg",
         "jpeg",
@@ -53,179 +40,21 @@ namespace ClassifyFiles.Util
         "exe",
         "msi"
         }.AsReadOnly();
-        public static bool IsImage(this File file)
+        public static bool IsImage(string path)
         {
-            return imgExtensions.Contains(file.FileInfo.Extension.RemoveStart(".").ToLower());
+            return imgExtensions.Contains(P.GetExtension(path).RemoveStart(".").ToLower());
+        }
+        public static bool IsExecutable(string path)
+        {
+            return programExtensions.Contains(P.GetExtension(path).RemoveStart(".").ToLower());
+        }
+        public static bool IsVideo(string path)
+        {
+            return videoExtensions.Contains(P.GetExtension(path).RemoveStart(".").ToLower());
         }
         public static bool IsImage(this FI file)
         {
-            return imgExtensions.Contains(file.Extension.RemoveStart(".").ToLower());
-        }
-
-        public static bool TryGenerateThumbnail(File file)
-        {
-            if (file.IsFolder)
-            {
-                return false;
-            }
-            string path = file.GetAbsolutePath();
-            if (!F.Exists(path))
-            {
-                return false;
-            }
-            if (imgExtensions.Contains(P.GetExtension(path).ToLower().Trim('.')))
-            {
-                try
-                {
-                    file.ThumbnailGUID = CreateImageThumbnail(path);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    file.ThumbnailGUID = "";
-                    return false;
-                }
-            }
-            else if (videoExtensions.Contains(P.GetExtension(path).ToLower().Trim('.')))
-            {
-                try
-                {
-                    file.ThumbnailGUID = CreateVideoThumbnail(path);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    file.ThumbnailGUID = "";
-                    return false;
-                }
-            }
-            return false;
-
-        }
-
-        public static bool TryGenerateExplorerIcon(File file)
-        {
-
-            string path = file.GetAbsolutePath();
-            if (!F.Exists(path))
-            {
-                return false;
-            }
-            try
-            {
-
-                string ext = P.GetExtension(path).Replace(".", string.Empty);
-                if (file.IsFolder)
-                {
-                    string guid = GetGuidFromString("folder").ToString();
-                    //文件夹，统一图标
-                    if (!F.Exists(GetIconPath(guid)))
-                    {
-                        var iconPath = GetIconPath(guid);
-                        GetFolderIcon(path).Save(iconPath, ImageFormat.Png);
-                    }
-                    file.IconGUID = guid;
-                }
-                else if (programExtensions.Contains(ext))
-                {
-                    //程序文件，每个图标都不同
-                    string guid = Guid.NewGuid().ToString();
-                    var iconPath = GetIconPath(guid);
-                    GetFileIcon(path).Save(iconPath, ImageFormat.Png);
-                    file.IconGUID = guid;
-                }
-                else
-                {
-                    string guid = GetGuidFromString(ext).ToString();
-                    var iconPath = GetIconPath(guid);
-                    //其他文件，同一个格式的用同一个图标
-                    if (F.Exists(iconPath))
-                    {
-                    }
-                    else
-                    {
-                        string tempPath = P.GetTempFileName();
-
-                        GetFileIcon(path).Save(tempPath, ImageFormat.Png);
-                        try
-                        {
-                            F.Move(tempPath, iconPath);
-                        }
-                        catch { }
-                    }
-                    file.IconGUID = guid;
-                }
-            }
-            catch (Exception ex)
-            {
-                file.IconGUID = "";
-            }
-            return false;
-        }
-
-        private static Guid GetGuidFromString(string str)
-        {
-            using MD5 md5 = MD5.Create();
-            byte[] hash = md5.ComputeHash(Encoding.Default.GetBytes(str));
-            Guid result = new Guid(hash);
-            return result;
-        }
-
-        public static string GetThumbnailPath(string guid)
-        {
-            return P.GetFullPath(P.Combine(ThumbnailFolderPath, guid + ".jpg"));
-        }
-        public static string GetIconPath(string guid)
-        {
-            return P.GetFullPath(P.Combine(ThumbnailFolderPath, guid + ".png"));
-        }
-        private static string CreateImageThumbnail(string img)
-        {
-            using Image image = Image.FromFile(img);
-            using Image thumb = image.GetThumbnailImage(240, (int)(240.0 / image.Width * image.Height), () => false, IntPtr.Zero);
-            string guid = Guid.NewGuid().ToString();
-
-            thumb.Save(GetThumbnailPath(guid), encoder, encParams);
-            return guid;
-        }
-        private static string CreateVideoThumbnail(string video)
-        {
-            string guid = Guid.NewGuid().ToString();
-            var thumbnail = GetThumbnailPath(guid);
-            var cmd = "  -itsoffset -1  -i " + '"' + video + '"' + " -vcodec mjpeg -vframes 1 -an -f rawvideo -vf scale=480:-1 " + '"' + thumbnail + '"';
-
-            var startInfo = new ProcessStartInfo
-            {
-                WindowStyle = ProcessWindowStyle.Hidden,
-                FileName = P.GetFullPath(FFMpegPath),
-                Arguments = cmd,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                //RedirectStandardOutput = true,
-                //RedirectStandardError = true,
-            };
-            Process p = Process.Start(startInfo);
-            bool result = p.WaitForExit(20000);
-            if (!result)
-            {
-                p.Kill();
-                try
-                {
-                    F.Delete(thumbnail);
-                }
-                catch
-                {
-
-                }
-                return null;
-            }
-            //string output = p.StandardOutput.ReadToEnd();
-            //string error = p.StandardError.ReadToEnd();
-            if (!F.Exists(thumbnail))
-            {
-                return null;
-            }
-            return guid;
+            return IsImage(file.Extension);
         }
 
         public static bool IsMatched(FI file, Class c)
@@ -579,7 +408,7 @@ namespace ClassifyFiles.Util
             }
             SaveChanges();
         }
-        public static void DeleteAllThumbnails()
+        public static void DeleteAllThumbnails(string thumbPath)
         {
             foreach (var file in db.Files)
             {
@@ -594,7 +423,7 @@ namespace ClassifyFiles.Util
                     db.Entry(file).State = EntityState.Modified;
                 }
             }
-            foreach (var file in D.EnumerateFiles(ThumbnailFolderPath))
+            foreach (var file in D.EnumerateFiles(thumbPath))
             {
                 try
                 {
@@ -607,7 +436,7 @@ namespace ClassifyFiles.Util
             }
             int changes = SaveChanges();
         }
-        public static void DeleteThumbnails(Project project)
+        public static void DeleteThumbnails(Project project, Func<File, string> getThumbnailPath)
         {
             var files = db.Files.Where(p => p.ProjectID == project.ID).AsEnumerable();
 
@@ -615,7 +444,7 @@ namespace ClassifyFiles.Util
             {
                 if (file.ThumbnailGUID != null && file.ThumbnailGUID.Length > 0)
                 {
-                    string path = GetThumbnailPath(file.ThumbnailGUID);
+                    string path = getThumbnailPath(file);
                     if (F.Exists(path))
                     {
                         try
@@ -648,10 +477,10 @@ namespace ClassifyFiles.Util
         public static (int DeleteFromDb,
             int DeleteFromDisk,
             int RemainsCount,
-            List<string> FailedFiles) OptimizeThumbnailsAndIcons()
+            List<string> FailedFiles) OptimizeThumbnailsAndIcons(string thumbPath)
         {
             int deletedFromDb = 0;
-            var files = D.EnumerateFiles(ThumbnailFolderPath).ToDictionary(p => P.GetFileNameWithoutExtension(p));
+            var files = D.EnumerateFiles(thumbPath).ToDictionary(p => P.GetFileNameWithoutExtension(p));
             foreach (var dbFile in db.Files)
             {
                 Check(dbFile, dbFile.ThumbnailGUID, () => dbFile.ThumbnailGUID = null);
