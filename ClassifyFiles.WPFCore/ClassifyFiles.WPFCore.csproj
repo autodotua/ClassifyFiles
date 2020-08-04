@@ -37,10 +37,10 @@
 
   <ItemGroup>
     <Reference Include="FzCoreLib.Windows">
-      <HintPath>..\..\模块\Release\AnyCPU\netcoreapp3.1\FzCoreLib.Windows.dll</HintPath>
+      <HintPath>..\Libs\FzCoreLib.Windows.dll</HintPath>
     </Reference>
     <Reference Include="FzStandardLib">
-      <HintPath>..\..\模块\Release\AnyCPU\netstandard2.0\FzStandardLib.dll</HintPath>
+      <HintPath>..\Libs\FzStandardLib.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <Reference Include="FzStandardLib">
-      <HintPath>..\..\模块\Release\AnyCPU\netstandard2.0\FzStandardLib.dll</HintPath>
+      <HintPath>..\Libs\FzStandardLib.dll</HintPath>
     </Reference>
   </ItemGroup>
 
