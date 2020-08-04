@@ -342,3 +342,4 @@ healthchecksdb
 
 
 *.db
+/ClassifyFiles.App/Images

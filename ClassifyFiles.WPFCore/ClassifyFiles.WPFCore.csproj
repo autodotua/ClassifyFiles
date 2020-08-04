@@ -9,9 +9,10 @@
     <ApplicationIcon>Images\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="UI\Panel\FilesViewer.xaml-Fz-Laptop.cs" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <WarningLevel>1</WarningLevel>
+  </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Images\icon_dark.png" />

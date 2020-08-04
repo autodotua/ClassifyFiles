@@ -9,7 +9,20 @@ namespace ClassifyFiles.Util
 {
     public static class DbUtility
     {
-        public static string DbPath => System.IO.Path.GetFullPath("data.db");
+        public static string DbPath
+        {
+            get
+            {
+                if (System.IO.Directory.GetCurrentDirectory().StartsWith("C:\\WINDOWS"))
+                {
+                    string path = System.IO.Path.Combine(
+                       Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(ClassifyFiles), "data.db");
+                    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+                    return path;
+                }
+                return System.IO.Path.GetFullPath("data.db");
+            }
+        }
         internal static AppDbContext db = new AppDbContext(DbPath);
         /// <summary>
         /// 获取新的
@@ -39,7 +52,7 @@ namespace ClassifyFiles.Util
             {
                 lock (db)
                 {
-                    result= db.SaveChanges();
+                    result = db.SaveChanges();
                 }
             }
             catch (Exception ex)

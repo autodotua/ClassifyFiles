@@ -59,7 +59,16 @@ namespace ClassifyFiles.Util
             }
             else
             {
-                ThumbnailFolderPath = "thumb";
+                if (D.GetCurrentDirectory().StartsWith("C:\\WINDOWS"))
+                {
+                    string path = P.Combine(
+                       Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(ClassifyFiles), "thumb");
+                    ThumbnailFolderPath = path;
+                }
+                else
+                {
+                    ThumbnailFolderPath = "thumb";
+                }
             }
             D.CreateDirectory(P.Combine(ThumbnailFolderPath, "exp"));
             D.CreateDirectory(P.Combine(ThumbnailFolderPath, "win10"));
