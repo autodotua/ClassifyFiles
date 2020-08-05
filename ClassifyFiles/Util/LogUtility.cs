@@ -10,6 +10,7 @@ namespace ClassifyFiles.Util
 {
     public static class LogUtility
     {
+        private static AppDbContext db = GetNewDb();
         public static List<Log> GetLogs(DateTime from, DateTime to)
         {
             return db.Logs.Where(p => p.Time > from && p.Time < to).ToList();
@@ -19,7 +20,7 @@ namespace ClassifyFiles.Util
         {
             Log log = new Log() { Time = DateTime.Now, Message = message, Details = details };
             db.Logs.Add(log);
-            db.SaveChanges();
+            SaveChanges(db);
         }
     }
 }

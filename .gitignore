@@ -338,7 +338,7 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
-/ClassifyFiles.WPFCore/exe
+/ClassifyFiles.WPFCore/exe/*.exe
 
 
 *.db

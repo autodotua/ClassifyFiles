@@ -528,6 +528,26 @@ namespace ClassifyFiles.Util
             int remainsCount = db.Files.Where(p => p.ThumbnailGUID != null).Count();
             return (deletedFromDb, deletedFromDisk, remainsCount, failedFiles);
         }
+
+        private static bool? canWriteInCurrentDirectory = null;
+        public static bool CanWriteInCurrentDirectory()
+        {
+            if (canWriteInCurrentDirectory == null)
+            {
+                string path = P.Combine(D.GetCurrentDirectory(), Guid.NewGuid().ToString());
+                try
+                {
+                    using (F.Create(path)) { }
+                    F.Delete(path);
+                    canWriteInCurrentDirectory = true;
+                }
+                catch
+                {
+                    canWriteInCurrentDirectory = false;
+                }
+            }
+            return canWriteInCurrentDirectory.Value;
+        }
     }
 
 

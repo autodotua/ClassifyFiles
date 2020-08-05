@@ -36,12 +36,14 @@ namespace ClassifyFiles.WPFCore
         public static new App Current { get; private set; }
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            FileIconUtility.UpdateSettings();
             FzLib.Program.Runtime.UnhandledException.RegistAll();
             FzLib.Program.Runtime.UnhandledException.UnhandledExceptionCatched += UnhandledException_UnhandledExceptionCatched;
 
             Current = this;
             SplashWindow.TryShow();
+
+            FileIconUtility.UpdateSettings();
+
             MainWindow win = new MainWindow();
             MainWindow = win;
             win.Show();

@@ -32,6 +32,8 @@
 
 打开解决方案，设置```Classify.WPF```为启动项目，按F5一般来说可以直接运行。
 
+由于二进制文件ffmpeg过大，所以被我gitIgnore了。如果需要生成视频缩略图功能，请手动添加至ClassifyFiles.WPFCore的exe目录下。
+
 如果出现依赖错误，请重新定位```Classify```和```Classify.WPF```的dll引用，dll位于项目的Libs文件夹。
 
 ## 如何使用

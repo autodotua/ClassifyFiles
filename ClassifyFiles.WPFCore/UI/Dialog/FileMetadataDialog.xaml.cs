@@ -1,4 +1,5 @@
 ﻿using ClassifyFiles.Data;
+using ClassifyFiles.UI.Util;
 using ClassifyFiles.Util;
 using FzLib.Extension;
 using MetadataExtractor;
@@ -25,6 +26,7 @@ namespace ClassifyFiles.UI.Dialog
         {
             InitializeComponent();
             Path = path;
+            SmoothScrollViewerHelper.Regist(scr);
         }
 
         public string Path { get; }

@@ -86,6 +86,7 @@
                             </TextBlock>
                         </m:SimpleStackPanel>
                         <m:SimpleStackPanel
+                            ToolTip="当程序所在目录可写入时，默认位置为程序目录；否则， 默认目录为Windows应用数据目录"
                             Background="Transparent" VerticalAlignment="Center"
                             Orientation="Horizontal" Spacing="12">
                             <TextBlock VerticalAlignment="Center">当前缓存位置：</TextBlock>

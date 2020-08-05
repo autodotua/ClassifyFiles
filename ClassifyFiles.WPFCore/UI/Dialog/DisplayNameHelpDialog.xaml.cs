@@ -1,4 +1,5 @@
 ﻿using ClassifyFiles.Data;
+using ClassifyFiles.UI.Util;
 using ClassifyFiles.Util;
 using FzLib.Extension;
 using Newtonsoft.Json;
@@ -22,6 +23,7 @@ namespace ClassifyFiles.UI.Dialog
         public DisplayNameHelpDialog()
         {
             InitializeComponent();
+            SmoothScrollViewerHelper.Regist(scr);
         }
 
         public Dictionary<string,string> DisplayNameFormatItem { get; } = new Dictionary<string, string>()

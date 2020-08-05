@@ -5,10 +5,8 @@ using System.Linq;
 using System.IO;
 using System.Globalization;
 using System.Windows;
-using System.Drawing;
 using System.Windows.Data;
 using FzLib.Basic;
-using System.Drawing.Imaging;
 using System.Text;
 using System.Text.RegularExpressions;
 using ClassifyFiles.UI.Model;
@@ -16,13 +14,11 @@ using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Management.Automation;
 using System.Collections.Concurrent;
 
 using static ClassifyFiles.Util.FileUtility;
 using System.Diagnostics;
 using CSScriptLib;
-using System.Windows.Forms;
 
 namespace ClassifyFiles.UI.Converter
 {
@@ -104,6 +100,17 @@ namespace ClassifyFiles.UI.Converter
                 return null;
             }
             return exif.GetString(exifCode[name]);
+        }  
+        
+        private string GetExifValue(FileInfo fileInfo, int code)
+        {
+            var exif = GetExif(fileInfo.FullName);
+            if (exif == null)
+            {
+                return null;
+            }
+            var tag = exif.Tags.FirstOrDefault(p => p.Type == code);
+            return tag?.Description;
         }
 
         /// <summary>
@@ -140,13 +147,20 @@ namespace ClassifyFiles.UI.Converter
             if (key.StartsWith("Exif-") && file.IsImage())
             {
                 string exifKey = key.Substring(5);
-                return GetExifValue(file, exifKey);
+                if (int.TryParse(exifKey, out int code))
+                {
+                    //数字代码
+                    return GetExifValue(file, code);
+                }
+                else
+                {
+                    return GetExifValue(file, exifKey);
+                }
             }
             return null;
 
         }
 
-        ConcurrentDictionary<string, PSCommand> powershells = new ConcurrentDictionary<string, PSCommand>();
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             if (values[0].Equals(DependencyProperty.UnsetValue))
@@ -172,11 +186,7 @@ namespace ClassifyFiles.UI.Converter
             Stopwatch sw = Stopwatch.StartNew();
             try
             {
-                if (format.StartsWith("ps:"))
-                {
-                    result = ConvertByPs(format, display.FileInfo, c);
-                }
-                else if (format.StartsWith("cs:"))
+                if (format.StartsWith("cs:"))
                 {
                     result = ConvertByCs(format, display.FileInfo, c);
                 }
@@ -185,20 +195,15 @@ namespace ClassifyFiles.UI.Converter
                     result = Convert(format, display.FileInfo, c);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 result = "";
             }
             sw.Stop();
-            Debug.WriteLineIf(DebugSwitch.DisplayValueConvertTime,"convert use " + sw.ElapsedMilliseconds);
+            Debug.WriteLineIf(DebugSwitch.DisplayValueConvertTime, "convert use " + sw.ElapsedMilliseconds);
             return result;
 
         }
-        public void ClearCache()
-        {
-            powershells.Clear();
-        }
-
         /// <summary>
         /// 通过C#语法进行值的转换
         /// </summary>
@@ -216,11 +221,11 @@ namespace ClassifyFiles.UI.Converter
             else
             {
                 string f = format.Substring(3).Trim();
-                if(!f.EndsWith(";"))
+                if (!f.EndsWith(";"))
                 {
                     f += ";";
                 }
-                 csMethod = CSScript.Evaluator.CreateDelegate($@"
+                csMethod = CSScript.Evaluator.CreateDelegate($@"
 string GetValue(System.IO.FileInfo file, System.Collections.Generic.Dictionary<object,string> exifs){{
       var Name =System.IO.Path.GetFileNameWithoutExtension(file.Name);
             var Extension=file.Extension.Replace(""."","""");
@@ -233,7 +238,7 @@ var Exif=exifs;
 ");
                 csMthods.TryAdd(format, csMethod);
             }
-          
+
             Dictionary<object, string> exifs = new Dictionary<object, string>();
             if (file.IsImage() && file.Exists)
             {
@@ -265,75 +270,7 @@ var Exif=exifs;
 
             try
             {
-                return csMethod(file,exifs) as string;
-            }
-            catch (Exception ex)
-            {
-
-            }
-            return null;
-        }
-        /// <summary>
-        /// 通过Powershell语法进行值的转换
-        /// </summary>
-        /// <param name="format"></param>
-        /// <param name="file"></param>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        public string ConvertByPs(string format, FileInfo file, Class c)
-        {
-
-            PowerShell ps = PowerShell.Create();
-            PowerShell.Create();
-            ps.AddScript($"$Name='{Path.GetFileNameWithoutExtension(file.Name)}'");
-            ps.AddScript($"$Extension='{file.Extension.RemoveStart(".")}'");
-            ps.AddScript($"$CreationTime='{file.CreationTime}'");
-            ps.AddScript($"$LastWriteTime='{file.LastWriteTime}'");
-            ps.AddScript($"$DirectoryName='{file.Directory.Name}'");
-
-            if (file.IsImage() && file.Exists)
-            {
-                var exif = GetExif(file.FullName);
-
-                if (exif != null)
-                {
-                    foreach (var code in exifCode)
-                    {
-                        if (exif.ContainsTag(code.Value))
-                        {
-                            ps.AddScript($"$Exif_{code.Key}='{exif.GetDescription(code.Value)}'");
-                        }
-                    }
-
-                    //以数字定义的值
-                    foreach (Match match in rPsExifType.Matches(format))
-                    {
-                        int code = int.Parse(match.Groups["Type"].Value);
-                        Tag tag = exif.Tags.FirstOrDefault(p => p.Type == code);
-                        if (tag != null)
-                        {
-                            ps.AddScript($"{match.Value}='{tag.Description}'");
-                        }
-                    }
-                }
-
-            }
-            //    powershells.TryAdd(key, ps.Commands);
-            //}
-
-            //支持多行输入，每行作为一个命令
-            foreach (var line in format.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                ps.AddScript(line.Trim().RemoveStart("ps:"));
-            }
-
-            try
-            {
-                var result = ps.Invoke();
-                if (result.Count >= 1)
-                {
-                    return result[0]?.ToString();
-                }
+                return csMethod(file, exifs) as string;
             }
             catch (Exception ex)
             {

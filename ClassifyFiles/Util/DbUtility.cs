@@ -13,7 +13,7 @@ namespace ClassifyFiles.Util
         {
             get
             {
-                if (System.IO.Directory.GetCurrentDirectory().StartsWith("C:\\WINDOWS"))
+                if (FileUtility.CanWriteInCurrentDirectory())
                 {
                     string path = System.IO.Path.Combine(
                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(ClassifyFiles), "data.db");

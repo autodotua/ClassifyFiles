@@ -1,24 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using ClassifyFiles.Data;
-using FzLib.Basic;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using static ClassifyFiles.Util.DbUtility;
-using Dir = System.IO.Directory;
 using F = System.IO.File;
 using D = System.IO.Directory;
-using FI = System.IO.FileInfo;
 using P = System.IO.Path;
 using ClassifyFiles.Util.Win32;
 using Windows.Storage;
@@ -59,7 +48,7 @@ namespace ClassifyFiles.Util
             }
             else
             {
-                if (D.GetCurrentDirectory().StartsWith("C:\\WINDOWS"))
+                if (FileUtility.CanWriteInCurrentDirectory())
                 {
                     string path = P.Combine(
                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(ClassifyFiles), "thumb");

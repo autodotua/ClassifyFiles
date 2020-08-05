@@ -1068,10 +1068,6 @@ namespace ClassifyFiles.UI.Panel
         }
 
 
-
-
-        #endregion
-
         private async void ListViewItem_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             UIFile file = (sender as FrameworkElement).DataContext as UIFile;
@@ -1085,6 +1081,10 @@ namespace ClassifyFiles.UI.Panel
             menu.Placement = PlacementMode.Mouse;
             menu.IsOpen = true;
         }
+
+
+        #endregion
+
 
     }
 

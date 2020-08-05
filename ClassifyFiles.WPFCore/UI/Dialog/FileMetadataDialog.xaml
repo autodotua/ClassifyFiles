@@ -12,7 +12,7 @@
     ContentRendered="DialogWindowBase_ContentRendered"
     mc:Ignorable="d">
 
-    <ScrollViewer Margin="8">
+    <ScrollViewer Margin="8" HorizontalScrollBarVisibility="Auto" x:Name="scr">
         <ItemsControl x:Name="items">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
@@ -26,7 +26,7 @@
                                 </TextBlock>
                             </m:SimpleStackPanel>
                         </Expander.Header>
-                        <ListView ItemsSource="{Binding Tags}">
+                        <ListView ItemsSource="{Binding Tags}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                             <ListView.ItemContainerStyle>
                                 <Style BasedOn="{StaticResource ResourceKey={x:Static GridView.GridViewItemContainerStyleKey}}" TargetType="ListViewItem">
                                     <Setter Property="Height" Value="42" />

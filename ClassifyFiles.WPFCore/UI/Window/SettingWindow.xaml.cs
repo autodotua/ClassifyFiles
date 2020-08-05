@@ -171,7 +171,15 @@ namespace ClassifyFiles.UI
         private async Task<T> DoSthNeedToCloseOtherWindowsAsync<T>(Func<T> func)
         {
             Progress.Show();
-            App.Current.Windows.Cast<Window>().Where(p => p != this).ForEach(p => p.Close());
+            if (!(App.Current.MainWindow as MainWindow).IsClosed)
+            {
+                MainWindow mainWindow = App.Current.MainWindow as MainWindow;
+                await mainWindow.BeforeClosing(false);
+                mainWindow.Close();
+            }
+            var windows = App.Current.Windows.Cast<Window>()
+                .Where(p => p != this && !(p is MainWindow));
+            windows.ForEach(p => p.Close());
             while(FileIcon.Tasks.IsExcuting)
             {
                 //等待任务结束
@@ -183,9 +191,18 @@ namespace ClassifyFiles.UI
                 result = func();
             });
             App.Current.MainWindow = new MainWindow();
+            bool canReturn = false;
+            App.Current.MainWindow.ContentRendered += (p1, p2) =>
+            {
+                BringToFront();
+                Progress.Close();
+                canReturn = true;
+            };
             App.Current.MainWindow.Show();
-            BringToFront();
-            Progress.Close();
+            while(!canReturn)
+            {
+                await Task.Delay(20);
+            }
             return result;
         }
 
@@ -218,12 +235,12 @@ namespace ClassifyFiles.UI
             if (Configs.CacheInTempDir)
             {
                 tbkCachePath.Text = "临时目录";
-                runCachePathTo.Text = "程序目录";
+                runCachePathTo.Text = "默认位置";
             }
             else
             {
 
-                tbkCachePath.Text = "程序目录";
+                tbkCachePath.Text = "默认位置";
                 runCachePathTo.Text = "临时目录";
             }
         }

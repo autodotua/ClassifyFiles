@@ -173,14 +173,19 @@ namespace ClassifyFiles.UI
         private ILoadable mainPage;
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            if(canClose)
+            {
+                return;
+            }
             //退出前还要做一些工作，暂时先隐藏窗体，暂缓退出
             e.Cancel = true;
             Visibility = Visibility.Collapsed;
-            BeforeClosing();
+            BeforeClosing(true);
         }
-
-        public async Task BeforeClosing()
+        bool canClose = false;
+        public async Task BeforeClosing(bool shutDownApp)
         {
+            canClose = true;
             if (mainPage is ClassSettingPanel p)
             {
                 await p.SaveClassesAsync();
@@ -190,7 +195,10 @@ namespace ClassifyFiles.UI
                 await SaveChangesAsync();
             }
             await FileIcon.Tasks.Stop();
-            Application.Current.Shutdown();
+            if (shutDownApp)
+            {
+                Application.Current.Shutdown();
+            }
         }
 
         private void SettingMenuItem_Click(object sender, RoutedEventArgs e)
