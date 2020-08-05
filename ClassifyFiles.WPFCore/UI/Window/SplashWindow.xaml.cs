@@ -41,10 +41,8 @@ namespace ClassifyFiles.UI
         public SplashWindow()
         {
             DataContext = this;
-            App.SetTheme(this);
             InitializeComponent();
-            var theme = ThemeManager.GetActualTheme(this); 
-            image=new Uri(theme == ElementTheme.Dark ? "../../Images/icon_dark.png" : "../../Images/icon_light.png", UriKind.Relative);
+            image=new Uri(App.AppsUseLightTheme==false ? "../../Images/icon_dark.png" : "../../Images/icon_light.png", UriKind.Relative);
             this.Notify(nameof(Image));
         }
     }

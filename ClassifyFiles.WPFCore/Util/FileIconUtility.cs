@@ -48,7 +48,7 @@ namespace ClassifyFiles.Util
             }
             else
             {
-                if (FileUtility.CanWriteInCurrentDirectory())
+                if (!FileUtility.CanWriteInCurrentDirectory())
                 {
                     string path = P.Combine(
                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(ClassifyFiles), "thumb");

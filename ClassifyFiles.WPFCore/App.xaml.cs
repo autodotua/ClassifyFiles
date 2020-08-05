@@ -38,7 +38,7 @@ namespace ClassifyFiles.WPFCore
         {
             FzLib.Program.Runtime.UnhandledException.RegistAll();
             FzLib.Program.Runtime.UnhandledException.UnhandledExceptionCatched += UnhandledException_UnhandledExceptionCatched;
-
+            InitializeTheme();
             Current = this;
             SplashWindow.TryShow();
 
