@@ -53,7 +53,7 @@ namespace ClassifyFiles.UI.Page
             {
                 await base.LoadAsync(project);
                 filesViewer.Project = project;
-                await filesViewer.SetFilesAsync(null, null,FileCollectionType.None);
+                await filesViewer.SetFilesAsync(null, null, FileCollectionType.None);
             }
             await classPanel.LoadAsync(project);
             UpdateAppBarButtonsEnable();
@@ -82,7 +82,7 @@ namespace ClassifyFiles.UI.Page
             }
             if (classPanel.SelectedUIClass == null)
             {
-                await filesViewer.SetFilesAsync(null, null,FileCollectionType.None);
+                await filesViewer.SetFilesAsync(null, null, FileCollectionType.None);
             }
             else
             {
@@ -105,28 +105,31 @@ namespace ClassifyFiles.UI.Page
         /// <param name="e"></param>
         private async void ClassPanel_ClassFilesDrop(object sender, ClassFilesDropEventArgs e)
         {
-            GetProgress().Show();
-            if (e.Files != null)
+            await MainWindow.Current.DoProcessAsync(Do());
+            async Task Do()
             {
-                await AddFilesAsync(e.Class, e.Files);
-            }
-            else if (e.UIFiles != null)//说明是由软件内部拖放过来的
-            {
-                IReadOnlyList<File> files = null;
-                if (currentFileCollectionType == FileCollectionType.NoClass)
-                {
-                    //如果当前显示的是没有被分类的文件，那么当拖放之后，自然就不再是没有分类的文件了，所以要从列表中删去
-                    await filesViewer.RemoveFilesAsync(e.UIFiles);
-                }
-                await Task.Run(() => files = AddFilesToClass(e.UIFiles.Select(p => p.File), e.Class));
 
-                foreach (var file in e.UIFiles)
+                if (e.Files != null)
                 {
-                    await file.LoadClassesAsync(null);
+                    await AddFilesAsync(e.Class, e.Files);
                 }
-                await classPanel.UpdateUIClassesAsync();
+                else if (e.UIFiles != null)//说明是由软件内部拖放过来的
+                {
+                    IReadOnlyList<File> files = null;
+                    if (currentFileCollectionType == FileCollectionType.NoClass)
+                    {
+                        //如果当前显示的是没有被分类的文件，那么当拖放之后，自然就不再是没有分类的文件了，所以要从列表中删去
+                        await filesViewer.RemoveFilesAsync(e.UIFiles);
+                    }
+                    await Task.Run(() => files = AddFilesToClass(e.UIFiles.Select(p => p.File), e.Class));
+
+                    foreach (var file in e.UIFiles)
+                    {
+                        await file.LoadClassesAsync(null);
+                    }
+                    await classPanel.UpdateUIClassesAsync();
+                }
             }
-            GetProgress().Close();
         }
 
         #endregion
@@ -143,67 +146,70 @@ namespace ClassifyFiles.UI.Page
           )
         {
             currentFileCollectionType = type;
-            GetProgress().Show();
-            Debug.WriteLine("Set Files, Project Hashcode is " + Project.GetHashCode()
-            + ", Class is " + (classPanel.SelectedUIClass == null ? "null" : classPanel.SelectedUIClass.Class.Name));
-            IEnumerable<UIFile> uiFiles = null;
-            await Task.Delay(1);
-            Class c = classPanel.SelectedUIClass?.Class;
             bool result = false;
-            await Task.Run(() =>
+            await MainWindow.Current.DoProcessAsync(Do());
+            async Task Do()
             {
-                try
+                Debug.WriteLine("Set Files, Project Hashcode is " + Project.GetHashCode()
+            + ", Class is " + (classPanel.SelectedUIClass == null ? "null" : classPanel.SelectedUIClass.Class.Name));
+                IEnumerable<UIFile> uiFiles = null;
+                await Task.Delay(1);
+                Class c = classPanel.SelectedUIClass?.Class;
+                await Task.Run(() =>
                 {
-                    uiFiles = getUIFiles();
-                }
-                catch (Exception ex)
-                {
-                    Dispatcher.Invoke(() =>
-                   {
-                       new ErrorDialog().ShowAsync(ex, "查询文件失败");
-                   });
-                    return;
-                }
-                rawFiles = uiFiles;
-                if (FilterPattern.Length > 0)
-                {
-                    Regex r = new Regex(FilterPattern);
-                    uiFiles = uiFiles.Where(p => r.IsMatch(p.File.Name));
-                }
-                uiFiles.ForEach(p => p.Class = c);
-                result = true;
-            });
-            await filesViewer.SetFilesAsync(uiFiles, c,type);
+                    try
+                    {
+                        uiFiles = getUIFiles();
+                    }
+                    catch (Exception ex)
+                    {
+                        Dispatcher.Invoke(() =>
+                       {
+                           new ErrorDialog().ShowAsync(ex, "查询文件失败");
+                       });
+                        return;
+                    }
+                    rawFiles = uiFiles;
+                    if (FilterPattern.Length > 0)
+                    {
+                        Regex r = new Regex(FilterPattern);
+                        uiFiles = uiFiles.Where(p => r.IsMatch(p.File.Name));
+                    }
+                    uiFiles.ForEach(p => p.Class = c);
+                    result = true;
+                });
+                await filesViewer.SetFilesAsync(uiFiles, c, type);
 
-            await classPanel.UpdateUIClassesAsync();
-            await ApplyDirs();
-            GetProgress().Close();
+                await classPanel.UpdateUIClassesAsync();
+                await ApplyDirs();
+            }
             return result;
         }
         private IEnumerable<UIFile> rawFiles = null;
         private async Task ApplyFilterAsync()
         {
-            GetProgress().Show();
-
-            IEnumerable<UIFile> files = rawFiles;
-            if (rawFiles != null)
+            await MainWindow.Current.DoProcessAsync(Do());
+            async Task Do()
             {
-                if (FilterPattern.Length > 0)
+                IEnumerable<UIFile> files = rawFiles;
+                if (rawFiles != null)
                 {
-                    await Task.Run(() =>
+                    if (FilterPattern.Length > 0)
                     {
-                        Regex r = new Regex(FilterPattern);
-                        files = files.Where(p => r.IsMatch(p.File.Name));
-                    });
+                        await Task.Run(() =>
+                        {
+                            Regex r = new Regex(FilterPattern);
+                            files = files.Where(p => r.IsMatch(p.File.Name));
+                        });
+                    }
+                    else
+                    {
+                        files = rawFiles;
+                    }
+                    await filesViewer.SetFilesAsync(files, classPanel.SelectedUIClass?.Class, filesViewer.FileCollectionType);
+                    await ApplyDirs();
                 }
-                else
-                {
-                    files = rawFiles;
-                }
-                await filesViewer.SetFilesAsync(files, classPanel.SelectedUIClass?.Class, filesViewer.FileCollectionType);
-                await ApplyDirs();
             }
-            GetProgress().Close();
         }
 
         private async Task ApplyDirs()
@@ -300,7 +306,7 @@ namespace ClassifyFiles.UI.Page
         /// <param name="e"></param>
         private async void BtnAllFiles_Click(object sender, RoutedEventArgs e)
         {
-            await SetSpecialFiles( GetFilesWithClassesByProject, FileCollectionType.All);
+            await SetSpecialFiles(GetFilesWithClassesByProject, FileCollectionType.All);
         }
 
         private async void BtnManualClassFiles_Click(object sender, RoutedEventArgs e)
@@ -535,15 +541,17 @@ namespace ClassifyFiles.UI.Page
                 await new ErrorDialog().ShowAsync("请先设置根目录地址！", "错误");
                 return;
             }
-            GetProgress().Show();
-            var dialog = new UpdateFilesDialog(Project) { Owner = Window.GetWindow(this) };
-            dialog.ShowDialog();
-            if (dialog.Updated)
+            await MainWindow.Current.DoProcessAsync(Do());
+            async Task Do()
             {
-                classPanel.SelectedUIClass = null;
-                await classPanel.UpdateUIClassesAsync();
+                var dialog = new UpdateFilesDialog(Project) { Owner = Window.GetWindow(this) };
+                dialog.ShowDialog();
+                if (dialog.Updated)
+                {
+                    classPanel.SelectedUIClass = null;
+                    await classPanel.UpdateUIClassesAsync();
+                }
             }
-            GetProgress().Close();
         }
 
         /// <summary>
@@ -602,15 +610,17 @@ namespace ClassifyFiles.UI.Page
             {
                 return;
             }
-            GetProgress().Show();
-            SortType type = (SortType)(sender as FrameworkElement).Tag;
-            await filesViewer.SortAsync(type);
-            Configs.SortType = (int)type;
-            Configs.GroupByDir = false;
+            await MainWindow.Current.DoProcessAsync(Do());
+            async Task Do()
+            {
+                SortType type = (SortType)(sender as FrameworkElement).Tag;
+                await filesViewer.SortAsync(type);
+                Configs.SortType = (int)type;
+                Configs.GroupByDir = false;
 
-            this.Notify(nameof(GroupByDir));
-            UpdateAppBarButtonsEnable();
-            GetProgress().Close();
+                this.Notify(nameof(GroupByDir));
+                UpdateAppBarButtonsEnable();
+            }
         }
 
         private string filterContent = "";
@@ -711,7 +721,7 @@ namespace ClassifyFiles.UI.Page
             ani.Completed += (p1, p2) =>
             {
                 filesViewer.Width = double.NaN;
-                    isAnimating = false;
+                isAnimating = false;
                 grdSplitter.IsEnabled = true;
                 //grdLeft.Width = to;
                 //本来是写了上面注释掉的部分的，后来发现反正改变宽度都是用动画，那么就无所谓了

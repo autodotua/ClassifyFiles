@@ -176,8 +176,8 @@
             </ContentControl.RenderTransform>
         </m:Frame>
 
-        <local:ProgressDialog
-            x:Name="Progress" Grid.RowSpan="999"
+        <local:ProgressDialog x:FieldModifier="private"
+            x:Name="ring" Grid.RowSpan="999"
             Grid.ColumnSpan="999" />
     </Grid>
 </local:WindowBase>

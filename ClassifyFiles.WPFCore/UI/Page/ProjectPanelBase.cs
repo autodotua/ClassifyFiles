@@ -45,9 +45,5 @@ namespace ClassifyFiles.UI.Page
                 this.Notify(nameof(Project));
             }
         }
-        protected ProgressDialog GetProgress()
-        {
-            return (App.Current.MainWindow as MainWindow).Progress;
-        }
     }
 }

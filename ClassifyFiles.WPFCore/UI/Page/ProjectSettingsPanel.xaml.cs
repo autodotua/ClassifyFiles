@@ -78,7 +78,8 @@ namespace ClassifyFiles.UI.Page
         }
         void ShowProgressMessage(Data.File file)
         {
-            Dispatcher.Invoke(() => GetProgress().Message = "正在导出" + Environment.NewLine + Path.Combine(file.Dir, file.Name));
+            MainWindow.Current.SetProcessRingMessage(
+                "正在导出" + Environment.NewLine + Path.Combine(file.Dir, file.Name));
         }
         private async void ExportLinkButton_Click(object sender, RoutedEventArgs e)
         {
@@ -89,14 +90,11 @@ namespace ClassifyFiles.UI.Page
             };
             if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
             {
-                string path = dialog.FileName;
-                GetProgress().Show();
-                await Task.Run(() =>
+                string path = dialog.FileName; await MainWindow.Current.DoProcessAsync(
+                     Task.Run(() =>
                 {
                     FileUtility.Export(path, Project, ExportFormat, LinkUtility.CreateLink, Splitter, ShowProgressMessage);
-                });
-
-                GetProgress().Close();
+                }));
             }
         }
 
@@ -111,14 +109,12 @@ namespace ClassifyFiles.UI.Page
             if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
             {
                 string path = dialog.FileName;
-                GetProgress().Show();
-                await Task.Run(() =>
+                await MainWindow.Current.DoProcessAsync(Task.Run(() =>
                 {
                     FileUtility.Export(path, Project, ExportFormat, (from, to) => System.IO.File.Copy(from, to, true),
                                       Splitter, ShowProgressMessage);
-                });
+                }));
 
-                GetProgress().Close();
             }
         }
 
@@ -133,9 +129,7 @@ namespace ClassifyFiles.UI.Page
             if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
             {
                 string path = dialog.FileName;
-                GetProgress().Show();
-                await Task.Run(() => ExportProject(path, Project));
-                GetProgress().Close();
+                await MainWindow.Current.DoProcessAsync(Task.Run(() => ExportProject(path, Project)));
                 await new MessageDialog().ShowAsync("导出成功", "导出");
             }
 
@@ -158,12 +152,10 @@ namespace ClassifyFiles.UI.Page
         private async void DeleteFiles_Click(object sender, RoutedEventArgs e)
         {
             flyoutDeleteFiles.Hide();
-            GetProgress().Show();
-            await Task.Run(() =>
+            await MainWindow.Current.DoProcessAsync(Task.Run(() =>
             {
                 DeleteFilesOfProject(Project);
-            });
-            GetProgress().Close();
+            }));
             await new MessageDialog().ShowAsync("删除成功", "删除文件");
 
         }
@@ -171,38 +163,34 @@ namespace ClassifyFiles.UI.Page
         private async void CheckButton_Click(object sender, RoutedEventArgs e)
         {
             //无用
-            GetProgress().Show();
-            await Task.Run(() => Check(Project));
-            GetProgress().Close();
+            await MainWindow.Current.DoProcessAsync(Task.Run(() => Check(Project)));
         }
 
         private async void DeleteThumbnails_Click(object sender, RoutedEventArgs e)
         {
-            GetProgress().Show();
-            await Task.Run(() =>
+            await MainWindow.Current.DoProcessAsync(
+                 Task.Run(() =>
             {
                 try
                 {
-                    FileUtility.DeleteThumbnails(Project,file=>FileIconUtility.GetThumbnailPath(file.ThumbnailGUID));
+                    FileUtility.DeleteThumbnails(Project, file => FileIconUtility.GetThumbnailPath(file.ThumbnailGUID));
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
 
                 }
-            });
+            }));
             RealtimeUpdate.ClearCahces();
-            GetProgress().Close();
             await new MessageDialog().ShowAsync("删除成功，部分物理文件可能无法删除，请从设置中进行修复", "删除缩略图");
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
             flyoutDeleteFileClasses.Hide();
-            GetProgress().Show(); await Task.Run(() =>
+            await MainWindow.Current.DoProcessAsync(Task.Run(() =>
             {
                 DeleteAllFileClasses(Project);
-            });
-            GetProgress().Close();
+            }));
             await new MessageDialog().ShowAsync("删除成功", "删除文件分类关系");
         }
     }

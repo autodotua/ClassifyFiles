@@ -270,7 +270,7 @@
             </m:SimpleStackPanel>
         </ScrollViewer>
         <local:ProgressDialog
-            x:Name="Progress" Grid.RowSpan="999"
+            x:Name="ring" Grid.RowSpan="999"
             Grid.ColumnSpan="999" Margin="-12" />
 
     </Grid>

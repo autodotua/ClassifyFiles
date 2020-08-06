@@ -32,13 +32,14 @@ using System.Windows.Media.Imaging;
 using System.IO;
 using ClassifyFiles.UI.Component;
 using System.Threading;
+using ClassifyFiles.WPFCore;
 
 namespace ClassifyFiles.UI
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : WindowBase
+    public partial class MainWindow : WindowBase, IWithProcessRing
     {
         private ObservableCollection<Project> projects;
         public ObservableCollection<Project> Projects
@@ -103,27 +104,28 @@ namespace ClassifyFiles.UI
             mainPage = fileBrowserPanel;
             frame.Content = mainPage;
         }
+        public static MainWindow Current => App.Current.MainWindow as MainWindow;
 
-        public async Task DeleteSelectedProjectAsync()
+        public Task DeleteSelectedProjectAsync()
         {
-            Progress.Show();
-            List<Project> projects = null;
-            await Task.Run(() =>
+            return DoProcessAsync(Do());
+            async Task Do()
             {
-                DeleteProject(SelectedProject);
-                projects = GetProjects();
-                if (projects.Count == 0)
+                List<Project> projects = null;
+                await Task.Run(() =>
                 {
-                    var newProject = AddProject();
-                    projects.Add(newProject);
-                }
-            });
-            await Task.Delay(1000);
-            Projects = new ObservableCollection<Project>(projects);
-            SelectedProject = Projects[0];
-            //RadioButton_Checked(btnModeView, null);
-
-            Progress.Close();
+                    DeleteProject(SelectedProject);
+                    projects = GetProjects();
+                    if (projects.Count == 0)
+                    {
+                        var newProject = AddProject();
+                        projects.Add(newProject);
+                    }
+                });
+                await Task.Delay(1000);
+                Projects = new ObservableCollection<Project>(projects);
+                SelectedProject = Projects[0];
+            }
         }
 
         FileBrowserPanel fileBrowserPanel = new FileBrowserPanel();
@@ -152,16 +154,7 @@ namespace ClassifyFiles.UI
             if (mainPage != null)
             {
                 await NavigateToAsync(mainPage);
-                Progress.Show();
-                try
-                {
-                    await mainPage.LoadAsync(SelectedProject);
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-                Progress.Close();
+                await DoProcessAsync(mainPage.LoadAsync(SelectedProject));
             }
         }
 
@@ -173,7 +166,7 @@ namespace ClassifyFiles.UI
         private ILoadable mainPage;
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            if(canClose)
+            if (canClose)
             {
                 return;
             }
@@ -221,32 +214,33 @@ namespace ClassifyFiles.UI
             {
                 return;
             }
-            Progress.Show();
-            ToggleButton btn = sender as ToggleButton;
-            foreach (var t in cmdBarPanel.PrimaryCommands.OfType<ToggleButton>())
+            await DoProcessAsync(Do());
+            async Task Do()
             {
-                t.IsChecked = btn == t;
-            }
-            ILoadable page = btn.Name switch
-            {
-                nameof(btnModeView) => fileBrowserPanel,
-                nameof(btnModeClasses) => classSettingPanel,
-                nameof(btnModeProjectSettings) => projectSettingsPanel,
-                _ => throw new Exception()
-            };
-            if (mainPage is ClassSettingPanel p)
-            {
-                await p.SaveClassesAsync();
-            }
-            else if (mainPage is ProjectSettingsPanel)
-            {
-                await SaveChangesAsync();
-            }
+                ToggleButton btn = sender as ToggleButton;
+                foreach (var t in cmdBarPanel.PrimaryCommands.OfType<ToggleButton>())
+                {
+                    t.IsChecked = btn == t;
+                }
+                ILoadable page = btn.Name switch
+                {
+                    nameof(btnModeView) => fileBrowserPanel,
+                    nameof(btnModeClasses) => classSettingPanel,
+                    nameof(btnModeProjectSettings) => projectSettingsPanel,
+                    _ => throw new Exception()
+                };
+                if (mainPage is ClassSettingPanel p)
+                {
+                    await p.SaveClassesAsync();
+                }
+                else if (mainPage is ProjectSettingsPanel)
+                {
+                    await SaveChangesAsync();
+                }
 
-            mainPage = page;
-            await LoadPanelAsync();
-
-            Progress.Close();
+                mainPage = page;
+                await LoadPanelAsync();
+            }
         }
 
         private async Task<int> SaveChangesAsync()
@@ -258,12 +252,37 @@ namespace ClassifyFiles.UI
 
         private async void AddProjectButton_Click(object sender, RoutedEventArgs e)
         {
-            Progress.Show();
-            Project project = null;
-            await Task.Run(() => project = AddProject());
-            Projects.Add(project);
-            SelectedProject = project;
-            Progress.Close();
+            await DoProcessAsync(Do());
+            async Task Do()
+            {
+                Project project = null;
+                await Task.Run(() => project = AddProject());
+                Projects.Add(project);
+                SelectedProject = project;
+            }
+        }
+
+        public async Task DoProcessAsync(Task task)
+        {
+            ring.Show();
+            try
+            {
+                await task;
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                ring.Close();
+            }
+        }
+
+        public void SetProcessRingMessage(string message)
+        {
+            Dispatcher.BeginInvoke((Action)(() =>
+               ring.Message = message));
         }
     }
 }

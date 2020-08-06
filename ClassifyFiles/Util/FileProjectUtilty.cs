@@ -39,8 +39,7 @@ namespace ClassifyFiles.Util
             Debug.WriteLine("db begin: " + nameof(GetManualFilesWithClassesByProject));
             var result = db.FileClasses
                       .Where(p => p.File.Project == project)
-                      .Where(p => p.Status != FileClassStatus.Disabled)
-                      .Where(p => p.Status != FileClassStatus.AddManully)
+                      .Where(p => p.Status == FileClassStatus.AddManully)
                       .IncludeAll()//需要包含FileClass.File
                       .AsEnumerable()//需要内存分组
                       .GroupBy(p => p.File)//按文件分组

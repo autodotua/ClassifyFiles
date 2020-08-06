@@ -496,14 +496,6 @@ namespace ClassifyFiles.UI.Panel
 
         #region 视图相关
 
-        /// <summary>
-        /// 获取“处理中”圈圈
-        /// </summary>
-        /// <returns></returns>
-        protected ProgressDialog GetProgress()
-        {
-            return (Window.GetWindow(this) as MainWindow).Progress;
-        }
 
         /// <summary>
         /// 视图类型改变事件
@@ -978,73 +970,78 @@ namespace ClassifyFiles.UI.Panel
         private async void MenuRecover_Click(object sender, RoutedEventArgs e)
         {
             var files = GetSelectedFiles();
-            GetProgress().Show();
-            await Task.Run(() =>
-            FileUtility.DeleteFilesRecord(files.Select(p => p.File)));
-            foreach (var file in files)
+            await MainWindow.Current.DoProcessAsync(Do());
+            async Task Do()
             {
-                Files.Remove(file);
+                await Task.Run(() =>
+                FileUtility.DeleteFilesRecord(files.Select(p => p.File)));
+                foreach (var file in files)
+                {
+                    Files.Remove(file);
+                }
+                if (CurrentFileView == FileView.Tree && GetSelectedFile() != null)
+                {
+                    await treeViewHelper.RemoveItemAsync(files[0], FileTree);
+                }
             }
-            if (CurrentFileView == FileView.Tree && GetSelectedFile() != null)
-            {
-                await treeViewHelper.RemoveItemAsync(files[0], FileTree);
-            }
-            GetProgress().Close();
         }
 
         private async void MenuDelete_Click(object sender, RoutedEventArgs e)
         {
             var files = GetSelectedFiles();
-            GetProgress().Show();
-            await Task.Run(() =>
-            FileUtility.DeleteFilesRecord(files.Select(p => p.File)));
-            foreach (var file in files)
+            await MainWindow.Current.DoProcessAsync(Do());
+            async Task Do()
             {
-                Files.Remove(file);
+                await Task.Run(() =>
+                FileUtility.DeleteFilesRecord(files.Select(p => p.File)));
+                foreach (var file in files)
+                {
+                    Files.Remove(file);
+                }
+                if (CurrentFileView == FileView.Tree && GetSelectedFile() != null)
+                {
+                    await treeViewHelper.RemoveItemAsync(files[0], FileTree);
+                }
             }
-            if (CurrentFileView == FileView.Tree && GetSelectedFile() != null)
-            {
-                await treeViewHelper.RemoveItemAsync(files[0], FileTree);
-            }
-            GetProgress().Close();
         }
 
         private async void ChkTag_Click(object sender, RoutedEventArgs e)
         {
-            GetProgress().Show();
-            await Task.Delay(100);
-            var files = GetSelectedFiles();
-            CheckBox chk = sender as CheckBox;
-            Class tag = chk.Tag as Class;
-
-            if (chk.IsChecked == true)
+            await MainWindow.Current.DoProcessAsync(Do());
+            async Task Do()
             {
-                //添加到类
-                await Task.Run(() => AddFilesToClass(files.Select(p => p.File), tag));
-                foreach (var file in files)
+                await Task.Delay(1);
+                var files = GetSelectedFiles();
+                CheckBox chk = sender as CheckBox;
+                Class tag = chk.Tag as Class;
+
+                if (chk.IsChecked == true)
                 {
-                    var newC = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
-                    if (newC == null)
+                    //添加到类
+                    await Task.Run(() => AddFilesToClass(files.Select(p => p.File), tag));
+                    foreach (var file in files)
                     {
-                        file.Classes.Add(tag);
+                        var newC = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
+                        if (newC == null)
+                        {
+                            file.Classes.Add(tag);
+                        }
+                    }
+                }
+                else
+                {
+                    //从类中删除
+                    await Task.Run(() => RemoveFilesFromClass(files.Select(p => p.File), tag));
+                    foreach (var file in files)
+                    {
+                        var c = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
+                        if (c != null)
+                        {
+                            file.Classes.Remove(c);
+                        }
                     }
                 }
             }
-            else
-            {
-                //从类中删除
-                await Task.Run(() => RemoveFilesFromClass(files.Select(p => p.File), tag));
-                foreach (var file in files)
-                {
-                    var c = file.Classes.FirstOrDefault(p => p.ID == tag.ID);
-                    if (c != null)
-                    {
-                        file.Classes.Remove(c);
-                    }
-                }
-            }
-
-            GetProgress().Close();
         }
 
         /// <summary>

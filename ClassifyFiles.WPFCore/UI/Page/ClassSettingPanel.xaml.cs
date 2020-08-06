@@ -126,19 +126,21 @@ namespace ClassifyFiles.UI.Page
 
         private async void AddClassInButton_Click(object sender, RoutedEventArgs e)
         {
-            GetProgress().Show();
-            await classes.AddAsync();
-            GetProgress().Close();
-            //btnRename.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-
+            await MainWindow.Current.DoProcessAsync(Do());
+            async Task Do()
+            {
+                await classes.AddAsync();
+            }
         }
 
         private async void DeleteClassButton_Click(object sender, RoutedEventArgs e)
         {
-            GetProgress().Show();
-            await classes.DeleteSelectedAsync();
-            flyDelete.Hide();
-            GetProgress().Close();
+            await MainWindow.Current.DoProcessAsync(Do());
+            async Task Do()
+            {
+                await classes.DeleteSelectedAsync();
+                flyDelete.Hide();
+            }
         }
 
         private void AddMatchConditionButton_Click(object sender, RoutedEventArgs e)

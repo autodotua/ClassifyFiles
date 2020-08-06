@@ -20,7 +20,7 @@ namespace ClassifyFiles.UI
     /// <summary>
     /// LogsWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class SettingWindow : WindowBase
+    public partial class SettingWindow : WindowBase, IWithProcessRing
     {
         public ObservableCollection<Project> Projects { get; }
         public static SettingWindow Current { get; private set; }
@@ -78,18 +78,20 @@ namespace ClassifyFiles.UI
         private async void DeleteProjects_Click(object sender, RoutedEventArgs e)
         {
             flyoutDeleteProjects.Hide();
-            Progress.Show();
             Project project = null;
-            await Task.Run(() =>
+            await DoProcessAsync(Do());
+            async Task Do()
+            {
+                await Task.Run(() =>
             {
                 foreach (var p in GetProjects())
                 {
                     DeleteProject(p);
                 }
             });
-            Projects.Clear();
-            Projects.Add(project);
-            Progress.Close();
+                Projects.Clear();
+                Projects.Add(project);
+            }
             await new MessageDialog().ShowAsync("删除成功", "删除");
         }
 
@@ -104,10 +106,9 @@ namespace ClassifyFiles.UI
             if (dialog.ShowDialog(this) == CommonFileDialogResult.Ok)
             {
                 string path = dialog.FileName;
-                Progress.Show();
                 List<Project> projects = null;
-                await Task.Run(() => projects = Import(path));
-                Progress.Close();
+                await DoProcessAsync(Task.Run(() => projects = Import(path)));
+
                 await new MessageDialog().ShowAsync("导入成功", "导出");
                 projects.ForEach(p => Projects.Add(p));
             }
@@ -125,9 +126,7 @@ namespace ClassifyFiles.UI
             if (dialog.ShowDialog(this) == CommonFileDialogResult.Ok)
             {
                 string path = dialog.FileName;
-                Progress.Show();
-                await Task.Run(() => ExportAll(path));
-                Progress.Close();
+                await DoProcessAsync(Task.Run(() => ExportAll(path)));
                 await new MessageDialog().ShowAsync("导出成功", "导出");
             }
 
@@ -154,7 +153,7 @@ namespace ClassifyFiles.UI
             (int DeleteFromDb, int DeleteFromDisk, int RemainsCount, List<string> FailedToDelete) result = (-1, -1, -1, new List<string>());
 
             //由于删除缩略图可能会影响正在显示的缩略图，因此先关闭窗体
-            result = await DoSthNeedToCloseOtherWindowsAsync(()=> FileUtility.OptimizeThumbnailsAndIcons(FileIconUtility.ThumbnailFolderPath));
+            result = await DoSthNeedToCloseOtherWindowsAsync(() => FileUtility.OptimizeThumbnailsAndIcons(FileIconUtility.ThumbnailFolderPath));
             await new MessageDialog().ShowAsync($"修复成功，{Environment.NewLine}" +
                 $"从数据库中删除了{result.DeleteFromDb}张缩略图，{Environment.NewLine}" +
                 $"从磁盘中删除了{result.DeleteFromDisk}张缩略图，{Environment.NewLine}" +
@@ -170,38 +169,40 @@ namespace ClassifyFiles.UI
         /// <returns></returns>
         private async Task<T> DoSthNeedToCloseOtherWindowsAsync<T>(Func<T> func)
         {
-            Progress.Show();
-            if (!(App.Current.MainWindow as MainWindow).IsClosed)
-            {
-                MainWindow mainWindow = App.Current.MainWindow as MainWindow;
-                await mainWindow.BeforeClosing(false);
-                mainWindow.Close();
-            }
-            var windows = App.Current.Windows.Cast<Window>()
-                .Where(p => p != this && !(p is MainWindow));
-            windows.ForEach(p => p.Close());
-            while(FileIcon.Tasks.IsExcuting)
-            {
-                //等待任务结束
-                await Task.Delay(1);
-            }
+            await DoProcessAsync(Do());
             T result = default;
-            await Task.Run(() =>
+            async Task Do()
             {
-                result = func();
-            });
-            App.Current.MainWindow = new MainWindow();
-            bool canReturn = false;
-            App.Current.MainWindow.ContentRendered += (p1, p2) =>
-            {
-                BringToFront();
-                Progress.Close();
-                canReturn = true;
-            };
-            App.Current.MainWindow.Show();
-            while(!canReturn)
-            {
-                await Task.Delay(20);
+                if (!MainWindow.Current.IsClosed)
+                {
+                    await MainWindow.Current.BeforeClosing(false);
+                    MainWindow.Current.Close();
+                }
+                var windows = App.Current.Windows.Cast<Window>()
+                    .Where(p => p != this && !(p is MainWindow));
+                windows.ForEach(p => p.Close());
+                while (FileIcon.Tasks.IsExcuting)
+                {
+                    //等待任务结束
+                    await Task.Delay(1);
+                }
+                await Task.Run(() =>
+                {
+                    result = func();
+                });
+                await DbUtility.ReplaceDbContextAsync();
+                App.Current.MainWindow = new MainWindow();
+                bool canReturn = false;
+                App.Current.MainWindow.ContentRendered += (p1, p2) =>
+                {
+                    BringToFront();
+                    canReturn = true;
+                };
+                App.Current.MainWindow.Show();
+                while (!canReturn)
+                {
+                    await Task.Delay(20);
+                }
             }
             return result;
         }
@@ -248,6 +249,29 @@ namespace ClassifyFiles.UI
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start("explorer.exe", FileIconUtility.ThumbnailFolderPath);
+        }
+
+        public async Task DoProcessAsync(Task task)
+        {
+            ring.Show();
+            try
+            {
+                await task;
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                ring.Close();
+            }
+        }
+
+        public void SetProcessRingMessage(string message)
+        {
+            Dispatcher.BeginInvoke((Action)(() =>
+               ring.Message = message));
         }
     }
 }
