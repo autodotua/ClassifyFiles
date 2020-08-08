@@ -17,6 +17,7 @@
         <c:IsNotNull2VisibilityConverter x:Key="nn2v" />
 
     </UserControl.Resources>
+
     <Grid>
         <Grid.Resources>
 
@@ -80,14 +81,6 @@
                     </m:SimpleStackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
-            <!--<ListView.View>
-            <GridView>
-                <GridViewColumn Header="类名"  DisplayMemberBinding="{Binding Class.Name}"/>
-                <GridViewColumn Header="文件数"  DisplayMemberBinding="{Binding FileCount}"/>
-            </GridView>
-        </ListView.View>-->
         </ListBox>
     </Grid>
-
-
 </ui:UserControlBase>

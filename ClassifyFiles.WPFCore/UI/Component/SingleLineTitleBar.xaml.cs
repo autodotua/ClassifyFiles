@@ -23,15 +23,5 @@ namespace ClassifyFiles.UI.Component
         {
             InitializeComponent();
         }
-
-        private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            if (sender is ScrollViewer scr)
-            {
-                e.Handled = true;
-                SmoothScrollViewerHelper.HandleMouseWheel(scr, e.Delta, true);
-            }
-        }
-
     }
 }

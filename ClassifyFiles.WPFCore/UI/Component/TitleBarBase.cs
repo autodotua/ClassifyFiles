@@ -1,8 +1,10 @@
 ﻿using ClassifyFiles.Data;
+using ClassifyFiles.UI.Util;
 using System;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace ClassifyFiles.UI.Component
 {
@@ -60,6 +62,14 @@ namespace ClassifyFiles.UI.Component
             else
             {
                 SettingWindow.Current.BringToFront();
+            }
+        }
+        protected void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (sender is ScrollViewer scr)
+            {
+                e.Handled = true;
+                SmoothScrollViewerHelper.HandleMouseWheel(scr, e.Delta, true);
             }
         }
 

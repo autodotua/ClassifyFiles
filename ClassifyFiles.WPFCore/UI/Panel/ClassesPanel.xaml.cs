@@ -26,9 +26,11 @@ namespace ClassifyFiles.UI.Panel
         {
             InitializeComponent();
         }
+        private bool isLoading = false;
         public async Task LoadAsync(Project project)
         {
-            Project = project;
+            isLoading = true;
+               Project = project;
             List<Class> classes = null;
             await Task.Run(() => classes = GetClasses(Project));
             UIClasses = new ObservableCollection<UIClass>(classes.Select(p => new UIClass(p)));
@@ -36,6 +38,7 @@ namespace ClassifyFiles.UI.Panel
             {
                 await c.UpdatePropertiesAsync();
             }
+            isLoading = false;
             if (UIClasses.Any(p => p.Class.ID == Configs.LastClassID))
             {
                 SelectedUIClass = UIClasses.First(p => p.Class.ID == Configs.LastClassID);
@@ -58,6 +61,10 @@ namespace ClassifyFiles.UI.Panel
             get => selectedUIClass;
             set
             {
+                if(isLoading)
+                {
+                    return;
+                }
                 if (selectedUIClass == value)
                 {
                     return;

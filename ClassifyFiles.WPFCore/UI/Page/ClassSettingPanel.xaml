@@ -22,7 +22,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="8" />
+            <RowDefinition Height="0" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -31,11 +31,13 @@
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
         <panel:ClassesPanel
-            x:Name="classes" CanReorder="True"
+            x:Name="classes"
+            Background="{DynamicResource SystemControlBackgroundListLowBrush}"
+            CanReorder="True"
             SelectedClassChanged="SelectedUIClassesChanged" />
 
         <Grid
-            Grid.Column="2" Margin="0,0,12,0"
+            Grid.Column="2" Margin="0,8,12,8"
             IsEnabled="{Binding ElementName=classes, Path=SelectedUIClass, Converter={StaticResource nn2b}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -172,7 +174,7 @@
             </GroupBox>
             <GroupBox Grid.Row="99" Header="匹配条件">
 
-                <ScrollViewer>
+                <ScrollViewer x:Name="scrMathConditions">
                     <ItemsControl x:Name="lst" ItemsSource="{Binding MatchConditions}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>

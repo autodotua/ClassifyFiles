@@ -7,14 +7,15 @@
     xmlns:m="http://schemas.modernwpf.com/2019"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="450" d:DesignWidth="800"
+    Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
     mc:Ignorable="d">
     <Grid x:Name="outGrd">
         <Grid.RowDefinitions>
             <RowDefinition Height="32" />
             <RowDefinition Height="8" />
-            <RowDefinition Height="40" />
+            <RowDefinition Height="32" />
         </Grid.RowDefinitions>
-        <Grid Grid.Row="1" Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" />
+        <Grid Grid.Row="1" />
         <Grid x:Name="grdTitle" Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="8" />
@@ -94,84 +95,111 @@
 
             </StackPanel>
         </Grid>
-        <TabControl
-            x:Name="tab" Grid.Row="2"
-            Grid.RowSpan="99" Padding="0"
-            Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
-            ClipToBounds="True"
-            ItemsSource="{Binding Projects}"
-            SelectedItem="{Binding SelectedProject}">
-            <m:TabControlHelper.TabStripHeader>
-                <m:AppBarButton
-                    Grid.Column="0"
-                    Click="AddProjectButton_Click"
-                    Icon="Add" IsCompact="True"
-                    LabelPosition="Collapsed" />
-            </m:TabControlHelper.TabStripHeader>
-            <m:TabControlHelper.TabStripFooter>
-                <m:SimpleStackPanel
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal" Spacing="8">
-                    <ListBox
-                        x:Name="lbxPanelSelector"
-                        Grid.Column="8" Height="32"
-                        VerticalContentAlignment="Center"
-                        Background="Transparent"
-                        FocusVisualStyle="{x:Null}"
-                        FontSize="12"
-                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                        ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                        SelectedIndex="0"
-                        SelectionChanged="ListBox_SelectionChanged"
-                        WindowChrome.IsHitTestVisibleInChrome="True">
-                        <ListBox.ItemContainerStyle>
-                            <Style BasedOn="{StaticResource DefaultListBoxItemStyle}" TargetType="{x:Type ListBoxItem}">
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="Padding" Value="8,2" />
-                            </Style>
-                        </ListBox.ItemContainerStyle>
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" />
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                        <ListBoxItem FocusVisualStyle="{x:Null}">
-                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="6">
-                                <m:SymbolIcon Symbol="View" />
-                                <TextBlock VerticalAlignment="Center" Text="查看" />
-                            </m:SimpleStackPanel>
-                        </ListBoxItem>
-                        <ListBoxItem FocusVisualStyle="{x:Null}">
-                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
-                                <m:SymbolIcon Symbol="List" />
-                                <TextBlock VerticalAlignment="Center" Text="分类" />
-                            </m:SimpleStackPanel>
-                        </ListBoxItem>
-                        <ListBoxItem FocusVisualStyle="{x:Null}">
-                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <m:TitleBarButton
+                Grid.Column="0" Width="NaN"
+                Padding="16,0"
+                Click="AddProjectButton_Click"
+                FontFamily="{DynamicResource ContentControlThemeFontFamily}">
+                <m:SymbolIcon Symbol="Add" />
+            </m:TitleBarButton>
 
-                                <m:FontIcon Glyph="&#xF259;" RenderTransformOrigin="0.5,0.5">
-                                    <m:FontIcon.RenderTransform>
-                                        <ScaleTransform ScaleX="0.8" ScaleY="0.75" />
-                                    </m:FontIcon.RenderTransform>
-                                </m:FontIcon>
-                                <TextBlock VerticalAlignment="Center" Text="项目设置" />
-                            </m:SimpleStackPanel>
-                        </ListBoxItem>
-                    </ListBox>
-                </m:SimpleStackPanel>
-            </m:TabControlHelper.TabStripFooter>
-            <TabControl.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}" />
-                </DataTemplate>
-            </TabControl.ItemTemplate>
-            <TabControl.ContentTemplate>
-                <DataTemplate>
-                    <TextBlock />
-                </DataTemplate>
-            </TabControl.ContentTemplate>
-        </TabControl>
+            <TabControl
+                x:Name="tab" Grid.RowSpan="99"
+                Grid.Column="2" Padding="0"
+                HorizontalAlignment="Left"
+                Background="Transparent"
+                ClipToBounds="True"
+                ItemsSource="{Binding Projects}"
+                SelectedItem="{Binding SelectedProject}"
+                WindowChrome.IsHitTestVisibleInChrome="True">
+                <TabControl.Template>
+                    <ControlTemplate TargetType="TabControl">
+                        <StackPanel>
+                            <ScrollViewer
+                                HorizontalScrollBarVisibility="Hidden"
+                                PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
+                                VerticalScrollBarVisibility="Disabled">
+                                <TabPanel
+                                    x:Name="HeaderPanel" Grid.Row="0"
+                                    Grid.Column="0" Margin="2,2,2,0"
+                                    Panel.ZIndex="1" IsItemsHost="true"
+                                    KeyboardNavigation.TabIndex="1" />
+                            </ScrollViewer>
+                            <ContentPresenter
+                                x:Name="PART_SelectedContentHost"
+                                Margin="{TemplateBinding Padding}"
+                                ContentSource="SelectedContent"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        </StackPanel>
+                    </ControlTemplate>
+                </TabControl.Template>
+                <TabControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate>
+                        <TextBlock />
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
+            <ListBox
+                x:Name="lbxPanelSelector"
+                Grid.Column="4"
+                VerticalContentAlignment="Center"
+                Background="Transparent"
+                FocusVisualStyle="{x:Null}"
+                FontSize="12"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                SelectedIndex="0"
+                SelectionChanged="ListBox_SelectionChanged"
+                WindowChrome.IsHitTestVisibleInChrome="True">
+                <ListBox.ItemContainerStyle>
+                    <Style BasedOn="{StaticResource DefaultListBoxItemStyle}" TargetType="{x:Type ListBoxItem}">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="Padding" Value="8,2" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBoxItem FocusVisualStyle="{x:Null}">
+                    <m:SimpleStackPanel Orientation="Horizontal" Spacing="6">
+                        <m:SymbolIcon Symbol="View" />
+                        <TextBlock VerticalAlignment="Center" Text="查看" />
+                    </m:SimpleStackPanel>
+                </ListBoxItem>
+                <ListBoxItem FocusVisualStyle="{x:Null}">
+                    <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                        <m:SymbolIcon Symbol="List" />
+                        <TextBlock VerticalAlignment="Center" Text="分类" />
+                    </m:SimpleStackPanel>
+                </ListBoxItem>
+                <ListBoxItem FocusVisualStyle="{x:Null}">
+                    <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+
+                        <m:FontIcon Glyph="&#xF259;" RenderTransformOrigin="0.5,0.5">
+                            <m:FontIcon.RenderTransform>
+                                <ScaleTransform ScaleX="0.8" ScaleY="0.75" />
+                            </m:FontIcon.RenderTransform>
+                        </m:FontIcon>
+                        <TextBlock VerticalAlignment="Center" Text="项目设置" />
+                    </m:SimpleStackPanel>
+                </ListBoxItem>
+            </ListBox>
+        </Grid>
 
     </Grid>
 </local:TitleBarBase>

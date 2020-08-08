@@ -25,8 +25,16 @@
             <RowDefinition Height="0" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <ContentControl Content="{Binding TitleBar}" />
-
+        <Grid Margin="0,0,0,-8" ClipToBounds="True">
+            <ContentControl Margin="0,0,0,8" Content="{Binding TitleBar}">
+                <ContentControl.Effect>
+                    <!--这个效果只有在亮色模式才会显示-->
+                    <DropShadowEffect
+                        BlurRadius="8" Direction="-90" Opacity="0.4"
+                        ShadowDepth="1" Color="Black" />
+                </ContentControl.Effect>
+            </ContentControl>
+        </Grid>
         <m:Frame
             x:Name="frame" Grid.Row="4"
             IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}">

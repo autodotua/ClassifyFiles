@@ -34,6 +34,7 @@ namespace ClassifyFiles.UI.Page
         public ClassSettingPanel()
         {
             InitializeComponent();
+            SmoothScrollViewerHelper.Regist(scrMathConditions);
         }
 
         public ObservableCollection<MatchCondition> matchConditions;
