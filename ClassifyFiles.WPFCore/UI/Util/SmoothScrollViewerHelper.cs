@@ -58,7 +58,7 @@ namespace ClassifyFiles.UI.Util
                 remainsDeltas.Add(scr, 0);
             }
 
-            remainsDeltas[scr] = remainsDeltas[scr] + delta;
+            remainsDeltas[scr] = remainsDeltas[scr]*1.5 + delta;//乘一个系数，那么滚轮越快页面滑动也将越快
             if (remainsDeltas[scr] != delta)
             {
                 //如果滚动正在进行，那么把滚动交给之前的方法即可

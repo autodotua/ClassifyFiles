@@ -53,15 +53,18 @@
                             </CheckBox.ToolTip>
                         </CheckBox>
 
-                        <m:SimpleStackPanel
-                        Orientation="Horizontal" Spacing="12">
-                            <TextBlock Text="标题栏样式：" VerticalAlignment="Center" Margin="0,0,24,0"/>
+                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock
+                                Margin="0,0,24,0"
+                                VerticalAlignment="Center" Text="标题栏样式：" />
                             <RadioButton
-                            x:Name="rbtnSingleLineTitileBar"
-                            Click="rbtnSingleLineTitileBar_Click" Content="单行"/>
+                                x:Name="rbtnSingleLineTitileBar"
+                                Click="rbtnSingleLineTitileBar_Click"
+                                Content="单行" />
                             <RadioButton
-                            x:Name="rbtnTwoLineTitileBar"
-                            Click="rbtnSingleLineTitileBar_Click" Content="双行" />
+                                x:Name="rbtnTwoLineTitileBar"
+                                Click="rbtnSingleLineTitileBar_Click"
+                                Content="双行" />
                         </m:SimpleStackPanel>
                     </m:SimpleStackPanel>
                 </GroupBox>

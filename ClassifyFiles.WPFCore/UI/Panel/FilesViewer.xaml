@@ -15,7 +15,7 @@
     xmlns:uim="clr-namespace:ClassifyFiles.UI.Model"
     xmlns:wpftk="clr-namespace:WpfToolkit.Controls;assembly=VirtualizingWrapPanel"
     x:Name="root" d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignWidth="800" ClipToBounds="True"
     Loaded="Panel_Loaded"
     PreviewKeyDown="UserControl_PreviewKeyDown"
     mc:Ignorable="d">
@@ -571,9 +571,10 @@
         </Grid>
 
         <ContentControl
-            Grid.Row="4"
+            x:Name="mainContent" Grid.Row="4"
             Content="{Binding FilesContent}"
-            PreviewMouseWheel="ListBox_PreviewMouseWheel" />
+            PreviewMouseWheel="ListBox_PreviewMouseWheel"
+            RenderTransformOrigin="0.5,0.5" />
 
     </Grid>
 </UserControl>

@@ -672,18 +672,60 @@ namespace ClassifyFiles.UI.Panel
                 await new ErrorDialog().ShowAsync(ex, "打开失败");
             }
         }
-
+        private double currentScale = 1;
+        private DoubleAnimation lastAnimation = null;
         /// <summary>
         /// 鼠标滚轮事件。当按下Ctrl时滚动滚轮，将能够缩放。全面接管滚动，自己写了一个动画滚动
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void ListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        private void ListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && CurrentFileView != FileView.Detail)
             {
+                //基本思路是：
+                //首先根据鼠标位置设置变换起点
+                //然后开始缩放动画
+                //缩放动画完成后，检测是否为最后一个缩放动画
+                //如果是最后一个缩放动画，那么说明缩放结束。
+                //之后开始渐隐动画，同时禁止鼠标操作
+                //透明度为0后，进行真正的图标大小配置设置
+                //设置完成后，重新开始新的动画，把透明度变成1，释放鼠标操作
+
+                var point = e.GetPosition(mainContent);
+                var scalePoint = new Point(point.X / mainContent.ActualWidth, point.Y / mainContent.ActualHeight);
+                mainContent.RenderTransformOrigin = scalePoint;
+
                 e.Handled = true;
-                Configs.IconSize += e.Delta / 30;
+                double scale = 1 + e.Delta / 500d;
+                DoubleAnimation ani = new DoubleAnimation(currentScale * scale, Configs.AnimationDuration);
+                ani.Completed += (p1, p2) =>
+                {
+                    if (ani == lastAnimation)
+                    {
+                        lastAnimation = null;
+                        IsHitTestVisible = false;
+                        DoubleAnimation ani2 = new DoubleAnimation(0, Configs.AnimationDuration);
+                        ani2.Completed += (p3, p4) =>
+                        {
+                            Configs.IconSize *= currentScale;
+                            currentScale = 1;
+                            mainContent.RenderTransform = Transform.Identity;
+                            DoubleAnimation ani3 = new DoubleAnimation(1, Configs.AnimationDuration);
+                            mainContent.BeginAnimation(OpacityProperty, ani3);
+                            IsHitTestVisible = true;
+                        };
+                        mainContent.BeginAnimation(OpacityProperty, ani2);
+                    };
+                };
+                if (!(mainContent.RenderTransform is ScaleTransform))
+                {
+                    mainContent.RenderTransform = new ScaleTransform();
+                }
+                currentScale *= scale;
+                lastAnimation = ani;
+                mainContent.RenderTransform.BeginAnimation(ScaleTransform.ScaleXProperty, ani);
+                mainContent.RenderTransform.BeginAnimation(ScaleTransform.ScaleYProperty, ani);
             }
             else
             {
@@ -695,7 +737,7 @@ namespace ClassifyFiles.UI.Panel
                 {
                     e.Handled = true;
 
-                     SmoothScrollViewerHelper.HandleMouseWheel(scr, e.Delta);
+                    SmoothScrollViewerHelper.HandleMouseWheel(scr, e.Delta);
                 }
             }
         }
