@@ -8,7 +8,6 @@ using System.Windows.Media.Imaging;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Media;
-using ClassifyFiles.WPFCore;
 using System.Drawing;
 using System.Threading.Tasks;
 using Windows.Storage;

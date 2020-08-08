@@ -2,7 +2,6 @@
 using ClassifyFiles.UI.Component;
 using ClassifyFiles.UI.Util;
 using ClassifyFiles.Util;
-using ClassifyFiles.WPFCore;
 using FzLib.Basic;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
@@ -36,8 +35,13 @@ namespace ClassifyFiles.UI
                 case 0: rbtnThemeAuto.IsChecked = true; break;
                 case -1: rbtnThemeDark.IsChecked = true; break;
                 case 1: rbtnThemeLight.IsChecked = true; break;
-                default:
-                    break;
+                default: throw new Exception();
+            }
+            switch (Configs.TitleBarLine)
+            {
+                case 1:rbtnSingleLineTitileBar.IsChecked = true;break;
+                case 2:rbtnTwoLineTitileBar.IsChecked = true;break;
+                default:throw new Exception();
             }
             chkAutoThumbnails.IsChecked = Configs.AutoThumbnails;
             numThread.Value = Configs.RefreshThreadCount;
@@ -272,6 +276,20 @@ namespace ClassifyFiles.UI
         {
             Dispatcher.BeginInvoke((Action)(() =>
                ring.Message = message));
+        }
+
+        private void rbtnSingleLineTitileBar_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender == rbtnSingleLineTitileBar)
+            {
+                Configs.TitleBarLine = 1;
+            }
+            else
+            {
+
+                Configs.TitleBarLine = 2;
+            }
+            MainWindow.Current.SetTitleBar();
         }
     }
 }

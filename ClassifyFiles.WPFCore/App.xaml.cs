@@ -17,22 +17,17 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
-namespace ClassifyFiles.WPFCore
+namespace ClassifyFiles
 {
     /// <summary>
     /// App.xaml 的交互逻辑
     /// </summary>
     public partial class App : Application
     {
-        public static Window CurrentWindow
-        {
-            get
-            {
-               return Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
-            }
-        }
+        public static Window CurrentWindow => 
+            Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
 
-       
+
         public static new App Current { get; private set; }
         private void Application_Startup(object sender, StartupEventArgs e)
         {

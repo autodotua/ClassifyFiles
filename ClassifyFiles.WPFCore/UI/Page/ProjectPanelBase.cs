@@ -10,7 +10,6 @@ using System.Collections.ObjectModel;
 using FzLib.Extension;
 using System.Windows;
 using System.ComponentModel;
-using ClassifyFiles.WPFCore;
 
 namespace ClassifyFiles.UI.Page
 {

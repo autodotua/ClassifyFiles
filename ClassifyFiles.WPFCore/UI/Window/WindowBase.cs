@@ -24,7 +24,7 @@ namespace ClassifyFiles.UI
             DataContext = this;
             WindowHelper.SetUseModernWindowStyle(this, true);
             ThemeManager.SetIsThemeAware(this, true);
-            WPFCore.App.SetTheme(this);
+            App.SetTheme(this);
         }
         public event PropertyChangedEventHandler PropertyChanged;
 

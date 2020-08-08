@@ -1,5 +1,4 @@
-﻿using ClassifyFiles.WPFCore;
-using ModernWpf.Controls;
+﻿using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

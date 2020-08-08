@@ -8,8 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:root="clr-namespace:ClassifyFiles"
     Title="设置" Width="800"
-    Height="450"
-    Closing="Window_Closing"
+    Height="450" Closing="Window_Closing"
     Loaded="Window_Loaded"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
@@ -32,7 +31,8 @@
                         Orientation="Horizontal" Spacing="12">
                         <RadioButton
                             x:Name="rbtnThemeAuto"
-                            Click="ThemeButton_Click" Content="自动" />
+                            Click="ThemeButton_Click" Content="自动"
+                            ToolTip="该设置由Windows10的个性化-颜色所提供" />
                         <RadioButton
                             x:Name="rbtnThemeLight"
                             Click="ThemeButton_Click" Content="亮色" />
@@ -43,9 +43,27 @@
                 </GroupBox>
 
                 <GroupBox Header="显示">
-                    <CheckBox Content="平滑滚动" IsChecked="{Binding Path=(root:Configs.SmoothScroll)}">
-                        <CheckBox.ToolTip>开启后将会启动像素级滚动。当列表项过多（超过10000项）时，开启该选项可能反而会降低使用体验。</CheckBox.ToolTip>
-                    </CheckBox>
+                    <m:SimpleStackPanel Spacing="12">
+                        <CheckBox Content="平滑滚动" IsChecked="{Binding Path=(root:Configs.SmoothScroll)}">
+                            <CheckBox.ToolTip>
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock>开启后将会启动像素级滚动。当列表项过多（超过10000项）时，开启该选项可能反而会降低使用体验。</TextBlock>
+                                    <TextBlock>该设置仅针对于文件查看面板，其他区域会保持启用。</TextBlock>
+                                </StackPanel>
+                            </CheckBox.ToolTip>
+                        </CheckBox>
+
+                        <m:SimpleStackPanel
+                        Orientation="Horizontal" Spacing="12">
+                            <TextBlock Text="标题栏样式：" VerticalAlignment="Center" Margin="0,0,24,0"/>
+                            <RadioButton
+                            x:Name="rbtnSingleLineTitileBar"
+                            Click="rbtnSingleLineTitileBar_Click" Content="单行"/>
+                            <RadioButton
+                            x:Name="rbtnTwoLineTitileBar"
+                            Click="rbtnSingleLineTitileBar_Click" Content="双行" />
+                        </m:SimpleStackPanel>
+                    </m:SimpleStackPanel>
                 </GroupBox>
 
                 <GroupBox Header="缩略图和缓存">
@@ -86,9 +104,10 @@
                             </TextBlock>
                         </m:SimpleStackPanel>
                         <m:SimpleStackPanel
-                            ToolTip="当程序所在目录可写入时，默认位置为程序目录；否则， 默认目录为Windows应用数据目录"
-                            Background="Transparent" VerticalAlignment="Center"
-                            Orientation="Horizontal" Spacing="12">
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            Orientation="Horizontal" Spacing="12"
+                            ToolTip="当程序所在目录可写入时，默认位置为程序目录；否则， 默认目录为Windows应用数据目录">
                             <TextBlock VerticalAlignment="Center">当前缓存位置：</TextBlock>
                             <TextBlock x:Name="tbkCachePath" VerticalAlignment="Center" />
                             <Button Click="ChangeThumbnailPositionButton_Click">
@@ -97,7 +116,7 @@
                                     <Run x:Name="runCachePathTo" />
                                 </TextBlock>
                             </Button>
-                            <Button Click="Button_Click">  打开</Button>
+                            <Button Click="Button_Click">打开</Button>
 
                         </m:SimpleStackPanel>
                     </m:SimpleStackPanel>
@@ -123,22 +142,23 @@
                         <Button Click="ImportMenu_Click" Content="导入" />
                         <Button Click="ExportMenu_Click" Content="导出" />
                         <Button
-                            Click="OptimizeThumbnailsAndIconsButton_Click" Content="修复孤立缩略图"
+                            Click="OptimizeThumbnailsAndIconsButton_Click"
+                            Content="修复孤立缩略图"
                             ToolTip="将会删除存在于数据库、但不存在于文件系统，或存在于文件系统、但没有对应的数据库文件缩略图的文件" />
                     </m:SimpleStackPanel>
                 </GroupBox>
-                
+
                 <GroupBox Header="记忆">
                     <Button
                         Click="ResetAutoAddFilesButton_Click"
                         Content="取消自动添加文件"
                         IsEnabled="{Binding Path=(root:Configs.AutoAddFiles)}" />
                 </GroupBox>
-                
+
                 <GroupBox Header="日志">
                     <Button Click="OpenLogButton_Click" Content="查看日志" />
                 </GroupBox>
-                
+
                 <GroupBox Header="关于">
                     <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
                         <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">

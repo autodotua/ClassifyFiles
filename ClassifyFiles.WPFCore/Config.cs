@@ -44,19 +44,6 @@ namespace ClassifyFiles
             get => Get(ref refreshThreadCount, GetInt, 4, nameof(RefreshThreadCount));
             set => Set(ref refreshThreadCount, value, nameof(RefreshThreadCount));
         }
-        //private static bool? showExplorerIcon = null;
-        //public static bool ShowExplorerIcon
-        //{
-        //    get => Get(ref showExplorerIcon, GetBool, false, nameof(ShowExplorerIcon));
-        //    set => Set(ref showExplorerIcon, value, nameof(ShowExplorerIcon));
-        //}
-
-        //private static bool? showThumbnail = null;
-        //public static bool ShowThumbnail
-        //{
-        //    get => Get(ref showThumbnail, GetBool, true, nameof(ShowThumbnail));
-        //    set => Set(ref showThumbnail, value, nameof(ShowThumbnail));
-        //}
 
         private static bool? showIconViewNames = null;
         public static bool ShowIconViewNames
@@ -103,6 +90,15 @@ namespace ClassifyFiles
 
         private static int? thumbnailStrategy = null;
 
+        private static int? titleBarLine = null;
+        public static int TitleBarLine
+        {
+            get => Get(ref titleBarLine, GetInt, 2, nameof(TitleBarLine));
+            set => Set(ref titleBarLine, value, nameof(TitleBarLine));
+        }
+
+
+
         public static int SortType
         {
             get => Get(ref sortType, GetInt, 0, nameof(SortType));
@@ -143,7 +139,7 @@ namespace ClassifyFiles
         private static bool? showFileTime = null;
         public static bool ShowFileTime
         {
-            get => Get(ref showFileTime, GetBool, true, nameof(ShowFileTime));
+            get => Get(ref showFileTime, GetBool, false, nameof(ShowFileTime));
             set => Set(ref showFileTime, value, nameof(ShowFileTime));
         }
         private static bool? showToolTip = null;
@@ -212,6 +208,14 @@ namespace ClassifyFiles
             }
             return field;
         }
+
+        private static bool? hasOpened = null;
+        public static bool HasOpened
+        {
+            get => Get(ref hasOpened, GetBool, false, nameof(HasOpened));
+            set => Set(ref hasOpened, value, nameof(HasOpened));
+        }
+
 
         public static TimeSpan AnimationDuration { get; } = TimeSpan.FromSeconds(0.2);
 

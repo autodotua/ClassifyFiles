@@ -1,5 +1,4 @@
-﻿using ClassifyFiles.WPFCore;
-using FzLib.Extension;
+﻿using FzLib.Extension;
 using ModernWpf;
 using System;
 using System.ComponentModel;

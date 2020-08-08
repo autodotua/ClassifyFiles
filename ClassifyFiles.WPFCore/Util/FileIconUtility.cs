@@ -38,7 +38,7 @@ namespace ClassifyFiles.Util
                 ExplorerIcon.GetBitmapFromFolderPath("C:\\Windows", ExplorerIcon.IconSizeEnum.ExtraLargeIcon)
                     .Save(folderIconPath, ImageFormat.Png);
             }
-            return new BitmapImage(new Uri(folderIconPath, UriKind.Absolute));
+            return new BitmapImage(new Uri(Path.GetFullPath(folderIconPath), UriKind.Absolute));
         }
         public static void UpdateSettings()
         {

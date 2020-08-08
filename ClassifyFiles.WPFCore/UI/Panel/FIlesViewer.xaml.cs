@@ -695,7 +695,7 @@ namespace ClassifyFiles.UI.Panel
                 {
                     e.Handled = true;
 
-                    await SmoothScrollViewerHelper.HandleMouseWheel(scr, e.Delta);
+                     SmoothScrollViewerHelper.HandleMouseWheel(scr, e.Delta);
                 }
             }
         }

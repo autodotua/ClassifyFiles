@@ -18,27 +18,24 @@ namespace ClassifyFiles.UI.Util
     public static class SmoothScrollViewerHelper
     {
         private static Dictionary<ScrollViewer, double> remainsDeltas = new Dictionary<ScrollViewer, double>();
-        public static void Regist(Control ctrl)
+        public static void Regist(Control ctrl, bool horizontal = false)
         {
             ScrollViewer scr = ctrl.GetVisualChild<ScrollViewer>();
-            if(scr==null)
+            if (scr == null)
             {
                 throw new Exception("Control内没有ScrollViewer");
             }
             Regist(scr);
         }
-        public static void Regist(ScrollViewer scr)
+        public static void Regist(ScrollViewer scr, bool horizontal = false)
         {
             scr.PreviewMouseWheel += async (p1, p2) =>
              {
-                 if (Configs.SmoothScroll)
-                 {
-                     p2.Handled = true;
-                     await HandleMouseWheel(p1 as ScrollViewer, p2.Delta);
-                 }
+                 p2.Handled = true;
+                 HandleMouseWheel(p1 as ScrollViewer, p2.Delta, horizontal);
              };
         }
-        public static async Task HandleMouseWheel(ScrollViewer scr, int delta)
+        public static async void HandleMouseWheel(ScrollViewer scr, int delta, bool horizontal = false)
         {
             Debug.Assert(scr != null);
             Debug.WriteLineIf(DebugSwitch.ScorllInfo, "Scroll Happened");
@@ -57,8 +54,14 @@ namespace ClassifyFiles.UI.Util
             }
             while (remainsDeltas[scr] != 0)
             {
-                //Debug.WriteLineIf(DebugSwitch.ScorllInfo, "Scroll delta remains " + remainsDeltas[scr]); ;
-                scr.ScrollToVerticalOffset(scr.VerticalOffset - remainsDeltas[scr] / 30d * System.Windows.Forms.SystemInformation.MouseWheelScrollLines);
+                if (horizontal)
+                {
+                    scr.ScrollToHorizontalOffset(scr.HorizontalOffset - remainsDeltas[scr] / 30d * System.Windows.Forms.SystemInformation.MouseWheelScrollLines);
+                }
+                else
+                {
+                    scr.ScrollToVerticalOffset(scr.VerticalOffset - remainsDeltas[scr] / 30d * System.Windows.Forms.SystemInformation.MouseWheelScrollLines);
+                }
                 remainsDeltas[scr] /= 1.2;
                 await Task.Delay(1);
                 //如果到目标距离不到10了，就直接停止滚动，因为不然的话会永远滚下去
