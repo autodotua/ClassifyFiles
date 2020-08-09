@@ -600,10 +600,7 @@ namespace ClassifyFiles.UI.Panel
         {
             try
             {
-                Dispatcher.Invoke(() =>
-                {
-                    progress.IsActive = e.IsRunning;
-                });
+                Dispatcher.BeginInvoke((Action)(() => progress.IsActive = e.IsRunning));
             }
             catch
             {
@@ -694,7 +691,7 @@ namespace ClassifyFiles.UI.Panel
 
                 var point = e.GetPosition(mainContent);
                 var scalePoint = CurrentFileView != FileView.Icon && CurrentFileView != FileView.Tile ?
-                    new Point(0, 0): 
+                    new Point(0, 0) :
                     new Point(point.X / mainContent.ActualWidth, point.Y / mainContent.ActualHeight);
 
                 mainContent.RenderTransformOrigin = scalePoint;

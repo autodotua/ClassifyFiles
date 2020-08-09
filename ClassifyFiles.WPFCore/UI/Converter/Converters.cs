@@ -10,6 +10,24 @@ using System.Windows.Markup;
 
 namespace ClassifyFiles.UI.Converter
 {
+    public class Bool2intConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            int[] nums = (parameter as string).Split(',', ' ').Select(p => int.Parse(p)).ToArray();
+            if((bool)value)
+            {
+                return nums[0];
+            }
+            return nums[1];
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class Null2ZeroConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

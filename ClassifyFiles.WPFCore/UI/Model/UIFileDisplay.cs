@@ -205,7 +205,6 @@ namespace ClassifyFiles.UI.Model
             }
         }
         public string DisplayDir => File.IsFolder ? File.Dir.Substring(0, File.Dir.Length - DefaultDisplayName.Length).Trim('\\') : File.Dir;
-        public bool ShowTileViewPaths => Configs.ShowTilePath;
         public const string FileGlyph = "\uED41";
         public const string FolderGlyph = "\uED43";
 

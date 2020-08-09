@@ -98,7 +98,7 @@ namespace ClassifyFiles.UI.Component
                 {
                     try
                     {
-                        Dispatcher.InvokeAsync(() => LoadImageAsync());
+                        Dispatcher.Invoke(() => LoadImageAsync());
                     }
                     catch
                     {
@@ -107,7 +107,13 @@ namespace ClassifyFiles.UI.Component
                 }
             };
             await Tasks.Enqueue(RefreshIcon);
-            await Tasks.Enqueue(RefreshTexts);
+            if (File.Class!=null &&(!string.IsNullOrEmpty(File.Class.DisplayNameFormat)
+                || !string.IsNullOrEmpty(File.Class.DisplayProperty1)
+                || !string.IsNullOrEmpty(File.Class.DisplayProperty2)
+                || !string.IsNullOrEmpty(File.Class.DisplayProperty3)))
+            {
+                await Tasks.Enqueue(RefreshTexts);
+            }
         }
 
         private static string folderIconPath = null;
@@ -128,19 +134,13 @@ namespace ClassifyFiles.UI.Component
         public void RefreshIcon()
         {
             UIFile file = null;
-            Dispatcher.Invoke(() =>
-            {
-                file = File;
-            });
+            Dispatcher.Invoke(() => file = File);
             RealtimeUpdate.UpdateFileIcon(file);
         }
         public void RefreshTexts()
         {
             UIFile file = null;
-            Dispatcher.Invoke(() =>
-            {
-                file = File;
-            });
+            Dispatcher.Invoke(() => file = File);
             RealtimeUpdate.UpdateDisplay(file);
         }
         public async Task<bool> LoadImageAsync()
@@ -166,9 +166,9 @@ namespace ClassifyFiles.UI.Component
                 IconContent = item;
                 return true;
             }
-            if (File.File.IsFolder &&(
+            if (File.File.IsFolder && (
                 Configs.ThumbnailStrategy == ThumbnailStrategy.MediaThumbnailPrefer
-                ||Configs.ThumbnailStrategy == ThumbnailStrategy.WindowsExplorerIcon
+                || Configs.ThumbnailStrategy == ThumbnailStrategy.WindowsExplorerIcon
                 ))
             {
                 if (folderIconPath == null)
@@ -194,6 +194,7 @@ namespace ClassifyFiles.UI.Component
                 }
                 else
                 {
+                    img.Freeze();
                     item = new Image()
                     {
                         Source = img,

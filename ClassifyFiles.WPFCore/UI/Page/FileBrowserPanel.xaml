@@ -23,7 +23,7 @@
     <Grid x:Name="grdMain">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" MaxWidth="600" />
-            <ColumnDefinition Width="16" />
+            <ColumnDefinition Width="8" />
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -31,19 +31,53 @@
             <RowDefinition Height="0" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+
         <GridSplitter
             x:Name="grdSplitter" Grid.RowSpan="99"
             Grid.Column="1"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             Background="Transparent"
-            PreviewMouseUp="Splitter_PreviewMouseUp" />
-        <Label
-            Grid.Column="1"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center" Content="⁞"
-            FontSize="26" FontWeight="Bold"
-            IsHitTestVisible="False" Opacity="0.5" />
+            FocusVisualStyle="{x:Null}"
+            Opacity="0.5"
+            PreviewMouseUp="Splitter_PreviewMouseUp">
+            <GridSplitter.Template>
+                <ControlTemplate>
+                    <Border x:Name="border" Background="{TemplateBinding Background}">
+                        <TextBlock
+                            x:Name="tbk"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" FontSize="26"
+                            FontWeight="Bold" Opacity="0"
+                            Text="⁞" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="tbk"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="1" Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="tbk"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0" Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </GridSplitter.Template>
+        </GridSplitter>
         <Grid
             x:Name="grdLeft" Grid.RowSpan="99"
             Width="200" Margin="0,0,0,-8"
@@ -77,14 +111,13 @@
         </Grid>
 
         <Grid Grid.Column="2" Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
-        <panel:FilesViewer
-            x:Name="filesViewer" 
-            Margin="0,32,0,0" AllowDrop="True"
-            
-            ClickTag="FilesViewer_ClickTag"
-            Drop="FileViewer_Drop"
-            PreviewMouseWheel="FilesViewer_PreviewMouseWheel"
-            ViewTypeChanged="FilesViewer_ViewTypeChanged" />
+            <panel:FilesViewer
+                x:Name="filesViewer" Margin="0,32,0,0"
+                AllowDrop="True"
+                ClickTag="FilesViewer_ClickTag"
+                Drop="FileViewer_Drop"
+                PreviewMouseWheel="FilesViewer_PreviewMouseWheel"
+                ViewTypeChanged="FilesViewer_ViewTypeChanged" />
         </Grid>
         <m:CommandBar
             Grid.Row="2" Grid.Column="2"
@@ -192,7 +225,7 @@
             </m:AppBarButton>
             <m:AppBarButton Icon="View" Label="显示">
                 <m:AppBarButton.Flyout>
-                    <m:Flyout x:Name="flyoutDisplay"  Opening="flyoutDisplay_Opening">
+                    <m:Flyout x:Name="flyoutDisplay" Opening="flyoutDisplay_Opening">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
@@ -301,8 +334,13 @@
                 <m:AppBarButton.Flyout>
                     <m:Flyout x:Name="flyoutJumpToDir">
                         <ListBox
-                            Grid.Row="2" MaxHeight="600"
+                            x:Name="lbxDirs" Grid.Row="2"
+                            Width="320" MaxHeight="600"
                             ItemsSource="{Binding Dirs}"
+                            PreviewMouseWheel="lbxDirs_PreviewMouseWheel"
+                            ScrollViewer.CanContentScroll="False"
+                            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
                             SelectionChanged="JumpToDirComboBox_SelectionChanged" />
                     </m:Flyout>
                 </m:AppBarButton.Flyout>

@@ -744,12 +744,19 @@ namespace ClassifyFiles.UI.Page
             var cd = grdMain.ColumnDefinitions[0];
             if (cd.Width.IsAbsolute)
             {
-                StartAnimation(cd.Width.Value - 8);
-                //这边可能是有Margin什么的，要-8才能没有顿挫
+                StartAnimation(cd.Width.Value);
             }
         }
 
+
         #endregion
+
+        private void lbxDirs_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            e.Handled = true;
+            //不知道为啥，这边速度偏快好多
+            SmoothScrollViewerHelper.HandleMouseWheel(UIUtility.GetVisualChild<ScrollViewer>(e.Source as FrameworkElement), e.Delta);
+        }
 
 
     }

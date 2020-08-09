@@ -28,9 +28,10 @@ namespace ClassifyFiles.Util
                              .ToList();
             var result = tempFiles
                  .GroupBy(p => p.File)
-                 .Select( p => KeyValuePair.Create( p.Key,  p
-                 .Where(q => q.Class != null)//由于上面用了左连接，因此会有一些Class为null的出现，需要剔除。
-                 .Select(q => q.Class)));
+                 .OrderBy(p => p.Key.Dir)
+                 .Select(p => KeyValuePair.Create(p.Key, p
+                .Where(q => q.Class != null)//由于上面用了左连接，因此会有一些Class为null的出现，需要剔除。
+                .Select(q => q.Class).OrderBy(q => q.Name) as IEnumerable<Class>));
             Debug.WriteLine("db end: " + nameof(GetFilesWithClassesByProject));
             return result;
         }
@@ -43,7 +44,8 @@ namespace ClassifyFiles.Util
                       .IncludeAll()//需要包含FileClass.File
                       .AsEnumerable()//需要内存分组
                       .GroupBy(p => p.File)//按文件分组
-                      .Select(p => KeyValuePair.Create(p.Key, p.Select(q => q.Class)));
+                      .OrderBy(p => p.Key.Dir)
+                      .Select(p => KeyValuePair.Create(p.Key, p.Select(q => q.Class).OrderBy(q => q.Name) as IEnumerable<Class>));
             Debug.WriteLine("db end: " + nameof(GetManualFilesWithClassesByProject));
             return result;
         }
@@ -56,7 +58,8 @@ namespace ClassifyFiles.Util
                       .IncludeAll()//需要包含FileClass.File
                       .AsEnumerable()//需要内存分组
                       .GroupBy(p => p.File)//按文件分组
-                      .Select(p => KeyValuePair.Create(p.Key, p.Select(q => q.Class)));
+                      .OrderBy(p => p.Key.Dir)
+                      .Select(p => KeyValuePair.Create(p.Key, p.Select(q => q.Class).OrderBy(q => q.Name) as IEnumerable<Class>));
             Debug.WriteLine("db end: " + nameof(GetDisabledFilesWithClassesByProject));
             return result;
         }

@@ -56,8 +56,9 @@ namespace ClassifyFiles.Util
                 .IncludeAll()//需要包含FileClass.File
                 .AsEnumerable()//需要内存分组
                 .GroupBy(p => p.File)//按文件分组
+                .OrderBy(p => p.Key.Dir)
                 .Where(p => p.Any(q => q.ClassID == c.ID))//获取拥有该类的FileClass
-                .Select(p => KeyValuePair.Create(p.Key, p.Select(q => q.Class)));
+                .Select(p => KeyValuePair.Create(p.Key, p.Select(q => q.Class).OrderBy(q=>q.Name) as IEnumerable<Class>));
             //因为最后需要转换为UIFile，所以这里不需要直接转换成Dictionary
 
             //.ToDictionary(p => p.Key, p => p.Select(q => q.Class).ToArray());

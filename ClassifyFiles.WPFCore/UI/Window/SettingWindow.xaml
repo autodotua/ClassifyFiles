@@ -47,8 +47,10 @@
                         <CheckBox Content="平滑滚动" IsChecked="{Binding Path=(root:Configs.SmoothScroll)}">
                             <CheckBox.ToolTip>
                                 <StackPanel Orientation="Vertical">
-                                    <TextBlock>开启后将会启动像素级滚动。当列表项过多（超过10000项）时，开启该选项可能反而会降低使用体验。</TextBlock>
-                                    <TextBlock>该设置仅针对于文件查看面板，其他区域会保持启用。</TextBlock>
+                                    <TextBlock Margin="0,0,0,8">开启后将会启动像素级滚动。</TextBlock>
+                                    <TextBlock>当列表项过多（超过10000项）时，</TextBlock>
+                                    <TextBlock>开启该选项可能反而会降低使用体验。</TextBlock>
+                                    <TextBlock Margin="0,8,0,0">该设置仅针对于文件查看面板，其他区域会保持启用。</TextBlock>
                                 </StackPanel>
                             </CheckBox.ToolTip>
                         </CheckBox>

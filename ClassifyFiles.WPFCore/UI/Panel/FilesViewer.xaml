@@ -26,6 +26,7 @@
         <c:IsNotNull2BoolConverter x:Key="nn2b" />
         <c:IsNotNull2VisibilityConverter x:Key="nn2v" />
         <c:Null2ZeroConverter x:Key="n2z" />
+        <c:Bool2intConverter x:Key="b2i" />
 
         <sys:Double x:Key="iconViewMinWidth">72</sys:Double>
 
@@ -35,6 +36,8 @@
         <sys:Double x:Key="three">3.0</sys:Double>
         <sys:Double x:Key="five">5.0</sys:Double>
         <sys:Double x:Key="eight">8.0</sys:Double>
+
+        <sys:String x:Key="tileViewerConverterParameter">3,6</sys:String>
 
         <!--  公用的右键菜单  -->
         <ContextMenu x:Key="menu" Opened="ContextMenu_Opened">
@@ -213,7 +216,8 @@
 
                 </Grid.RowDefinitions>
                 <TextBlock
-                    Grid.Row="0" Grid.RowSpan="3"
+                    Grid.Row="0"
+                    Grid.RowSpan="{Binding Path=(root:Configs.ShowTilePath), Converter={StaticResource b2i}, ConverterParameter={StaticResource tileViewerConverterParameter}}"
                     Grid.Column="2"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
@@ -229,7 +233,7 @@
                     Text="{Binding Display.DisplayDir, Mode=OneTime}"
                     TextTrimming="CharacterEllipsis"
                     TextWrapping="Wrap"
-                    Visibility="{Binding Display.ShowTileViewPaths, Converter={StaticResource b2v}}" />
+                    Visibility="{Binding Path=(root:Configs.ShowTilePath), Converter={StaticResource b2v}}" />
 
                 <component:FileIcon
                     Grid.Row="0" Grid.RowSpan="5"
@@ -348,8 +352,8 @@
             x:Key="grdFiles"
             ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
             PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
-            VirtualizingPanel.CacheLength="2"
-            VirtualizingPanel.CacheLengthUnit="Page"
+            VirtualizingPanel.CacheLength="0"
+            VirtualizingPanel.CacheLengthUnit="Pixel"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
             VirtualizingPanel.ScrollUnit="Pixel">
@@ -378,8 +382,8 @@
             ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
             PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
             SelectionMode="Extended"
-            VirtualizingPanel.CacheLength="2"
-            VirtualizingPanel.CacheLengthUnit="Page"
+            VirtualizingPanel.CacheLength="0"
+            VirtualizingPanel.CacheLengthUnit="Pixel"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
             VirtualizingPanel.ScrollUnit="Pixel">
@@ -402,8 +406,8 @@
             ItemsSource="{Binding FileTree}"
             PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
             PreviewMouseRightButtonDown="TreeFiles_PreviewMouseRightButtonDown"
-            VirtualizingPanel.CacheLength="2"
-            VirtualizingPanel.CacheLengthUnit="Page"
+            VirtualizingPanel.CacheLength="0"
+            VirtualizingPanel.CacheLengthUnit="Pixel"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
             VirtualizingPanel.ScrollUnit="Pixel">
@@ -424,8 +428,8 @@
             ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
             PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
             SelectionMode="Extended"
-            VirtualizingPanel.CacheLength="2"
-            VirtualizingPanel.CacheLengthUnit="Page"
+            VirtualizingPanel.CacheLength="0"
+            VirtualizingPanel.CacheLengthUnit="Pixel"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
             VirtualizingPanel.ScrollUnit="Pixel">

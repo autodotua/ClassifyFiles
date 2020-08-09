@@ -320,22 +320,6 @@ namespace ClassifyFiles.UI
                 {
                     SettingWindow.Current.BringToFront();
                 }
-                await Task.Delay(1000);
-                ignoreNavViewSelectionChanged = true;
-                if (mainPage is FileBrowserPanel)
-                {
-                    sender.SelectedItem = sender.MenuItems[0];
-                }
-                else if (mainPage is ClassSettingPanel)
-                {
-                    sender.SelectedItem = sender.MenuItems[1];
-                }
-                else if (mainPage is ProjectSettingsPanel)
-                {
-                    sender.SelectedItem = sender.MenuItems[2];
-                }
-
-                ignoreNavViewSelectionChanged = false;
             }
             await DoProcessAsync(Do());
             async Task Do()
@@ -369,6 +353,45 @@ namespace ClassifyFiles.UI
             {
                 (grdProject.FindResource("flyoutProject") as Flyout).Hide();
             }
+        }
+
+
+        /// <summary>
+        /// 由于SelectedItem为设置是不期望的，所以要找个时间把SelectedItem设置回来。
+        /// 不知道为什么，Active事件总是在取消激活的时候触发，完全反了
+        /// 只好用MouseEnter了
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_MouseEnterOrDown(object sender, MouseEventArgs e)
+        {
+            if (!IsActive)
+            {
+                return;
+            }
+            if (navView.MenuItems.IndexOf(navView.SelectedItem)==-1)
+            {
+                ignoreNavViewSelectionChanged = true;
+                if (mainPage is FileBrowserPanel)
+                {
+                    navView.SelectedItem = navView.MenuItems[0];
+                }
+                else if (mainPage is ClassSettingPanel)
+                {
+                    navView.SelectedItem = navView.MenuItems[1];
+                }
+                else if (mainPage is ProjectSettingsPanel)
+                {
+                    navView.SelectedItem = navView.MenuItems[2];
+                }
+
+                ignoreNavViewSelectionChanged = false;
+            }
+        }
+
+        private void Window_MouseEnterOrDown(object sender, MouseButtonEventArgs e)
+        {
+            Window_MouseEnterOrDown(sender, e as MouseEventArgs);
         }
     }
 }
