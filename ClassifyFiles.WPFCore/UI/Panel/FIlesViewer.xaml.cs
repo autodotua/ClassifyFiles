@@ -693,7 +693,10 @@ namespace ClassifyFiles.UI.Panel
                 //设置完成后，重新开始新的动画，把透明度变成1，释放鼠标操作
 
                 var point = e.GetPosition(mainContent);
-                var scalePoint = new Point(point.X / mainContent.ActualWidth, point.Y / mainContent.ActualHeight);
+                var scalePoint = CurrentFileView != FileView.Icon && CurrentFileView != FileView.Tile ?
+                    new Point(0, 0): 
+                    new Point(point.X / mainContent.ActualWidth, point.Y / mainContent.ActualHeight);
+
                 mainContent.RenderTransformOrigin = scalePoint;
 
                 e.Handled = true;
@@ -705,7 +708,7 @@ namespace ClassifyFiles.UI.Panel
                     {
                         lastAnimation = null;
                         IsHitTestVisible = false;
-                        DoubleAnimation ani2 = new DoubleAnimation(0, Configs.AnimationDuration);
+                        DoubleAnimation ani2 = new DoubleAnimation(0.25, Configs.AnimationDuration);
                         ani2.Completed += (p3, p4) =>
                         {
                             Configs.IconSize *= currentScale;

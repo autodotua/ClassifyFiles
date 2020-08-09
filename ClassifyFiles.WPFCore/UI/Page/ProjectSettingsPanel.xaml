@@ -14,8 +14,9 @@
     xmlns:util="clr-namespace:ClassifyFiles.Util;assembly=ClassifyFiles.Core"
     Loaded="Window_Loaded"
     mc:Ignorable="d">
+    <Grid Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
     <ScrollViewer
-        x:Name="scr" Padding="8"
+        x:Name="scr" Padding="8,42,8,8"
         HorizontalScrollBarVisibility="Disabled "
         VerticalScrollBarVisibility="Auto">
 
@@ -154,5 +155,6 @@
             </GroupBox>
         </m:SimpleStackPanel>
 
-    </ScrollViewer>
+        </ScrollViewer>
+    </Grid>
 </local:ProjectPageBase>

@@ -37,12 +37,6 @@ namespace ClassifyFiles.UI
                 case 1: rbtnThemeLight.IsChecked = true; break;
                 default: throw new Exception();
             }
-            switch (Configs.TitleBarLine)
-            {
-                case 1:rbtnSingleLineTitileBar.IsChecked = true;break;
-                case 2:rbtnTwoLineTitileBar.IsChecked = true;break;
-                default:throw new Exception();
-            }
             chkAutoThumbnails.IsChecked = Configs.AutoThumbnails;
             numThread.Value = Configs.RefreshThreadCount;
             Projects = projects;
@@ -278,18 +272,5 @@ namespace ClassifyFiles.UI
                ring.Message = message));
         }
 
-        private void rbtnSingleLineTitileBar_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender == rbtnSingleLineTitileBar)
-            {
-                Configs.TitleBarLine = 1;
-            }
-            else
-            {
-
-                Configs.TitleBarLine = 2;
-            }
-            MainWindow.Current.SetTitleBar();
-        }
     }
 }

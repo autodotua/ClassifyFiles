@@ -38,7 +38,7 @@ namespace ClassifyFiles.UI
         /// <summary>
         /// 把窗体带到最前面
         /// </summary>
-        public void BringToFront()
+        public async void BringToFront()
         {
             if (!IsVisible)
             {
@@ -52,6 +52,7 @@ namespace ClassifyFiles.UI
 
             Activate();
             Topmost = true;  // important
+            await Task.Delay(200);
             Topmost = false; // important
             Focus();
         }

@@ -90,15 +90,6 @@ namespace ClassifyFiles
 
         private static int? thumbnailStrategy = null;
 
-        private static int? titleBarLine = null;
-        public static int TitleBarLine
-        {
-            get => Get(ref titleBarLine, GetInt, 2, nameof(TitleBarLine));
-            set => Set(ref titleBarLine, value, nameof(TitleBarLine));
-        }
-
-
-
         public static int SortType
         {
             get => Get(ref sortType, GetInt, 0, nameof(SortType));
@@ -110,11 +101,18 @@ namespace ClassifyFiles
             get => Get(ref iconSize, GetDouble, 32d, nameof(IconSize));
             set
             {
-                if (value < 16 || value > 256)
+                if (value < 16)
                 {
-                    return;
+                    Set(ref iconSize, 16, nameof(IconSize));
                 }
-                Set(ref iconSize, value, nameof(IconSize));
+                else if (value > 256)
+                {
+                    Set(ref iconSize, 256, nameof(IconSize));
+                }
+                else
+                {
+                    Set(ref iconSize, value, nameof(IconSize));
+                }
             }
         }
 

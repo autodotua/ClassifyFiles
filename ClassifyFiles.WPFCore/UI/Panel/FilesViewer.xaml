@@ -569,12 +569,12 @@
                     VerticalAlignment="Center" />
             </Grid>
         </Grid>
-
-        <ContentControl
-            x:Name="mainContent" Grid.Row="4"
-            Content="{Binding FilesContent}"
-            PreviewMouseWheel="ListBox_PreviewMouseWheel"
-            RenderTransformOrigin="0.5,0.5" />
-
+        <Grid Grid.Row="4" ClipToBounds="True">
+            <ContentControl
+                x:Name="mainContent"
+                Content="{Binding FilesContent}"
+                PreviewMouseWheel="ListBox_PreviewMouseWheel"
+                RenderTransformOrigin="0.5,0.5" />
+        </Grid>
     </Grid>
 </UserControl>

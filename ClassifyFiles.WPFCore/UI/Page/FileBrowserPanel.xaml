@@ -32,7 +32,8 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <GridSplitter
-            x:Name="grdSplitter" Grid.Column="1"
+            x:Name="grdSplitter" Grid.RowSpan="99"
+            Grid.Column="1"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             Background="Transparent"
@@ -44,10 +45,9 @@
             FontSize="26" FontWeight="Bold"
             IsHitTestVisible="False" Opacity="0.5" />
         <Grid
-            x:Name="grdLeft" Width="200"
-            Margin="0,0,0,-8"
-            HorizontalAlignment="Left"
-            Background="{DynamicResource SystemControlBackgroundListLowBrush}">
+            x:Name="grdLeft" Grid.RowSpan="99"
+            Width="200" Margin="0,0,0,-8"
+            HorizontalAlignment="Left">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="8" />
@@ -76,16 +76,20 @@
             </Button>
         </Grid>
 
-
+        <Grid Grid.Column="2" Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
         <panel:FilesViewer
-            x:Name="filesViewer" Grid.Column="2"
-            AllowDrop="True"
+            x:Name="filesViewer" 
+            Margin="0,32,0,0" AllowDrop="True"
+            
             ClickTag="FilesViewer_ClickTag"
             Drop="FileViewer_Drop"
             PreviewMouseWheel="FilesViewer_PreviewMouseWheel"
             ViewTypeChanged="FilesViewer_ViewTypeChanged" />
+        </Grid>
         <m:CommandBar
-            Grid.Row="2" Grid.ColumnSpan="999"
+            Grid.Row="2" Grid.Column="2"
+            Grid.ColumnSpan="999"
+            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
             DefaultLabelPosition="Right">
             <m:AppBarButton
                 x:Name="btnFileViewerWindow"
@@ -188,7 +192,7 @@
             </m:AppBarButton>
             <m:AppBarButton Icon="View" Label="显示">
                 <m:AppBarButton.Flyout>
-                    <m:Flyout x:Name="flyoutDisplay">
+                    <m:Flyout x:Name="flyoutDisplay"  Opening="flyoutDisplay_Opening">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />

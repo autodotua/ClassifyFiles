@@ -492,7 +492,10 @@ namespace ClassifyFiles.UI.Page
             sldIconSize.Value = 32;
         }
 
-
+        private void flyoutDisplay_Opening(object sender, object e)
+        {
+            this.Notify(nameof(IconSize), nameof(IconSizeString));
+        }
         #endregion
 
         #region 底部操作栏
@@ -745,6 +748,7 @@ namespace ClassifyFiles.UI.Page
                 //这边可能是有Margin什么的，要-8才能没有顿挫
             }
         }
+
         #endregion
 
 
