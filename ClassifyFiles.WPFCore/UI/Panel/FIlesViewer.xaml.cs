@@ -100,8 +100,15 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(FilesContent));
             }
         }
-
-        public Class CurrentClass { get; private set; }
+        private Class currentClass;
+        public Class CurrentClass
+        {
+            get => currentClass; private set
+            {
+                currentClass = value;
+                this.Notify(nameof(CurrentClass));
+            }
+        }
 
         private Project project;
         /// <summary>
@@ -158,7 +165,6 @@ namespace ClassifyFiles.UI.Panel
         {
             CurrentClass = currentClass;
             FileCollectionType = FileCollectionType;
-            this.Notify(nameof(CurrentClass));
             if (files == null || !files.Any())
             {
                 //如果为空

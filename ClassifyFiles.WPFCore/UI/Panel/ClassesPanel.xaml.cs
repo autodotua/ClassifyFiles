@@ -30,10 +30,13 @@ namespace ClassifyFiles.UI.Panel
         public async Task LoadAsync(Project project)
         {
             isLoading = true;
-               Project = project;
+            Project = project;
             List<Class> classes = null;
             await Task.Run(() => classes = GetClasses(Project));
+
             UIClasses = new ObservableCollection<UIClass>(classes.Select(p => new UIClass(p)));
+            SelectedUIClass = null;
+            //不知道为什么，设置了UIClasses以后，会自动设置SelectedUIClass
             foreach (var c in UIClasses)
             {
                 await c.UpdatePropertiesAsync();
@@ -61,8 +64,13 @@ namespace ClassifyFiles.UI.Panel
             get => selectedUIClass;
             set
             {
-                if(isLoading)
+                if (isLoading)
                 {
+                    if(value==null)
+                    {
+                        selectedUIClass = value;
+                        this.Notify(nameof(SelectedUIClass));
+                    }
                     return;
                 }
                 if (selectedUIClass == value)
