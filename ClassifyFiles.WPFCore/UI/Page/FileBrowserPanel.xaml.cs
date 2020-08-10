@@ -682,6 +682,14 @@ namespace ClassifyFiles.UI.Page
             Keyboard.Focus(txtFilter);
         }
 
+
+        private void LbxDirs_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            e.Handled = true;
+            //不知道为啥，这边速度偏快好多
+            SmoothScrollViewerHelper.HandleMouseWheel(UIUtility.GetVisualChild<ScrollViewer>(e.Source as FrameworkElement), e.Delta);
+        }
+
         #endregion
 
         #region 左侧分类列表面板
@@ -742,24 +750,25 @@ namespace ClassifyFiles.UI.Page
         {
             //此处不是MouseMove，而是在移动结束后，通过动画的形式改变左侧面板的宽度，这样节省性能
             var cd = grdMain.ColumnDefinitions[0];
+            cd.MinWidth = 0;
             if (cd.Width.IsAbsolute)
             {
                 StartAnimation(cd.Width.Value);
             }
         }
 
-
-        #endregion
-
-        private void lbxDirs_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        private void grdSplitter_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            e.Handled = true;
-            //不知道为啥，这边速度偏快好多
-            SmoothScrollViewerHelper.HandleMouseWheel(UIUtility.GetVisualChild<ScrollViewer>(e.Source as FrameworkElement), e.Delta);
+            var cd = grdMain.ColumnDefinitions[0];
+            if (cd.Width.IsAbsolute && cd.Width.Value < 200)
+            {
+                cd.MinWidth = 200;
+            }
         }
 
 
+        #endregion
+
+
     }
-
-
 }

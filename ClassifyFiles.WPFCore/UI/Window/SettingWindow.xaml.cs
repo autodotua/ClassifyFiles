@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using static ClassifyFiles.Util.ProjectUtility;
+using F = System.IO.File;
 
 namespace ClassifyFiles.UI
 {
@@ -37,20 +38,19 @@ namespace ClassifyFiles.UI
                 case 1: rbtnThemeLight.IsChecked = true; break;
                 default: throw new Exception();
             }
-            chkAutoThumbnails.IsChecked = Configs.AutoThumbnails;
-            numThread.Value = Configs.RefreshThreadCount;
+
+            if (!FileUtility.CanWriteInCurrentDirectory())
+            {
+                swtDbInAppDataFolder.IsOn = true;
+                swtDbInAppDataFolder.IsEnabled = false;
+            }
+            else if (F.Exists(DbUtility.DbInAppDataFolderMarkerFileName))
+            {
+                swtDbInAppDataFolder.IsOn = true;
+            }
             Projects = projects;
             RefreshCacheText();
         }
-
-        public int ProcessorCount => Environment.ProcessorCount;
-
-        private void CheckBox_Click(object sender, RoutedEventArgs e)
-        {
-            Configs.AutoThumbnails = chkAutoThumbnails.IsChecked.Value;
-            //ConfigUtility.Set(ConfigKeys.IncludeThumbnailsWhenAddingFilesKey, chkIncludeThumbnailsWhenAddingFiles.IsChecked.Value);
-        }
-
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -130,12 +130,6 @@ namespace ClassifyFiles.UI
 
         }
 
-        private void NumThread_ValueChanged(ModernWpf.Controls.NumberBox sender, ModernWpf.Controls.NumberBoxValueChangedEventArgs args)
-        {
-            Configs.RefreshThreadCount = (int)numThread.Value;
-            numThread.Value = (int)numThread.Value;
-        }
-
         private void OpenLogButton_Click(object sender, RoutedEventArgs e)
         {
             new LogsWindow().Show();
@@ -171,6 +165,7 @@ namespace ClassifyFiles.UI
             T result = default;
             async Task Do()
             {
+                Owner = null;
                 if (!MainWindow.Current.IsClosed)
                 {
                     await MainWindow.Current.BeforeClosing(false);
@@ -272,5 +267,22 @@ namespace ClassifyFiles.UI
                ring.Message = message));
         }
 
+        private void swtDbInAppDataFolder_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (!IsLoaded)
+            {
+                return;
+            }
+
+            string path = DbUtility.DbInAppDataFolderMarkerFileName;
+            if (F.Exists(path) && !swtDbInAppDataFolder.IsOn)
+            {
+                F.Delete(path);
+            }
+            else if (!F.Exists(path) && swtDbInAppDataFolder.IsOn)
+            {
+                F.Create(path);
+            }
+        }
     }
 }

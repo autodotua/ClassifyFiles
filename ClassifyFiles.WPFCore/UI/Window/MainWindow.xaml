@@ -14,8 +14,6 @@
     m:TitleBar.ExtendViewIntoTitleBar="True"
     Closing="Window_Closing"
     Loaded="Window_Loaded"
-    MouseDown="Window_MouseEnterOrDown"
-    MouseEnter="Window_MouseEnterOrDown"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <local:WindowBase.Resources>
@@ -26,12 +24,11 @@
             <!--  不知道为什么，上面-1就能实现-32的效果  -->
             <m:NavigationView
                 x:Name="navView"
-                Background="{DynamicResource SystemControlBackgroundListLowBrush}"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
                 IsBackButtonVisible="Collapsed"
                 IsBackEnabled="False" IsPaneOpen="False"
-                PaneDisplayMode="LeftCompact"
+                PaneDisplayMode="LeftMinimal" 
                 SelectionChanged="NavView_SelectionChanged">
-
                 <m:NavigationView.MenuItems>
                     <m:NavigationViewItem
                         Content="查看" Icon="View"
@@ -69,6 +66,10 @@
                             <ColumnDefinition Width="0" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="24"/>
+                        </Grid.RowDefinitions>
                         <Button
                             Margin="-2" Padding="2"
                             m:FlyoutService.Flyout="{StaticResource flyoutProject}"
@@ -152,7 +153,7 @@
                     </Canvas>
                 </Viewbox>
                 <TextBlock
-                    Grid.Column="2"
+                    Grid.Column="2" Margin="0,0,0,2"
                     VerticalAlignment="Center" FontSize="14"
                     Text="{Binding MainWindow.Title, Source={x:Static Application.Current}}" />
             </m:SimpleStackPanel>

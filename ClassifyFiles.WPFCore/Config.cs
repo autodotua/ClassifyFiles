@@ -14,7 +14,6 @@ namespace ClassifyFiles
 {
     public static class Configs
     {
-
         private static int? theme = null;
         public static int Theme
         {
@@ -81,7 +80,7 @@ namespace ClassifyFiles
         }
 
         private static int? sortType = null;
-        
+
         public static ThumbnailStrategy ThumbnailStrategy
         {
             get => (ThumbnailStrategy)Get(ref thumbnailStrategy, GetInt, 3, nameof(ThumbnailStrategy));
@@ -212,6 +211,12 @@ namespace ClassifyFiles
         {
             get => Get(ref hasOpened, GetBool, false, nameof(HasOpened));
             set => Set(ref hasOpened, value, nameof(HasOpened));
+        }
+        private static bool? paneDisplayLeftMinimal = null;
+        public static bool PaneDisplayLeftMinimal
+        {
+            get => Get(ref paneDisplayLeftMinimal, GetBool, false, nameof(PaneDisplayLeftMinimal));
+            set => Set(ref paneDisplayLeftMinimal, value, nameof(PaneDisplayLeftMinimal));
         }
 
 

@@ -31,7 +31,7 @@ namespace ClassifyFiles.Data
             else
             {
                 Name = file.Name;
-                Dir = file.FullName.Substring(root.FullName.Length, file.FullName.Length - file.Name.Length - root.FullName.Length - 1).Trim('\\');
+                Dir = file.FullName.Substring(root.FullName.Length, file.FullName.Length - file.Name.Length - root.FullName.Length).Trim('\\');
             }
 
         }

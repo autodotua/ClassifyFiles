@@ -209,7 +209,7 @@ namespace ClassifyFiles.Util
             if (args.Research)
             {
                 dbFiles = new HashSet<File>(db.Files.Where(p => p.ProjectID == args.Project.ID));
-                List<System.IO.FileSystemInfo> diskFiles = new DI(args.Project.RootPath).EnumerateFileSystemInfos("*", SO.AllDirectories).ToList();
+                IReadOnlyList<System.IO.FileSystemInfo> diskFiles = FzLib.IO.FileSystem.EnumerateAccessibleFileSystemInfos(args.Project.RootPath);
                 if (args.DeleteNonExistentItems)
                 {
                     HashSet<string> paths = new HashSet<string>(diskFiles.Select(p => p.FullName));

@@ -526,7 +526,7 @@ namespace ClassifyFiles.Util
             }
             SaveChanges();
             int remainsCount = db.Files.Where(p => p.ThumbnailGUID != null).Count();
-            return (deletedFromDb, deletedFromDisk, remainsCount, failedFiles);
+            return (deletedFromDb, deletedFromDisk, remainsCount, failedFiles==null?new List<string>():failedFiles);
         }
 
         private static bool? canWriteInCurrentDirectory = null;

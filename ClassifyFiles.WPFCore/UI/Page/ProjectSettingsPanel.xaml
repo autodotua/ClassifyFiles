@@ -12,148 +12,147 @@
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
     xmlns:uiutil="clr-namespace:ClassifyFiles.UI.Util"
     xmlns:util="clr-namespace:ClassifyFiles.Util;assembly=ClassifyFiles.Core"
-    Loaded="Window_Loaded"
-    mc:Ignorable="d">
+    Loaded="Window_Loaded" mc:Ignorable="d">
     <Grid Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
-    <ScrollViewer
-        x:Name="scr" Padding="8,42,8,8"
-        HorizontalScrollBarVisibility="Disabled "
-        VerticalScrollBarVisibility="Auto">
+        <ScrollViewer
+            x:Name="scr" Padding="8,42,8,8"
+            HorizontalScrollBarVisibility="Disabled "
+            VerticalScrollBarVisibility="Auto">
 
-        <m:SimpleStackPanel
-            Margin="0,8,16,8" Orientation="Vertical"
-            Spacing="8">
-            <GroupBox Header="项目名">
-                <TextBox
-                    VerticalAlignment="Center" FontSize="24"
-                    Text="{Binding Project.Name}" />
-            </GroupBox>
-            <GroupBox Header="项目根目录">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="8" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+            <m:SimpleStackPanel
+                Margin="0,8,16,8" Orientation="Vertical"
+                Spacing="8">
+                <GroupBox Header="项目名">
                     <TextBox
-                        Grid.Column="0"
                         VerticalAlignment="Center" FontSize="24"
-                        Text="{Binding Project.RootPath}" />
-                    <Button
-                        Grid.Column="2"
-                        VerticalAlignment="Stretch"
-                        Click="Button_Click" Content="浏览.." />
-                </Grid>
-            </GroupBox>
-            <GroupBox Header="操作">
-                <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
-                    <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
-                        <Button Background="Red" Foreground="White">
-                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
-                                <m:SymbolIcon VerticalAlignment="Center" Symbol="Delete" />
-                                <TextBlock VerticalAlignment="Center">删除项目</TextBlock>
-                            </m:SimpleStackPanel>
-                            <m:FlyoutService.Flyout>
-                                <m:Flyout x:Name="flyoutDelete">
-                                    <m:SimpleStackPanel Spacing="8">
-                                        <TextBlock>即将删除项目</TextBlock>
-                                        <Button Click="DeleteButton_Click" Content="确定" />
-                                    </m:SimpleStackPanel>
-                                </m:Flyout>
-                            </m:FlyoutService.Flyout>
-                        </Button>
-                        <Button Background="Red" Foreground="White">
-                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
-                                <m:SymbolIcon VerticalAlignment="Center" Symbol="Delete" />
-                                <TextBlock VerticalAlignment="Center">删除所有关系</TextBlock>
-                            </m:SimpleStackPanel>
-                            <m:FlyoutService.Flyout>
-                                <m:Flyout x:Name="flyoutDeleteFileClasses">
-                                    <m:SimpleStackPanel Spacing="8">
-                                        <TextBlock>即将删除所有文件和分类的连接。这不会删除硬盘中的物理文件。</TextBlock>
-                                        <Button Click="Button_Click_1" Content="确定" />
-                                    </m:SimpleStackPanel>
-                                </m:Flyout>
-                            </m:FlyoutService.Flyout>
-                        </Button>
-                        <Button Background="Red" Foreground="White">
-                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
-                                <m:SymbolIcon VerticalAlignment="Center" Symbol="Delete" />
-                                <TextBlock VerticalAlignment="Center">删除所有文件</TextBlock>
-                            </m:SimpleStackPanel>
-                            <m:FlyoutService.Flyout>
-                                <m:Flyout x:Name="flyoutDeleteFiles">
-                                    <m:SimpleStackPanel Spacing="8">
-                                        <TextBlock>即将删除项目中的文件。这不会删除硬盘中的物理文件。</TextBlock>
-                                        <Button Click="DeleteFiles_Click" Content="确定" />
-                                    </m:SimpleStackPanel>
-                                </m:Flyout>
-                            </m:FlyoutService.Flyout>
-                        </Button>
-                        <Button Click="DeleteThumbnails_Click">
-                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
-                                <m:SymbolIcon VerticalAlignment="Center" Symbol="Delete" />
-                                <TextBlock VerticalAlignment="Center">删除所有缩略图</TextBlock>
-                            </m:SimpleStackPanel>
-                        </Button>
-                        <Button Click="CheckButton_Click" Content="查询项目数据库错误" />
+                        Text="{Binding Project.Name}" />
+                </GroupBox>
+                <GroupBox Header="项目根目录">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox
+                            Grid.Column="0"
+                            VerticalAlignment="Center" FontSize="24"
+                            Text="{Binding Project.RootPath}" />
+                        <Button
+                            Grid.Column="2"
+                            VerticalAlignment="Stretch"
+                            Click="Button_Click" Content="浏览.." />
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="操作">
+                    <m:SimpleStackPanel Orientation="Vertical" Spacing="8">
+                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                            <Button Background="Red" Foreground="White">
+                                <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                                    <m:SymbolIcon VerticalAlignment="Center" Symbol="Delete" />
+                                    <TextBlock VerticalAlignment="Center">删除项目</TextBlock>
+                                </m:SimpleStackPanel>
+                                <m:FlyoutService.Flyout>
+                                    <m:Flyout x:Name="flyoutDelete">
+                                        <m:SimpleStackPanel Spacing="8">
+                                            <TextBlock>即将删除项目</TextBlock>
+                                            <Button Click="DeleteButton_Click" Content="确定" />
+                                        </m:SimpleStackPanel>
+                                    </m:Flyout>
+                                </m:FlyoutService.Flyout>
+                            </Button>
+                            <Button Background="Red" Foreground="White">
+                                <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                                    <m:SymbolIcon VerticalAlignment="Center" Symbol="Delete" />
+                                    <TextBlock VerticalAlignment="Center">删除所有关系</TextBlock>
+                                </m:SimpleStackPanel>
+                                <m:FlyoutService.Flyout>
+                                    <m:Flyout x:Name="flyoutDeleteFileClasses">
+                                        <m:SimpleStackPanel Spacing="8">
+                                            <TextBlock>即将删除所有文件和分类的连接。这不会删除硬盘中的物理文件。</TextBlock>
+                                            <Button Click="Button_Click_1" Content="确定" />
+                                        </m:SimpleStackPanel>
+                                    </m:Flyout>
+                                </m:FlyoutService.Flyout>
+                            </Button>
+                            <Button Background="Red" Foreground="White">
+                                <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                                    <m:SymbolIcon VerticalAlignment="Center" Symbol="Delete" />
+                                    <TextBlock VerticalAlignment="Center">删除所有文件</TextBlock>
+                                </m:SimpleStackPanel>
+                                <m:FlyoutService.Flyout>
+                                    <m:Flyout x:Name="flyoutDeleteFiles">
+                                        <m:SimpleStackPanel Spacing="8">
+                                            <TextBlock>即将删除项目中的文件。这不会删除硬盘中的物理文件。</TextBlock>
+                                            <Button Click="DeleteFiles_Click" Content="确定" />
+                                        </m:SimpleStackPanel>
+                                    </m:Flyout>
+                                </m:FlyoutService.Flyout>
+                            </Button>
+                            <Button Click="DeleteThumbnails_Click">
+                                <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                                    <m:SymbolIcon VerticalAlignment="Center" Symbol="Delete" />
+                                    <TextBlock VerticalAlignment="Center">删除所有缩略图</TextBlock>
+                                </m:SimpleStackPanel>
+                            </Button>
+                            <Button Click="CheckButton_Click" Content="查询项目数据库错误" />
 
-                    </m:SimpleStackPanel>
-                    <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
-                        <TextBlock>文件数量：</TextBlock>
-                        <TextBlock x:Name="tbkFilesCount" Margin="0,0,12,0" />
-                        <TextBlock>分类数量：</TextBlock>
-                        <TextBlock x:Name="tbkClassesCount" Margin="0,0,12,0" />
-                        <TextBlock>文件分类关系数量：</TextBlock>
-                        <TextBlock x:Name="tbkFileClassesCount" Margin="0,0,12,0" />
-                    </m:SimpleStackPanel>
-                </m:SimpleStackPanel>
-            </GroupBox>
-            <GroupBox Header="文件导出">
-                <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
-                    <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
-                        <TextBlock VerticalAlignment="Center">导出文件格式：</TextBlock>
-                        <ComboBox
-                            Width="120" VerticalAlignment="Bottom"
-                            DisplayMemberPath="DisplayName"
-                            ItemsSource="{uiutil:EnumToItemsSource {x:Type util:ExportFormat}}"
-                            SelectedIndex="0"
-                            SelectedValue="{Binding ExportFormat}"
-                            SelectedValuePath="Value" />
-
-                        <TextBlock VerticalAlignment="Center">分隔符：</TextBlock>
-                        <TextBox MinWidth="120" Text="{Binding Splitter}" />
-                    </m:SimpleStackPanel>
-                    <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
-                        <Button Click="ExportLinkButton_Click">
-                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
-                                <m:SymbolIcon VerticalAlignment="Center" Symbol="Link" />
-                                <TextBlock VerticalAlignment="Center">导出为快捷方式</TextBlock>
-                            </m:SimpleStackPanel>
-                        </Button>
-                        <Button Click="ExportFileButton_Click">
-                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
-                                <m:SymbolIcon VerticalAlignment="Center" Symbol="Copy" />
-                                <TextBlock VerticalAlignment="Center">导出为副本</TextBlock>
-                            </m:SimpleStackPanel>
-                        </Button>
-
-                    </m:SimpleStackPanel>
-                </m:SimpleStackPanel>
-            </GroupBox>
-
-            <GroupBox Header="数据库">
-                <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
-                    <Button Click="ExportProjectButton_Click">
-                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
-                            <m:FontIcon VerticalAlignment="Center" Glyph="&#xEDE1;" />
-                            <TextBlock VerticalAlignment="Center">导出</TextBlock>
                         </m:SimpleStackPanel>
-                    </Button>
-                    <TextBlock>导入操作请点击右上角主菜单</TextBlock>
-                </m:SimpleStackPanel>
-            </GroupBox>
-        </m:SimpleStackPanel>
+                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock>文件数量：</TextBlock>
+                            <TextBlock x:Name="tbkFilesCount" Margin="0,0,12,0" />
+                            <TextBlock>分类数量：</TextBlock>
+                            <TextBlock x:Name="tbkClassesCount" Margin="0,0,12,0" />
+                            <TextBlock>文件分类关系数量：</TextBlock>
+                            <TextBlock x:Name="tbkFileClassesCount" Margin="0,0,12,0" />
+                        </m:SimpleStackPanel>
+                    </m:SimpleStackPanel>
+                </GroupBox>
+                <GroupBox Header="文件导出">
+                    <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
+                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock VerticalAlignment="Center">导出文件格式：</TextBlock>
+                            <ComboBox
+                                Width="120" VerticalAlignment="Bottom"
+                                DisplayMemberPath="DisplayName"
+                                ItemsSource="{uiutil:EnumToItemsSource {x:Type util:ExportFormat}}"
+                                SelectedIndex="0"
+                                SelectedValue="{Binding ExportFormat}"
+                                SelectedValuePath="Value" />
+
+                            <TextBlock VerticalAlignment="Center">分隔符：</TextBlock>
+                            <TextBox MinWidth="120" Text="{Binding Splitter}" />
+                        </m:SimpleStackPanel>
+                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                            <Button Click="ExportLinkButton_Click">
+                                <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                                    <m:SymbolIcon VerticalAlignment="Center" Symbol="Link" />
+                                    <TextBlock VerticalAlignment="Center">导出为快捷方式</TextBlock>
+                                </m:SimpleStackPanel>
+                            </Button>
+                            <Button Click="ExportFileButton_Click">
+                                <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                                    <m:SymbolIcon VerticalAlignment="Center" Symbol="Copy" />
+                                    <TextBlock VerticalAlignment="Center">导出为副本</TextBlock>
+                                </m:SimpleStackPanel>
+                            </Button>
+
+                        </m:SimpleStackPanel>
+                    </m:SimpleStackPanel>
+                </GroupBox>
+
+                <GroupBox Header="数据库">
+                    <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
+                        <Button Click="ExportProjectButton_Click">
+                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                                <m:FontIcon VerticalAlignment="Center" Glyph="&#xEDE1;" />
+                                <TextBlock VerticalAlignment="Center">导出</TextBlock>
+                            </m:SimpleStackPanel>
+                        </Button>
+                        <TextBlock>导入操作请点击右上角主菜单</TextBlock>
+                    </m:SimpleStackPanel>
+                </GroupBox>
+            </m:SimpleStackPanel>
 
         </ScrollViewer>
     </Grid>

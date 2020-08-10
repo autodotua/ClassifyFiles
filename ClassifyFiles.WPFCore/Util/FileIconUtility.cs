@@ -26,8 +26,6 @@ namespace ClassifyFiles.Util
             encParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 50L);
             encoder = ImageCodecInfo.GetImageEncoders()
                            .First(c => c.FormatID == ImageFormat.Jpeg.Guid);
-
-
         }
 
         public static BitmapImage GetFolderIcon()
@@ -48,7 +46,7 @@ namespace ClassifyFiles.Util
             }
             else
             {
-                if (!FileUtility.CanWriteInCurrentDirectory())
+                if (!FileUtility.CanWriteInCurrentDirectory() ||F.Exists(DbUtility.DbInAppDataFolderMarkerFileName))
                 {
                     string path = P.Combine(
                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(ClassifyFiles), "thumb");

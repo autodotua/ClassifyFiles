@@ -9,11 +9,12 @@ namespace ClassifyFiles.Util
 {
     public static class DbUtility
     {
+        public const string DbInAppDataFolderMarkerFileName= "dbInAppDataFolder";
         public static string DbPath
         {
             get
             {
-                if (!FileUtility.CanWriteInCurrentDirectory())
+                if (!FileUtility.CanWriteInCurrentDirectory() || System.IO.File.Exists(DbInAppDataFolderMarkerFileName))
                 {
                     string path = System.IO.Path.Combine(
                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(ClassifyFiles), "data.db");

@@ -181,40 +181,15 @@ namespace ClassifyFiles.UI.Panel
                 });
                 Files = uiFiles;
             }
-            FileTree = await GetFileTreeAsync();
+            if (CurrentFileView == FileView.Tree)
+            {
+                await SetFileTreeAsync();
+            }
+            else
+            {
+                FileTree = null;
+            }
         }
-        //public async Task SetFilesAsync(IEnumerable<File> files)
-        //{
-        //    if (files == null || !files.Any())
-        //    {
-        //        //如果为空
-        //        Files = new ObservableCollection<UIFile>();
-        //    }
-        //    else
-        //    {
-        //        List<UIFile> filesWithIcon = new List<UIFile>();
-        //        await Task.Run(() =>
-        //        {
-        //            //把每个File要转换为UIFile
-        //            foreach (var file in files)
-        //            {
-        //                UIFile uiFile = new UIFile(file);
-        //                filesWithIcon.Add(uiFile);
-        //            }
-        //        });
-
-        //        if (Configs.SortType == 0)
-        //        {
-        //            //如果使用默认排序（已经在数据库那边排了）
-        //            Files = new ObservableCollection<UIFile>(filesWithIcon);
-        //        }
-        //        else
-        //        {
-        //            await SortAsync((SortType)Configs.SortType, filesWithIcon);
-        //        }
-        //    }
-        //    ResetFileTree();
-        //}
         /// <summary>
         /// 添加文件
         /// </summary>
@@ -240,7 +215,14 @@ namespace ClassifyFiles.UI.Panel
             }
 
             this.Notify(nameof(Files));
-            FileTree = await GetFileTreeAsync();
+            if (CurrentFileView == FileView.Tree)
+            {
+                await SetFileTreeAsync();
+            }
+            else
+            {
+                FileTree = null;
+            }
             if (filesWithIcon.Count > 0)
             {
                 await SelectFileAsync(filesWithIcon.First());
@@ -267,7 +249,7 @@ namespace ClassifyFiles.UI.Panel
         /// <summary>
         /// 重新设置树状图
         /// </summary>
-        private async Task<ObservableCollection<UIFile>> GetFileTreeAsync()
+        private async Task SetFileTreeAsync()
         {
             ObservableCollection<UIFile> fileTree = new ObservableCollection<UIFile>();
             await Task.Run(() =>
@@ -287,7 +269,7 @@ namespace ClassifyFiles.UI.Panel
                    .SubUIFiles);
                 }
             });
-            return fileTree;
+            FileTree = fileTree;
 
         }
         /// <summary>
@@ -559,6 +541,10 @@ namespace ClassifyFiles.UI.Panel
             {
                 FilesContent = FindResource("treeFiles") as TreeView;
                 FilesContent.ItemTemplate = FindResource(Configs.TreeSimpleTemplate ? "treeSimpleDataTemplate" : "listDataTemplate") as DataTemplate;
+                if (FileTree == null)
+                {
+                    await MainWindow.Current.DoProcessAsync(SetFileTreeAsync());
+                }
             }
             else if (CurrentFileView == FileView.Detail)
             {

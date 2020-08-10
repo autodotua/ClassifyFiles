@@ -7,6 +7,8 @@
     xmlns:m="http://schemas.modernwpf.com/2019"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:root="clr-namespace:ClassifyFiles"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    xmlns:sys2="clr-namespace:System;assembly=System.Runtime.Extensions"
     Title="设置" Width="800"
     Height="450" Closing="Window_Closing"
     Loaded="Window_Loaded"
@@ -55,15 +57,16 @@
                             </CheckBox.ToolTip>
                         </CheckBox>
 
+                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock VerticalAlignment="Center">主界面侧边栏最小化</TextBlock>
+                            <m:ToggleSwitch VerticalAlignment="Center" IsOn="{Binding Path=(root:Configs.PaneDisplayLeftMinimal)}" />
+                        </m:SimpleStackPanel>
                     </m:SimpleStackPanel>
                 </GroupBox>
 
-                <GroupBox Header="缩略图和缓存">
+                <GroupBox Header="数据库与缓存">
                     <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
-                        <CheckBox
-                            x:Name="chkAutoThumbnails"
-                            Click="CheckBox_Click"
-                            Content="在浏览时尝试为没有缩略图的对象生成缩略图">
+                        <CheckBox Content="在浏览时尝试为没有缩略图的对象生成缩略图" IsChecked="{Binding Path=(root:Configs.AutoThumbnails)}">
                             <CheckBox.ToolTip>
                                 <ToolTip>
                                     <StackPanel>
@@ -86,16 +89,16 @@
                             </m:SimpleStackPanel.ToolTip>
                             <TextBlock VerticalAlignment="Center">最大并行线程：</TextBlock>
                             <m:NumberBox
-                                x:Name="numThread" Width="128"
-                                VerticalAlignment="Center" Maximum="12"
-                                Minimum="1"
-                                ValueChanged="NumThread_ValueChanged" />
+                                Width="128" VerticalAlignment="Center"
+                                Maximum="24" Minimum="1"
+                                Value="{Binding Path=(root:Configs.RefreshThreadCount)}" />
                             <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource SystemControlBackgroundBaseMediumBrush}">
                                 <Run>CPU核心数：</Run>
-                                <Run Text="{Binding ProcessorCount, Mode=OneTime}" />
+                                <Run Text="{Binding Path=(sys2:Environment.ProcessorCount),Mode=OneWay}" />
                             </TextBlock>
                         </m:SimpleStackPanel>
                         <m:SimpleStackPanel
+                            x:Name="stkThumbPath"
                             VerticalAlignment="Center"
                             Background="Transparent"
                             Orientation="Horizontal" Spacing="12"
@@ -115,28 +118,40 @@
                 </GroupBox>
 
                 <GroupBox Header="数据库">
-                    <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
-                        <Button Background="Red" Foreground="White">
-                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
-                                <m:SymbolIcon VerticalAlignment="Center" Symbol="Delete" />
-                                <TextBlock VerticalAlignment="Center">删除所有项目</TextBlock>
-                            </m:SimpleStackPanel>
-                            <m:FlyoutService.Flyout>
-                                <m:Flyout x:Name="flyoutDeleteProjects">
-                                    <m:SimpleStackPanel Spacing="8">
-                                        <TextBlock>即将删除所有项目。这不会删除硬盘中的物理文件。</TextBlock>
-                                        <Button Click="DeleteProjects_Click" Content="确定" />
-                                    </m:SimpleStackPanel>
-                                </m:Flyout>
-                            </m:FlyoutService.Flyout>
-                        </Button>
-                        <Button Click="ZipDatabaseButton_Click" Content="压缩数据库" />
-                        <Button Click="ImportMenu_Click" Content="导入" />
-                        <Button Click="ExportMenu_Click" Content="导出" />
-                        <Button
-                            Click="OptimizeThumbnailsAndIconsButton_Click"
-                            Content="修复孤立缩略图"
-                            ToolTip="将会删除存在于数据库、但不存在于文件系统，或存在于文件系统、但没有对应的数据库文件缩略图的文件" />
+                    <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
+                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                            <m:SimpleStackPanel.ToolTip>
+                                <StackPanel>
+                                    <TextBlock Width="200" TextWrapping="Wrap">默认情况下，若程序目录可写，数据库在程序目录下。程序数据目录位于%APPDATA%/ClassifyFiles。</TextBlock>
+                                    <TextBlock>该设置重启后生效。</TextBlock>
+                                </StackPanel>
+                            </m:SimpleStackPanel.ToolTip>
+                            <TextBlock VerticalAlignment="Center">将数据库存放于系统默认的程序数据目录下</TextBlock>
+                            <m:ToggleSwitch x:Name="swtDbInAppDataFolder" Toggled="swtDbInAppDataFolder_Toggled" />
+                        </m:SimpleStackPanel>
+                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                            <Button Background="Red" Foreground="White">
+                                <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                                    <m:SymbolIcon VerticalAlignment="Center" Symbol="Delete" />
+                                    <TextBlock VerticalAlignment="Center">删除所有项目</TextBlock>
+                                </m:SimpleStackPanel>
+                                <m:FlyoutService.Flyout>
+                                    <m:Flyout x:Name="flyoutDeleteProjects">
+                                        <m:SimpleStackPanel Spacing="8">
+                                            <TextBlock>即将删除所有项目。这不会删除硬盘中的物理文件。</TextBlock>
+                                            <Button Click="DeleteProjects_Click" Content="确定" />
+                                        </m:SimpleStackPanel>
+                                    </m:Flyout>
+                                </m:FlyoutService.Flyout>
+                            </Button>
+                            <Button Click="ZipDatabaseButton_Click" Content="压缩数据库" />
+                            <Button Click="ImportMenu_Click" Content="导入" />
+                            <Button Click="ExportMenu_Click" Content="导出" />
+                            <Button
+                                Click="OptimizeThumbnailsAndIconsButton_Click"
+                                Content="修复孤立缩略图"
+                                ToolTip="将会删除存在于数据库、但不存在于文件系统，或存在于文件系统、但没有对应的数据库文件缩略图的文件" />
+                        </m:SimpleStackPanel>
                     </m:SimpleStackPanel>
                 </GroupBox>
 
