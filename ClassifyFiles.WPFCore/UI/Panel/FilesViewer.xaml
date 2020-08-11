@@ -357,7 +357,8 @@
             VirtualizingPanel.CacheLengthUnit="Pixel"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-            VirtualizingPanel.ScrollUnit="Pixel">
+            VirtualizingPanel.ScrollUnit="Pixel"
+            VirtualizingPanel.VirtualizationMode="Recycling">
 
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -387,7 +388,8 @@
             VirtualizingPanel.CacheLengthUnit="Pixel"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-            VirtualizingPanel.ScrollUnit="Pixel">
+            VirtualizingPanel.ScrollUnit="Pixel"
+            VirtualizingPanel.VirtualizationMode="Recycling">
             <m:ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type m:ListViewItem}">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -411,7 +413,8 @@
             VirtualizingPanel.CacheLengthUnit="Pixel"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-            VirtualizingPanel.ScrollUnit="Pixel">
+            VirtualizingPanel.ScrollUnit="Pixel"
+            VirtualizingPanel.VirtualizationMode="Recycling">
             <TreeView.ItemContainerStyle>
                 <Style BasedOn="{StaticResource DefaultTreeViewItemStyle}" TargetType="{x:Type TreeViewItem}">
                     <!--  以下代码无效  -->
@@ -433,7 +436,8 @@
             VirtualizingPanel.CacheLengthUnit="Pixel"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-            VirtualizingPanel.ScrollUnit="Pixel">
+            VirtualizingPanel.ScrollUnit="Pixel"
+            VirtualizingPanel.VirtualizationMode="Recycling">
             <ListView.ItemContainerStyle>
                 <Style BasedOn="{StaticResource {x:Static GridView.GridViewItemContainerStyleKey}}" TargetType="ListViewItem">
                     <Setter Property="VerticalContentAlignment" Value="Center" />

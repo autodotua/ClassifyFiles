@@ -26,6 +26,7 @@ using System.Collections.ObjectModel;
 using ClassifyFiles.UI.Util;
 using FzLib.Basic;
 using Windows.Storage;
+using ClassifyFiles.UI.Converter;
 
 namespace ClassifyFiles.UI.Page
 {
@@ -56,6 +57,19 @@ namespace ClassifyFiles.UI.Page
                 await filesViewer.SetFilesAsync(null, null, FileCollectionType.None);
             }
             await classPanel.LoadAsync(project);
+            await Task.Run(() =>
+            {
+                HashSet<string> formats = new HashSet<string>();
+                foreach (var item in classPanel.UIClasses.Select(p => p.Class))
+                {
+                    formats.Add(item.DisplayNameFormat);
+                    formats.Add(item.DisplayProperty1);
+                    formats.Add(item.DisplayProperty2);
+                    formats.Add(item.DisplayProperty3);
+                }
+                var csFormats = formats.Where(p =>p!=null && p.StartsWith("cs:"));
+                DisplayFormatConverter.InitializeCsMethods(csFormats);
+            });
             UpdateAppBarButtonsEnable();
         }
 

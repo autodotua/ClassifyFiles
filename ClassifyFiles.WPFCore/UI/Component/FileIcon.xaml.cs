@@ -69,6 +69,7 @@ namespace ClassifyFiles.UI.Component
 
             FileIcon fileIcon = obj as FileIcon;
             bool loaded = fileIcon.IsLoaded;
+            fileIcon.IconContent = null;
             await fileIcon.Dispatcher.InvokeAsync(() =>
             {
                 fileIcon.NonDPFile = fileIcon.File;

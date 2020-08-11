@@ -100,8 +100,8 @@ namespace ClassifyFiles.UI.Converter
                 return null;
             }
             return exif.GetString(exifCode[name]);
-        }  
-        
+        }
+
         private string GetExifValue(FileInfo fileInfo, int code)
         {
             var exif = GetExif(fileInfo.FullName);
@@ -204,28 +204,16 @@ namespace ClassifyFiles.UI.Converter
             return result;
 
         }
-        /// <summary>
-        /// 通过C#语法进行值的转换
-        /// </summary>
-        /// <param name="format"></param>
-        /// <param name="file"></param>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        public string ConvertByCs(string format, FileInfo file, Class c)
+        public static void InitializeCsMethods(IEnumerable<string> formats)
         {
-            MethodDelegate csMethod;
-            if (csMthods.ContainsKey(format))
-            {
-                csMethod = csMthods[format];
-            }
-            else
+            foreach (var format in formats)
             {
                 string f = format.Substring(3).Trim();
                 if (!f.EndsWith(";"))
                 {
                     f += ";";
                 }
-                csMethod = CSScript.Evaluator.CreateDelegate($@"
+                var csMethod = CSScript.Evaluator.CreateDelegate($@"
 string GetValue(System.IO.FileInfo file, System.Collections.Generic.Dictionary<object,string> exifs){{
       var Name =System.IO.Path.GetFileNameWithoutExtension(file.Name);
             var Extension=file.Extension.Replace(""."","""");
@@ -237,6 +225,26 @@ var Exif=exifs;
         }}
 ");
                 csMthods.TryAdd(format, csMethod);
+            }
+        }
+
+        /// <summary>
+        /// 通过C#语法进行值的转换
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="file"></param>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public string ConvertByCs(string format, FileInfo file, Class c)
+        {
+            MethodDelegate csMethod=null;
+            if (csMthods.ContainsKey(format))
+            {
+                csMethod = csMthods[format];
+            }
+            else
+            {
+                throw new Exception("发现没有被初始化的C#格式化！这不应该发生");
             }
 
             Dictionary<object, string> exifs = new Dictionary<object, string>();
