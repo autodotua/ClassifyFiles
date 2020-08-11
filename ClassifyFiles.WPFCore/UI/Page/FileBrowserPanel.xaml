@@ -50,13 +50,16 @@
                     <Border
                         x:Name="border"
                         HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch" CornerRadius="0,8,8,0"
-                        Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}" Opacity="0">
+                        VerticalAlignment="Stretch"
+                        Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                        CornerRadius="0,8,8,0" Opacity="0">
                         <TextBlock
                             x:Name="tbk"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center" FontSize="26"
-                            FontWeight="Bold" Text="⁞"  Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                            FontWeight="Bold"
+                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                            Text="⁞" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -85,10 +88,11 @@
                 </ControlTemplate>
             </GridSplitter.Template>
         </GridSplitter>
-        <Grid Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+        <Grid
             x:Name="grdLeft" Grid.RowSpan="99"
             Width="200" Margin="0,0,0,-8"
-            HorizontalAlignment="Left">
+            HorizontalAlignment="Left"
+            Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="8" />

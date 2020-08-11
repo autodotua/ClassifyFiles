@@ -218,6 +218,12 @@ namespace ClassifyFiles
             get => Get(ref paneDisplayLeftMinimal, GetBool, false, nameof(PaneDisplayLeftMinimal));
             set => Set(ref paneDisplayLeftMinimal, value, nameof(PaneDisplayLeftMinimal));
         }
+        private static bool? fluencyFirst = null;
+        public static bool FluencyFirst
+        {
+            get => Get(ref fluencyFirst, GetBool, false, nameof(FluencyFirst));
+            set => Set(ref fluencyFirst, value, nameof(FluencyFirst));
+        }
 
 
         public static TimeSpan AnimationDuration { get; } = TimeSpan.FromSeconds(0.2);

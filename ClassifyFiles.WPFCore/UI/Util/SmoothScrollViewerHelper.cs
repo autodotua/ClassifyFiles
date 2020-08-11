@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ClassifyFiles.UI.Component;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -19,11 +20,6 @@ namespace ClassifyFiles.UI.Util
     public static class SmoothScrollViewerHelper
     {
         static SmoothScrollViewerHelper()
-        {
-            CompositionTarget.Rendering += CompositionTarget_Rendering;
-        }
-
-        private static void CompositionTarget_Rendering(object sender, EventArgs e)
         {
         }
 
@@ -86,7 +82,6 @@ namespace ClassifyFiles.UI.Util
                     remainsDeltas[scr] = 0;
                 }
             }
-
             Debug.WriteLineIf(DebugSwitch.ScorllInfo, "Scroll End\r\n");
 
         }

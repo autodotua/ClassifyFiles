@@ -1,5 +1,6 @@
 ﻿using FzLib.Extension;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace ClassifyFiles.Data
@@ -17,8 +18,8 @@ namespace ClassifyFiles.Data
                 this.Notify(nameof(Name));
             }
         }
-        private List<Class> classes;
-        public List<Class> Classes
+        private ObservableCollection<Class> classes;
+        public ObservableCollection<Class> Classes
         {
             get => classes;
             set

@@ -15,7 +15,7 @@ namespace ClassifyFiles.Util
         {
             Debug.WriteLine("db begin: " + nameof(GetProjects));
 
-            return db.Projects.ToList();
+            return db.Projects.Include(p=>p.Classes).ToList();
         }
         public static bool UpdateProject(Project project)
         {

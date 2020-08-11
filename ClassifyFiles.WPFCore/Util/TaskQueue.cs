@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Windows.Documents;
 using System.Collections.Generic;
+using FzLib.Basic;
 
 namespace ClassifyFiles.Util
 {
@@ -51,7 +52,7 @@ namespace ClassifyFiles.Util
                         }
                         isExcuting = true;
                     }
-                    Debug.WriteLineIf(DebugSwitch.TaskQueue,"New Task Queue");
+                    Debug.WriteLineIf(DebugSwitch.TaskQueue, "New Task Queue");
 
                     ProcessStatusChanged?.Invoke(this, new ProcessStatusChangedEventArgs(true));
                     try
@@ -67,11 +68,11 @@ namespace ClassifyFiles.Util
                         Debug.WriteLineIf(DebugSwitch.TaskQueue, "Task count is " + tasks.Count);
                         List<Action> currentTasks = new List<Action>();
                         //后进来的先处理，每次处理3倍的线程数份，这样可以让后进来的尽快处理
-                        for(int i=0;i< Configs.RefreshThreadCount * 3;i++)
+                        for (int i = 0; i < Configs.RefreshThreadCount * 3; i++)
                         {
-                            if(tasks.Count>0)
+                            if (tasks.Count > 0)
                             {
-                                if(tasks.TryPop(out Action act))
+                                if (tasks.TryPop(out Action act))
                                 {
                                     currentTasks.Add(act);
                                 }

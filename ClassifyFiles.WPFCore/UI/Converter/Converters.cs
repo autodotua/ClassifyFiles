@@ -196,6 +196,22 @@ namespace ClassifyFiles.UI.Converter
             throw new NotSupportedException();
         }
 
+    }   
+    /// <summary>
+    /// 空转可见性
+    /// </summary>
+    public class IsNull2VisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value == null ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+
     }
 
     /// <summary>

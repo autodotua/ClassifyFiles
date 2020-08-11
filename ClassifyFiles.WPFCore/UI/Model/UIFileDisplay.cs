@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Drawing;
 using System.Threading.Tasks;
 using Windows.Storage;
+using System.Windows;
 
 namespace ClassifyFiles.UI.Model
 {
@@ -58,41 +59,59 @@ namespace ClassifyFiles.UI.Model
                 };
             }
         }
+
+        private string GetLengthString()
+        {
+            if (File.IsFolder)
+            {
+                return "文件夹";
+            }
+            long length = 0;
+            if (System.IO.File.Exists(File.GetAbsolutePath()))
+            {
+                try
+                {
+                    length = FileInfo.Length;
+                }
+                catch
+                {
+                    length = -1;
+                }
+            }
+            else
+            {
+                length = -1;
+            }
+
+            if (length == -1)
+            {
+                return "未知";
+            }
+            return FzLib.Basic.Number.ByteToFitString(length);
+        }
+        public async void BuildUI()
+        {
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+           {
+               DisplayDir = File.IsFolder ? File.Dir.Substring(0, File.Dir.Length - DefaultDisplayName.Length).Trim('\\') : File.Dir;
+               if (Length != null)
+               {
+                   Length = GetLengthString();
+               }
+           },
+          System.Windows.Threading.DispatcherPriority.Background);
+        }
         public Data.File File { get; private set; }
         public FileInfo FileInfo { get; private set; }
 
-        public long? length = null;
+        public string length;
         public string Length
         {
-            get
+            get => length;
+            set
             {
-                if (File.IsFolder)
-                {
-                    return "文件夹";
-                }
-                if (length == null)
-                {
-                    if (System.IO.File.Exists(File.GetAbsolutePath()))
-                    {
-                        try
-                        {
-                            length = FileInfo.Length;
-                        }
-                        catch
-                        {
-                            length = -1;
-                        }
-                    }
-                    else
-                    {
-                        length = -1;
-                    }
-                }
-                if (length == -1)
-                {
-                    return "未知";
-                }
-                return FzLib.Basic.Number.ByteToFitString(length.Value);
+                length = value;
+                this.Notify(nameof(Length));
             }
         }
         private string displayName;
@@ -204,7 +223,16 @@ namespace ClassifyFiles.UI.Model
                 }
             }
         }
-        public string DisplayDir => File.IsFolder ? File.Dir.Substring(0, File.Dir.Length - DefaultDisplayName.Length).Trim('\\') : File.Dir;
+        public string displayDir;
+        public string DisplayDir
+        {
+            get => displayDir;
+            set
+            {
+                displayDir = value;
+                this.Notify(nameof(DisplayDir));
+            }
+        }
         public const string FileGlyph = "\uED41";
         public const string FolderGlyph = "\uED43";
 

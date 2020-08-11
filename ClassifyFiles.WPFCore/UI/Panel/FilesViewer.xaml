@@ -29,6 +29,7 @@
         <c:Bool2intConverter x:Key="b2i" />
 
         <sys:Double x:Key="iconViewMinWidth">72</sys:Double>
+        <VirtualizationCacheLength x:Key="virtualizingPanelCacheLength">20,20</VirtualizationCacheLength>
 
         <sys:Double x:Key="half">0.5</sys:Double>
         <sys:Double x:Key="two">2.0</sys:Double>
@@ -352,7 +353,7 @@
             x:Key="grdFiles"
             ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
             PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
-            VirtualizingPanel.CacheLength="0"
+            VirtualizingPanel.CacheLength="{StaticResource virtualizingPanelCacheLength}"
             VirtualizingPanel.CacheLengthUnit="Pixel"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
@@ -382,7 +383,7 @@
             ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
             PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
             SelectionMode="Extended"
-            VirtualizingPanel.CacheLength="0"
+            VirtualizingPanel.CacheLength="{StaticResource virtualizingPanelCacheLength}"
             VirtualizingPanel.CacheLengthUnit="Pixel"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
@@ -406,7 +407,7 @@
             ItemsSource="{Binding FileTree}"
             PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
             PreviewMouseRightButtonDown="TreeFiles_PreviewMouseRightButtonDown"
-            VirtualizingPanel.CacheLength="0"
+            VirtualizingPanel.CacheLength="{StaticResource virtualizingPanelCacheLength}"
             VirtualizingPanel.CacheLengthUnit="Pixel"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
@@ -428,7 +429,7 @@
             ItemsSource="{Binding Source={StaticResource listDetailItemsSource}}"
             PreviewMouseDoubleClick="Viewer_PreviewMouseDoubleClick"
             SelectionMode="Extended"
-            VirtualizingPanel.CacheLength="0"
+            VirtualizingPanel.CacheLength="{StaticResource virtualizingPanelCacheLength}"
             VirtualizingPanel.CacheLengthUnit="Pixel"
             VirtualizingPanel.IsVirtualizing="True"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"

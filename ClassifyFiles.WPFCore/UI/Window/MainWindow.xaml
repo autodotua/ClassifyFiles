@@ -27,7 +27,7 @@
                 Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
                 IsBackButtonVisible="Collapsed"
                 IsBackEnabled="False" IsPaneOpen="False"
-                PaneDisplayMode="LeftMinimal" 
+                PaneDisplayMode="LeftMinimal"
                 SelectionChanged="NavView_SelectionChanged">
                 <m:NavigationView.MenuItems>
                     <m:NavigationViewItem
@@ -46,17 +46,54 @@
                     <Grid x:Name="grdProject" Margin="8,0">
                         <Grid.Resources>
                             <m:Flyout x:Key="flyoutProject">
-                                <ListBox
-                                    Width="200" DisplayMemberPath="Name"
-                                    ItemsSource="{Binding Projects}"
-                                    SelectedItem="{Binding SelectedProject}"
-                                    SelectionChanged="ProjectListBox_SelectionChanged">
-                                    <ListBox.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <WrapPanel />
-                                        </ItemsPanelTemplate>
-                                    </ListBox.ItemsPanel>
-                                </ListBox>
+                                <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
+                                    <Button
+                                        HorizontalAlignment="Stretch"
+                                        Click="AddProjectButton_Click"
+                                        Content="新增项目" />
+                                    <ListView
+                                        DisplayMemberPath="Name"
+                                        ItemsSource="{Binding Projects}"
+                                        SelectedItem="{Binding SelectedProject}"
+                                        SelectionChanged="ProjectListBox_SelectionChanged">
+
+                                        <ListView.View>
+                                            <GridView>
+                                                <GridViewColumn Header="项目名">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <Grid Height="32" VerticalAlignment="Stretch">
+                                                                <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+                                                <GridViewColumn Header="分类数">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <Grid Height="32" VerticalAlignment="Stretch">
+                                                                <TextBlock VerticalAlignment="Center" Text="{Binding Classes.Count}" />
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+                                                <GridViewColumn Header="删除">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <Button
+                                                                Background="Transparent"
+                                                                Click="DeleteProjectButton_Click"
+                                                                Tag="{Binding .}">
+                                                                <m:SymbolIcon Symbol="Delete" />
+                                                            </Button>
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+                                            </GridView>
+                                        </ListView.View>
+                                    </ListView>
+
+                                </m:SimpleStackPanel>
                             </m:Flyout>
                         </Grid.Resources>
                         <Grid.ColumnDefinitions>
@@ -67,8 +104,8 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="24"/>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="24" />
                         </Grid.RowDefinitions>
                         <Button
                             Margin="-2" Padding="2"
@@ -79,7 +116,8 @@
                         </Button>
                         <Button
                             Grid.Column="4" Background="Transparent"
-                            Click="AddProjectButton_Click" ToolTip="新增项目">
+                            Click="AddProjectButton_Click"
+                            ToolTip="新增项目">
                             <m:SymbolIcon Symbol="Add" />
                         </Button>
                         <m:DropDownButton

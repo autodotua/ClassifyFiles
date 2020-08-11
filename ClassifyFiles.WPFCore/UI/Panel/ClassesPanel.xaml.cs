@@ -46,6 +46,10 @@ namespace ClassifyFiles.UI.Panel
             {
                 SelectedUIClass = UIClasses.First(p => p.Class.ID == Configs.LastClassID);
             }
+            else if(UIClasses.Count>0)
+            {
+                SelectedUIClass = UIClasses.First();
+            }
         }
 
         private ObservableCollection<UIClass> uIClasses;

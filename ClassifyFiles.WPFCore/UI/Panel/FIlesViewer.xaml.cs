@@ -185,7 +185,8 @@ namespace ClassifyFiles.UI.Panel
                         uiFiles = GetSortedFiles((SortType)Configs.SortType, files);
                     }
                 });
-                Files = uiFiles;
+                await Dispatcher.InvokeAsync(() =>
+                 Files = uiFiles, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
             }
             if (CurrentFileView == FileView.Tree)
             {

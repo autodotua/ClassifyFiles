@@ -260,6 +260,7 @@ namespace ClassifyFiles.UI
 
         private async void AddProjectButton_Click(object sender, RoutedEventArgs e)
         {
+            navView.IsPaneOpen = false;
             await DoProcessAsync(Do());
             async Task Do()
             {
@@ -394,7 +395,19 @@ namespace ClassifyFiles.UI
             {
                 (grdProject.FindResource("flyoutProject") as Flyout).Hide();
             }
+            navView.IsPaneOpen = false;
         }
 
+        private async void DeleteProjectButton_Click(object sender, RoutedEventArgs e)
+        {
+            Project project = (sender as Button).Tag as Project;
+            if (await new ConfirmDialog().ShowAsync("是否删除项目：" + project.Name + "？", "删除项目"))
+            {
+                await DoProcessAsync(Task.Run(() => ProjectUtility.DeleteProject(project)));
+                Project newProject = Projects.FirstOrDefault(p => p != project);
+                SelectedProject = newProject;
+                Projects.Remove(project);
+            }
+        }
     }
 }

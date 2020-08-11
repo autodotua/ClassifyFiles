@@ -2,15 +2,22 @@
     x:Class="ClassifyFiles.UI.Component.FileIcon"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="clr-namespace:ClassifyFiles.UI.Converter"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:ClassifyFiles.UI.Component"
     xmlns:m="http://schemas.modernwpf.com/2019"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="clr-namespace:ClassifyFiles.UI"
     xmlns:uim="clr-namespace:ClassifyFiles.UI.Model"
-    Loaded="UserControlBase_Loaded"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <c:IsNull2VisibilityConverter x:Key="n2v" />
+
+    </UserControl.Resources>
     <Viewbox x:Name="view" Stretch="{Binding ActualStretch}">
-        <ContentControl Content="{Binding IconContent}" />
+        <Grid>
+            <m:FontIcon Glyph="&#xED41;" Visibility="{Binding IconContent, Converter={StaticResource n2v}}" />
+            <ContentControl Content="{Binding IconContent}" />
+        </Grid>
     </Viewbox>
 </ui:UserControlBase>

@@ -61,6 +61,19 @@
                             <TextBlock VerticalAlignment="Center">主界面侧边栏最小化</TextBlock>
                             <m:ToggleSwitch VerticalAlignment="Center" IsOn="{Binding Path=(root:Configs.PaneDisplayLeftMinimal)}" />
                         </m:SimpleStackPanel>
+
+                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock VerticalAlignment="Center">显示优先级：</TextBlock>
+                            <m:ToggleSwitch
+                                VerticalAlignment="Center"
+                                IsOn="{Binding Path=(root:Configs.FluencyFirst)}"
+                                OffContent="内容完整性优先" OnContent="流畅度优先" />
+                            <m:SimpleStackPanel.ToolTip>
+                                <TextBlock Width="240">
+                                    在流畅度优先模式下，程序将会尽可能保证更高的帧率。相应地，内容的显示可能会滞后。
+                                </TextBlock>
+                            </m:SimpleStackPanel.ToolTip>
+                        </m:SimpleStackPanel>
                     </m:SimpleStackPanel>
                 </GroupBox>
 
@@ -94,7 +107,7 @@
                                 Value="{Binding Path=(root:Configs.RefreshThreadCount)}" />
                             <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource SystemControlBackgroundBaseMediumBrush}">
                                 <Run>CPU核心数：</Run>
-                                <Run Text="{Binding Path=(sys2:Environment.ProcessorCount),Mode=OneWay}" />
+                                <Run Text="{Binding Path=(sys2:Environment.ProcessorCount), Mode=OneWay}" />
                             </TextBlock>
                         </m:SimpleStackPanel>
                         <m:SimpleStackPanel
