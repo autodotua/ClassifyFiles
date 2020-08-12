@@ -4,7 +4,6 @@ using System.Windows.Input;
 
 namespace ClassifyFiles.UI.Util
 {
-
     /// <summary>
     /// 为没有Click事件的控件添加Click事件
     /// </summary>

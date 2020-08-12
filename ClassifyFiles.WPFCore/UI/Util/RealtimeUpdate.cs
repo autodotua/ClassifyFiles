@@ -1,12 +1,7 @@
 ﻿using ClassifyFiles.UI.Model;
 using ClassifyFiles.UI.Panel;
 using ClassifyFiles.Util;
-using ClassifyFiles.Util.Win32.Shell;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClassifyFiles.UI.Util
 {

@@ -12,5 +12,4 @@ namespace ClassifyFiles.UI.Dialog
             WindowStartupLocation = WindowStartupLocation.CenterOwner;
         }
     }
-
 }

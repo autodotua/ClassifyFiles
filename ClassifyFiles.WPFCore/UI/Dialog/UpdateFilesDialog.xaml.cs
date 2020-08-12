@@ -20,7 +20,6 @@ namespace ClassifyFiles.UI.Dialog
             Project = project;
         }
 
-
         public Project Project { get; }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -38,10 +37,11 @@ namespace ClassifyFiles.UI.Dialog
 
         private void RegardOneSideParseErrorAsNotSameCheckBox_Click(object sender, RoutedEventArgs e)
         {
-
         }
-        bool working = false;
-        bool stopping = false;
+
+        private bool working = false;
+        private bool stopping = false;
+
         private bool Callback(double per, Data.File file)
         {
             if (stopping)
@@ -57,7 +57,9 @@ namespace ClassifyFiles.UI.Dialog
             Message = $"正在处理（{100 * per:N2}%）：" + file.GetAbsolutePath();
             return true;
         }
+
         private string message;
+
         public string Message
         {
             get => message;
@@ -67,7 +69,9 @@ namespace ClassifyFiles.UI.Dialog
                 this.Notify(nameof(Message));
             }
         }
+
         private double percentage;
+
         public double Percentage
         {
             get => percentage;
@@ -77,7 +81,9 @@ namespace ClassifyFiles.UI.Dialog
                 this.Notify(nameof(Percentage));
             }
         }
+
         public bool Updated { get; private set; }
+
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             (sender as Button).IsEnabled = false;

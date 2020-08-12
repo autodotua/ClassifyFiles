@@ -1,10 +1,6 @@
 ﻿using ModernWpf.Controls;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 
 namespace ClassifyFiles.UI.Dialog
 {
@@ -23,6 +19,7 @@ namespace ClassifyFiles.UI.Dialog
         }
 
         private static ContentDialogBase currentDialog = null;
+
         protected new Task<ContentDialogResult> ShowAsync()
         {
             if (currentDialog != null)

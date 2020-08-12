@@ -157,7 +157,6 @@
                         Grid.Row="10" Grid.Column="2"
                         VerticalAlignment="Center"
                         Text="{Binding Display.DisplayCreationTime}" />
-
                 </Grid>
             </m:SimpleStackPanel>
         </ToolTip>
@@ -214,7 +213,6 @@
                     <RowDefinition Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource half}}" />
                     <RowDefinition Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource half}}" />
                     <RowDefinition Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource half}}" />
-
                 </Grid.RowDefinitions>
                 <TextBlock
                     Grid.Row="0"
@@ -268,7 +266,6 @@
                     Grid.Column="2"
                     Text="{Binding Display.DisplayName}"
                     TextTrimming="CharacterEllipsis" />
-
             </Grid>
         </HierarchicalDataTemplate>
 
@@ -423,8 +420,6 @@
             </TreeView.ItemContainerStyle>
         </TreeView>
 
-
-
         <!--  详细信息视图  -->
         <ListView
             x:Key="lvwDetailFiles"
@@ -493,7 +488,6 @@
         </ListView>
 
         <!--#endregion-->
-
     </UserControl.Resources>
     <Grid Margin="8,0,0,0">
         <Grid.RowDefinitions>

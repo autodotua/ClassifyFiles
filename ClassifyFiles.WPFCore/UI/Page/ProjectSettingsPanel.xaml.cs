@@ -1,51 +1,27 @@
-﻿using FzLib.Basic;
-using FzLib.Extension;
+﻿using ClassifyFiles.Data;
+using ClassifyFiles.UI.Util;
+using ClassifyFiles.Util;
+using ClassifyFiles.Util.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using ClassifyFiles.Data;
-using ClassifyFiles.Util;
-using ClassifyFiles.UI;
-using ClassifyFiles.UI.Panel;
-using System.Diagnostics;
-using DImg = System.Drawing.Image;
-using ModernWpf.Controls;
-using ClassifyFiles.UI.Model;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-using FzLib.Program;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using static ClassifyFiles.Util.ClassUtility;
 using static ClassifyFiles.Util.FileClassUtility;
 using static ClassifyFiles.Util.FileProjectUtilty;
 using static ClassifyFiles.Util.ProjectUtility;
-using ClassifyFiles.UI.Component;
-using ClassifyFiles.UI.Util;
-using ClassifyFiles.Util.Win32;
 
 namespace ClassifyFiles.UI.Page
 {
     public partial class ProjectSettingsPanel : ProjectPageBase
     {
         public string Splitter { get; set; } = "-";
+
         public ProjectSettingsPanel()
         {
             InitializeComponent();
         }
-
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -70,18 +46,21 @@ namespace ClassifyFiles.UI.Page
         }
 
         public ExportFormat ExportFormat { get; set; }
+
         private async void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             flyoutDelete.Hide();
             MainWindow mainWin = (Window.GetWindow(this) as MainWindow);
             await mainWin.DeleteSelectedProjectAsync();
         }
-        void ShowProgressMessage(Data.File file)
+
+        private void ShowProgressMessage(Data.File file)
         {
-            Dispatcher.Invoke(() => 
+            Dispatcher.Invoke(() =>
                 MainWindow.Current.SetProcessRingMessage(
                     "正在导出" + Environment.NewLine + Path.Combine(file.Dir, file.Name)));
         }
+
         private async void ExportLinkButton_Click(object sender, RoutedEventArgs e)
         {
             CommonFileDialog dialog = new CommonOpenFileDialog()
@@ -99,7 +78,6 @@ namespace ClassifyFiles.UI.Page
             }
         }
 
-
         private async void ExportFileButton_Click(object sender, RoutedEventArgs e)
         {
             CommonFileDialog dialog = new CommonOpenFileDialog()
@@ -115,7 +93,6 @@ namespace ClassifyFiles.UI.Page
                     FileUtility.Export(path, Project, ExportFormat, (from, to) => System.IO.File.Copy(from, to, true),
                                       Splitter, ShowProgressMessage);
                 }));
-
             }
         }
 
@@ -133,7 +110,6 @@ namespace ClassifyFiles.UI.Page
                 await MainWindow.Current.DoProcessAsync(Task.Run(() => ExportProject(path, Project)));
                 await new MessageDialog().ShowAsync("导出成功", "导出");
             }
-
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -146,7 +122,6 @@ namespace ClassifyFiles.UI.Page
             if (dialog.ShowDialog(Window.GetWindow(this)) == CommonFileDialogResult.Ok)
             {
                 Project.RootPath = dialog.FileName;
-
             }
         }
 
@@ -158,7 +133,6 @@ namespace ClassifyFiles.UI.Page
                 DeleteFilesOfProject(Project);
             }));
             await new MessageDialog().ShowAsync("删除成功", "删除文件");
-
         }
 
         private async void CheckButton_Click(object sender, RoutedEventArgs e)
@@ -178,5 +152,3 @@ namespace ClassifyFiles.UI.Page
         }
     }
 }
-
-

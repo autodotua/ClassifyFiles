@@ -4,22 +4,21 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
-using FI = System.IO.FileInfo;
-using DI = System.IO.DirectoryInfo;
-using SO = System.IO.SearchOption;
 using static ClassifyFiles.Util.DbUtility;
+using FI = System.IO.FileInfo;
 
 namespace ClassifyFiles.Util
 {
     public static class FileClassUtility
     {
         private const int CallbackUpdateMs = 200;
+
         public static List<Class> GetClassesOfFile(File file)
         {
             using var db = GetNewDb();
             return GetClassesOfFile(db, file);
         }
+
         public static List<Class> GetClassesOfFile(AppDbContext db, File file)
         {
             Debug.WriteLine("db begin: " + nameof(GetClassesOfFile));
@@ -46,6 +45,7 @@ namespace ClassifyFiles.Util
                  .Select(p => p.File)
                  .ToList();
         }
+
         public static IEnumerable<KeyValuePair<File, IEnumerable<Class>>> GetFilesWithClassesByClass(Class c)
         {
             Debug.WriteLine("db begin: " + nameof(GetFilesWithClassesByClass));
@@ -58,7 +58,7 @@ namespace ClassifyFiles.Util
                 .GroupBy(p => p.File)//按文件分组
                 .OrderBy(p => p.Key.Dir)
                 .Where(p => p.Any(q => q.ClassID == c.ID))//获取拥有该类的FileClass
-                .Select(p => KeyValuePair.Create(p.Key, p.Select(q => q.Class).OrderBy(q=>q.Name) as IEnumerable<Class>));
+                .Select(p => KeyValuePair.Create(p.Key, p.Select(q => q.Class).OrderBy(q => q.Name) as IEnumerable<Class>));
             //因为最后需要转换为UIFile，所以这里不需要直接转换成Dictionary
 
             //.ToDictionary(p => p.Key, p => p.Select(q => q.Class).ToArray());
@@ -66,6 +66,7 @@ namespace ClassifyFiles.Util
             Debug.WriteLine("db end: " + nameof(GetFilesWithClassesByClass));
             return result;
         }
+
         public static IQueryable<FileClass> IncludeAll(this IQueryable<FileClass> fileClassQueryable)
         {
             return fileClassQueryable.Include(p => p.File).Include(p => p.File);
@@ -137,7 +138,6 @@ namespace ClassifyFiles.Util
             Debug.WriteLine("db end: " + nameof(AddFilesToClass));
 
             return fs.AsReadOnly();
-
         }
 
         public static int GetFileClassesCount(Project project)
@@ -173,6 +173,7 @@ namespace ClassifyFiles.Util
             Debug.WriteLine("db end: " + nameof(AddFilesToClass));
             return addedFiles.AsReadOnly();
         }
+
         public static bool RemoveFilesFromClass(IEnumerable<File> files, Class c)
         {
             Debug.WriteLine("db begin: " + nameof(RemoveFilesFromClass));
@@ -198,6 +199,7 @@ namespace ClassifyFiles.Util
             Debug.WriteLine("db end: " + nameof(RemoveFilesFromClass));
             return result;
         }
+
         public static void UpdateFilesOfClasses(UpdateFilesArgs args)
         {
             Debug.WriteLine("db begin: " + nameof(UpdateFilesOfClasses));
@@ -296,7 +298,6 @@ namespace ClassifyFiles.Util
                 index++;
                 if (args.Callback != null && (DateTime.Now - lastCallbackTime).TotalMilliseconds > CallbackUpdateMs)
                 {
-
                     lastCallbackTime = DateTime.Now;
                     if (!args.Callback(index * 1.0 / count, f))
                     {
@@ -305,7 +306,7 @@ namespace ClassifyFiles.Util
                     }
                 }
             }
-            
+
             db.SaveChanges();
             Debug.WriteLine("db end: " + nameof(UpdateFilesOfClasses));
         }

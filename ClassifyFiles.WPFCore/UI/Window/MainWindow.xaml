@@ -22,7 +22,7 @@
     <Grid x:Name="outGrd" ClipToBounds="True">
         <Grid Margin="0,-1,0,0">
             <!--  不知道为什么，上面-1就能实现-32的效果  -->
-            <m:NavigationView 
+            <m:NavigationView
                 x:Name="navView"
                 Background="Transparent"
                 OpenPaneLength="240"
@@ -40,8 +40,6 @@
                             <m:FontIcon Glyph="&#xF259;" />
                         </m:NavigationViewItem.Icon>
                     </m:NavigationViewItem>
-
-
                 </m:NavigationView.MenuItems>
                 <m:NavigationView.PaneCustomContent>
                     <Grid x:Name="grdProject" Margin="8,0">
@@ -93,7 +91,6 @@
                                             </GridView>
                                         </ListView.View>
                                     </ListView>
-
                                 </m:SimpleStackPanel>
                             </m:Flyout>
                         </Grid.Resources>
@@ -130,8 +127,6 @@
                             <TextBlock Text="{Binding SelectedProject.Name}" />
                         </m:DropDownButton>
                     </Grid>
-
-
                 </m:NavigationView.PaneCustomContent>
                 <m:Frame x:Name="frame" IsEnabled="{Binding SelectedProject, Converter={StaticResource nn2b}}">
                     <ContentControl.RenderTransform>

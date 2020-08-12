@@ -7,7 +7,6 @@ namespace ClassifyFiles.UI.Util
 {
     public static class SelectorBehavior
     {
-
         public static readonly DependencyProperty ShouldSelectItemOnMouseUpProperty =
             DependencyProperty.RegisterAttached(
                 "ShouldSelectItemOnMouseUp", typeof(bool), typeof(SelectorBehavior),
@@ -61,7 +60,5 @@ namespace ClassifyFiles.UI.Util
         {
             e.Handled = e.ChangedButton == MouseButton.Left;
         }
-
-
     }
 }

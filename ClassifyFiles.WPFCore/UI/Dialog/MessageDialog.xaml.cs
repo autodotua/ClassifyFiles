@@ -1,23 +1,6 @@
 ﻿using ClassifyFiles.UI.Dialog;
 using FzLib.Extension;
-
-using ModernWpf.Controls;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ClassifyFiles.UI
 {
@@ -31,6 +14,7 @@ namespace ClassifyFiles.UI
             InitializeComponent();
             base.PrimaryButtonText = "确定";
         }
+
         private string message;
 
         public string Message
@@ -42,16 +26,17 @@ namespace ClassifyFiles.UI
                 this.Notify(nameof(Message));
             }
         }
+
         public async new Task ShowAsync()
         {
             await base.ShowAsync();
         }
+
         public async new Task ShowAsync(string message, string title)
         {
             Message = message;
             Title = title;
             await base.ShowAsync();
         }
-
     }
 }

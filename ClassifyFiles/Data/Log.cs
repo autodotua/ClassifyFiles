@@ -1,7 +1,5 @@
 ﻿using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace ClassifyFiles.Data
 {
@@ -9,10 +7,11 @@ namespace ClassifyFiles.Data
     {
         [Required]
         public DateTime Time { get; set; }
+
         [Required]
         public string Message { get; set; } = "";
+
         [Required]
         public string Details { get; set; } = "";
-
     }
 }

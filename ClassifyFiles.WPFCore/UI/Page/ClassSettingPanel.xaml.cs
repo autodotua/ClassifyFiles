@@ -1,31 +1,17 @@
-﻿using FzLib.Basic;
-using FzLib.Extension;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using ClassifyFiles.Data;
-using ClassifyFiles.Util;
-using ClassifyFiles.UI;
-using System.Windows.Markup;
-using System.Diagnostics;
+﻿using ClassifyFiles.Data;
+using ClassifyFiles.UI.Converter;
+using ClassifyFiles.UI.Dialog;
 using ClassifyFiles.UI.Event;
 using ClassifyFiles.UI.Model;
 using ClassifyFiles.UI.Util;
-using ClassifyFiles.UI.Converter;
-using ClassifyFiles.UI.Dialog;
+using ClassifyFiles.Util;
+using FzLib.Extension;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Data;
 
 namespace ClassifyFiles.UI.Page
 {
@@ -48,6 +34,7 @@ namespace ClassifyFiles.UI.Page
                 this.Notify(nameof(MatchConditions));
             }
         }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             //不知道为什么，Xaml里绑定不上，只好在代码里绑定了
@@ -96,18 +83,18 @@ namespace ClassifyFiles.UI.Page
 
         private void ApplyMatchConditions(Class c)
         {
-           
-                foreach (var m in c.MatchConditions)
+            foreach (var m in c.MatchConditions)
+            {
+                if (m.Value == null)
                 {
-                    if (m.Value == null)
-                    {
-                        Debug.Assert(false);
-                        m.Value = "";
-                    }
+                    Debug.Assert(false);
+                    m.Value = "";
                 }
-                c.MatchConditions.Clear();
-                c.MatchConditions.AddRange(MatchConditions);
             }
+            c.MatchConditions.Clear();
+            c.MatchConditions.AddRange(MatchConditions);
+        }
+
         public async Task SaveClassesAsync()
         {
             await Task.Run(() =>
@@ -181,12 +168,11 @@ namespace ClassifyFiles.UI.Page
         }
 
         private UIClass needToSelectedClass = null;
+
         private void TextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             //分组修改后，会取消选择，需要手动重新选择
             needToSelectedClass = classes.SelectedUIClass;
         }
     }
-
-
 }

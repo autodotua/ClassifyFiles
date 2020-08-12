@@ -15,7 +15,6 @@
     <UserControl.Resources>
         <c:Bool2VisibilityConverter x:Key="b2v" />
         <c:IsNotNull2VisibilityConverter x:Key="nn2v" />
-
     </UserControl.Resources>
 
     <Grid>
@@ -35,7 +34,6 @@
                                     Visibility="{Binding Path=Name, Converter={StaticResource nn2v}}" />
                                 <ItemsPresenter />
                             </m:SimpleStackPanel>
-
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>

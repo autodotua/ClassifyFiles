@@ -12,7 +12,6 @@
     mc:Ignorable="d">
     <UserControl.Resources>
         <c:IsNull2VisibilityConverter x:Key="n2v" />
-
     </UserControl.Resources>
     <Viewbox x:Name="view" Stretch="{Binding ActualStretch}">
         <Grid>

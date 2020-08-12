@@ -65,6 +65,5 @@
                 </Style>
             </ListBox.ItemContainerStyle>
         </ListBox>
-
     </Grid>
 </UserControl>

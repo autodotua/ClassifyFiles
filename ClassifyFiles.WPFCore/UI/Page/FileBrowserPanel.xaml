@@ -154,7 +154,6 @@
                             <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
                                 <Button Click="FilterButton_Click">筛选</Button>
                                 <Button Click="ClearFilterButton_Click">清除筛选</Button>
-
                             </m:SimpleStackPanel>
                         </m:SimpleStackPanel>
                     </m:Flyout>
@@ -292,7 +291,6 @@
                                         x:Name="swtFileIconUniformToFill"
                                         Header="将图标裁剪为正方形"
                                         IsOn="{Binding FileIconUniformToFill}" />
-
                                 </m:SimpleStackPanel>
                             </GroupBox>
 
@@ -332,7 +330,6 @@
                                         PreviewMouseDoubleClick="IconSize_PreviewMouseDoubleClick"
                                         SmallChange="1"
                                         Value="{Binding IconSize}" />
-
                                 </Grid>
                             </GroupBox>
                         </Grid>
@@ -377,7 +374,6 @@
                     <m:FontIcon Glyph="&#xE72C;&#xEA37;" />
                 </m:AppBarButton.Icon>
             </m:AppBarButton>
-
         </m:CommandBar>
     </Grid>
 </local:ProjectPageBase>

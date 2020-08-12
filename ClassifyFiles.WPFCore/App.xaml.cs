@@ -1,22 +1,12 @@
 ﻿using ClassifyFiles.UI;
 using ClassifyFiles.Util;
-using ClassifyFiles.Util.Win32;
-using ClassifyFiles.Util.Win32.Shell;
 using ModernWpf;
-using ModernWpf.Controls.Primitives;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.Diagnostics;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls.Primitives;
-using System.Windows.Media;
 
 namespace ClassifyFiles
 {
@@ -28,17 +18,17 @@ namespace ClassifyFiles
         public static Window CurrentWindow =>
             Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
 
-
         public static new App Current { get; private set; }
-        Timer timer;
+        private Timer timer;
+
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             if (DebugSwitch.ThreadCount)
             {
-                 timer = new Timer(new TimerCallback(p =>
-                {
-                    Debug.WriteLine("Current Thread Count is " + Process.GetCurrentProcess().Threads.Count);
-                }), this, 0, 1000);
+                timer = new Timer(new TimerCallback(p =>
+               {
+                   Debug.WriteLine("Current Thread Count is " + Process.GetCurrentProcess().Threads.Count);
+               }), this, 0, 1000);
             }
 
             FzLib.Program.Runtime.UnhandledException.RegistAll();
@@ -53,8 +43,6 @@ namespace ClassifyFiles
             MainWindow = win;
             win.Show();
             SplashWindow.TryClose();
-
-
         }
 
         private async void UnhandledException_UnhandledExceptionCatched(object sender, FzLib.Program.Runtime.UnhandledExceptionEventArgs e)
@@ -67,12 +55,10 @@ namespace ClassifyFiles
                 }
                 catch (Exception ex)
                 {
-
                 }
             });
             if (!e.Exception.Source.StartsWith("Microsoft.EntityFrameworkCore"))
             {
-
                 await Dispatcher.Invoke(async () =>
                 {
                     try
@@ -81,7 +67,6 @@ namespace ClassifyFiles
                     }
                     catch
                     {
-
                     }
                 });
             }
@@ -100,6 +85,7 @@ namespace ClassifyFiles
                 SystemUsesLightTheme = true;
             }
         }
+
         public static void SetTheme(FrameworkElement element = null)
         {
             InitializeTheme();
@@ -117,6 +103,7 @@ namespace ClassifyFiles
                 d:
                     theme = ElementTheme.Dark;
                     break;
+
                 case 1:
                 l:
                     theme = ElementTheme.Light;
@@ -127,7 +114,6 @@ namespace ClassifyFiles
                 foreach (var win in Current.Windows)
                 {
                     ThemeManager.SetRequestedTheme(win as Window, theme);
-
                 }
             }
             else
@@ -139,7 +125,6 @@ namespace ClassifyFiles
         public static bool SystemUsesLightTheme { get; private set; }
         public static bool AppsUseLightTheme { get; private set; }
 
-
         //public void SetCulture()
         //{
         //    string culture = Config.Instance.Language;
@@ -147,27 +132,23 @@ namespace ClassifyFiles
         //    //Copy all MergedDictionarys into a auxiliar list.
         //    var dictionary = Resources.MergedDictionaries;
 
-        //    //Search for the specified culture.     
+        //    //Search for the specified culture.
         //    string requestedCulture = string.Format("/Properties/StringResources.{0}.xaml", culture);
         //    var resourceDictionary = dictionary.
         //        FirstOrDefault(p => p.Source != null && p.Source.OriginalString == requestedCulture);
 
-
-        //    //If we have the requested resource, remove it from the list and place at the end.     
-        //    //Then this language will be our string table to use.      
+        //    //If we have the requested resource, remove it from the list and place at the end.
+        //    //Then this language will be our string table to use.
         //    if (resourceDictionary != null)
         //    {
         //        dictionary.Remove(resourceDictionary);
         //        dictionary.Add(resourceDictionary);
         //    }
 
-
-        //    //Inform the threads of the new culture.     
+        //    //Inform the threads of the new culture.
         //    var c = new CultureInfo(culture);
         //    Thread.CurrentThread.CurrentCulture = c;
         //    Thread.CurrentThread.CurrentUICulture = c;
         //}
-
-
     }
 }

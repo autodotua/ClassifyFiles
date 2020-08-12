@@ -1,5 +1,4 @@
 ﻿using ClassifyFiles.Data;
-using ClassifyFiles.Util;
 using FzLib.Extension;
 using System.ComponentModel;
 using System.Threading.Tasks;
@@ -13,6 +12,7 @@ namespace ClassifyFiles.UI.Model
         {
             Class = c;
         }
+
         public async Task UpdatePropertiesAsync()
         {
             int count = 0;
@@ -23,6 +23,7 @@ namespace ClassifyFiles.UI.Model
 
         public Class Class { get; private set; }
         private int fileCount;
+
         public int FileCount
         {
             get => fileCount;
@@ -31,8 +32,10 @@ namespace ClassifyFiles.UI.Model
                 fileCount = value;
                 this.Notify(nameof(FileCount));
             }
-        }     
+        }
+
         private int matchConditionsCount;
+
         public int MatchConditionsCount
         {
             get => matchConditionsCount;
@@ -42,6 +45,7 @@ namespace ClassifyFiles.UI.Model
                 this.Notify(nameof(MatchConditionsCount));
             }
         }
+
         public event PropertyChangedEventHandler PropertyChanged;
     }
 }

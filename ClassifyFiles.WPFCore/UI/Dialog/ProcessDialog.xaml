@@ -27,5 +27,4 @@
             <TextBlock Text="{Binding Message}" TextAlignment="Center" />
         </ui:SimpleStackPanel>
     </Grid>
-
 </local:UserControlBase>

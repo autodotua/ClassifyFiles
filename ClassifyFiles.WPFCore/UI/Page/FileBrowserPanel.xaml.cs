@@ -1,39 +1,31 @@
-﻿using FzLib.Extension;
+﻿using ClassifyFiles.Data;
+using ClassifyFiles.Enum;
+using ClassifyFiles.UI.Converter;
+using ClassifyFiles.UI.Dialog;
+using ClassifyFiles.UI.Event;
+using ClassifyFiles.UI.Model;
+using ClassifyFiles.UI.Util;
+using FzLib.Basic;
+using FzLib.Extension;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using ClassifyFiles.Data;
-using System.Diagnostics;
-using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Windows.Media.Animation;
 using static ClassifyFiles.Util.FileClassUtility;
 using static ClassifyFiles.Util.FileProjectUtilty;
-using static ClassifyFiles.Util.ProjectUtility;
-using System.Windows.Media.Animation;
-using ClassifyFiles.Enum;
-using ClassifyFiles.UI.Event;
-using ClassifyFiles.UI.Dialog;
-using ClassifyFiles.UI.Model;
-using ClassifyFiles.Util;
-using ClassifyFiles.UI.Panel;
-using System.Text.RegularExpressions;
-using System.Windows.Data;
-using System.Globalization;
-using System.Collections.ObjectModel;
-using ClassifyFiles.UI.Util;
-using FzLib.Basic;
-using Windows.Storage;
-using ClassifyFiles.UI.Converter;
 
 namespace ClassifyFiles.UI.Page
 {
-
     public partial class FileBrowserPanel : ProjectPageBase
     {
-
         public FileBrowserPanel()
         {
             InitializeComponent();
@@ -67,15 +59,13 @@ namespace ClassifyFiles.UI.Page
                     formats.Add(item.DisplayProperty2);
                     formats.Add(item.DisplayProperty3);
                 }
-                var csFormats = formats.Where(p =>p!=null && p.StartsWith("cs:"));
+                var csFormats = formats.Where(p => p != null && p.StartsWith("cs:"));
                 DisplayFormatConverter.InitializeCsMethods(csFormats);
             });
             UpdateAppBarButtonsEnable();
         }
 
         #region 分类面板
-
-
 
         /// <summary>
         /// 是否忽略类选择事件。当显示全部文件或未被分类的文件时，
@@ -122,7 +112,6 @@ namespace ClassifyFiles.UI.Page
             await MainWindow.Current.DoProcessAsync(Do());
             async Task Do()
             {
-
                 if (e.Files != null)
                 {
                     await AddFilesAsync(e.Class, e.Files);
@@ -146,9 +135,10 @@ namespace ClassifyFiles.UI.Page
             }
         }
 
-        #endregion
+        #endregion 分类面板
 
         #region 文件视图
+
         /// <summary>
         /// 设置FileViewer的文件
         /// </summary>
@@ -199,7 +189,9 @@ namespace ClassifyFiles.UI.Page
             }
             return result;
         }
+
         private IEnumerable<UIFile> rawFiles = null;
+
         private async Task ApplyFilterAsync()
         {
             await MainWindow.Current.DoProcessAsync(Do());
@@ -297,8 +289,6 @@ namespace ClassifyFiles.UI.Page
             btnSort.IsEnabled = filesViewer.CurrentFileView != FileView.Tree;
         }
 
-
-
         private async Task SetSpecialFiles(Func<Project, IEnumerable<KeyValuePair<File, IEnumerable<Class>>>> func, FileCollectionType type)
         {
             ignoreClassChanged = true;
@@ -313,6 +303,7 @@ namespace ClassifyFiles.UI.Page
                 }).ToList();
             }, type);
         }
+
         /// <summary>
         /// 单击全部文件按钮
         /// </summary>
@@ -370,9 +361,10 @@ namespace ClassifyFiles.UI.Page
             }
         }
 
-        #endregion
+        #endregion 文件视图
 
         #region 显示设置面板
+
         public bool ShowFileTime
         {
             get => Configs.ShowFileTime;
@@ -382,6 +374,7 @@ namespace ClassifyFiles.UI.Page
                 //filesViewer.Refresh();
             }
         }
+
         public bool ShowClassTags
         {
             get => Configs.ShowClassTags;
@@ -401,6 +394,7 @@ namespace ClassifyFiles.UI.Page
                 filesViewer.Refresh();
             }
         }
+
         public bool ShowIconViewNames
         {
             get => Configs.ShowIconViewNames;
@@ -410,6 +404,7 @@ namespace ClassifyFiles.UI.Page
                 filesViewer.Refresh();
             }
         }
+
         public bool ShowTilePath
         {
             get => Configs.ShowTilePath;
@@ -419,6 +414,7 @@ namespace ClassifyFiles.UI.Page
                 filesViewer.Refresh();
             }
         }
+
         public bool ShowFileExtension
         {
             get => Configs.ShowFileExtension;
@@ -428,11 +424,13 @@ namespace ClassifyFiles.UI.Page
                 filesViewer.Refresh();
             }
         }
+
         public bool ShowToolTip
         {
             get => Configs.ShowToolTip;
             set => Configs.ShowToolTip = value;
         }
+
         public bool FileIconUniformToFill
         {
             get => Configs.FileIconUniformToFill;
@@ -442,6 +440,7 @@ namespace ClassifyFiles.UI.Page
                 filesViewer.Refresh();
             }
         }
+
         public bool TreeSimpleTemplate
         {
             get => Configs.TreeSimpleTemplate;
@@ -454,12 +453,15 @@ namespace ClassifyFiles.UI.Page
                 }
             }
         }
+
         public bool ShowToolTipImage
         {
             get => Configs.ShowToolTipImage;
             set => Configs.ShowToolTipImage = value;
         }
-        bool isSettingSortChecked = false;
+
+        private bool isSettingSortChecked = false;
+
         public double IconSize
         {
             get => Configs.IconSize;
@@ -510,11 +512,13 @@ namespace ClassifyFiles.UI.Page
         {
             this.Notify(nameof(IconSize), nameof(IconSizeString));
         }
-        #endregion
+
+        #endregion 显示设置面板
 
         #region 底部操作栏
 
         public HashSet<string> dirs;
+
         /// <summary>
         /// 所有的目录
         /// </summary>
@@ -558,7 +562,7 @@ namespace ClassifyFiles.UI.Page
                 await new ErrorDialog().ShowAsync("请先设置根目录地址！", "错误");
                 return;
             }
-            if(!System.IO.Directory.Exists(Project.RootPath))
+            if (!System.IO.Directory.Exists(Project.RootPath))
             {
                 await new ErrorDialog().ShowAsync("根目录不存在", "错误");
                 return;
@@ -646,6 +650,7 @@ namespace ClassifyFiles.UI.Page
         }
 
         private string filterContent = "";
+
         public string FilterPattern
         {
             get => filterContent;
@@ -688,6 +693,7 @@ namespace ClassifyFiles.UI.Page
             flyoutFilter.Hide();
             await ApplyFilterAsync();
         }
+
         /// <summary>
         /// 筛选弹窗打开
         /// </summary>
@@ -701,7 +707,6 @@ namespace ClassifyFiles.UI.Page
             Keyboard.Focus(txtFilter);
         }
 
-
         private void LbxDirs_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             e.Handled = true;
@@ -709,14 +714,14 @@ namespace ClassifyFiles.UI.Page
             SmoothScrollViewerHelper.HandleMouseWheel(UIUtility.GetVisualChild<ScrollViewer>(e.Source as FrameworkElement), e.Delta);
         }
 
-        #endregion
+        #endregion 底部操作栏
 
         #region 左侧分类列表面板
 
         /// <summary>
         /// 是否正在执行左侧面板伸展和收缩的动画
         /// </summary>
-        bool isAnimating = false;
+        private bool isAnimating = false;
 
         /// <summary>
         /// 单击分界处
@@ -785,9 +790,6 @@ namespace ClassifyFiles.UI.Page
             }
         }
 
-
-        #endregion
-
-
+        #endregion 左侧分类列表面板
     }
 }

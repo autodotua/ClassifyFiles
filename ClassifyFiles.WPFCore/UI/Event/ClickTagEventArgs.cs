@@ -1,5 +1,4 @@
 ﻿using ClassifyFiles.Data;
-using ClassifyFiles.UI.Model;
 using System;
 
 namespace ClassifyFiles.UI.Event
@@ -13,5 +12,4 @@ namespace ClassifyFiles.UI.Event
 
         public Class Class { get; }
     }
-
 }

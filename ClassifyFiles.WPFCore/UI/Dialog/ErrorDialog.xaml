@@ -35,8 +35,6 @@
                     HorizontalAlignment="Right"
                     Click="Button_Click" Content="复制" />
             </m:SimpleStackPanel>
-
         </Expander>
     </m:SimpleStackPanel>
-
 </dialog:ContentDialogBase>

@@ -15,7 +15,7 @@ namespace ClassifyFiles.UI.Converter
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             int[] nums = (parameter as string).Split(',', ' ').Select(p => int.Parse(p)).ToArray();
-            if((bool)value)
+            if ((bool)value)
             {
                 return nums[0];
             }
@@ -41,8 +41,10 @@ namespace ClassifyFiles.UI.Converter
             {
                 case "1":
                     return c.DisplayProperty1 == null ? 0 : 200;
+
                 case "2":
                     return c.DisplayProperty2 == null ? 0 : 200;
+
                 case "3":
                     return c.DisplayProperty3 == null ? 0 : 200;
             }
@@ -126,9 +128,7 @@ namespace ClassifyFiles.UI.Converter
         {
             throw new NotSupportedException();
         }
-
     }
-
 
     /// <summary>
     /// 绑定源和转换参数相等则为真
@@ -144,7 +144,6 @@ namespace ClassifyFiles.UI.Converter
         {
             throw new NotSupportedException();
         }
-
     }
 
     /// <summary>
@@ -161,7 +160,6 @@ namespace ClassifyFiles.UI.Converter
         {
             return ((Visibility)value) == Visibility.Visible;
         }
-
     }
 
     /// <summary>
@@ -178,7 +176,6 @@ namespace ClassifyFiles.UI.Converter
         {
             throw new NotSupportedException();
         }
-
     }
 
     /// <summary>
@@ -195,8 +192,8 @@ namespace ClassifyFiles.UI.Converter
         {
             throw new NotSupportedException();
         }
+    }
 
-    }   
     /// <summary>
     /// 空转可见性
     /// </summary>
@@ -211,7 +208,6 @@ namespace ClassifyFiles.UI.Converter
         {
             throw new NotSupportedException();
         }
-
     }
 
     /// <summary>
@@ -238,10 +234,8 @@ namespace ClassifyFiles.UI.Converter
                 return ms;
             }
             return 1000 * 600;
-
         }
     }
-
 
     public sealed class MethodToValueConverter : IValueConverter
     {
@@ -265,7 +259,6 @@ namespace ClassifyFiles.UI.Converter
         }
     }
 
-
     /// <summary>
     /// 绑定值减去参数值
     /// </summary>
@@ -281,7 +274,6 @@ namespace ClassifyFiles.UI.Converter
             throw new NotImplementedException();
         }
     }
-
 
     /// <summary>
     /// 匹配规则转控件的可见性，控件的转换参数为text或time
@@ -301,8 +293,8 @@ namespace ClassifyFiles.UI.Converter
             [MatchType.SizeSmallerThan] = "text",
             [MatchType.TimeEarlierThan] = "time",
             [MatchType.TimeLaterThan] = "time",
-
         };
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (MatchConditionTypeWithControlType[(MatchType)value] == parameter as string)

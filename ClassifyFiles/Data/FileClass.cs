@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace ClassifyFiles.Data
+﻿namespace ClassifyFiles.Data
 {
     public class FileClass : DbModelBase
     {
@@ -8,7 +6,7 @@ namespace ClassifyFiles.Data
         {
         }
 
-        public FileClass(Class c, File file,bool manual)
+        public FileClass(Class c, File file, bool manual)
         {
             Class = c;
             File = file;
@@ -34,14 +32,16 @@ namespace ClassifyFiles.Data
         /// <summary>
         /// 通过分类加进来的
         /// </summary>
-        Auto=1,
+        Auto = 1,
+
         /// <summary>
         /// 手动加入的
         /// </summary>
-        AddManully=2,
+        AddManully = 2,
+
         /// <summary>
         /// 被删除的。如果为该值，那么一定是通过分类加进来的。
         /// </summary>
-        Disabled=3
+        Disabled = 3
     }
 }

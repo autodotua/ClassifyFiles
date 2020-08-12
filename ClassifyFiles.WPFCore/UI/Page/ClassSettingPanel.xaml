@@ -70,9 +70,7 @@
                             Grid.Column="6"
                             LostFocus="TextBox_LostFocus"
                             Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.GroupName}" />
-
                     </Grid>
-
                 </GroupBox>
                 <GroupBox Grid.Row="2">
                     <GroupBox.Header>
@@ -166,7 +164,6 @@
                             AcceptsTab="True"
                             Text="{Binding ElementName=classes, Path=SelectedUIClass.Class.DisplayProperty3}"
                             TextWrapping="Wrap" />
-
                     </Grid>
                 </GroupBox>
                 <GroupBox Grid.Row="99" Header="匹配条件">
@@ -227,7 +224,6 @@
                                             <m:SymbolIcon Symbol="Delete" />
                                         </Button>
                                     </Grid>
-
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>

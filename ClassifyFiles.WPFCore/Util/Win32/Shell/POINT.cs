@@ -14,7 +14,9 @@ namespace ClassifyFiles.Util.Win32.Shell
             this.Y = y;
         }
 
-        public POINT(System.Drawing.Point pt) : this(pt.X, pt.Y) { }
+        public POINT(System.Drawing.Point pt) : this(pt.X, pt.Y)
+        {
+        }
 
         public static implicit operator System.Drawing.Point(POINT p)
         {

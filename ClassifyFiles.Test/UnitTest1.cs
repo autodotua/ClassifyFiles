@@ -3,9 +3,7 @@ using ClassifyFiles.Util;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using DFile = ClassifyFiles.Data.File;
 using IOFile = System.IO.File;
 
 namespace ClassifyFiles.Test
@@ -42,6 +40,7 @@ namespace ClassifyFiles.Test
             Assert.AreEqual(FileUtility.GetFileSize("115.3 KB"), Convert.ToInt64(115.3 * 1024));
             Assert.AreEqual(FileUtility.GetFileSize("1.03      GB"), Convert.ToInt64(1.03 * 1024 * 1024 * 1024));
         }
+
         private void CreateFiles()
         {
             if (Directory.Exists("test"))
@@ -54,7 +53,6 @@ namespace ClassifyFiles.Test
             IOFile.WriteAllText(Path.Combine(dir1.FullName, "º½ÅÄ-2.mp4"), "");
             IOFile.WriteAllText(Path.Combine(dir1.FullName, "Æû³µ-1.mp4"), "");
             IOFile.WriteAllText(Path.Combine(dir1.FullName, "Æû³µ-2.mp4"), "");
-
 
             var dir2 = dir1.CreateSubdirectory("dir2");
             IOFile.WriteAllText(Path.Combine(dir2.FullName, "·É»ú-1.mp4"), "");

@@ -1,12 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data.Common;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClassifyFiles.Data
 {
@@ -14,6 +7,7 @@ namespace ClassifyFiles.Data
     {
         public string DbPath { get; }
         private static bool created = false;
+
         /// <summary>
         /// 从配置文件读取链接字符串
         /// </summary>
@@ -71,7 +65,6 @@ namespace ClassifyFiles.Data
                 .HasForeignKey(p => p.ClassID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-
             modelBuilder.Entity<FileClass>()
                 .HasOne(p => p.File)
                 .WithMany(/*p => p.Classes*/)
@@ -80,7 +73,6 @@ namespace ClassifyFiles.Data
 
             modelBuilder.Entity<Config>()
                  .HasIndex(p => p.Key);
-
 
             modelBuilder.Entity<FileClass>()
                 .Property(e => e.Status)
@@ -98,8 +90,8 @@ namespace ClassifyFiles.Data
            .HasConversion(
                v => (int)v,
                v => (MatchType)v);
-
         }
+
         private void InsertTestDatas()
         {
             Project project = new Project() { Name = "测试项目" };
@@ -113,11 +105,9 @@ namespace ClassifyFiles.Data
             {
                 Name = GetName(),
                 Project = project,
-
             };
             Classes.Add(c);
             SaveChanges();
         }
-
     }
 }

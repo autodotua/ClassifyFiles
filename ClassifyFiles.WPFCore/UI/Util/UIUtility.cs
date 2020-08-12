@@ -26,6 +26,7 @@ namespace ClassifyFiles.UI.Util
             }
             return child as T;
         }
+
         public static List<T> GetVisualChilds<T>(this Visual referenceVisual) where T : Visual
         {
             List<T> results = new List<T>();

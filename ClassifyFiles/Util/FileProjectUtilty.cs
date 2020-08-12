@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using static ClassifyFiles.Util.DbUtility;
 
 namespace ClassifyFiles.Util
@@ -35,6 +34,7 @@ namespace ClassifyFiles.Util
             Debug.WriteLine("db end: " + nameof(GetFilesWithClassesByProject));
             return result;
         }
+
         public static IEnumerable<KeyValuePair<File, IEnumerable<Class>>> GetManualFilesWithClassesByProject(Project project)
         {
             Debug.WriteLine("db begin: " + nameof(GetManualFilesWithClassesByProject));
@@ -49,6 +49,7 @@ namespace ClassifyFiles.Util
             Debug.WriteLine("db end: " + nameof(GetManualFilesWithClassesByProject));
             return result;
         }
+
         public static IEnumerable<KeyValuePair<File, IEnumerable<Class>>> GetDisabledFilesWithClassesByProject(Project project)
         {
             Debug.WriteLine("db begin: " + nameof(GetDisabledFilesWithClassesByProject));

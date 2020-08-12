@@ -1,19 +1,9 @@
-﻿using ClassifyFiles.Data;
-using ClassifyFiles.UI.Util;
-using ClassifyFiles.Util;
-using FzLib.Extension;
+﻿using ClassifyFiles.UI.Util;
 using MetadataExtractor;
-using MetadataExtractor.Formats.Exif;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using static ClassifyFiles.Util.FileClassUtility;
 
 namespace ClassifyFiles.UI.Dialog
 {

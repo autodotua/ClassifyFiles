@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using static ClassifyFiles.Util.FileClassUtility;
 
 namespace ClassifyFiles.UI.Dialog
@@ -34,15 +33,16 @@ namespace ClassifyFiles.UI.Dialog
                 case 1:
                     rbtnFolderAsFile.IsChecked = true;
                     break;
+
                 case 2:
                     rbtnFolderIgnore.IsChecked = true;
                     break;
+
                 case 3:
                     rbtnFolderImportFiles.IsChecked = true;
                     break;
             }
             chkIncludeThumbnails.IsChecked = obj.IncludeThumbnails.Value;
-
         }
 
         private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -63,10 +63,11 @@ namespace ClassifyFiles.UI.Dialog
 
         private void RegardOneSideParseErrorAsNotSameCheckBox_Click(object sender, RoutedEventArgs e)
         {
-
         }
-        bool working = false;
-        bool stopping = false;
+
+        private bool working = false;
+        private bool stopping = false;
+
         private bool Callback(double per, Data.File file)
         {
             if (stopping)
@@ -82,7 +83,9 @@ namespace ClassifyFiles.UI.Dialog
             Message = $"正在处理（{100 * per:N2}%）：" + file.GetAbsolutePath();
             return true;
         }
+
         private string message;
+
         public string Message
         {
             get => message;
@@ -92,7 +95,9 @@ namespace ClassifyFiles.UI.Dialog
                 this.Notify(nameof(Message));
             }
         }
+
         private double percentage;
+
         public double Percentage
         {
             get => percentage;
@@ -102,6 +107,7 @@ namespace ClassifyFiles.UI.Dialog
                 this.Notify(nameof(Percentage));
             }
         }
+
         public bool Updated { get; private set; }
         public Class Class { get; }
         public IList<string> Files { get; }
@@ -150,7 +156,7 @@ namespace ClassifyFiles.UI.Dialog
             {
                 await Task.Run(() =>
                 {
-                    AddedFiles =  AddFilesToClass(args);
+                    AddedFiles = AddFilesToClass(args);
                 });
                 working = false;
                 Updated = true;
@@ -163,6 +169,7 @@ namespace ClassifyFiles.UI.Dialog
             }
             Close();
         }
+
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             string json = JsonConvert.SerializeObject(new
@@ -178,7 +185,7 @@ namespace ClassifyFiles.UI.Dialog
         public IReadOnlyList<File> AddedFiles { get; private set; }
 
         private async void Dialog_Loaded(object sender, RoutedEventArgs e)
-        { 
+        {
             if (Configs.AutoAddFiles)
             {
                 await Do();

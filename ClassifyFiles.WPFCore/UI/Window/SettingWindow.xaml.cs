@@ -11,7 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Documents;
 using static ClassifyFiles.Util.ProjectUtility;
 using F = System.IO.File;
 
@@ -56,6 +55,7 @@ namespace ClassifyFiles.UI
         {
             Current = null;
         }
+
         private void ThemeButton_Click(object sender, RoutedEventArgs e)
         {
             int theme = rbtnThemeAuto.IsChecked.Value ?
@@ -110,7 +110,6 @@ namespace ClassifyFiles.UI
                 await new MessageDialog().ShowAsync("导入成功", "导出");
                 projects.ForEach(p => Projects.Add(p));
             }
-
         }
 
         private async void ExportMenu_Click(object sender, RoutedEventArgs e)
@@ -127,7 +126,6 @@ namespace ClassifyFiles.UI
                 await DoProcessAsync(Task.Run(() => ExportAll(path)));
                 await new MessageDialog().ShowAsync("导出成功", "导出");
             }
-
         }
 
         private void OpenLogButton_Click(object sender, RoutedEventArgs e)
@@ -224,9 +222,9 @@ namespace ClassifyFiles.UI
                 return null;
             }
         }
+
         private async void DeleteThumbnailButton_Click(object sender, RoutedEventArgs e)
         {
-
             await DoSthNeedToCloseOtherWindowsAsync(Do);
 
             static object Do()
@@ -248,7 +246,6 @@ namespace ClassifyFiles.UI
             }
             else
             {
-
                 tbkCachePath.Text = "默认位置";
                 runCachePathTo.Text = "临时目录";
             }
@@ -268,7 +265,6 @@ namespace ClassifyFiles.UI
             }
             catch
             {
-
             }
             finally
             {

@@ -3,18 +3,14 @@ using FzLib.Basic;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using static ClassifyFiles.Util.DbUtility;
-using Dir = System.IO.Directory;
-using F = System.IO.File;
 using D = System.IO.Directory;
+
+using Dir = System.IO.Directory;
+
+using F = System.IO.File;
 using FI = System.IO.FileInfo;
 using P = System.IO.Path;
 
@@ -30,28 +26,34 @@ namespace ClassifyFiles.Util
         "tiff",
         "bmp",
         }.AsReadOnly();
+
         private static readonly IReadOnlyList<string> videoExtensions = new List<string>() {
         "mp4",
         "mkv",
         "avi",
         "mov"
         }.AsReadOnly();
+
         private static readonly IReadOnlyList<string> programExtensions = new List<string>() {
         "exe",
         "msi"
         }.AsReadOnly();
+
         public static bool IsImage(string path)
         {
             return imgExtensions.Contains(P.GetExtension(path).RemoveStart(".").ToLower());
         }
+
         public static bool IsExecutable(string path)
         {
             return programExtensions.Contains(P.GetExtension(path).RemoveStart(".").ToLower());
         }
+
         public static bool IsVideo(string path)
         {
             return videoExtensions.Contains(P.GetExtension(path).RemoveStart(".").ToLower());
         }
+
         public static bool IsImage(this FI file)
         {
             return IsImage(file.Extension);
@@ -76,6 +78,7 @@ namespace ClassifyFiles.Util
                     case Logic.And:
                         orGroup.Last().Add(mc);
                         break;
+
                     case Logic.Or:
                         orGroup.Add(new List<MatchCondition>() { mc });
                         break;
@@ -101,9 +104,9 @@ namespace ClassifyFiles.Util
             }
             return false;//如果每一组or都不通过，那么只好不通过
         }
+
         private static bool IsMatched(FI file, MatchCondition mc)
         {
-
             string value = mc.Value;
             bool? result = mc.Type switch
             {
@@ -134,9 +137,10 @@ namespace ClassifyFiles.Util
             {
                 return DateTime.Parse(mc.Value);
             }
-
         }
+
         private static Dictionary<string, string[]> splitedExtensions = new Dictionary<string, string[]>();
+
         private static bool IsExtensionMatched(string ext, string target)
         {
             string[] splited = null;
@@ -151,6 +155,7 @@ namespace ClassifyFiles.Util
             }
             return splited.Contains(ext.ToLower().TrimStart('.'));
         }
+
         public static long? GetFileSize(string value)
         {
             if (long.TryParse(value, out long result))
@@ -175,6 +180,7 @@ namespace ClassifyFiles.Util
             }
             return null;
         }
+
         public static File GetFileTree(IEnumerable<File> files)
         {
             Dictionary<File, Queue<string>> fileDirs = new Dictionary<File, Queue<string>>();
@@ -311,6 +317,7 @@ namespace ClassifyFiles.Util
                             afterExportAFile?.Invoke(file);
                         }
                         break;
+
                     case ExportFormat.Path:
                         foreach (var file in files)
                         {
@@ -321,6 +328,7 @@ namespace ClassifyFiles.Util
                             afterExportAFile?.Invoke(file);
                         }
                         break;
+
                     case ExportFormat.Tree:
                         var tree = GetFileTree(files);
                         File root = new File();
@@ -348,7 +356,6 @@ namespace ClassifyFiles.Util
                         break;
                 }
             }
-
         }
 
         private static string GetValidFileName(string name)
@@ -374,6 +381,7 @@ namespace ClassifyFiles.Util
             } while (F.Exists(P.Combine(dir, newName)));
             return newName;
         }
+
         public static bool SaveFiles(IEnumerable<File> files)
         {
             files.ForEach(p => db.Entry(p).State = EntityState.Modified);
@@ -388,6 +396,7 @@ namespace ClassifyFiles.Util
             }
             SaveChanges();
         }
+
         public static void RecoverFiles(IEnumerable<File> files)
         {
             foreach (var file in files)
@@ -404,10 +413,10 @@ namespace ClassifyFiles.Util
                         db.Entry(fc).State = EntityState.Modified;
                     }
                 }
-
             }
             SaveChanges();
         }
+
         public static void DeleteAllThumbnails()
         {
             foreach (var file in db.Files)
@@ -421,16 +430,17 @@ namespace ClassifyFiles.Util
                 {
                     file.IconGUID = null;
                     db.Entry(file).State = EntityState.Modified;
-                }     
+                }
                 if (file.Win10IconGUID != null)
                 {
                     file.Win10IconGUID = null;
                     db.Entry(file).State = EntityState.Modified;
                 }
             }
-          
+
             int changes = SaveChanges();
         }
+
         public static void DeleteThumbnails(Project project, Func<File, string> getThumbnailPath)
         {
             var files = db.Files.Where(p => p.ProjectID == project.ID).AsEnumerable();
@@ -448,7 +458,6 @@ namespace ClassifyFiles.Util
                         }
                         catch (Exception ex)
                         {
-
                         }
                     }
                     file.ThumbnailGUID = null;
@@ -466,7 +475,6 @@ namespace ClassifyFiles.Util
                 }
             }
             db.SaveChanges();
-
         }
 
         public static (int DeleteFromDb,
@@ -521,10 +529,11 @@ namespace ClassifyFiles.Util
             }
             SaveChanges();
             int remainsCount = db.Files.Where(p => p.ThumbnailGUID != null).Count();
-            return (deletedFromDb, deletedFromDisk, remainsCount, failedFiles==null?new List<string>():failedFiles);
+            return (deletedFromDb, deletedFromDisk, remainsCount, failedFiles == null ? new List<string>() : failedFiles);
         }
 
         private static bool? canWriteInCurrentDirectory = null;
+
         public static bool CanWriteInCurrentDirectory()
         {
             if (canWriteInCurrentDirectory == null)
@@ -544,6 +553,4 @@ namespace ClassifyFiles.Util
             return canWriteInCurrentDirectory.Value;
         }
     }
-
-
 }

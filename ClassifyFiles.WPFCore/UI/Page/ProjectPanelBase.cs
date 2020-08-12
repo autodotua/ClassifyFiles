@@ -1,24 +1,17 @@
 ﻿using ClassifyFiles.Data;
-using ClassifyFiles.Util;
-using ClassifyFiles.UI;
-using ClassifyFiles.UI.Panel;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections.ObjectModel;
 using FzLib.Extension;
-using System.Windows;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace ClassifyFiles.UI.Page
 {
     public interface ILoadable
     {
         public Task LoadAsync(Project project);
-
     }
-    public abstract class ProjectPageBase : ModernWpf.Controls.Page, ILoadable ,INotifyPropertyChanged
+
+    public abstract class ProjectPageBase : ModernWpf.Controls.Page, ILoadable, INotifyPropertyChanged
     {
         public ProjectPageBase()
         {
@@ -27,10 +20,12 @@ namespace ClassifyFiles.UI.Page
                 (Content as FrameworkElement).DataContext = this;
             };
         }
+
         public virtual async Task LoadAsync(Project project)
         {
             Project = project;
         }
+
         private Project project;
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -33,16 +33,19 @@ namespace ClassifyFiles.Data
                 Name = file.Name;
                 Dir = file.FullName.Substring(root.FullName.Length, file.FullName.Length - file.Name.Length - root.FullName.Length).Trim('\\');
             }
-
         }
 
         [Required]
         public string Dir { get; set; } = "";
+
         [Required]
         public string Name { get; set; } = "";
+
         [NotMapped]
         public bool IsFolder => string.IsNullOrEmpty(Name);
+
         private string thumbnailGUID;
+
         public string ThumbnailGUID
         {
             //如果为null，则是没有获取；如果为""，则是获取失败
@@ -53,7 +56,9 @@ namespace ClassifyFiles.Data
                 this.Notify(nameof(ThumbnailGUID));
             }
         }
+
         private string iconGUID;
+
         public string IconGUID
         {
             //如果为null，则是没有获取；如果为""，则是获取失败
@@ -64,7 +69,9 @@ namespace ClassifyFiles.Data
                 this.Notify(nameof(IconGUID));
             }
         }
+
         private string win10IconGUID;
+
         public string Win10IconGUID
         {
             //如果为null，则是没有获取；如果为""，则是获取失败
@@ -78,9 +85,12 @@ namespace ClassifyFiles.Data
 
         [Required]
         public Project Project { get; set; }
+
         public int ProjectID { get; set; }
+
         [NotMapped]
         public List<File> SubFiles { get; set; } = new List<File>();
+
         public override bool Equals(object obj)
         {
             if (!(obj is File item))
@@ -96,6 +106,7 @@ namespace ClassifyFiles.Data
         }
 
         private FileInfo fileInfo;
+
         public FileInfo FileInfo
         {
             get

@@ -1,29 +1,15 @@
-﻿using ClassifyFiles.Data;
-using ClassifyFiles.UI.Model;
-using ClassifyFiles.UI.Panel;
+﻿using ClassifyFiles.UI.Model;
 using ClassifyFiles.UI.Util;
 using ClassifyFiles.Util;
 using ClassifyFiles.Util.Win32;
-using ClassifyFiles.Util.Win32.Shell;
 using FzLib.Extension;
 using ModernWpf.Controls;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace ClassifyFiles.UI.Component
@@ -44,6 +30,7 @@ namespace ClassifyFiles.UI.Component
             };
             ResetDefaultDispatcherPriority();
         }
+
         private static void ResetDefaultDispatcherPriority()
         {
             if (Configs.FluencyFirst)
@@ -55,6 +42,7 @@ namespace ClassifyFiles.UI.Component
                 DefaultDispatcherPriority = DispatcherPriority.Normal;
             }
         }
+
         public FileIcon()
         {
             InitializeComponent();
@@ -62,11 +50,12 @@ namespace ClassifyFiles.UI.Component
 
         private static DispatcherPriority DefaultDispatcherPriority;
         public bool DisplayBetterImage { get; set; } = false;
+
         public static readonly DependencyProperty FileProperty =
             DependencyProperty.Register("File", typeof(UIFile), typeof(FileIcon), new PropertyMetadata(OnFileChanged));
-        static async void OnFileChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
-        {
 
+        private static async void OnFileChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
+        {
             FileIcon fileIcon = obj as FileIcon;
             bool loaded = fileIcon.IsLoaded;
             fileIcon.IconContent = null;
@@ -77,7 +66,6 @@ namespace ClassifyFiles.UI.Component
             }, DefaultDispatcherPriority);
             if (loaded)
             {
-
             }
             else
             {
@@ -86,6 +74,7 @@ namespace ClassifyFiles.UI.Component
         }
 
         private UIFile NonDPFile { get; set; }
+
         public UIFile File
         {
             get => GetValue(FileProperty) as UIFile; //file;
@@ -96,6 +85,7 @@ namespace ClassifyFiles.UI.Component
         }
 
         public Stretch? stretch;
+
         public Stretch? Stretch
         {
             get => stretch;
@@ -105,6 +95,7 @@ namespace ClassifyFiles.UI.Component
                 this.Notify(nameof(Stretch), nameof(ActualStretch));
             }
         }
+
         public Stretch ActualStretch
         {
             get
@@ -120,6 +111,7 @@ namespace ClassifyFiles.UI.Component
                 return Stretch.Value;
             }
         }
+
         private async Task LoadAsync()
         {
             await File.LoadClassesAsync();
@@ -134,7 +126,6 @@ namespace ClassifyFiles.UI.Component
                      }
                      catch
                      {
-
                      }
                  }
              };
@@ -153,6 +144,7 @@ namespace ClassifyFiles.UI.Component
 
         private static string folderIconPath = null;
         private object iconContent;
+
         public object IconContent
         {
             get => iconContent;
@@ -196,7 +188,6 @@ namespace ClassifyFiles.UI.Component
                     IconContent = item, DefaultDispatcherPriority);
                 return true;
             }
-
 
             await Dispatcher.InvokeAsync(() =>
             {
@@ -243,8 +234,5 @@ namespace ClassifyFiles.UI.Component
         }
 
         public static TaskQueue Tasks { get; private set; } = new TaskQueue();
-
-
     }
-
 }

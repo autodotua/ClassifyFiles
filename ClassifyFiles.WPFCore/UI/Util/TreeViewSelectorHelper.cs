@@ -1,8 +1,5 @@
-﻿using ClassifyFiles.UI.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -101,6 +98,7 @@ namespace ClassifyFiles.UI.Util
                 }
             }
         }
+
         public async Task SelectItemWhileLoadedAsync(TModel node, IList<TModel> rootNodes)
         {
             while (!TreeView.IsLoaded)
@@ -156,7 +154,7 @@ namespace ClassifyFiles.UI.Util
                 //获取该项对应的视图
                 treeViewItem = treeViewItem.ItemContainerGenerator
                        .ContainerFromItem(node) as TreeViewItem;
-                if(treeViewItem==null)
+                if (treeViewItem == null)
                 {
                     return null;
                 }
@@ -173,7 +171,6 @@ namespace ClassifyFiles.UI.Util
                     await Task.Delay(1);
                 }
             }
-
         }
 
         public async Task RemoveItemAsync(TModel node, IList<TModel> rootNodes)

@@ -46,7 +46,6 @@
                     Click="Button_Click">
                     开始
                 </Button>
-
             </Grid>
         </m:SimpleStackPanel>
     </m:SimpleStackPanel>

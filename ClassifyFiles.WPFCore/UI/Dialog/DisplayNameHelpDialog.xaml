@@ -19,8 +19,8 @@
             <Setter Property="CellSpacing" Value="0" />
         </Style>
         <Style TargetType="{x:Type Run}" x:Key="runCode">
-            <Setter Property="FontStyle" Value="Italic"/>
-            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontStyle" Value="Italic" />
+            <Setter Property="FontFamily" Value="Consolas" />
         </Style>
     </local:DialogWindowBase.Resources>
     <ScrollViewer Margin="8" x:Name="scr">
@@ -35,17 +35,16 @@
                     设置文本显示格式可以在浏览视图中显示不同于文件名的名称，通常用于显示一些文件的元数据，特别是对于照片来说，例如分辨率、拍摄时间等等。
                 </Paragraph>
 
-
                 <Paragraph FontSize="16" FontWeight="Bold">
                     语法
                 </Paragraph>
-                <Paragraph  >
+                <Paragraph>
                     本程序共支持3种语法：简易语法、Powershell语法、C#语法。
                 </Paragraph>
                 <Paragraph FontSize="16" Margin="32,0,0,0" FontWeight="Bold">
                     简易语法
                 </Paragraph>
-                <Paragraph >
+                <Paragraph>
                     简易语法中，纯文本直接输出，属性文本放置在大括号之间。Exif信息使用
                     <Run Style="{StaticResource runCode}">Exif_Name/Code</Run>
                     例如：
@@ -54,7 +53,7 @@
                     <Run  Style="{StaticResource runCode}">File_</Run>
                     加照片拍摄日期。
                 </Paragraph>
-                <Paragraph >
+                <Paragraph>
                     使用
                     <Run Style="{StaticResource runCode}">{...}??{...}</Run>
                     可以在前者没有值的时候，显示后者。例如：
@@ -63,7 +62,7 @@
                      使用
                     <Run Style="{StaticResource runCode}">{...}??{}</Run> 可以在前者不存在时，放弃显示。
                 </Paragraph>
-                <Paragraph >
+                <Paragraph>
                     对于没有属性的值，且没有使用
                     <Run Style="{StaticResource runCode}">??</Run>
                     时，将显示原文。
@@ -72,7 +71,7 @@
                 <Paragraph FontSize="16" Margin="32,0,0,0" FontWeight="Bold">
                     C#语法
                 </Paragraph>
-                <Paragraph >
+                <Paragraph>
                     当格式使用
                     <Run Style="{StaticResource runCode}">cs:</Run>
                     开头时，将使用C#语法。文件常规属性为变量，例如文件名可以直接使用
@@ -88,19 +87,19 @@
                     。例如：
                 </Paragraph>
                 <Paragraph>
-                    <Run Style="{StaticResource runCode}" >
+                    <Run Style="{StaticResource runCode}">
                         if(Exif.ContainsKey(12345))
                     </Run>
-                    <LineBreak/>
-                    <Run Style="{StaticResource runCode}" >
+                    <LineBreak />
+                    <Run Style="{StaticResource runCode}">
                         &#160;&#160; return Exif[12345];
                     </Run>
-                    <LineBreak/>
-                    <Run Style="{StaticResource runCode}" >
+                    <LineBreak />
+                    <Run Style="{StaticResource runCode}">
                         else
                     </Run>
-                    <LineBreak/>
-                    <Run Style="{StaticResource runCode}" >
+                    <LineBreak />
+                    <Run Style="{StaticResource runCode}">
                         &#160;&#160; return Name;
                     </Run>
                 </Paragraph>
@@ -154,8 +153,6 @@
                                 <Paragraph>文件的修改时间</Paragraph>
                             </TableCell>
                         </TableRow>
-
-
                     </TableRowGroup>
                 </Table>
                 <Paragraph FontSize="16" FontWeight="Bold">

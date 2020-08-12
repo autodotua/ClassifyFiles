@@ -3,15 +3,13 @@ using ClassifyFiles.Util;
 using FzLib.Extension;
 using ModernWpf.Controls;
 using System;
-using System.Linq;
-using System.Windows.Media.Imaging;
 using System.ComponentModel;
-using System.IO;
-using System.Windows.Media;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using Windows.Storage;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace ClassifyFiles.UI.Model
 {
@@ -89,6 +87,7 @@ namespace ClassifyFiles.UI.Model
             }
             return FzLib.Basic.Number.ByteToFitString(length);
         }
+
         public async void BuildUI()
         {
             await Application.Current.Dispatcher.InvokeAsync(() =>
@@ -101,10 +100,12 @@ namespace ClassifyFiles.UI.Model
            },
           System.Windows.Threading.DispatcherPriority.Background);
         }
+
         public Data.File File { get; private set; }
         public FileInfo FileInfo { get; private set; }
 
         public string length;
+
         public string Length
         {
             get => length;
@@ -114,7 +115,9 @@ namespace ClassifyFiles.UI.Model
                 this.Notify(nameof(Length));
             }
         }
+
         private string displayName;
+
         public string DisplayName
         {
             get
@@ -131,7 +134,9 @@ namespace ClassifyFiles.UI.Model
                 this.Notify(nameof(DisplayName));
             }
         }
+
         private string displayProperty1 = null;
+
         public string DisplayProperty1
         {
             get => displayProperty1;
@@ -141,7 +146,9 @@ namespace ClassifyFiles.UI.Model
                 this.Notify(nameof(DisplayProperty1));
             }
         }
+
         private string displayProperty2 = null;
+
         public string DisplayProperty2
         {
             get => displayProperty2;
@@ -151,7 +158,9 @@ namespace ClassifyFiles.UI.Model
                 this.Notify(nameof(DisplayProperty2));
             }
         }
+
         private string displayProperty3 = null;
+
         public string DisplayProperty3
         {
             get => displayProperty3;
@@ -161,6 +170,7 @@ namespace ClassifyFiles.UI.Model
                 this.Notify(nameof(DisplayProperty3));
             }
         }
+
         public string DefaultDisplayName
         {
             get
@@ -177,6 +187,7 @@ namespace ClassifyFiles.UI.Model
                 return Path.GetFileNameWithoutExtension(File.Name);
             }
         }
+
         public string DisplayLastWriteTime
         {
             get
@@ -200,6 +211,7 @@ namespace ClassifyFiles.UI.Model
                 }
             }
         }
+
         public string DisplayCreationTime
         {
             get
@@ -223,7 +235,9 @@ namespace ClassifyFiles.UI.Model
                 }
             }
         }
+
         public string displayDir;
+
         public string DisplayDir
         {
             get => displayDir;
@@ -233,6 +247,7 @@ namespace ClassifyFiles.UI.Model
                 this.Notify(nameof(DisplayDir));
             }
         }
+
         public const string FileGlyph = "\uED41";
         public const string FolderGlyph = "\uED43";
 
@@ -263,7 +278,6 @@ namespace ClassifyFiles.UI.Model
                     }
                     catch
                     {
-
                     }
                     //var bitmapImage = new BitmapImage(new Uri(File.GetAbsolutePath(), UriKind.Absolute));
                 });
@@ -271,6 +285,7 @@ namespace ClassifyFiles.UI.Model
             }
             return null;
         }
+
         public BitmapImage Image
         {
             get

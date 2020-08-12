@@ -1,5 +1,4 @@
 ﻿using FzLib.Extension;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -9,6 +8,7 @@ namespace ClassifyFiles.Data
     {
         [Required]
         private string name = "";
+
         public string Name
         {
             get => name;
@@ -18,7 +18,9 @@ namespace ClassifyFiles.Data
                 this.Notify(nameof(Name));
             }
         }
+
         private ObservableCollection<Class> classes;
+
         public ObservableCollection<Class> Classes
         {
             get => classes;
@@ -28,8 +30,9 @@ namespace ClassifyFiles.Data
                 this.Notify(nameof(Classes));
             }
         }
-      
+
         private string rootPath;
+
         public string RootPath
         {
             get => rootPath;
@@ -39,6 +42,7 @@ namespace ClassifyFiles.Data
                 this.Notify(nameof(RootPath));
             }
         }
+
         public enum ClassifyType
         {
             FileProps,

@@ -8,5 +8,4 @@
         Tree = 4,
         Detail = 5
     }
-
 }

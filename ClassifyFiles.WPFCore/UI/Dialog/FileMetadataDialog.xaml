@@ -52,7 +52,6 @@
                                 </GridView>
                             </ListView.View>
                         </ListView>
-
                     </Expander>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

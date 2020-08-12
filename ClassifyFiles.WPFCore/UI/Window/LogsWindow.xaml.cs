@@ -2,7 +2,6 @@
 using ClassifyFiles.Util;
 using FzLib.Extension;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
@@ -22,6 +21,7 @@ namespace ClassifyFiles.UI
         }
 
         private IList<Log> logs;
+
         public IList<Log> Logs
         {
             get => logs;

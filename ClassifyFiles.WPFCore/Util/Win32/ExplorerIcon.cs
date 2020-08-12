@@ -29,7 +29,6 @@ namespace ClassifyFiles.Util.Win32
             IntPtr wParam,
             IntPtr lParam);
 
-
         [DllImport("shell32.dll")]
         private static extern int SHGetImageList(
             int iImageList,
@@ -49,7 +48,7 @@ namespace ClassifyFiles.Util.Win32
             IntPtr hIcon);
 
         public static System.Drawing.Bitmap GetBitmapFromFolderPath(
-            string filepath, IconSizeEnum iconsize=IconSizeEnum.ExtraLargeIcon)
+            string filepath, IconSizeEnum iconsize = IconSizeEnum.ExtraLargeIcon)
         {
             IntPtr hIcon = GetIconHandleFromFolderPath(filepath, iconsize);
             return getBitmapFromIconHandle(hIcon);
@@ -93,14 +92,13 @@ namespace ClassifyFiles.Util.Win32
 
         private static IntPtr GetIconHandleFromFilePath(string filepath, IconSizeEnum iconsize)
         {
-            if(filepath.EndsWith(".exe")|| filepath.EndsWith(".lnk")|| filepath.EndsWith(".msi"))
+            if (filepath.EndsWith(".exe") || filepath.EndsWith(".lnk") || filepath.EndsWith(".msi"))
             {
                 var shinfo = new SHFILEINFO();
                 return getIconHandleFromFilePathWithFlags(filepath, iconsize, ref shinfo);
             }
             else
             {
-
                 var shinfo = new SHFILEINFO();
                 const uint SHGFI_SYSICONINDEX = 0x4000;
                 const int FILE_ATTRIBUTE_NORMAL = 0x80;
@@ -135,14 +133,14 @@ namespace ClassifyFiles.Util.Win32
             hres = iml.GetIcon(iconIndex, ILD_TRANSPARENT, ref hIcon);
             return hIcon;
         }
+
         private static IntPtr getIconHandleFromFilePathWithFlags(
             string filepath, IconSizeEnum iconsize,
             ref SHFILEINFO shinfo)
         {
             const int ILD_TRANSPARENT = 1;
             var retval = SHGetFileInfo(filepath, 0, ref shinfo, Marshal.SizeOf(shinfo), (uint)16640);
-            return shinfo. hIcon;
+            return shinfo.hIcon;
         }
-
     }
 }

@@ -3,20 +3,10 @@ using FzLib.Extension;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using static ClassifyFiles.Data.Project;
-using static ClassifyFiles.Util.ClassUtility;
-using static ClassifyFiles.Util.FileClassUtility;
-using static ClassifyFiles.Util.FileProjectUtilty;
-using static ClassifyFiles.Util.ProjectUtility;
-using static ClassifyFiles.Util.DbUtility;
-using ClassifyFiles.UI.Component;
 using System.ComponentModel;
-using System.Diagnostics;
-using ClassifyFiles.Util;
+using System.Linq;
+using System.Threading.Tasks;
+using static ClassifyFiles.Util.FileClassUtility;
 
 namespace ClassifyFiles.UI.Model
 {
@@ -24,17 +14,18 @@ namespace ClassifyFiles.UI.Model
     {
         public UIFile()
         {
-
         }
+
         public UIFile(File file) : this()
         {
             File = file;
             SubUIFiles = new ObservableCollection<UIFile>(file.SubFiles.Select(p => new UIFile(p)));
             Display = new UIFileDisplay(file);
-
         }
+
         public ObservableCollection<UIFile> SubUIFiles { get; } = new ObservableCollection<UIFile>();
         private UIFile parent;
+
         public UIFile Parent
         {
             get => parent;
@@ -44,7 +35,9 @@ namespace ClassifyFiles.UI.Model
                 this.Notify(nameof(Parent));
             }
         }
+
         private File file;
+
         public File File
         {
             get => file;
@@ -54,12 +47,14 @@ namespace ClassifyFiles.UI.Model
                 this.Notify(nameof(File));
             }
         }
+
         public UIFileDisplay Display { get; set; }
-        public async Task LoadClassesAsync(AppDbContext db = null,bool force=false)
+
+        public async Task LoadClassesAsync(AppDbContext db = null, bool force = false)
         {
-            if (Classes==null || force)
+            if (Classes == null || force)
             {
-                IEnumerable<Class> classes=null;
+                IEnumerable<Class> classes = null;
                 await Task.Run(() =>
                 {
                     try
@@ -73,7 +68,7 @@ namespace ClassifyFiles.UI.Model
                             classes = GetClassesOfFile(db, File);
                         }
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         classes = Array.Empty<Class>();
                     }
@@ -95,7 +90,9 @@ namespace ClassifyFiles.UI.Model
                 this.Notify(nameof(Classes));
             }
         }
+
         public Class Class { get; set; }
+
         public override string ToString()
         {
             return File.Name + (string.IsNullOrEmpty(File.Dir) ? "" : $" （{File.Dir}）");

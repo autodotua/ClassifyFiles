@@ -1,6 +1,6 @@
-﻿using System;
-using ClassifyFiles.Data;
+﻿using ClassifyFiles.Data;
 using ClassifyFiles.UI.Model;
+using System;
 
 namespace ClassifyFiles.UI.Event
 {
@@ -14,7 +14,8 @@ namespace ClassifyFiles.UI.Event
 
         public Class OldValue { get; set; }
         public Class NewValue { get; set; }
-    }   
+    }
+
     public class ClassFilesDropEventArgs : EventArgs
     {
         public ClassFilesDropEventArgs(Class c, string[] files)
@@ -22,6 +23,7 @@ namespace ClassifyFiles.UI.Event
             Class = c;
             Files = files;
         }
+
         public ClassFilesDropEventArgs(Class c, UIFile[] files)
         {
             Class = c;

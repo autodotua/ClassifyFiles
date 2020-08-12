@@ -3,21 +3,19 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using static ClassifyFiles.Util.DbUtility;
 
 namespace ClassifyFiles.Util
 {
     public static class ClassUtility
     {
-
         public static List<Class> GetClasses(Project project)
         {
             Debug.WriteLine("db begin: " + nameof(GetClasses));
 
             List<Class> classes = db.Classes
                 .Where(p => p.Project == project)
-                .OrderBy(p=>p.GroupName)
+                .OrderBy(p => p.GroupName)
                 .ThenBy(p => p.Index)
                 .Include(p => p.MatchConditions)
                 .ToList();
@@ -31,7 +29,7 @@ namespace ClassifyFiles.Util
             using var db = GetNewDb();
             return db.FileClasses
                 .Where(p => p.Class == c)
-                .Where(p => p.Status!=FileClassStatus.Disabled)
+                .Where(p => p.Status != FileClassStatus.Disabled)
                 .Count();
         }
 
@@ -40,7 +38,7 @@ namespace ClassifyFiles.Util
             Debug.WriteLine("db begin: " + nameof(AddClass));
 
             int maxIndex = db.Classes
-                .Where(p => p.Project == project).Count()==0?0: 
+                .Where(p => p.Project == project).Count() == 0 ? 0 :
                 db.Classes
                 .Where(p => p.Project == project)
                 .Max(p => p.Index);
@@ -52,11 +50,12 @@ namespace ClassifyFiles.Util
             Debug.WriteLine("db end: " + nameof(AddClass));
             return c;
         }
+
         public static bool DeleteClass(Class c)
         {
             Debug.WriteLine("db begin: " + nameof(DeleteClass));
             db.Entry(c).State = EntityState.Deleted;
-            bool result= SaveChanges() > 0;
+            bool result = SaveChanges() > 0;
 
             Debug.WriteLine("db end: " + nameof(DeleteClass));
             return result;
@@ -66,11 +65,12 @@ namespace ClassifyFiles.Util
         {
             Debug.WriteLine("db begin: " + nameof(SaveClass));
             db.Entry(c).State = EntityState.Modified;
-            bool result= SaveChanges() > 0;
+            bool result = SaveChanges() > 0;
             Debug.WriteLine("db end: " + nameof(SaveClass));
 
             return result;
         }
+
         public static bool SaveClasses(IEnumerable<Class> classes)
         {
             Debug.WriteLine("db begin: " + nameof(SaveClass));
@@ -78,7 +78,7 @@ namespace ClassifyFiles.Util
             {
                 db.Entry(c).State = EntityState.Modified;
             }
-            bool result= SaveChanges() > 0;
+            bool result = SaveChanges() > 0;
             Debug.WriteLine("db end: " + nameof(SaveClass));
             return result;
         }

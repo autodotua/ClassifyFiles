@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using static ClassifyFiles.Util.DbUtility;
 
 namespace ClassifyFiles.Util
@@ -15,8 +13,9 @@ namespace ClassifyFiles.Util
         {
             Debug.WriteLine("db begin: " + nameof(GetProjects));
 
-            return db.Projects.Include(p=>p.Classes).ToList();
+            return db.Projects.Include(p => p.Classes).ToList();
         }
+
         public static bool UpdateProject(Project project)
         {
             Debug.WriteLine("db begin: " + nameof(UpdateProject));
@@ -24,6 +23,7 @@ namespace ClassifyFiles.Util
             db.Entry(project).State = EntityState.Modified;
             return SaveChanges() > 0;
         }
+
         public static bool DeleteProject(Project project)
         {
             Debug.WriteLine("db begin: " + nameof(DeleteProject));
@@ -31,6 +31,7 @@ namespace ClassifyFiles.Util
             db.Entry(project).State = EntityState.Deleted;
             return SaveChanges() > 0;
         }
+
         public static Project AddProject()
         {
             Debug.WriteLine("db begin: " + nameof(AddProject));
@@ -62,10 +63,12 @@ namespace ClassifyFiles.Util
             newDb.SaveChanges();
             newDb.Dispose();
         }
+
         public static void ExportAll(string path)
         {
             System.IO.File.Copy(DbPath, path);
         }
+
         public static List<Project> Import(string path)
         {
             if (!System.IO.File.Exists(path))
@@ -121,11 +124,11 @@ namespace ClassifyFiles.Util
                 var duplicated = fcs.GroupBy(p => p.ClassID).Where(p => p.Count() > 1).ToList();
                 if (duplicated.Count > 0)
                 {
-
                 }
             }
             return results;
         }
+
         public enum CheckType
         {
             DuplicatedFileClasses

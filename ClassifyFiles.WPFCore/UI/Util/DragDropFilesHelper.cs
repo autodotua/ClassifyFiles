@@ -1,12 +1,12 @@
 ﻿using ClassifyFiles.UI.Model;
+using ClassifyFiles.Util;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using ClassifyFiles.Util;
 using System.Windows.Controls.Primitives;
-using System.Collections.Generic;
+using System.Windows.Input;
 
 namespace ClassifyFiles.UI.Util
 {
@@ -24,6 +24,7 @@ namespace ClassifyFiles.UI.Util
         {
             this.list = list;
         }
+
         public void Regist()
         {
             list.PreviewMouseLeftButtonDown += List_PreviewMouseLeftButtonDown;
@@ -55,12 +56,13 @@ namespace ClassifyFiles.UI.Util
                 DragDrop.DoDragDrop(sender as DependencyObject, data, DragDropEffects.All);
             }
         }
+
         private IReadOnlyList<UIFile> GetSelectedFiles()
         {
             return list switch
             {
                 ListBox lvw => lvw.SelectedItems.Cast<UIFile>().ToList().AsReadOnly(),
-                TreeView t => t.SelectedItem== null? new List<UIFile>().AsReadOnly() : new List<UIFile>() { t.SelectedItem as UIFile }.AsReadOnly(),
+                TreeView t => t.SelectedItem == null ? new List<UIFile>().AsReadOnly() : new List<UIFile>() { t.SelectedItem as UIFile }.AsReadOnly(),
                 _ => new List<UIFile>().AsReadOnly(),
             };
         }
@@ -90,7 +92,8 @@ namespace ClassifyFiles.UI.Util
             }
         }
 
-        bool ignoredSelect = false;
+        private bool ignoredSelect = false;
+
         private void List_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             mouseDown = true;
@@ -98,7 +101,7 @@ namespace ClassifyFiles.UI.Util
             beginPosition = e.GetPosition(null);
             //当鼠标点击列表项时，如果鼠标位置在已经被选中的项的上方，那么取消响应
             //这是由于ListView总是在拖放之前就把多选变成了单选，与拖放需求不符
-            if (e.ClickCount > 1 || GetSelectedFiles().Count==0)
+            if (e.ClickCount > 1 || GetSelectedFiles().Count == 0)
             {
                 return;
             }
@@ -117,7 +120,5 @@ namespace ClassifyFiles.UI.Util
                 e.Handled = true;
             }
         }
-
     }
-
 }

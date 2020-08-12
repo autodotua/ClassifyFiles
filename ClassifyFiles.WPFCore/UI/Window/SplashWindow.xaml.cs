@@ -1,18 +1,14 @@
 ﻿using FzLib.Extension;
-using ModernWpf;
 using System;
 using System.ComponentModel;
-using System.IO;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace ClassifyFiles.UI
 {
     /// <summary>
     /// SplashWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class SplashWindow : Window,INotifyPropertyChanged
+    public partial class SplashWindow : Window, INotifyPropertyChanged
     {
         private static SplashWindow instance = null;
 
@@ -37,11 +33,12 @@ namespace ClassifyFiles.UI
 
         public Uri image = null;
         public Uri Image => image;
+
         public SplashWindow()
         {
             DataContext = this;
             InitializeComponent();
-            image=new Uri(App.AppsUseLightTheme==false ? "../../Images/icon_dark.png" : "../../Images/icon_light.png", UriKind.Relative);
+            image = new Uri(App.AppsUseLightTheme == false ? "../../Images/icon_dark.png" : "../../Images/icon_light.png", UriKind.Relative);
             this.Notify(nameof(Image));
         }
     }

@@ -91,7 +91,6 @@
                             </Button>
 
                             <Button Click="CheckButton_Click" Content="查询项目数据库错误" />
-
                         </m:SimpleStackPanel>
                         <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
                             <TextBlock>文件数量：</TextBlock>
@@ -131,7 +130,6 @@
                                     <TextBlock VerticalAlignment="Center">导出为副本</TextBlock>
                                 </m:SimpleStackPanel>
                             </Button>
-
                         </m:SimpleStackPanel>
                     </m:SimpleStackPanel>
                 </GroupBox>
@@ -148,7 +146,6 @@
                     </m:SimpleStackPanel>
                 </GroupBox>
             </m:SimpleStackPanel>
-
         </ScrollViewer>
     </Grid>
 </local:ProjectPageBase>

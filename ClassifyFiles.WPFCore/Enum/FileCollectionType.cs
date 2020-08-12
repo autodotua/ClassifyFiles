@@ -9,5 +9,4 @@
         Disabled,
         NoClass
     }
-
 }

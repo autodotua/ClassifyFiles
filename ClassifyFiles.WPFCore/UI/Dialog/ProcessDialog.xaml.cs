@@ -1,5 +1,4 @@
 ﻿using FzLib.Extension;
-using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media.Animation;
@@ -24,9 +23,10 @@ namespace ClassifyFiles.UI
             }
         }
 
-        bool canClose = true;
+        private bool canClose = true;
 
         private string message;
+
         public string Message
         {
             get => message;
@@ -36,9 +36,11 @@ namespace ClassifyFiles.UI
                 this.Notify(nameof(Message));
             }
         }
+
         public bool Showing { get; private set; }
 
         private int showCount = 0;
+
         public void Show()
         {
             showCount++;
@@ -72,7 +74,6 @@ namespace ClassifyFiles.UI
                 Showing = false;
             };
             BeginAnimation(OpacityProperty, ani);
-
         }
 
         private void UserControlBase_Loaded(object sender, RoutedEventArgs e)
@@ -80,6 +81,4 @@ namespace ClassifyFiles.UI
             Window.GetWindow(this).Closing += Window_Closing;
         }
     }
-
-
 }

@@ -2,8 +2,8 @@
 {
     public enum SortType
     {
-        Default=0,
-        NameUp=1,
+        Default = 0,
+        NameUp = 1,
         NameDown = 2,
         LengthUp = 3,
         LengthDown = 4,
@@ -12,5 +12,4 @@
         CreationTimeUp = 7,
         CreationTimeDown = 8,
     }
-
 }

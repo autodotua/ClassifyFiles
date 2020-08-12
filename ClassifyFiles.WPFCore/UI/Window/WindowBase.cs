@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Documents;
-using System.Windows.Media;
-using System.Windows;
-using System.Runtime.InteropServices;
-using System.Windows.Interop;
-using System.Drawing;
-using System.Windows.Media.Imaging;
-using System.Globalization;
+﻿using ModernWpf;
 using ModernWpf.Controls.Primitives;
-using ModernWpf;
+using System;
+using System.ComponentModel;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace ClassifyFiles.UI
 {
@@ -26,9 +16,11 @@ namespace ClassifyFiles.UI
             ThemeManager.SetIsThemeAware(this, true);
             App.SetTheme(this);
         }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public bool IsClosed { get; private set; }
+
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
@@ -56,7 +48,5 @@ namespace ClassifyFiles.UI
             Topmost = false; // important
             Focus();
         }
-
     }
-
 }

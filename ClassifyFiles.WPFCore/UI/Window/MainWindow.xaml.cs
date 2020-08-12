@@ -1,39 +1,23 @@
-﻿using System.Diagnostics;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using ClassifyFiles.Data;
-using System;
-using System.Windows.Input;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
+﻿using ClassifyFiles.Data;
+using ClassifyFiles.UI.Component;
+using ClassifyFiles.UI.Page;
 using ClassifyFiles.Util;
+using FzLib.Extension;
+using ModernWpf;
+using ModernWpf.Controls;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using FzLib.Extension;
-using System.Threading.Tasks;
-using ClassifyFiles.UI.Panel;
-using System.Windows.Controls.Primitives;
-using ModernWpf.Controls;
-using ModernWpf;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using FzLib.Basic;
 using System.ComponentModel;
-using static ClassifyFiles.Data.Project;
-using static ClassifyFiles.Util.ClassUtility;
-using static ClassifyFiles.Util.FileClassUtility;
-using static ClassifyFiles.Util.FileProjectUtilty;
-using static ClassifyFiles.Util.ProjectUtility;
-using static ClassifyFiles.Util.DbUtility;
-using System.Windows.Media.Animation;
-using System.Windows.Media;
-using ClassifyFiles.UI.Page;
-using System.Windows.Media.Imaging;
 using System.IO;
-using ClassifyFiles.UI.Component;
-using System.Threading;
-using ClassifyFiles.UI.Util;
 using System.IO.Compression;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using static ClassifyFiles.Util.DbUtility;
+using static ClassifyFiles.Util.ProjectUtility;
 
 namespace ClassifyFiles.UI
 {
@@ -43,6 +27,7 @@ namespace ClassifyFiles.UI
     public partial class MainWindow : WindowBase, IWithProcessRing
     {
         private ObservableCollection<Project> projects;
+
         public ObservableCollection<Project> Projects
         {
             get => projects;
@@ -52,7 +37,9 @@ namespace ClassifyFiles.UI
                 this.Notify(nameof(Projects));
             }
         }
+
         private Project selectedProject;
+
         public Project SelectedProject
         {
             get => selectedProject;
@@ -71,6 +58,7 @@ namespace ClassifyFiles.UI
                 LoadPanelAsync();
             }
         }
+
         public MainWindow()
         {
             Application.Current.MainWindow = this;
@@ -170,11 +158,11 @@ namespace ClassifyFiles.UI
             }
         }
 
-        FileBrowserPanel fileBrowserPanel = new FileBrowserPanel();
-        ClassSettingPanel classSettingPanel = new ClassSettingPanel();
-        ProjectSettingsPanel projectSettingsPanel = new ProjectSettingsPanel();
+        private FileBrowserPanel fileBrowserPanel = new FileBrowserPanel();
+        private ClassSettingPanel classSettingPanel = new ClassSettingPanel();
+        private ProjectSettingsPanel projectSettingsPanel = new ProjectSettingsPanel();
 
-        System.Windows.Controls.Page emptyPage = new System.Windows.Controls.Page();
+        private System.Windows.Controls.Page emptyPage = new System.Windows.Controls.Page();
 
         private async Task NavigateToAsync(object view)
         {
@@ -191,6 +179,7 @@ namespace ClassifyFiles.UI
             }
             frame.Navigate(view);
         }
+
         private async Task LoadPanelAsync()
         {
             if (mainPage != null)
@@ -235,9 +224,10 @@ namespace ClassifyFiles.UI
         }
 
         private ILoadable mainPage;
+
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            if(ring.Showing)
+            if (ring.Showing)
             {
                 e.Cancel = true;
                 return;
@@ -251,7 +241,9 @@ namespace ClassifyFiles.UI
             Visibility = Visibility.Collapsed;
             BeforeClosing(true);
         }
-        bool canClose = false;
+
+        private bool canClose = false;
+
         public async Task BeforeClosing(bool shutDownApp)
         {
             canClose = true;
@@ -269,8 +261,6 @@ namespace ClassifyFiles.UI
                 Application.Current.Shutdown();
             }
         }
-
-
 
         private async Task<int> SaveChangesAsync()
         {
@@ -301,7 +291,6 @@ namespace ClassifyFiles.UI
             }
             catch
             {
-
             }
             finally
             {
@@ -315,7 +304,6 @@ namespace ClassifyFiles.UI
                ring.Message = message));
         }
 
-
         private async void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!IsLoaded)
@@ -326,7 +314,6 @@ namespace ClassifyFiles.UI
             await DoProcessAsync(Do());
             async Task Do()
             {
-
                 ILoadable page = (sender as ListBox).SelectedIndex switch
                 {
                     0 => fileBrowserPanel,
@@ -349,6 +336,7 @@ namespace ClassifyFiles.UI
         }
 
         private bool ignoreNavViewSelectionChanged = false;
+
         private async void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
             if (!IsLoaded || ignoreNavViewSelectionChanged)
@@ -387,7 +375,6 @@ namespace ClassifyFiles.UI
             await DoProcessAsync(Do());
             async Task Do()
             {
-
                 ILoadable page = sender.MenuItems.IndexOf(args.SelectedItem) switch
                 {
                     0 => fileBrowserPanel,

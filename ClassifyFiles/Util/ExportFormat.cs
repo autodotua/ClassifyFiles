@@ -6,11 +6,11 @@ namespace ClassifyFiles.Util
     {
         [Description("文件名")]
         FileName,
+
         [Description("路径")]
         Path,
+
         [Description("树型")]
         Tree
     }
-
-
 }

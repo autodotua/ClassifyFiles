@@ -41,5 +41,4 @@
             TextWrapping="Wrap"
             Visibility="Collapsed" />
     </Grid>
-
 </dialog:ContentDialogBase>

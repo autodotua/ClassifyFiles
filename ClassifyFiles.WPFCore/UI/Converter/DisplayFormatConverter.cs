@@ -1,24 +1,23 @@
 ﻿using ClassifyFiles.Data;
-using ClassifyFiles.Util;
-using System;
-using System.Linq;
-using System.IO;
-using System.Globalization;
-using System.Windows;
-using System.Windows.Data;
-using FzLib.Basic;
-using System.Text;
-using System.Text.RegularExpressions;
 using ClassifyFiles.UI.Model;
+using ClassifyFiles.Util;
+using CSScriptLib;
+using FzLib.Basic;
 using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
-using System.Collections.Generic;
-using System.Reflection;
+using System;
 using System.Collections.Concurrent;
-
-using static ClassifyFiles.Util.FileUtility;
+using System.Collections.Generic;
 using System.Diagnostics;
-using CSScriptLib;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Data;
+using static ClassifyFiles.Util.FileUtility;
 
 namespace ClassifyFiles.UI.Converter
 {
@@ -40,14 +39,17 @@ namespace ClassifyFiles.UI.Converter
         /// 预定义的Exif文字表示对应编号
         /// </summary>
         private static Dictionary<string, int> exifCode;
+
         /// <summary>
         /// 文件对应的Exif信息
         /// </summary>
         private static ConcurrentDictionary<string, ExifSubIfdDirectory> fileExifSubIfdDirectory = new ConcurrentDictionary<string, ExifSubIfdDirectory>();
+
         /// <summary>
         /// 以ID号定义的Exif变量
         /// </summary>
         private static Regex rPsExifType = new Regex(@"\$Exif_(?<Type>[0-9]+)", RegexOptions.Compiled);
+
         private static Regex rCsExifType = new Regex(@"Exif\[(?<Type>[0-9]+)\]", RegexOptions.Compiled);
 
         /// <summary>
@@ -125,8 +127,10 @@ namespace ClassifyFiles.UI.Converter
             {
                 case "":
                     return "";
+
                 case nameof(FileInfo.Name):
                     return Path.GetFileNameWithoutExtension(file.Name);
+
                 case nameof(FileInfo.Extension):
                     return file.Extension.RemoveStart(".");
             }
@@ -139,8 +143,10 @@ namespace ClassifyFiles.UI.Converter
             {
                 case nameof(FileInfo.CreationTime):
                     return file.CreationTime.ToString();
+
                 case nameof(FileInfo.LastWriteTime):
                     return file.LastWriteTime.ToString();
+
                 case nameof(FileInfo.DirectoryName):
                     return file.Directory.Name;
             }
@@ -158,7 +164,6 @@ namespace ClassifyFiles.UI.Converter
                 }
             }
             return null;
-
         }
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -202,8 +207,8 @@ namespace ClassifyFiles.UI.Converter
             sw.Stop();
             Debug.WriteLineIf(DebugSwitch.DisplayValueConvertTime, "convert use " + sw.ElapsedMilliseconds);
             return result;
-
         }
+
         public static void InitializeCsMethods(IEnumerable<string> formats)
         {
             foreach (var format in formats)
@@ -237,7 +242,7 @@ var Exif=exifs;
         /// <returns></returns>
         public string ConvertByCs(string format, FileInfo file, Class c)
         {
-            MethodDelegate csMethod=null;
+            MethodDelegate csMethod = null;
             if (csMthods.ContainsKey(format))
             {
                 csMethod = csMthods[format];
@@ -273,7 +278,6 @@ var Exif=exifs;
                         }
                     }
                 }
-
             }
 
             try
@@ -282,7 +286,6 @@ var Exif=exifs;
             }
             catch (Exception ex)
             {
-
             }
             return null;
         }
@@ -362,12 +365,9 @@ var Exif=exifs;
             return result.ToString();
         }
 
-
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
-
     }
-
 }

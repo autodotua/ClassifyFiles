@@ -17,5 +17,4 @@
             <sys:Boolean x:Key="AutoHideScrollBars">True</sys:Boolean>
         </ResourceDictionary>
     </Application.Resources>
-
 </Application>

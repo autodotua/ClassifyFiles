@@ -18,6 +18,7 @@ namespace ClassifyFiles.UI
         {
             InitializeComponent();
         }
+
         public async Task<string> ShowAsync(string title, bool multipleLines, string hint = "", string defaultContent = "")
         {
             Title = title;
@@ -35,12 +36,12 @@ namespace ClassifyFiles.UI
                        txt.SelectAll();
                        Keyboard.Focus(txt);
                    }));
-                
             };
             PrimaryButtonClick += (p1, p2) => Result = true;
             await ShowAsync();
             return Result ? InputContent : "";
         }
+
         public string InputContent { get; set; }
         public bool Result { get; set; }
         //private void Button_Click_1(object sender, RoutedEventArgs e)

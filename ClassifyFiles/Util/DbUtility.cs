@@ -1,6 +1,5 @@
 ﻿using ClassifyFiles.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -10,6 +9,7 @@ namespace ClassifyFiles.Util
     public static class DbUtility
     {
         public const string DbInAppDataFolderMarkerFileName = "dbInAppDataFolder";
+
         public static string DbPath
         {
             get
@@ -24,7 +24,9 @@ namespace ClassifyFiles.Util
                 return System.IO.Path.GetFullPath("data.db");
             }
         }
+
         internal static AppDbContext db = new AppDbContext(DbPath);
+
         /// <summary>
         /// 获取新的
         /// </summary>
@@ -37,15 +39,20 @@ namespace ClassifyFiles.Util
         {
             return new AppDbContext(DbPath);
         }
-        const string dbReplacedMessage = "数据库保存出错";
+
+        private const string dbReplacedMessage = "数据库保存出错";
         public static bool IgnoreDbSavingError { get; set; } = true;
+
         public static event UnhandledExceptionEventHandler DbSavingException;
+
         public async static Task ReplaceDbContextAsync()
         {
             await db.DisposeAsync();
             db = new AppDbContext(DbPath);
         }
+
         private static bool isSavingDb = false;
+
         public static int SaveChanges()
         {
             Debug.WriteLine("db begin Save Changes");
@@ -71,7 +78,6 @@ namespace ClassifyFiles.Util
                 }
                 catch
                 {
-
                 }
                 if (!IgnoreDbSavingError)
                 {
@@ -86,6 +92,7 @@ namespace ClassifyFiles.Util
             Debug.WriteLine("db end Save Changes");
             return result;
         }
+
         public static int SaveChanges(AppDbContext db)
         {
             try
@@ -97,10 +104,12 @@ namespace ClassifyFiles.Util
                 throw;
             }
         }
+
         public static void Zip()
         {
             db.Database.ExecuteSqlRaw("VACUUM;");
         }
+
         public static void CancelChanges()
         {
             foreach (var entry in db.ChangeTracker.Entries())
@@ -112,6 +121,7 @@ namespace ClassifyFiles.Util
                         entry.State = EntityState.Modified; //Revert changes made to deleted entity.
                         entry.State = EntityState.Unchanged;
                         break;
+
                     case EntityState.Added:
                         entry.State = EntityState.Detached;
                         break;

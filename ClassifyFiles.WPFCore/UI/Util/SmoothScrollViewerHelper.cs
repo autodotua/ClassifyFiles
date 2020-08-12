@@ -1,13 +1,7 @@
-﻿using ClassifyFiles.UI.Component;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace ClassifyFiles.UI.Util
 {
@@ -40,8 +34,8 @@ namespace ClassifyFiles.UI.Util
                 var target = scr.VerticalOffset
                     - (remainsDeltas[scr] > 0 ? 1 : -1) * Math.Sqrt(Math.Abs(remainsDeltas[scr])) / 1.5d //这个控制滑动的距离，值越大距离越短
                     * System.Windows.Forms.SystemInformation.MouseWheelScrollLines;
-              
-                scr.Dispatcher.Invoke(()=> scr.ScrollToVerticalOffset(target));
+
+                scr.Dispatcher.Invoke(() => scr.ScrollToVerticalOffset(target));
                 //}
                 remainsDeltas[scr] /= 1.5;//这个控制每一次滑动的时间，值越大时间越短
 
@@ -56,6 +50,7 @@ namespace ClassifyFiles.UI.Util
         }
 
         private static Dictionary<ScrollViewer, double> remainsDeltas = new Dictionary<ScrollViewer, double>();
+
         public static void Regist(Control ctrl)
         {
             ScrollViewer scr = ctrl.GetVisualChild<ScrollViewer>();
@@ -65,6 +60,7 @@ namespace ClassifyFiles.UI.Util
             }
             Regist(scr);
         }
+
         public static void Regist(ScrollViewer scr)
         {
             scr.PreviewMouseWheel += (p1, p2) =>
@@ -75,6 +71,7 @@ namespace ClassifyFiles.UI.Util
         }
 
         private static ScrollViewer currentScrollViewer = null;
+
         public static void HandleMouseWheel(ScrollViewer scr, int delta)
         {
             Debug.Assert(scr != null);
@@ -97,7 +94,6 @@ namespace ClassifyFiles.UI.Util
                 remainsDeltas[currentScrollViewer] = 0;
             }
             currentScrollViewer = scr;
-
         }
     }
 }

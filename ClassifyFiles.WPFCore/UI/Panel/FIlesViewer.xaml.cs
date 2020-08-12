@@ -1,36 +1,34 @@
 ﻿using ClassifyFiles.Data;
+using ClassifyFiles.Enum;
+using ClassifyFiles.UI.Component;
+using ClassifyFiles.UI.Dialog;
+using ClassifyFiles.UI.Event;
 using ClassifyFiles.UI.Model;
-using System;
+using ClassifyFiles.UI.Util;
+using ClassifyFiles.Util;
+using ClassifyFiles.Util.Win32;
 using FzLib.Basic;
 using FzLib.Extension;
+using ModernWpf.Controls;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using ClassifyFiles.Util;
-using System.Diagnostics;
-using ModernWpf.Controls;
-using ClassifyFiles.UI.Component;
-using static ClassifyFiles.Util.FileClassUtility;
-using System.Collections;
-using System.Collections.Concurrent;
-using ListView = System.Windows.Controls.ListView;
-using System.Collections.Specialized;
-using System.Windows.Data;
-using FI = System.IO.FileInfo;
-using ClassifyFiles.UI.Util;
-using ClassifyFiles.Enum;
-using ClassifyFiles.UI.Event;
-using System.Runtime.InteropServices;
-using ClassifyFiles.Util.Win32;
-using System.Windows.Controls.Primitives;
 using System.Windows.Media.Animation;
-using ClassifyFiles.UI.Dialog;
+using static ClassifyFiles.Util.FileClassUtility;
+using FI = System.IO.FileInfo;
+using ListView = System.Windows.Controls.ListView;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -40,6 +38,7 @@ namespace ClassifyFiles.UI.Panel
     public partial class FilesViewer : UserControl, INotifyPropertyChanged
     {
         public static FilesViewer Main { get; private set; }
+
         public FilesViewer()
         {
             DataContext = this;
@@ -75,6 +74,7 @@ namespace ClassifyFiles.UI.Panel
                 }
             };
         }
+
         private void UpdateVirtualizationCacheLength()
         {
             if (Configs.FluencyFirst)
@@ -86,7 +86,9 @@ namespace ClassifyFiles.UI.Panel
                 Resources["virtualizingPanelCacheLength"] = new VirtualizationCacheLength(100);
             }
         }
+
         private bool IsSingleWindow { get; set; } = false;
+
         public Window ShowAsWindow()
         {
             WindowBase win = new WindowBase()
@@ -108,9 +110,11 @@ namespace ClassifyFiles.UI.Panel
         }
 
         #region 属性和字段
+
         private TreeViewSelectorHelper<UIFile> treeViewHelper;
 
         private ItemsControl filesContent;
+
         public ItemsControl FilesContent
         {
             get => filesContent;
@@ -120,7 +124,9 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(FilesContent));
             }
         }
+
         private Class currentClass;
+
         public Class CurrentClass
         {
             get => currentClass; private set
@@ -131,6 +137,7 @@ namespace ClassifyFiles.UI.Panel
         }
 
         private Project project;
+
         /// <summary>
         /// 当前项目
         /// </summary>
@@ -145,6 +152,7 @@ namespace ClassifyFiles.UI.Panel
         }
 
         private ObservableCollection<UIFile> files;
+
         public ObservableCollection<UIFile> Files
         {
             get => files;
@@ -156,6 +164,7 @@ namespace ClassifyFiles.UI.Panel
         }
 
         private ObservableCollection<UIFile> fileTree;
+
         /// <summary>
         /// 供树状图使用的文件树
         /// </summary>
@@ -170,7 +179,8 @@ namespace ClassifyFiles.UI.Panel
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        #endregion
+
+        #endregion 属性和字段
 
         #region 文件相关
 
@@ -217,6 +227,7 @@ namespace ClassifyFiles.UI.Panel
                 FileTree = null;
             }
         }
+
         /// <summary>
         /// 添加文件
         /// </summary>
@@ -255,6 +266,7 @@ namespace ClassifyFiles.UI.Panel
                 await SelectFileAsync(filesWithIcon.First());
             }
         }
+
         /// <summary>
         /// 移除文件
         /// </summary>
@@ -273,6 +285,7 @@ namespace ClassifyFiles.UI.Panel
                 }
             }
         }
+
         /// <summary>
         /// 重新设置树状图
         /// </summary>
@@ -297,8 +310,8 @@ namespace ClassifyFiles.UI.Panel
                 }
             });
             FileTree = fileTree;
-
         }
+
         /// <summary>
         /// 获取被选中的文件（1个）
         /// </summary>
@@ -359,7 +372,6 @@ namespace ClassifyFiles.UI.Panel
             {
                 if (file == null)
                 {
-
                     await treeViewHelper.ClearSelectionAsync(FileTree);
                 }
                 else
@@ -392,9 +404,9 @@ namespace ClassifyFiles.UI.Panel
                 {
                     FilesContent.ItemTemplate = dataTemplate;
                 }
-
             }
         }
+
         private ObservableCollection<UIFile> GetSortedFiles(SortType type, IEnumerable<UIFile> rawFiles = null)
         {
             IEnumerable<UIFile> files = null;
@@ -405,46 +417,54 @@ namespace ClassifyFiles.UI.Panel
                         .OrderBy(p => p.File.Dir)
                         .ThenBy(p => p.File.Name);
                     break;
+
                 case SortType.NameUp:
                     files = rawFiles
                         .OrderBy(p => p.File.Name)
                         .ThenBy(p => p.File.Dir);
                     break;
+
                 case SortType.NameDown:
                     files = rawFiles
                        .OrderByDescending(p => p.File.Name)
                        .ThenByDescending(p => p.File.Dir);
                     break;
+
                 case SortType.LengthUp:
                     files = rawFiles
                       .OrderBy(p => GetFileInfoValue(p, nameof(FI.Length)))
                       .ThenBy(p => p.File.Name)
                       .ThenBy(p => p.File.Dir);
                     break;
+
                 case SortType.LengthDown:
                     files = rawFiles
                       .OrderByDescending(p => GetFileInfoValue(p, nameof(FI.Length)))
                       .ThenByDescending(p => p.File.Name)
                       .ThenByDescending(p => p.File.Dir);
                     break;
+
                 case SortType.LastWriteTimeUp:
                     files = rawFiles
                       .OrderBy(p => GetFileInfoValue(p, nameof(FI.LastWriteTime)))
                       .ThenBy(p => p.File.Name)
                       .ThenBy(p => p.File.Dir);
                     break;
+
                 case SortType.LastWriteTimeDown:
                     files = rawFiles
                       .OrderByDescending(p => GetFileInfoValue(p, nameof(FI.LastWriteTime)))
                       .ThenByDescending(p => p.File.Name)
                       .ThenByDescending(p => p.File.Dir);
                     break;
+
                 case SortType.CreationTimeUp:
                     files = rawFiles
                       .OrderBy(p => GetFileInfoValue(p, nameof(FI.CreationTime)))
                       .ThenBy(p => p.File.Name)
                       .ThenBy(p => p.File.Dir);
                     break;
+
                 case SortType.CreationTimeDown:
                     files = rawFiles
                       .OrderByDescending(p => GetFileInfoValue(p, nameof(FI.CreationTime)))
@@ -501,10 +521,9 @@ namespace ClassifyFiles.UI.Panel
             SetGroupEnable(false);
         }
 
-        #endregion
+        #endregion 文件相关
 
         #region 视图相关
-
 
         /// <summary>
         /// 视图类型改变事件
@@ -557,7 +576,6 @@ namespace ClassifyFiles.UI.Panel
             if (CurrentFileView == FileView.List)
             {
                 FilesContent = FindResource("lvwFiles") as ListBox;
-
             }
             else if (CurrentFileView == FileView.Icon || CurrentFileView == FileView.Tile)
             {
@@ -588,15 +606,15 @@ namespace ClassifyFiles.UI.Panel
             Configs.LastViewType = (int)CurrentFileView);
         }
 
-
         /// <summary>
         /// 当前的视图
         /// </summary>
         public FileView CurrentFileView { get; private set; } = FileView.List;
 
-        #endregion
+        #endregion 视图相关
 
         #region 事件处理
+
         private void Panel_Loaded(object sender, RoutedEventArgs e)
         {
             if (Window.GetWindow(this) is MainWindow)
@@ -604,6 +622,7 @@ namespace ClassifyFiles.UI.Panel
                 Main = this;
             }
         }
+
         /// <summary>
         /// 任务队列状态改变事件
         /// </summary>
@@ -617,7 +636,6 @@ namespace ClassifyFiles.UI.Panel
             }
             catch
             {
-
             }
         }
 
@@ -682,8 +700,10 @@ namespace ClassifyFiles.UI.Panel
                 await new ErrorDialog().ShowAsync(ex, "打开失败");
             }
         }
+
         private double currentScale = 1;
         private DoubleAnimation lastAnimation = null;
+
         /// <summary>
         /// 鼠标滚轮事件。当按下Ctrl时滚动滚轮，将能够缩放。全面接管滚动，自己写了一个动画滚动
         /// </summary>
@@ -888,11 +908,10 @@ namespace ClassifyFiles.UI.Panel
                 await icon.LoadImageAsync();
             }
         }
-        #endregion
+
+        #endregion 事件处理
 
         #region 菜单相关
-
-
 
         /// <summary>
         /// 右键菜单打开
@@ -941,7 +960,6 @@ namespace ClassifyFiles.UI.Panel
                 menuShowExifs.Click += (p1, p2) =>
                     new FileMetadataDialog(files[0].File.GetAbsolutePath()) { Owner = Window.GetWindow(this) }.ShowDialog();
                 menu.Items.Add(menuShowExifs);
-
 
                 MenuItem menuShowProperties = new MenuItem() { Header = "属性" };
                 menuShowProperties.Click += (p1, p2) =>
@@ -1019,7 +1037,6 @@ namespace ClassifyFiles.UI.Panel
                     }
                 }
             }
-
         }
 
         private async void MenuRecover_Click(object sender, RoutedEventArgs e)
@@ -1114,11 +1131,9 @@ namespace ClassifyFiles.UI.Panel
             else
             {
                 files.Add(GetSelectedFile().File.GetAbsolutePath());
-
             }
             Clipboard.SetFileDropList(files);
         }
-
 
         private async void ListViewItem_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -1134,10 +1149,6 @@ namespace ClassifyFiles.UI.Panel
             menu.IsOpen = true;
         }
 
-
-        #endregion
-
-
+        #endregion 菜单相关
     }
-
 }

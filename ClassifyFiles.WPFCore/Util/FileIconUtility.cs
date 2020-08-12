@@ -1,20 +1,20 @@
-﻿using System;
-using System.Text;
+﻿using ClassifyFiles.Util.Win32;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
-using F = System.IO.File;
-using D = System.IO.Directory;
-using P = System.IO.Path;
-using ClassifyFiles.Util.Win32;
-using Windows.Storage;
-using System.IO;
-using File = ClassifyFiles.Data.File;
-using Windows.Storage.FileProperties;
 using System.Windows.Media.Imaging;
+using Windows.Storage;
+using Windows.Storage.FileProperties;
+using D = System.IO.Directory;
+using F = System.IO.File;
+using File = ClassifyFiles.Data.File;
+using P = System.IO.Path;
 
 namespace ClassifyFiles.Util
 {
@@ -38,6 +38,7 @@ namespace ClassifyFiles.Util
             }
             return new BitmapImage(new Uri(Path.GetFullPath(folderIconPath), UriKind.Absolute));
         }
+
         public static void UpdateSettings()
         {
             if (Configs.CacheInTempDir)
@@ -61,16 +62,15 @@ namespace ClassifyFiles.Util
             D.CreateDirectory(P.Combine(ThumbnailFolderPath, "win10"));
             D.CreateDirectory(P.Combine(ThumbnailFolderPath, "media"));
         }
+
         public static string ThumbnailFolderPath { get; set; }
         public static string FFMpegPath => "exe/ffmpeg.exe";
 
         private static EncoderParameters encParams;
         private static ImageCodecInfo encoder;
 
-
-
-
         #region 路径
+
         private static Guid GetGuidFromString(string str)
         {
             using MD5 md5 = MD5.Create();
@@ -83,18 +83,21 @@ namespace ClassifyFiles.Util
         {
             return P.GetFullPath(P.Combine(ThumbnailFolderPath, "media", guid + ".jpg"));
         }
+
         public static string GetWin10IconPath(string guid)
         {
             return P.GetFullPath(P.Combine(ThumbnailFolderPath, "win10", guid + ".png"));
         }
+
         public static string GetExplorerIconPath(string guid)
         {
             return P.GetFullPath(P.Combine(ThumbnailFolderPath, "exp", guid + ".png"));
         }
 
-        #endregion
+        #endregion 路径
 
         #region 获取图片
+
         private static string CreateImageThumbnail(string img)
         {
             using Image image = Image.FromFile(img);
@@ -104,6 +107,7 @@ namespace ClassifyFiles.Util
             thumb.Save(GetThumbnailPath(guid), encoder, encParams);
             return guid;
         }
+
         private static string CreateVideoThumbnail(string video)
         {
             string guid = Guid.NewGuid().ToString();
@@ -131,7 +135,6 @@ namespace ClassifyFiles.Util
                 }
                 catch
                 {
-
                 }
                 return null;
             }
@@ -143,6 +146,7 @@ namespace ClassifyFiles.Util
             }
             return guid;
         }
+
         private static async Task<string> CreateWin10ThumbnailAsync(string path)
         {
             var sFile = await StorageFile.GetFileFromPathAsync(path);
@@ -153,13 +157,12 @@ namespace ClassifyFiles.Util
 
             bitmap.Save(GetWin10IconPath(guid), ImageFormat.Png);
             return guid;
-
         }
 
-        #endregion
-
+        #endregion 获取图片
 
         #region 为文件生成缩略图
+
         public static bool TryGenerateThumbnail(File file)
         {
             if (file.IsFolder)
@@ -198,12 +201,10 @@ namespace ClassifyFiles.Util
                 }
             }
             return false;
-
         }
 
         public static bool TryGenerateExplorerIcon(File file)
         {
-
             string path = file.GetAbsolutePath();
             if (!F.Exists(path))
             {
@@ -211,7 +212,6 @@ namespace ClassifyFiles.Util
             }
             try
             {
-
                 string ext = P.GetExtension(path).Replace(".", string.Empty);
                 if (file.IsFolder)
                 {
@@ -271,7 +271,6 @@ namespace ClassifyFiles.Util
                 }
                 catch
                 {
-
                 }
             }
         }
@@ -295,12 +294,14 @@ namespace ClassifyFiles.Util
                 return false;
             }
         }
+
         public static void TryGenerateAllFileIcons(File file)
         {
             TryGenerateExplorerIcon(file);
             TryGenerateWin10Icon(file);
             TryGenerateThumbnail(file);
         }
-        #endregion
+
+        #endregion 为文件生成缩略图
     }
 }

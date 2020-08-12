@@ -1,19 +1,18 @@
-﻿using System;
-using System.Windows;
-using ClassifyFiles.Data;
-using FzLib.Extension;
-using static ClassifyFiles.Util.ClassUtility;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using System.Linq;
+﻿using ClassifyFiles.Data;
 using ClassifyFiles.UI.Event;
-using System.Windows.Controls;
 using ClassifyFiles.UI.Model;
-using System.Windows.Media.Effects;
+using ClassifyFiles.UI.Util;
+using FzLib.Extension;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Collections.Generic;
-using ClassifyFiles.UI.Util;
+using static ClassifyFiles.Util.ClassUtility;
 
 namespace ClassifyFiles.UI.Panel
 {
@@ -26,7 +25,9 @@ namespace ClassifyFiles.UI.Panel
         {
             InitializeComponent();
         }
+
         private bool isLoading = false;
+
         public async Task LoadAsync(Project project)
         {
             isLoading = true;
@@ -46,13 +47,14 @@ namespace ClassifyFiles.UI.Panel
             {
                 SelectedUIClass = UIClasses.First(p => p.Class.ID == Configs.LastClassID);
             }
-            else if(UIClasses.Count>0)
+            else if (UIClasses.Count > 0)
             {
                 SelectedUIClass = UIClasses.First();
             }
         }
 
         private ObservableCollection<UIClass> uIClasses;
+
         public ObservableCollection<UIClass> UIClasses
         {
             get => uIClasses;
@@ -62,7 +64,9 @@ namespace ClassifyFiles.UI.Panel
                 this.Notify(nameof(UIClasses));
             }
         }
+
         private UIClass selectedUIClass;
+
         public UIClass SelectedUIClass
         {
             get => selectedUIClass;
@@ -70,7 +74,7 @@ namespace ClassifyFiles.UI.Panel
             {
                 if (isLoading)
                 {
-                    if(value==null)
+                    if (value == null)
                     {
                         selectedUIClass = value;
                         this.Notify(nameof(SelectedUIClass));
@@ -103,6 +107,7 @@ namespace ClassifyFiles.UI.Panel
                 await c.UpdatePropertiesAsync();
             }
         }
+
         public Project Project { get; protected set; }
 
         public async Task<Class> AddAsync()
@@ -192,6 +197,4 @@ namespace ClassifyFiles.UI.Panel
 
         public event EventHandler ClassDragDroped;
     }
-
-
 }
