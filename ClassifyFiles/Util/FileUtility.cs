@@ -408,7 +408,7 @@ namespace ClassifyFiles.Util
             }
             SaveChanges();
         }
-        public static void DeleteAllThumbnails(string thumbPath)
+        public static void DeleteAllThumbnails()
         {
             foreach (var file in db.Files)
             {
@@ -421,19 +421,14 @@ namespace ClassifyFiles.Util
                 {
                     file.IconGUID = null;
                     db.Entry(file).State = EntityState.Modified;
+                }     
+                if (file.Win10IconGUID != null)
+                {
+                    file.Win10IconGUID = null;
+                    db.Entry(file).State = EntityState.Modified;
                 }
             }
-            foreach (var file in D.EnumerateFiles(thumbPath))
-            {
-                try
-                {
-                    F.Delete(file);
-                }
-                catch
-                {
-
-                }
-            }
+          
             int changes = SaveChanges();
         }
         public static void DeleteThumbnails(Project project, Func<File, string> getThumbnailPath)

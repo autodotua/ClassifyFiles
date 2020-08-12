@@ -9,7 +9,7 @@
     Height="256" AllowsTransparency="True"
     Background="Transparent"
     ResizeMode="NoResize"
-    ShowInTaskbar="False"
+    ShowInTaskbar="False" Topmost="True"
     WindowStartupLocation="CenterScreen"
     WindowStyle="None" mc:Ignorable="d">
     <Grid

@@ -9,7 +9,7 @@ namespace ClassifyFiles.Util
 {
     public static class DbUtility
     {
-        public const string DbInAppDataFolderMarkerFileName= "dbInAppDataFolder";
+        public const string DbInAppDataFolderMarkerFileName = "dbInAppDataFolder";
         public static string DbPath
         {
             get
@@ -45,10 +45,16 @@ namespace ClassifyFiles.Util
             await db.DisposeAsync();
             db = new AppDbContext(DbPath);
         }
+        private static bool isSavingDb = false;
         public static int SaveChanges()
         {
             Debug.WriteLine("db begin Save Changes");
+            if (isSavingDb)
+            {
+                return -2;
+            }
             int result = -1;
+            isSavingDb = true;
             try
             {
                 lock (db)
@@ -72,6 +78,10 @@ namespace ClassifyFiles.Util
                     throw;
                 }
                 DbSavingException?.Invoke(null, new UnhandledExceptionEventArgs(ex, false));
+            }
+            finally
+            {
+                isSavingDb = false;
             }
             Debug.WriteLine("db end Save Changes");
             return result;

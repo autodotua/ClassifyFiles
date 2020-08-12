@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -24,13 +25,22 @@ namespace ClassifyFiles
     /// </summary>
     public partial class App : Application
     {
-        public static Window CurrentWindow => 
+        public static Window CurrentWindow =>
             Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
 
 
         public static new App Current { get; private set; }
+        Timer timer;
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            if (DebugSwitch.ThreadCount)
+            {
+                 timer = new Timer(new TimerCallback(p =>
+                {
+                    Debug.WriteLine("Current Thread Count is " + Process.GetCurrentProcess().Threads.Count);
+                }), this, 0, 1000);
+            }
+
             FzLib.Program.Runtime.UnhandledException.RegistAll();
             FzLib.Program.Runtime.UnhandledException.UnhandledExceptionCatched += UnhandledException_UnhandledExceptionCatched;
             InitializeTheme();
@@ -43,6 +53,8 @@ namespace ClassifyFiles
             MainWindow = win;
             win.Show();
             SplashWindow.TryClose();
+
+
         }
 
         private async void UnhandledException_UnhandledExceptionCatched(object sender, FzLib.Program.Runtime.UnhandledExceptionEventArgs e)

@@ -216,9 +216,24 @@ namespace ClassifyFiles.UI
             object Do()
             {
                 RealtimeUpdate.ClearCahces();
-                FileUtility.DeleteAllThumbnails(FileIconUtility.ThumbnailFolderPath);
+                FileUtility.DeleteAllThumbnails();
+                FileIconUtility.DeleteAllThumbnails();
                 Configs.CacheInTempDir = !Configs.CacheInTempDir;
                 FileIconUtility.UpdateSettings();
+
+                return null;
+            }
+        }
+        private async void DeleteThumbnailButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            await DoSthNeedToCloseOtherWindowsAsync(Do);
+
+            static object Do()
+            {
+                RealtimeUpdate.ClearCahces();
+                FileUtility.DeleteAllThumbnails();
+                FileIconUtility.DeleteAllThumbnails();
 
                 return null;
             }

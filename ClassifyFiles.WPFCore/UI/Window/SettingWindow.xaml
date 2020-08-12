@@ -49,10 +49,16 @@
                         <CheckBox Content="平滑滚动" IsChecked="{Binding Path=(root:Configs.SmoothScroll)}">
                             <CheckBox.ToolTip>
                                 <StackPanel Orientation="Vertical">
-                                    <TextBlock Margin="0,0,0,8">开启后将会启动像素级滚动。</TextBlock>
-                                    <TextBlock>当列表项过多（超过10000项）时，</TextBlock>
-                                    <TextBlock>开启该选项可能反而会降低使用体验。</TextBlock>
-                                    <TextBlock Margin="0,8,0,0">该设置仅针对于文件查看面板，其他区域会保持启用。</TextBlock>
+                                    <TextBlock
+                                        Width="240" Margin="0,0,0,8"
+                                        TextWrapping="Wrap">
+                                        开启后将会启动像素级滚动。若设备性能较差，开启该选项可能反而会降低使用体验。
+                                    </TextBlock>
+                                    <TextBlock
+                                        Width="240" Margin="0,8,0,0"
+                                        TextWrapping="Wrap">
+                                        该设置仅针对于文件查看面板，其他区域会保持启用。
+                                    </TextBlock>
                                 </StackPanel>
                             </CheckBox.ToolTip>
                         </CheckBox>
@@ -127,6 +133,7 @@
                             <Button Click="Button_Click">打开</Button>
 
                         </m:SimpleStackPanel>
+                        <Button Click="DeleteThumbnailButton_Click">删除所有缩略图</Button>
                     </m:SimpleStackPanel>
                 </GroupBox>
 

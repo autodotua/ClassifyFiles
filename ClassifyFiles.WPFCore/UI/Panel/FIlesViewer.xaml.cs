@@ -64,7 +64,27 @@ namespace ClassifyFiles.UI.Panel
             }
 
             FileIcon.Tasks.ProcessStatusChanged += TaskQueue_ProcessStatusChanged;
-
+            UpdateVirtualizationCacheLength();
+            Configs.StaticPropertyChanged += (p1, p2) =>
+            {
+                switch (p2.PropertyName)
+                {
+                    case nameof(Configs.FluencyFirst):
+                        UpdateVirtualizationCacheLength();
+                        break;
+                }
+            };
+        }
+        private void UpdateVirtualizationCacheLength()
+        {
+            if (Configs.FluencyFirst)
+            {
+                Resources["virtualizingPanelCacheLength"] = new VirtualizationCacheLength(10);
+            }
+            else
+            {
+                Resources["virtualizingPanelCacheLength"] = new VirtualizationCacheLength(100);
+            }
         }
         private bool IsSingleWindow { get; set; } = false;
         public Window ShowAsWindow()

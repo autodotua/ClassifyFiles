@@ -124,25 +124,28 @@ namespace ClassifyFiles.UI.Component
         {
             await File.LoadClassesAsync();
             await LoadImageAsync();
-            File.Display.PropertyChanged +=async (s, e) =>
-            {
-                if (e.PropertyName == nameof(UIFileDisplay.Image))
-                {
-                    try
-                    {
-                        await Dispatcher.InvokeAsync(() => LoadImageAsync(), DefaultDispatcherPriority);
-                    }
-                    catch
-                    {
+            File.Display.PropertyChanged += async (s, e) =>
+             {
+                 if (e.PropertyName == nameof(UIFileDisplay.Image))
+                 {
+                     try
+                     {
+                         await Dispatcher.InvokeAsync(() => LoadImageAsync(), DefaultDispatcherPriority);
+                     }
+                     catch
+                     {
 
-                    }
-                }
-            };
-            await Tasks.Enqueue(() => RealtimeUpdate.UpdateFileIcon(NonDPFile));
+                     }
+                 }
+             };
+            if (Configs.AutoThumbnails)
+            {
+                await Tasks.Enqueue(() => RealtimeUpdate.UpdateFileIcon(NonDPFile));
+            }
             if (File.Class != null && (!string.IsNullOrEmpty(File.Class.DisplayNameFormat)
-                || !string.IsNullOrEmpty(File.Class.DisplayProperty1)
-                || !string.IsNullOrEmpty(File.Class.DisplayProperty2)
-                || !string.IsNullOrEmpty(File.Class.DisplayProperty3)))
+         || !string.IsNullOrEmpty(File.Class.DisplayProperty1)
+         || !string.IsNullOrEmpty(File.Class.DisplayProperty2)
+         || !string.IsNullOrEmpty(File.Class.DisplayProperty3)))
             {
                 await Tasks.Enqueue(() => RealtimeUpdate.UpdateDisplay(NonDPFile));
             }

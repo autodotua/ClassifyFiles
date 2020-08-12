@@ -184,7 +184,7 @@ namespace ClassifyFiles
         private static bool? smoothScroll = null;
         public static bool SmoothScroll
         {
-            get => Get(ref smoothScroll, GetBool, true, nameof(SmoothScroll));
+            get => Get(ref smoothScroll, GetBool, false, nameof(SmoothScroll));
             set => Set(ref smoothScroll, value, nameof(SmoothScroll));
         }
 

@@ -78,8 +78,9 @@ namespace ClassifyFiles.UI.Page
         }
         void ShowProgressMessage(Data.File file)
         {
-            MainWindow.Current.SetProcessRingMessage(
-                "正在导出" + Environment.NewLine + Path.Combine(file.Dir, file.Name));
+            Dispatcher.Invoke(() => 
+                MainWindow.Current.SetProcessRingMessage(
+                    "正在导出" + Environment.NewLine + Path.Combine(file.Dir, file.Name)));
         }
         private async void ExportLinkButton_Click(object sender, RoutedEventArgs e)
         {
@@ -164,24 +165,6 @@ namespace ClassifyFiles.UI.Page
         {
             //无用
             await MainWindow.Current.DoProcessAsync(Task.Run(() => Check(Project)));
-        }
-
-        private async void DeleteThumbnails_Click(object sender, RoutedEventArgs e)
-        {
-            await MainWindow.Current.DoProcessAsync(
-                 Task.Run(() =>
-            {
-                try
-                {
-                    FileUtility.DeleteThumbnails(Project, file => FileIconUtility.GetThumbnailPath(file.ThumbnailGUID));
-                }
-                catch (Exception ex)
-                {
-
-                }
-            }));
-            RealtimeUpdate.ClearCahces();
-            await new MessageDialog().ShowAsync("删除成功，部分物理文件可能无法删除，请从设置中进行修复", "删除缩略图");
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)

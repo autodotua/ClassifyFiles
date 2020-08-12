@@ -89,12 +89,7 @@
                                     </m:Flyout>
                                 </m:FlyoutService.Flyout>
                             </Button>
-                            <Button Click="DeleteThumbnails_Click">
-                                <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
-                                    <m:SymbolIcon VerticalAlignment="Center" Symbol="Delete" />
-                                    <TextBlock VerticalAlignment="Center">删除所有缩略图</TextBlock>
-                                </m:SimpleStackPanel>
-                            </Button>
+
                             <Button Click="CheckButton_Click" Content="查询项目数据库错误" />
 
                         </m:SimpleStackPanel>
@@ -149,7 +144,7 @@
                                 <TextBlock VerticalAlignment="Center">导出</TextBlock>
                             </m:SimpleStackPanel>
                         </Button>
-                        <TextBlock>导入操作请点击右上角主菜单</TextBlock>
+                        <TextBlock>导入操作请点击左侧设置按钮</TextBlock>
                     </m:SimpleStackPanel>
                 </GroupBox>
             </m:SimpleStackPanel>

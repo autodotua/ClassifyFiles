@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -19,12 +21,42 @@ namespace ClassifyFiles.UI.Util
     /// </remarks>
     public static class SmoothScrollViewerHelper
     {
-        static SmoothScrollViewerHelper()
+        private static System.Threading.Timer timer = new System.Threading.Timer(
+                new System.Threading.TimerCallback(Timer_Elapsed), null, 0, 10);//随便写的数字，反正不会低于15ms
+
+        private static void Timer_Elapsed(object obj)
         {
+            var scr = currentScrollViewer;
+            if (scr != null && remainsDeltas[scr] != 0)
+            {
+                //if (horizontal)
+                //{
+                //    scr.ScrollToHorizontalOffset(scr.HorizontalOffset
+                //        - (remainsDeltas[scr] > 0 ? 1 : -1) * Math.Sqrt(Math.Abs(remainsDeltas[scr])) / 1.5d //这个控制滑动的距离，值越大距离越短
+                //        * System.Windows.Forms.SystemInformation.MouseWheelScrollLines);
+                //}
+                //else
+                //{
+                var target = scr.VerticalOffset
+                    - (remainsDeltas[scr] > 0 ? 1 : -1) * Math.Sqrt(Math.Abs(remainsDeltas[scr])) / 1.5d //这个控制滑动的距离，值越大距离越短
+                    * System.Windows.Forms.SystemInformation.MouseWheelScrollLines;
+              
+                scr.Dispatcher.Invoke(()=> scr.ScrollToVerticalOffset(target));
+                //}
+                remainsDeltas[scr] /= 1.5;//这个控制每一次滑动的时间，值越大时间越短
+
+                //如果到目标距离不到10了，就直接停止滚动，因为不然的话会永远滚下去
+                if (Math.Abs(remainsDeltas[scr]) < 1)
+                {
+                    remainsDeltas[scr] = 0;
+                    currentScrollViewer = null;
+                    Debug.WriteLineIf(DebugSwitch.ScorllInfo, "Scroll End\r\n");
+                }
+            }
         }
 
         private static Dictionary<ScrollViewer, double> remainsDeltas = new Dictionary<ScrollViewer, double>();
-        public static void Regist(Control ctrl, bool horizontal = false)
+        public static void Regist(Control ctrl)
         {
             ScrollViewer scr = ctrl.GetVisualChild<ScrollViewer>();
             if (scr == null)
@@ -33,17 +65,17 @@ namespace ClassifyFiles.UI.Util
             }
             Regist(scr);
         }
-        public static void Regist(ScrollViewer scr, bool horizontal = false)
+        public static void Regist(ScrollViewer scr)
         {
-            scr.PreviewMouseWheel +=  (p1, p2) =>
-             {
-                 p2.Handled = true;
-                 HandleMouseWheel(p1 as ScrollViewer, p2.Delta, horizontal);
-             };
+            scr.PreviewMouseWheel += (p1, p2) =>
+            {
+                p2.Handled = true;
+                HandleMouseWheel(p1 as ScrollViewer, p2.Delta);
+            };
         }
 
-
-        public static async void HandleMouseWheel(ScrollViewer scr, int delta, bool horizontal = false)
+        private static ScrollViewer currentScrollViewer = null;
+        public static void HandleMouseWheel(ScrollViewer scr, int delta)
         {
             Debug.Assert(scr != null);
             Debug.WriteLineIf(DebugSwitch.ScorllInfo, "Scroll Happened");
@@ -54,35 +86,17 @@ namespace ClassifyFiles.UI.Util
                 remainsDeltas.Add(scr, 0);
             }
 
-            remainsDeltas[scr] = remainsDeltas[scr]*1.5 + delta;//乘一个系数，那么滚轮越快页面滑动也将越快
+            remainsDeltas[scr] = remainsDeltas[scr] * 1.5 + delta;//乘一个系数，那么滚轮越快页面滑动也将越快
             if (remainsDeltas[scr] != delta)
             {
                 //如果滚动正在进行，那么把滚动交给之前的方法即可
                 return;
             }
-            while (remainsDeltas[scr] != 0)
+            if (currentScrollViewer != null && remainsDeltas.ContainsKey(currentScrollViewer))
             {
-                if (horizontal)
-                {
-                    scr.ScrollToHorizontalOffset(scr.HorizontalOffset
-                        - (remainsDeltas[scr] > 0 ? 1 : -1) * Math.Sqrt(Math.Abs(remainsDeltas[scr])) / 1.5d //这个控制滑动的距离，值越大距离越短
-                        * System.Windows.Forms.SystemInformation.MouseWheelScrollLines);
-                }
-                else
-                {
-                    scr.ScrollToVerticalOffset(scr.VerticalOffset 
-                        - (remainsDeltas[scr] > 0 ? 1 : -1) * Math.Sqrt(Math.Abs(remainsDeltas[scr])) / 1.5d //这个控制滑动的距离，值越大距离越短
-                        * System.Windows.Forms.SystemInformation.MouseWheelScrollLines);
-                }
-                remainsDeltas[scr] /= 1.5;//这个控制每一次滑动的时间，值越大时间越短
-                await Task.Delay(5);
-                //如果到目标距离不到10了，就直接停止滚动，因为不然的话会永远滚下去
-                if (Math.Abs(remainsDeltas[scr]) < 1)
-                {
-                    remainsDeltas[scr] = 0;
-                }
+                remainsDeltas[currentScrollViewer] = 0;
             }
-            Debug.WriteLineIf(DebugSwitch.ScorllInfo, "Scroll End\r\n");
+            currentScrollViewer = scr;
 
         }
     }

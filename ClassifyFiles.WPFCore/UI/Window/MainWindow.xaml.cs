@@ -116,6 +116,22 @@ namespace ClassifyFiles.UI
                         break;
                 }
             };
+            SetNavViewPaneBackground();
+            ThemeManager.AddActualThemeChangedHandler(this, (p1, p2) => SetNavViewPaneBackground());
+        }
+
+        private void SetNavViewPaneBackground()
+        {
+            Color color = default;
+            if (ThemeManager.GetActualTheme(this) == ElementTheme.Light)
+            {
+                color = Color.FromArgb(0xFF, 0xD8, 0xD8, 0xD8);
+            }
+            else
+            {
+                color = Color.FromArgb(0xFF, 0x28, 0x28, 0x28);
+            }
+            Resources["NavigationViewDefaultPaneBackground"] = new SolidColorBrush(color);
         }
 
         public void SetNavViewPaneDisplayMode()
@@ -221,6 +237,11 @@ namespace ClassifyFiles.UI
         private ILoadable mainPage;
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            if(ring.Showing)
+            {
+                e.Cancel = true;
+                return;
+            }
             if (canClose)
             {
                 return;

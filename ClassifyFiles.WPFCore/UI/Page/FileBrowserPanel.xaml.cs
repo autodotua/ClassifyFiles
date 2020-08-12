@@ -558,6 +558,11 @@ namespace ClassifyFiles.UI.Page
                 await new ErrorDialog().ShowAsync("请先设置根目录地址！", "错误");
                 return;
             }
+            if(!System.IO.Directory.Exists(Project.RootPath))
+            {
+                await new ErrorDialog().ShowAsync("根目录不存在", "错误");
+                return;
+            }
             await MainWindow.Current.DoProcessAsync(Do());
             async Task Do()
             {

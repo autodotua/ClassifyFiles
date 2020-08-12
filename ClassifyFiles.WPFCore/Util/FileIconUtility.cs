@@ -46,7 +46,7 @@ namespace ClassifyFiles.Util
             }
             else
             {
-                if (!FileUtility.CanWriteInCurrentDirectory() ||F.Exists(DbUtility.DbInAppDataFolderMarkerFileName))
+                if (!FileUtility.CanWriteInCurrentDirectory() || F.Exists(DbUtility.DbInAppDataFolderMarkerFileName))
                 {
                     string path = P.Combine(
                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), nameof(ClassifyFiles), "thumb");
@@ -259,6 +259,21 @@ namespace ClassifyFiles.Util
                 file.IconGUID = "";
             }
             return false;
+        }
+
+        internal static void DeleteAllThumbnails()
+        {
+            foreach (var file in Directory.EnumerateFiles(ThumbnailFolderPath, "*", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    F.Delete(file);
+                }
+                catch
+                {
+
+                }
+            }
         }
 
         public static bool TryGenerateWin10Icon(File file)

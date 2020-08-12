@@ -22,9 +22,10 @@
     <Grid x:Name="outGrd" ClipToBounds="True">
         <Grid Margin="0,-1,0,0">
             <!--  不知道为什么，上面-1就能实现-32的效果  -->
-            <m:NavigationView
+            <m:NavigationView 
                 x:Name="navView"
-                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                Background="Transparent"
+                OpenPaneLength="240"
                 IsBackButtonVisible="Collapsed"
                 IsBackEnabled="False" IsPaneOpen="False"
                 PaneDisplayMode="LeftMinimal"
