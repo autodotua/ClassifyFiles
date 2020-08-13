@@ -258,6 +258,14 @@ namespace ClassifyFiles
             set => Set(ref fluencyFirst, value, nameof(FluencyFirst));
         }
 
+        private static bool? clearThumbsAfterExiting = null;
+
+        public static bool ClearThumbsAfterExiting
+        {
+            get => Get(ref clearThumbsAfterExiting, GetBool, false, nameof(ClearThumbsAfterExiting));
+            set => Set(ref clearThumbsAfterExiting, value, nameof(ClearThumbsAfterExiting));
+        }
+
         public static TimeSpan AnimationDuration { get; } = TimeSpan.FromSeconds(0.2);
 
         private static void Set<T>(ref T? field, T value, string key) where T : struct

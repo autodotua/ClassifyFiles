@@ -114,7 +114,10 @@ namespace ClassifyFiles.UI.Component
 
         private async Task LoadAsync()
         {
-            await File.LoadClassesAsync();
+            if (!File.File.IsFolder)
+            {
+                await File.LoadClassesAsync();
+            }
             await LoadImageAsync();
             File.Display.PropertyChanged += async (s, e) =>
              {

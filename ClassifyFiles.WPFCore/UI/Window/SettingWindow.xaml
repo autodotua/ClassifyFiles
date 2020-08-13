@@ -132,6 +132,13 @@
                             </Button>
                             <Button Click="Button_Click">打开</Button>
                         </m:SimpleStackPanel>
+                        <m:SimpleStackPanel
+                            VerticalAlignment="Center"
+                            Background="Transparent"
+                            Orientation="Horizontal" Spacing="12">
+                            <TextBlock VerticalAlignment="Center">在程序退出时删除所有缩略图：</TextBlock>
+                            <m:ToggleSwitch IsOn="{Binding Path=(root:Configs.ClearThumbsAfterExiting)}" />
+                        </m:SimpleStackPanel>
                         <Button Click="DeleteThumbnailButton_Click">删除所有缩略图</Button>
                     </m:SimpleStackPanel>
                 </GroupBox>
@@ -166,10 +173,6 @@
                             <Button Click="ZipDatabaseButton_Click" Content="压缩数据库" />
                             <Button Click="ImportMenu_Click" Content="导入" />
                             <Button Click="ExportMenu_Click" Content="导出" />
-                            <Button
-                                Click="OptimizeThumbnailsAndIconsButton_Click"
-                                Content="修复孤立缩略图"
-                                ToolTip="将会删除存在于数据库、但不存在于文件系统，或存在于文件系统、但没有对应的数据库文件缩略图的文件" />
                         </m:SimpleStackPanel>
                     </m:SimpleStackPanel>
                 </GroupBox>

@@ -16,6 +16,7 @@ namespace ClassifyFiles.Util
         private object isExcuting = false;
         public bool IsExcuting => (bool)isExcuting;
         private bool stopping = false;
+        private const int TasksMaxCount = 300;
 
         /// <summary>
         /// 将新的任务加入队列
@@ -42,7 +43,6 @@ namespace ClassifyFiles.Util
                         //多个请求可能会同时执行，所以先要把变量锁了，然后之后的解锁之后就会发现已经在执行了，就加入队列
                         if (isExcuting.Equals(true))
                         {
-                            //tasks.Enqueue(t);
                             return;
                         }
                         isExcuting = true;
@@ -59,10 +59,26 @@ namespace ClassifyFiles.Util
                     }
                     while (tasks.Count > 0 && !stopping)
                     {
+                        if (tasks.Count > TasksMaxCount)
+                        {
+                            Stack<Action> temp = new Stack<Action>();
+                            for (int i = 0; i < TasksMaxCount; i++)
+                            {
+                                if (tasks.TryPop(out Action act))
+                                {
+                                    temp.Push(act);
+                                }
+                            }
+                            tasks.Clear();
+                            while (temp.Count > 0)
+                            {
+                                tasks.Push(temp.Pop());
+                            }
+                        }
                         Debug.WriteLineIf(DebugSwitch.TaskQueue, "Task count is " + tasks.Count);
                         List<Action> currentTasks = new List<Action>();
-                        //后进来的先处理，每次处理3倍的线程数份，这样可以让后进来的尽快处理
-                        for (int i = 0; i < Configs.RefreshThreadCount * 3; i++)
+                        //后进来的先处理，每次处理2倍的线程数份，这样可以让后进来的尽快处理
+                        for (int i = 0; i < Configs.RefreshThreadCount * 2; i++)
                         {
                             if (tasks.Count > 0)
                             {
@@ -110,21 +126,6 @@ namespace ClassifyFiles.Util
                         });
 #endif
                     }
-                    if (!stopping)
-                    {
-                        //防止频繁保存数据库
-                        if ((DateTime.Now - lastDbSaveTime).Seconds > 10)
-                        {
-                            lastDbSaveTime = DateTime.Now;
-                            try
-                            {
-                                DbUtility.SaveChanges();
-                            }
-                            catch (Exception ex)
-                            {
-                            }
-                        }
-                    }
                     stopping = false;
                     ProcessStatusChanged?.Invoke(this, new ProcessStatusChangedEventArgs(false));
                     lock (isExcuting)
@@ -132,10 +133,6 @@ namespace ClassifyFiles.Util
                         isExcuting = false;
                     }
                 }
-                //else
-                //{
-                //    tasks.Enqueue(t);
-                //}
             });
         }
 

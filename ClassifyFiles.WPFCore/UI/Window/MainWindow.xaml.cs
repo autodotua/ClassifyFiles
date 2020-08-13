@@ -225,7 +225,7 @@ namespace ClassifyFiles.UI
 
         private ILoadable mainPage;
 
-        private void Window_Closing(object sender, CancelEventArgs e)
+        private async void Window_Closing(object sender, CancelEventArgs e)
         {
             if (ring.Showing)
             {
@@ -239,7 +239,7 @@ namespace ClassifyFiles.UI
             //退出前还要做一些工作，暂时先隐藏窗体，暂缓退出
             e.Cancel = true;
             Visibility = Visibility.Collapsed;
-            BeforeClosing(true);
+            await BeforeClosing(true);
         }
 
         private bool canClose = false;
@@ -258,6 +258,12 @@ namespace ClassifyFiles.UI
             await FileIcon.Tasks.Stop();
             if (shutDownApp)
             {
+                mainPage = null;
+                GC.Collect();
+                if (Configs.ClearThumbsAfterExiting)
+                {
+                    await Task.Run(() => FileIconUtility.DeleteAllThumbnails());
+                }
                 Application.Current.Shutdown();
             }
         }

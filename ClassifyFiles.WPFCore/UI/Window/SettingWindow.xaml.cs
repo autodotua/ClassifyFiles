@@ -138,19 +138,6 @@ namespace ClassifyFiles.UI
             Configs.AutoAddFiles = false;
         }
 
-        private async void OptimizeThumbnailsAndIconsButton_Click(object sender, RoutedEventArgs e)
-        {
-            (int DeleteFromDb, int DeleteFromDisk, int RemainsCount, List<string> FailedToDelete) result = (-1, -1, -1, new List<string>());
-
-            //由于删除缩略图可能会影响正在显示的缩略图，因此先关闭窗体
-            result = await DoSthNeedToCloseOtherWindowsAsync(() => FileUtility.OptimizeThumbnailsAndIcons(FileIconUtility.ThumbnailFolderPath));
-            await new MessageDialog().ShowAsync($"修复成功，{Environment.NewLine}" +
-                $"从数据库中删除了{result.DeleteFromDb}张缩略图，{Environment.NewLine}" +
-                $"从磁盘中删除了{result.DeleteFromDisk}张缩略图，{Environment.NewLine}" +
-                $"现存{result.RemainsCount}张缩略图，{Environment.NewLine}" +
-                $"有{result.FailedToDelete.Count}张缩略图删除失败", "修复缩略图");
-        }
-
         /// <summary>
         /// 执行需要关闭其他窗体的任务
         /// </summary>
@@ -214,7 +201,6 @@ namespace ClassifyFiles.UI
             object Do()
             {
                 RealtimeUpdate.ClearCahces();
-                FileUtility.DeleteAllThumbnails();
                 FileIconUtility.DeleteAllThumbnails();
                 Configs.CacheInTempDir = !Configs.CacheInTempDir;
                 FileIconUtility.UpdateSettings();
@@ -230,7 +216,6 @@ namespace ClassifyFiles.UI
             static object Do()
             {
                 RealtimeUpdate.ClearCahces();
-                FileUtility.DeleteAllThumbnails();
                 FileIconUtility.DeleteAllThumbnails();
 
                 return null;

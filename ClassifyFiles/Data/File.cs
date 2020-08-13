@@ -44,45 +44,6 @@ namespace ClassifyFiles.Data
         [NotMapped]
         public bool IsFolder => string.IsNullOrEmpty(Name);
 
-        private string thumbnailGUID;
-
-        public string ThumbnailGUID
-        {
-            //如果为null，则是没有获取；如果为""，则是获取失败
-            get => thumbnailGUID;
-            set
-            {
-                thumbnailGUID = value;
-                this.Notify(nameof(ThumbnailGUID));
-            }
-        }
-
-        private string iconGUID;
-
-        public string IconGUID
-        {
-            //如果为null，则是没有获取；如果为""，则是获取失败
-            get => iconGUID;
-            set
-            {
-                iconGUID = value;
-                this.Notify(nameof(IconGUID));
-            }
-        }
-
-        private string win10IconGUID;
-
-        public string Win10IconGUID
-        {
-            //如果为null，则是没有获取；如果为""，则是获取失败
-            get => win10IconGUID;
-            set
-            {
-                win10IconGUID = value;
-                this.Notify(nameof(Win10IconGUID));
-            }
-        }
-
         [Required]
         public Project Project { get; set; }
 

@@ -15,6 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\folder.png" />
     <None Remove="Images\icon_dark.png" />
     <None Remove="Images\icon_light.png" />
   </ItemGroup>
@@ -43,6 +44,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Images\folder.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Images\icon_dark.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

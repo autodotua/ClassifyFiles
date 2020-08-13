@@ -2,6 +2,7 @@
 using ClassifyFiles.UI.Panel;
 using ClassifyFiles.Util;
 using System.Collections.Concurrent;
+using static ClassifyFiles.Util.FileIconUtility;
 
 namespace ClassifyFiles.UI.Util
 {
@@ -26,15 +27,15 @@ namespace ClassifyFiles.UI.Util
             {
                 return;
             }
+            bool hasChanged = false;
             if (Configs.ThumbnailStrategy == ThumbnailStrategy.Win10Icon)
-            {  //本来是null为没有生成，""为生成失败，后来感觉这样容易出问题，所以干脆生成失败的也再试一次好了
+            {
                 if (!generatedWin10Icons.ContainsKey(file.File.ID)
-                && string.IsNullOrEmpty(file.File.ThumbnailGUID))
+                && !file.File.HasWin10Icon())
                 {
-                    //generatedWin10Icons.TryAdd(file.File.ID, file);
-                    if (FileIconUtility.TryGenerateWin10Icon(file.File))
+                    if (TryGenerateWin10Icon(file.File))
                     {
-                        DbUtility.SetObjectModified(file.File);
+                        hasChanged = true;
                     }
                 }
             }
@@ -44,12 +45,12 @@ namespace ClassifyFiles.UI.Util
                 {
                     //本来是null为没有生成，""为生成失败，后来感觉这样容易出问题，所以干脆生成失败的也再试一次好了
                     if (!generatedThumbnails.ContainsKey(file.File.ID)
-                    && string.IsNullOrEmpty(file.File.ThumbnailGUID))
+                    && !file.File.HasThumbnail())
                     {
                         // generatedThumbnails.TryAdd(file.File.ID, file);
                         if (FileIconUtility.TryGenerateThumbnail(file.File))
                         {
-                            DbUtility.SetObjectModified(file.File);
+                            hasChanged = true;
                         }
                     }
                 }
@@ -57,15 +58,19 @@ namespace ClassifyFiles.UI.Util
                     || Configs.ThumbnailStrategy == ThumbnailStrategy.WindowsExplorerIcon)
                 {
                     if (!generatedIcons.ContainsKey(file.File.ID
-                        ) && string.IsNullOrEmpty(file.File.IconGUID))
+                        ) && !file.File.HasExplorerIcon())
                     {
-                        // generatedIcons.TryAdd(file.File.ID, file);
                         if (FileIconUtility.TryGenerateExplorerIcon(file.File))
                         {
-                            DbUtility.SetObjectModified(file.File);
+                            hasChanged = true;
                         }
                     }
                 }
+            }
+
+            if (hasChanged)
+            {
+                file.Display.NotifyIconChanged();
             }
         }
 

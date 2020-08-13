@@ -23,20 +23,11 @@ namespace ClassifyFiles.UI.Util
             var scr = currentScrollViewer;
             if (scr != null && remainsDeltas[scr] != 0)
             {
-                //if (horizontal)
-                //{
-                //    scr.ScrollToHorizontalOffset(scr.HorizontalOffset
-                //        - (remainsDeltas[scr] > 0 ? 1 : -1) * Math.Sqrt(Math.Abs(remainsDeltas[scr])) / 1.5d //这个控制滑动的距离，值越大距离越短
-                //        * System.Windows.Forms.SystemInformation.MouseWheelScrollLines);
-                //}
-                //else
-                //{
                 var target = scr.VerticalOffset
                     - (remainsDeltas[scr] > 0 ? 1 : -1) * Math.Sqrt(Math.Abs(remainsDeltas[scr])) / 1.5d //这个控制滑动的距离，值越大距离越短
                     * System.Windows.Forms.SystemInformation.MouseWheelScrollLines;
 
                 scr.Dispatcher.Invoke(() => scr.ScrollToVerticalOffset(target));
-                //}
                 remainsDeltas[scr] /= 1.5;//这个控制每一次滑动的时间，值越大时间越短
 
                 //如果到目标距离不到10了，就直接停止滚动，因为不然的话会永远滚下去

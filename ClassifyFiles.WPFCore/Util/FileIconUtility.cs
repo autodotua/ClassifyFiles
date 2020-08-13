@@ -71,48 +71,53 @@ namespace ClassifyFiles.Util
 
         #region 路径
 
-        private static Guid GetGuidFromString(string str)
+        public static bool HasThumbnail(this File file)
         {
-            using MD5 md5 = MD5.Create();
-            byte[] hash = md5.ComputeHash(Encoding.Default.GetBytes(str));
-            Guid result = new Guid(hash);
-            return result;
+            return F.Exists(file.GetThumbnailPath());
         }
 
-        public static string GetThumbnailPath(string guid)
+        public static bool HasWin10Icon(this File file)
         {
-            return P.GetFullPath(P.Combine(ThumbnailFolderPath, "media", guid + ".jpg"));
+            return F.Exists(file.GetWin10IconPath());
         }
 
-        public static string GetWin10IconPath(string guid)
+        public static bool HasExplorerIcon(this File file)
         {
-            return P.GetFullPath(P.Combine(ThumbnailFolderPath, "win10", guid + ".png"));
+            return F.Exists(file.GetExplorerIconPath());
         }
 
-        public static string GetExplorerIconPath(string guid)
+        public static string GetThumbnailPath(this File file)
         {
-            return P.GetFullPath(P.Combine(ThumbnailFolderPath, "exp", guid + ".png"));
+            return P.GetFullPath(P.Combine(ThumbnailFolderPath, "media", file.ID + ".jpg"));
+        }
+
+        public static string GetWin10IconPath(this File file)
+        {
+            return P.GetFullPath(P.Combine(ThumbnailFolderPath, "win10", file.ID + ".jpg"));
+        }
+
+        public static string GetExplorerIconPath(this File file)
+        {
+            return P.GetFullPath(P.Combine(ThumbnailFolderPath, "exp", file.FileInfo.Extension.Trim('.').ToLower() + ".png"));
         }
 
         #endregion 路径
 
         #region 获取图片
 
-        private static string CreateImageThumbnail(string img)
+        private static void CreateImageThumbnail(File file)
         {
-            using Image image = Image.FromFile(img);
+            using Image image = Image.FromFile(file.GetAbsolutePath());
             using Image thumb = image.GetThumbnailImage(240, (int)(240.0 / image.Width * image.Height), () => false, IntPtr.Zero);
             string guid = Guid.NewGuid().ToString();
 
-            thumb.Save(GetThumbnailPath(guid), encoder, encParams);
-            return guid;
+            thumb.Save(GetThumbnailPath(file), encoder, encParams);
         }
 
-        private static string CreateVideoThumbnail(string video)
+        private static bool CreateVideoThumbnail(File file)
         {
-            string guid = Guid.NewGuid().ToString();
-            var thumbnail = GetThumbnailPath(guid);
-            var cmd = "  -itsoffset -1  -i " + '"' + video + '"' + " -vcodec mjpeg -vframes 1 -an -f rawvideo -vf scale=480:-1 " + '"' + thumbnail + '"';
+            var thumbnail = GetThumbnailPath(file);
+            var cmd = "  -itsoffset -1  -i " + '"' + file.GetAbsolutePath() + '"' + " -vcodec mjpeg -vframes 1 -an -f rawvideo -vf scale=480:-1 " + '"' + thumbnail + '"';
 
             var startInfo = new ProcessStartInfo
             {
@@ -136,27 +141,32 @@ namespace ClassifyFiles.Util
                 catch
                 {
                 }
-                return null;
+                return false;
             }
             //string output = p.StandardOutput.ReadToEnd();
             //string error = p.StandardError.ReadToEnd();
             if (!F.Exists(thumbnail))
             {
-                return null;
+                return false;
             }
-            return guid;
+            return true;
         }
 
-        private static async Task<string> CreateWin10ThumbnailAsync(string path)
+        private static async Task CreateWin10ThumbnailAsync(File file)
         {
-            var sFile = await StorageFile.GetFileFromPathAsync(path);
+            var sFile = await StorageFile.GetFileFromPathAsync(file.GetAbsolutePath());
             using StorageItemThumbnail thumb = await sFile.GetThumbnailAsync(ThumbnailMode.SingleItem);
 
             using var bitmap = Bitmap.FromStream(thumb.AsStream()) as Bitmap;
-            string guid = Guid.NewGuid().ToString();
-
-            bitmap.Save(GetWin10IconPath(guid), ImageFormat.Png);
-            return guid;
+            Color leftTopColor = bitmap.GetPixel(0, 0);
+            if (leftTopColor.A == byte.MaxValue)//非透明色
+            {
+                bitmap.Save(GetWin10IconPath(file), encoder, encParams);
+            }
+            else//有透明色
+            {
+                bitmap.Save(GetWin10IconPath(file), ImageFormat.Png);
+            }
         }
 
         #endregion 获取图片
@@ -178,12 +188,11 @@ namespace ClassifyFiles.Util
             {
                 try
                 {
-                    file.ThumbnailGUID = CreateImageThumbnail(path);
+                    CreateImageThumbnail(file);
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    file.ThumbnailGUID = "";
                     return false;
                 }
             }
@@ -191,12 +200,10 @@ namespace ClassifyFiles.Util
             {
                 try
                 {
-                    file.ThumbnailGUID = CreateVideoThumbnail(path);
-                    return true;
+                    return CreateVideoThumbnail(file);
                 }
                 catch (Exception ex)
                 {
-                    file.ThumbnailGUID = "";
                     return false;
                 }
             }
@@ -215,27 +222,26 @@ namespace ClassifyFiles.Util
                 string ext = P.GetExtension(path).Replace(".", string.Empty);
                 if (file.IsFolder)
                 {
-                    string guid = GetGuidFromString("folder").ToString();
-                    //文件夹，统一图标
-                    if (!F.Exists(GetExplorerIconPath(guid)))
-                    {
-                        var iconPath = GetExplorerIconPath(guid);
-                        ExplorerIcon.GetBitmapFromFolderPath(path, ExplorerIcon.IconSizeEnum.ExtraLargeIcon).Save(iconPath, ImageFormat.Png);
-                    }
-                    file.IconGUID = guid;
+                    //string guid = GetGuidFromString("folder").ToString();
+                    ////文件夹，统一图标
+                    //if (!F.Exists(GetExplorerIconPath(guid)))
+                    //{
+                    //    var iconPath = GetExplorerIconPath(guid);
+                    //    ExplorerIcon.GetBitmapFromFolderPath(path, ExplorerIcon.IconSizeEnum.ExtraLargeIcon).Save(iconPath, ImageFormat.Png);
+                    //}
+                    //file.IconGUID = guid;
                 }
                 else if (FileUtility.IsExecutable(path))
                 {
                     //程序文件，每个图标都不同
                     string guid = Guid.NewGuid().ToString();
-                    var iconPath = GetExplorerIconPath(guid);
-                    ExplorerIcon.GetBitmapFromFilePath(path, ExplorerIcon.IconSizeEnum.ExtraLargeIcon).Save(iconPath, ImageFormat.Png);
-                    file.IconGUID = guid;
+                    var iconPath = GetExplorerIconPath(file);
+                    ExplorerIcon.GetBitmapFromFilePath(path, ExplorerIcon.IconSizeEnum.ExtraLargeIcon)
+                        .Save(iconPath, ImageFormat.Png);
                 }
                 else
                 {
-                    string guid = GetGuidFromString(ext).ToString();
-                    var iconPath = GetExplorerIconPath(guid);
+                    var iconPath = GetExplorerIconPath(file);
                     //其他文件，同一个格式的用同一个图标
                     if (F.Exists(iconPath))
                     {
@@ -250,20 +256,18 @@ namespace ClassifyFiles.Util
                             F.Move(tempPath, iconPath);
                         }
                         catch { }
-                    }
-                    file.IconGUID = guid;
+                    };
                 }
             }
             catch (Exception ex)
             {
-                file.IconGUID = "";
             }
             return false;
         }
 
         internal static void DeleteAllThumbnails()
         {
-            foreach (var file in Directory.EnumerateFiles(ThumbnailFolderPath, "*", SearchOption.AllDirectories))
+            foreach (var file in D.EnumerateFiles(ThumbnailFolderPath, "*", SearchOption.AllDirectories))
             {
                 try
                 {
@@ -285,12 +289,11 @@ namespace ClassifyFiles.Util
 
             try
             {
-                file.Win10IconGUID = CreateWin10ThumbnailAsync(path).Result;
+                CreateWin10ThumbnailAsync(file).Wait();
                 return true;
             }
             catch (Exception ex)
             {
-                file.Win10IconGUID = "";
                 return false;
             }
         }
