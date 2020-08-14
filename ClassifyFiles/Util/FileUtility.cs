@@ -59,6 +59,11 @@ namespace ClassifyFiles.Util
             return IsImage(file.Extension);
         }
 
+        public static bool IsVideo(this FI file)
+        {
+            return IsVideo(file.Extension);
+        }
+
         public static bool IsMatched(FI file, Class c)
         {
             List<List<MatchCondition>> orGroup = new List<List<MatchCondition>>();

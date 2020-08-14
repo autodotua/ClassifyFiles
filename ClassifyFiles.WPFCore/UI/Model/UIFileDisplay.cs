@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace ClassifyFiles.UI.Model
@@ -290,12 +291,12 @@ namespace ClassifyFiles.UI.Model
                 }
 
                 if (Configs.ThumbnailStrategy == ThumbnailStrategy.Win10Icon)
-                {//需要提取方法
+                {
                     if (File.HasWin10Icon())
                     {
                         try
                         {
-                            return new BitmapImage(new Uri(File.GetWin10IconPath(), UriKind.Absolute));
+                            return GetBitmapImage(File.GetWin10IconPath());
                         }
                         catch (Exception ex)
                         {
@@ -311,7 +312,7 @@ namespace ClassifyFiles.UI.Model
                         {
                             try
                             {
-                                return new BitmapImage(new Uri(File.GetThumbnailPath(), UriKind.Absolute));
+                                return GetBitmapImage(File.GetThumbnailPath());
                             }
                             catch (Exception ex)
                             {
@@ -335,6 +336,24 @@ namespace ClassifyFiles.UI.Model
                     return null;
                 }
             }
+        }
+
+        private static DpiScale dpi = VisualTreeHelper.GetDpi(MainWindow.Current);
+
+        private BitmapImage GetBitmapImage(string path)
+        {
+            var uri = new Uri(path, UriKind.Absolute);
+            BitmapImage image = new BitmapImage();
+            image.BeginInit();
+            image.UriSource = uri;
+            if (Configs.FluencyFirst)
+            {
+                image.DecodePixelHeight = Math.Min(256, 2 * (int)(Configs.IconSize * dpi.DpiScaleY));
+            }
+            //image.DecodePixelHeight = 2 * (int)(Configs.IconSize * dpi.DpiScaleY);
+            image.EndInit();
+            image.Freeze();
+            return image;
         }
     }
 }

@@ -255,7 +255,7 @@ namespace ClassifyFiles.UI
             {
                 await SaveChangesAsync();
             }
-            await FileIcon.Tasks.Stop();
+            await FileIcon.Tasks.StopAsync();
             if (shutDownApp)
             {
                 mainPage = null;

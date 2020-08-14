@@ -125,27 +125,29 @@ namespace ClassifyFiles.UI.Component
                  {
                      try
                      {
-                         await Dispatcher.InvokeAsync(() => LoadImageAsync(), DefaultDispatcherPriority);
+                         await LoadImageAsync();
                      }
                      catch
                      {
                      }
                  }
              };
-            if (Configs.AutoThumbnails)
-            {
-                await Tasks.Enqueue(() => RealtimeUpdate.UpdateFileIcon(NonDPFile));
-            }
-            if (File.Class != null && (!string.IsNullOrEmpty(File.Class.DisplayNameFormat)
-         || !string.IsNullOrEmpty(File.Class.DisplayProperty1)
-         || !string.IsNullOrEmpty(File.Class.DisplayProperty2)
-         || !string.IsNullOrEmpty(File.Class.DisplayProperty3)))
-            {
-                await Tasks.Enqueue(() => RealtimeUpdate.UpdateDisplay(NonDPFile));
-            }
+            await Dispatcher.InvokeAsync(() =>
+             {
+                 if (Configs.AutoThumbnails && !File.File.HasIconInCurrentSettings())
+                 {
+                     Tasks.Enqueue(() => RealtimeUpdate.UpdateFileIcon(NonDPFile));
+                 }
+                 if (File.Class != null && (!string.IsNullOrEmpty(File.Class.DisplayNameFormat)
+              || !string.IsNullOrEmpty(File.Class.DisplayProperty1)
+              || !string.IsNullOrEmpty(File.Class.DisplayProperty2)
+              || !string.IsNullOrEmpty(File.Class.DisplayProperty3)))
+                 {
+                     Tasks.Enqueue(() => RealtimeUpdate.UpdateDisplay(NonDPFile));
+                 }
+             }, DispatcherPriority.Background);
         }
 
-        private static string folderIconPath = null;
         private object iconContent;
 
         public object IconContent
@@ -194,46 +196,37 @@ namespace ClassifyFiles.UI.Component
 
             await Dispatcher.InvokeAsync(() =>
             {
-                if (File.File.IsFolder && (
-                    Configs.ThumbnailStrategy == ThumbnailStrategy.MediaThumbnailPrefer
-                    || Configs.ThumbnailStrategy == ThumbnailStrategy.WindowsExplorerIcon
-                    ))
+                BitmapImage img = File.Display.Image;
+                if (img == null)
                 {
-                    if (folderIconPath == null)
+                    if (IconContent is Image)
                     {
-                        var bitmap = ExplorerIcon.GetBitmapFromFolderPath(File.File.GetAbsolutePath());
-                        string tempFileName = System.IO.Path.GetTempFileName() + ".png";
-                        bitmap.Save(tempFileName);
-                        folderIconPath = tempFileName;
+                        return;
                     }
-
-                    item = new Image() { Source = new BitmapImage(new Uri(folderIconPath, UriKind.Absolute)) };
+                    item = new FontIcon() { Glyph = File.Display.Glyph };
                 }
                 else
                 {
-                    var img = File.Display.Image;
-                    if (img == null)
-                    {
-                        if (IconContent is Image)
-                        {
-                            return;
-                        }
-                        item = new FontIcon() { Glyph = File.Display.Glyph };
-                    }
-                    else
-                    {
-                        img.Freeze();
-                        item = new Image()
-                        {
-                            Source = img,
-                        };
-                    }
-                    item.HorizontalAlignment = HorizontalAlignment.Center;
-                    item.VerticalAlignment = VerticalAlignment.Center;
+                    img.Freeze();
+                    item = GetImage(img);
                 }
+                item.HorizontalAlignment = HorizontalAlignment.Center;
+                item.VerticalAlignment = VerticalAlignment.Center;
+
                 IconContent = item;
             }, DefaultDispatcherPriority);
             return item is Image;
+        }
+
+        private Image GetImage(BitmapSource source)
+        {
+            Image image = new Image()
+            {
+                Source = source,
+                SnapsToDevicePixels = true,
+            };
+            RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.NearestNeighbor);
+            return image;
         }
 
         public static TaskQueue Tasks { get; private set; } = new TaskQueue();

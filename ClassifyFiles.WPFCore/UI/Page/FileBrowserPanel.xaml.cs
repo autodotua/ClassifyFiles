@@ -5,6 +5,7 @@ using ClassifyFiles.UI.Dialog;
 using ClassifyFiles.UI.Event;
 using ClassifyFiles.UI.Model;
 using ClassifyFiles.UI.Util;
+using ClassifyFiles.Util;
 using FzLib.Basic;
 using FzLib.Extension;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -48,11 +49,10 @@ namespace ClassifyFiles.UI.Page
                 filesViewer.Project = project;
                 await filesViewer.SetFilesAsync(null, null, FileCollectionType.None);
             }
-            await classPanel.LoadAsync(project);
             await Task.Run(() =>
             {
                 HashSet<string> formats = new HashSet<string>();
-                foreach (var item in classPanel.UIClasses.Select(p => p.Class))
+                foreach (var item in ClassUtility.GetClasses(project))
                 {
                     formats.Add(item.DisplayNameFormat);
                     formats.Add(item.DisplayProperty1);
@@ -62,6 +62,7 @@ namespace ClassifyFiles.UI.Page
                 var csFormats = formats.Where(p => p != null && p.StartsWith("cs:"));
                 DisplayFormatConverter.InitializeCsMethods(csFormats);
             });
+            await classPanel.LoadAsync(project);
             UpdateAppBarButtonsEnable();
         }
 
@@ -92,7 +93,15 @@ namespace ClassifyFiles.UI.Page
             {
                 await SetFilesAsync(() =>
                 {
-                    var fileClasses = GetFilesWithClassesByClass(classPanel.SelectedUIClass.Class);
+                    IEnumerable<KeyValuePair<File, IEnumerable<Class>>> fileClasses = null;
+                    //if (Configs.ShowClassTags)
+                    //{
+                    fileClasses = GetFilesWithClassesByClass(classPanel.SelectedUIClass.Class);
+                    //}
+                    //else
+                    //{
+                    //    fileClasses = GetFilesWithoutClassesByClass(classPanel.SelectedUIClass.Class);
+                    //}
                     var uiFiles = fileClasses.Select(p => new UIFile(p.Key)
                     {
                         Classes = new ObservableCollection<Class>(p.Value),

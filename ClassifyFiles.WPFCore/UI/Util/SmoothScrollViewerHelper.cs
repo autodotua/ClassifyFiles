@@ -18,7 +18,7 @@ namespace ClassifyFiles.UI.Util
         private static System.Threading.Timer timer = new System.Threading.Timer(
                 new System.Threading.TimerCallback(Timer_Elapsed), null, 0, 10);//随便写的数字，反正不会低于15ms
 
-        private static void Timer_Elapsed(object obj)
+        private static async void Timer_Elapsed(object obj)
         {
             var scr = currentScrollViewer;
             if (scr != null && remainsDeltas[scr] != 0)
@@ -27,7 +27,7 @@ namespace ClassifyFiles.UI.Util
                     - (remainsDeltas[scr] > 0 ? 1 : -1) * Math.Sqrt(Math.Abs(remainsDeltas[scr])) / 1.5d //这个控制滑动的距离，值越大距离越短
                     * System.Windows.Forms.SystemInformation.MouseWheelScrollLines;
 
-                scr.Dispatcher.Invoke(() => scr.ScrollToVerticalOffset(target));
+                scr.Dispatcher.InvokeAsync(() => scr.ScrollToVerticalOffset(target),System.Windows.Threading.DispatcherPriority.Render);
                 remainsDeltas[scr] /= 1.5;//这个控制每一次滑动的时间，值越大时间越短
 
                 //如果到目标距离不到10了，就直接停止滚动，因为不然的话会永远滚下去

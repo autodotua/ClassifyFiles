@@ -67,6 +67,20 @@ namespace ClassifyFiles.Util
             return result;
         }
 
+        public static IEnumerable<KeyValuePair<File, IEnumerable<Class>>> GetFilesWithoutClassesByClass(Class c)
+        {
+            Debug.WriteLine("db begin: " + nameof(GetFilesWithoutClassesByClass));
+            var result = db.FileClasses
+                .Where(p => p.Class == c)
+                .Where(p => p.Status != FileClassStatus.Disabled)
+                .IncludeAll()
+                .AsEnumerable()
+                .Select(p => new KeyValuePair<File, IEnumerable<Class>>(p.File, new Class[] { p.Class }));
+
+            Debug.WriteLine("db end: " + nameof(GetFilesWithoutClassesByClass));
+            return result;
+        }
+
         public static IQueryable<FileClass> IncludeAll(this IQueryable<FileClass> fileClassQueryable)
         {
             return fileClassQueryable.Include(p => p.File).Include(p => p.File);

@@ -21,7 +21,10 @@ namespace ClassifyFiles.Util
                 needToSave = false;
                 try
                 {
-                    db.SaveChanges();
+                    lock (db)
+                    {
+                        db.SaveChanges();
+                    }
                 }
                 catch
                 {
@@ -70,13 +73,19 @@ namespace ClassifyFiles.Util
                     return;
                 }
                 config.Value = value.ToString();
-                db.Entry(config).State = EntityState.Modified;
+                lock (db)
+                {
+                    db.Entry(config).State = EntityState.Modified;
+                }
             }
             else
             {
                 config = new Config(key, value.ToString());
-                var result = db.Configs.Add(config);
                 configs.Add(config);
+                lock (db)
+                {
+                    var result = db.Configs.Add(config);
+                }
             }
             needToSave = true;
         }

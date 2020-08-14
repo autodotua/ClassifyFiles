@@ -79,11 +79,11 @@ namespace ClassifyFiles.UI.Panel
         {
             if (Configs.FluencyFirst)
             {
-                Resources["virtualizingPanelCacheLength"] = new VirtualizationCacheLength(20);
+                Resources["virtualizingPanelCacheLength"] = new VirtualizationCacheLength(100);
             }
             else
             {
-                Resources["virtualizingPanelCacheLength"] = new VirtualizationCacheLength(50, 100);
+                Resources["virtualizingPanelCacheLength"] = new VirtualizationCacheLength(800);
             }
         }
 

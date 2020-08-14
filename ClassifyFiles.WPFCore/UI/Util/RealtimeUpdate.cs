@@ -48,7 +48,7 @@ namespace ClassifyFiles.UI.Util
                     && !file.File.HasThumbnail())
                     {
                         // generatedThumbnails.TryAdd(file.File.ID, file);
-                        if (FileIconUtility.TryGenerateThumbnail(file.File))
+                        if (TryGenerateThumbnail(file.File))
                         {
                             hasChanged = true;
                         }
@@ -60,7 +60,7 @@ namespace ClassifyFiles.UI.Util
                     if (!generatedIcons.ContainsKey(file.File.ID
                         ) && !file.File.HasExplorerIcon())
                     {
-                        if (FileIconUtility.TryGenerateExplorerIcon(file.File))
+                        if (TryGenerateExplorerIcon(file.File))
                         {
                             hasChanged = true;
                         }

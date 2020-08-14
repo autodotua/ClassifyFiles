@@ -86,6 +86,27 @@ namespace ClassifyFiles.Util
             return F.Exists(file.GetExplorerIconPath());
         }
 
+        public static bool HasIconInCurrentSettings(this File file)
+        {
+            if (Configs.ThumbnailStrategy == ThumbnailStrategy.Win10Icon)
+            {
+                return file.HasWin10Icon();
+            }
+            if (Configs.ThumbnailStrategy == ThumbnailStrategy.MediaThumbnailPrefer)
+            {
+                if (file.FileInfo.IsImage() || file.FileInfo.IsVideo())
+                {
+                    return file.HasThumbnail();
+                }
+                return file.HasExplorerIcon();
+            }
+            if (Configs.ThumbnailStrategy == ThumbnailStrategy.WindowsExplorerIcon)
+            {
+                return file.HasExplorerIcon();
+            }
+            return true;
+        }
+
         public static string GetThumbnailPath(this File file)
         {
             return P.GetFullPath(P.Combine(ThumbnailFolderPath, "media", file.ID + ".jpg"));
