@@ -22,7 +22,7 @@ namespace ClassifyFiles
             set
             {
                 theme = value;
-                ConfigUtility.Set(nameof(Theme), value);
+                SetAsync(nameof(Theme), value);
             }
         }
 
@@ -271,14 +271,14 @@ namespace ClassifyFiles
         private static void Set<T>(ref T? field, T value, string key) where T : struct
         {
             field = value;
-            ConfigUtility.Set(key, value);
+            SetAsync(key, value);
             StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(key));
         }
 
         private static void Set<T>(ref T field, T value, string key) where T : class
         {
             field = value;
-            ConfigUtility.Set(key, value);
+            SetAsync(key, value);
             StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(key));
         }
 

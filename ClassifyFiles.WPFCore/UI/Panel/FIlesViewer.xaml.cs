@@ -26,6 +26,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 using static ClassifyFiles.Util.FileClassUtility;
 using FI = System.IO.FileInfo;
 using ListView = System.Windows.Controls.ListView;
@@ -543,8 +544,8 @@ namespace ClassifyFiles.UI.Panel
             grdAppBar.Children.OfType<AppBarToggleButton>().ForEach(p => p.IsChecked = false);
             (sender as AppBarToggleButton).IsChecked = true;
             CurrentFileView = (FileView)type;
-            await Task.Delay(1);//让UI先响应
-            await RefreshFileViewAsync();
+            await Dispatcher.InvokeAsync(async () => await RefreshFileViewAsync(),
+                  DispatcherPriority.Loaded);
         }
 
         /// <summary>
@@ -1082,7 +1083,6 @@ namespace ClassifyFiles.UI.Panel
             await MainWindow.Current.DoProcessAsync(Do());
             async Task Do()
             {
-                await Task.Delay(1);
                 var files = GetSelectedFiles();
                 CheckBox chk = sender as CheckBox;
                 Class tag = chk.Tag as Class;

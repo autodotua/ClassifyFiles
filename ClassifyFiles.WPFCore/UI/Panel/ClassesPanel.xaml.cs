@@ -28,13 +28,14 @@ namespace ClassifyFiles.UI.Panel
 
         private bool isLoading = false;
 
-        public async Task LoadAsync(Project project)
+        public async Task LoadAsync(Project project, IEnumerable<Class> classes = null)
         {
             isLoading = true;
             Project = project;
-            List<Class> classes = null;
-            await Task.Run(() => classes = GetClasses(Project));
-
+            if (classes == null)
+            {
+                await Task.Run(() => classes = GetClasses(Project));
+            }
             UIClasses = new ObservableCollection<UIClass>(classes.Select(p => new UIClass(p)));
             SelectedUIClass = null;
             //不知道为什么，设置了UIClasses以后，会自动设置SelectedUIClass

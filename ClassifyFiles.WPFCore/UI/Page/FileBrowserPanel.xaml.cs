@@ -49,10 +49,12 @@ namespace ClassifyFiles.UI.Page
                 filesViewer.Project = project;
                 await filesViewer.SetFilesAsync(null, null, FileCollectionType.None);
             }
+            List<Class> classes = null;
             await Task.Run(() =>
             {
                 HashSet<string> formats = new HashSet<string>();
-                foreach (var item in ClassUtility.GetClasses(project))
+                classes = ClassUtility.GetClasses(project);
+                foreach (var item in classes)
                 {
                     formats.Add(item.DisplayNameFormat);
                     formats.Add(item.DisplayProperty1);
@@ -62,7 +64,7 @@ namespace ClassifyFiles.UI.Page
                 var csFormats = formats.Where(p => p != null && p.StartsWith("cs:"));
                 DisplayFormatConverter.InitializeCsMethods(csFormats);
             });
-            await classPanel.LoadAsync(project);
+            await classPanel.LoadAsync(project, classes);
             UpdateAppBarButtonsEnable();
         }
 
@@ -166,7 +168,6 @@ namespace ClassifyFiles.UI.Page
                 Debug.WriteLine("Set Files, Project Hashcode is " + Project.GetHashCode()
             + ", Class is " + (classPanel.SelectedUIClass == null ? "null" : classPanel.SelectedUIClass.Class.Name));
                 IEnumerable<UIFile> uiFiles = null;
-                await Task.Delay(1);
                 Class c = classPanel.SelectedUIClass?.Class;
                 await Task.Run(() =>
                 {
@@ -551,11 +552,11 @@ namespace ClassifyFiles.UI.Page
             string dir = e.AddedItems.Count == 0 ? null : e.AddedItems.Cast<string>().First();
             if (dir != null)
             {
-                await filesViewer.SelectFileByDirAsync(dir);
-                //延时1/4秒，让用户能够看到被选中的状态
-                await Task.Delay(250);
+                //延时，让用户能够看到被选中的状态
+                await Task.Delay(100);
                 flyoutJumpToDir.Hide();// = false;
                 (sender as ListBox).SelectedItem = null;
+                await filesViewer.SelectFileByDirAsync(dir);
             }
         }
 

@@ -159,10 +159,10 @@ namespace ClassifyFiles.UI
                 var windows = App.Current.Windows.Cast<Window>()
                     .Where(p => p != this && !(p is MainWindow));
                 windows.ForEach(p => p.Close());
-                while (FileIcon.Tasks.IsExcuting)
+                if (FileIcon.Tasks.IsExcuting)
                 {
                     //等待任务结束
-                    await Task.Delay(1);
+                    await FileIcon.Tasks.StopAsync();
                 }
                 await Task.Run(() =>
                 {
@@ -170,17 +170,9 @@ namespace ClassifyFiles.UI
                 });
                 await DbUtility.ReplaceDbContextAsync();
                 App.Current.MainWindow = new MainWindow();
-                bool canReturn = false;
-                App.Current.MainWindow.ContentRendered += (p1, p2) =>
-                {
-                    BringToFront();
-                    canReturn = true;
-                };
                 App.Current.MainWindow.Show();
-                while (!canReturn)
-                {
-                    await Task.Delay(20);
-                }
+                Owner = App.Current.MainWindow;
+                BringToFront();
             }
             return result;
         }

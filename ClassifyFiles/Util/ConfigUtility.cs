@@ -1,93 +1,78 @@
 ﻿using ClassifyFiles.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using static ClassifyFiles.Util.DbUtility;
 
 namespace ClassifyFiles.Util
 {
     public static class ConfigUtility
     {
-        private static Timer timer = new Timer(new TimerCallback(TimerCallback), null, 0, 10000);
-        private static bool needToSave = false;
-        private static AppDbContext db = GetNewDb();
-        private static System.Collections.Generic.List<Config> configs = db.Configs.ToList();
-
-        private static void TimerCallback(object obj)
+        static ConfigUtility()
         {
-            if (needToSave)
-            {
-                needToSave = false;
-                try
-                {
-                    lock (db)
-                    {
-                        db.SaveChanges();
-                    }
-                }
-                catch
-                {
-                    Debug.Assert(false);
-                }
-            }
+            using AppDbContext db = GetNewDb();
+            configs = db.Configs.ToDictionary(p => p.Key, p => p.Value);
         }
+
+        private static Dictionary<string, string> configs = null;
 
         public static int GetInt(string key, int defaultValue)
         {
-            string value = (configs.FirstOrDefault(p => p.Key == key))?.Value;
-            return value == null ? defaultValue : int.Parse(value);
+            bool hasValue = configs.TryGetValue(key, out string value);
+            return hasValue ? int.Parse(value) : defaultValue;
         }
 
         public static long GetLong(string key, long defaultValue)
         {
-            string value = (configs.FirstOrDefault(p => p.Key == key))?.Value;
-            return value == null ? defaultValue : long.Parse(value);
+            bool hasValue = configs.TryGetValue(key, out string value);
+            return hasValue ? long.Parse(value) : defaultValue;
         }
 
         public static double GetDouble(string key, double defaultValue)
         {
-            string value = (configs.FirstOrDefault(p => p.Key == key))?.Value;
-            return value == null ? defaultValue : double.Parse(value);
+            bool hasValue = configs.TryGetValue(key, out string value);
+            return hasValue ? double.Parse(value) : defaultValue;
         }
 
         public static bool GetBool(string key, bool defaultValue)
         {
-            string value = (configs.FirstOrDefault(p => p.Key == key))?.Value;
-            return value == null ? defaultValue : bool.Parse(value);
+            bool hasValue = configs.TryGetValue(key, out string value);
+            return hasValue ? bool.Parse(value) : defaultValue;
         }
 
         public static string GetString(string key, string defaultValue)
         {
-            string value = (configs.FirstOrDefault(p => p.Key == key))?.Value;
-            return value ?? defaultValue;
+            bool hasValue = configs.TryGetValue(key, out string value);
+            return hasValue ? value : defaultValue;
         }
 
-        public static void Set(string key, object value)
+        public static Task SetAsync(string key, object value)
         {
-            Config config = configs.FirstOrDefault(p => p.Key == key);
-            if (config != null)
+            return Task.Run(() =>
             {
-                if (config.ToString() == value.ToString())
+                using var db = GetNewDb();
+                Config config = db.Configs.FirstOrDefault(p => p.Key == key);
+                if (config != null)
                 {
-                    return;
-                }
-                config.Value = value.ToString();
-                lock (db)
-                {
+                    if (config.ToString() == value.ToString())
+                    {
+                        return;
+                    }
+                    config.Value = value.ToString();
+
                     db.Entry(config).State = EntityState.Modified;
                 }
-            }
-            else
-            {
-                config = new Config(key, value.ToString());
-                configs.Add(config);
-                lock (db)
+                else
                 {
+                    config = new Config(key, value.ToString());
+                    configs.Add(key, value.ToString());
                     var result = db.Configs.Add(config);
                 }
-            }
-            needToSave = true;
+                db.SaveChanges();
+            });
         }
     }
 }

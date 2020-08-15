@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 using static ClassifyFiles.Util.DbUtility;
 using static ClassifyFiles.Util.ProjectUtility;
 
@@ -152,7 +153,6 @@ namespace ClassifyFiles.UI
                         projects.Add(newProject);
                     }
                 });
-                await Task.Delay(1000);
                 Projects = new ObservableCollection<Project>(projects);
                 SelectedProject = Projects[0];
             }
@@ -175,9 +175,9 @@ namespace ClassifyFiles.UI
                 //但是如果直接来，那么画面会先黑一下，效果不好
                 //所以先给页面截一张图，放到空白的Page上，然后再进行设置和动画
                 frame.Content = emptyPage;
-                await Task.Delay(100);
             }
-            frame.Navigate(view);
+            await Dispatcher.InvokeAsync(() =>
+             frame.Navigate(view), DispatcherPriority.Loaded);
         }
 
         private async Task LoadPanelAsync()
@@ -355,7 +355,15 @@ namespace ClassifyFiles.UI
                 {
                     SettingWindow win = new SettingWindow(Projects) { Owner = this };
                     win.Show();
-                    await Task.Delay(500);
+                }
+                else
+                {
+                    SettingWindow.Current.BringToFront();
+                }
+
+                //由于程序的设置是单独的窗体而不是Page，所以要把选择项给还原
+                await Dispatcher.InvokeAsync(() =>
+                {
                     ignoreNavViewSelectionChanged = true;
                     if (mainPage is FileBrowserPanel)
                     {
@@ -371,12 +379,7 @@ namespace ClassifyFiles.UI
                     }
 
                     ignoreNavViewSelectionChanged = false;
-                    //win.BringToFront();
-                }
-                else
-                {
-                    SettingWindow.Current.BringToFront();
-                }
+                }, DispatcherPriority.Loaded);
             }
             await DoProcessAsync(Do());
             async Task Do()

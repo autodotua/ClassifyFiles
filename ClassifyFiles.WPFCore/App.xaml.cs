@@ -31,8 +31,10 @@ namespace ClassifyFiles
                }), this, 0, 1000);
             }
 
+#if !DEBUG
             FzLib.Program.Runtime.UnhandledException.RegistAll();
             FzLib.Program.Runtime.UnhandledException.UnhandledExceptionCatched += UnhandledException_UnhandledExceptionCatched;
+#endif
             InitializeTheme();
             Current = this;
             SplashWindow.TryShow();

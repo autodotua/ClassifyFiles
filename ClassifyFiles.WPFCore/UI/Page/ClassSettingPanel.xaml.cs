@@ -140,10 +140,12 @@ namespace ClassifyFiles.UI.Page
         {
             if (needToSelectedClass != null && classes.UIClasses.Contains(needToSelectedClass))
             {
-                UIClass c = needToSelectedClass;
-                needToSelectedClass = null;
-                await Task.Delay(1);
-                classes.SelectedUIClass = c;
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    UIClass c = needToSelectedClass;
+                    needToSelectedClass = null;
+                    classes.SelectedUIClass = c;
+                }, System.Windows.Threading.DispatcherPriority.Loaded);
                 return;
             }
             Class old = e.OldValue;

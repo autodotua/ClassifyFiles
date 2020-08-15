@@ -39,7 +39,7 @@ namespace ClassifyFiles.UI.Component
             }
             else
             {
-                DefaultDispatcherPriority = DispatcherPriority.Normal;
+                DefaultDispatcherPriority = DispatcherPriority.Render;
             }
         }
 

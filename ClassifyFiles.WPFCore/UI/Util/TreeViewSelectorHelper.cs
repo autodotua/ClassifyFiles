@@ -99,13 +99,22 @@ namespace ClassifyFiles.UI.Util
             }
         }
 
-        public async Task SelectItemWhileLoadedAsync(TModel node, IList<TModel> rootNodes)
+        public Task SelectItemWhileLoadedAsync(TModel node, IList<TModel> rootNodes)
         {
-            while (!TreeView.IsLoaded)
+            if (!TreeView.IsLoaded)
             {
-                await Task.Delay(1);
+                TaskCompletionSource<int> tcs = new TaskCompletionSource<int>();
+                TreeView.Loaded += async (p1, p2) =>
+                 {
+                     await SelectItemAsync(node, rootNodes);
+                     tcs.SetResult(0);
+                 };
+                return tcs.Task;
             }
-            await SelectItemAsync(node, rootNodes);
+            else
+            {
+                return SelectItemAsync(node, rootNodes);
+            }
         }
 
         public async Task<bool> ClearSelectionAsync(IList<TModel> rootNodes)
@@ -166,11 +175,31 @@ namespace ClassifyFiles.UI.Util
                 node = nodes.Pop();
                 treeViewItem.BringIntoView();
                 (treeViewItem as TreeViewItem).IsExpanded = true;
-                while (treeViewItem.ItemContainerGenerator.Status != GeneratorStatus.ContainersGenerated)
-                {
-                    await Task.Delay(1);
-                }
+                await WaitForContainersGenerated(treeViewItem.ItemContainerGenerator);
             }
+        }
+
+        private Task WaitForContainersGenerated(ItemContainerGenerator generator)
+        {
+            TaskCompletionSource<int> tcs = new TaskCompletionSource<int>();
+            if (generator.Status == GeneratorStatus.ContainersGenerated)
+            {
+                tcs.SetResult(0);
+            }
+            else
+            {
+                void callback(object p1, EventArgs p2)
+                {
+                    if (generator.Status == GeneratorStatus.ContainersGenerated)
+                    {
+                        generator.StatusChanged -= callback;
+                        tcs.TrySetResult(0);
+                    }
+                }
+
+                generator.StatusChanged += callback;
+            }
+            return tcs.Task;
         }
 
         public async Task RemoveItemAsync(TModel node, IList<TModel> rootNodes)

@@ -4,6 +4,7 @@ using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace ClassifyFiles.UI
 {
@@ -44,9 +45,11 @@ namespace ClassifyFiles.UI
 
             Activate();
             Topmost = true;  // important
-            await Task.Delay(200);
-            Topmost = false; // important
-            Focus();
+            Dispatcher.InvokeAsync(() =>
+            {
+                Topmost = false; // important
+                Focus();
+            }, DispatcherPriority.Loaded);
         }
     }
 }

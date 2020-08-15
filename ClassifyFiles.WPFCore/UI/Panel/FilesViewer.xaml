@@ -203,7 +203,7 @@
                 ToolTip="{StaticResource toolTip}"
                 ToolTipService.InitialShowDelay="{DynamicResource ToolTipInitialShowDelay}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}" />
+                    <ColumnDefinition Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}" />
                     <ColumnDefinition Width="8" />
                     <ColumnDefinition Width="144" />
                 </Grid.ColumnDefinitions>
@@ -236,8 +236,8 @@
 
                 <component:FileIcon
                     Grid.Row="0" Grid.RowSpan="5"
-                    Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
-                    Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource two}}"
+                    Width="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}"
+                    Height="{Binding Path=(root:Configs.IconSize), Converter={StaticResource mc}, ConverterParameter={StaticResource twoFive}}"
                     VerticalAlignment="Center"
                     File="{Binding Path=.}" />
             </Grid>
