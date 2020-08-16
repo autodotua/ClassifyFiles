@@ -15,6 +15,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using static ClassifyFiles.Util.FileUtility;
@@ -211,14 +212,14 @@ namespace ClassifyFiles.UI.Converter
 
         public static void InitializeCsMethods(IEnumerable<string> formats)
         {
-            foreach (var format in formats)
-            {
-                string f = format.Substring(3).Trim();
-                if (!f.EndsWith(";"))
-                {
-                    f += ";";
-                }
-                var csMethod = CSScript.Evaluator.CreateDelegate($@"
+            Parallel.ForEach(formats, format =>
+           {
+               string f = format.Substring(3).Trim();
+               if (!f.EndsWith(";"))
+               {
+                   f += ";";
+               }
+               var csMethod = CSScript.Evaluator.CreateDelegate($@"
 string GetValue(System.IO.FileInfo file, System.Collections.Generic.Dictionary<object,string> exifs){{
       var Name =System.IO.Path.GetFileNameWithoutExtension(file.Name);
             var Extension=file.Extension.Replace(""."","""");
@@ -229,8 +230,8 @@ var Exif=exifs;
 {f}
         }}
 ");
-                csMthods.TryAdd(format, csMethod);
-            }
+               csMthods.TryAdd(format, csMethod);
+           });
         }
 
         /// <summary>

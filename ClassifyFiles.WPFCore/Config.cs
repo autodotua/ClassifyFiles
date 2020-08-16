@@ -266,6 +266,14 @@ namespace ClassifyFiles
             set => Set(ref clearThumbsAfterExiting, value, nameof(ClearThumbsAfterExiting));
         }
 
+        private static bool? showRing = null;
+
+        public static bool ShowRing
+        {
+            get => Get(ref showRing, GetBool, true, nameof(ShowRing));
+            set => Set(ref showRing, value, nameof(ShowRing));
+        }
+
         public static TimeSpan AnimationDuration { get; } = TimeSpan.FromSeconds(0.2);
 
         private static void Set<T>(ref T? field, T value, string key) where T : struct

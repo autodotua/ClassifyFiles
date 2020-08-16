@@ -6,14 +6,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace ClassifyFiles.UI
+namespace ClassifyFiles.UI.Panel
 {
     /// <summary>
     /// LogsWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class LogsWindow : WindowBase
+    public partial class LogsPanel : UserControlBase
     {
-        public LogsWindow()
+        public LogsPanel()
         {
             DateBegin = DateTime.Today.AddDays(-5);
             DateEnd = DateTime.Today.AddDays(1);

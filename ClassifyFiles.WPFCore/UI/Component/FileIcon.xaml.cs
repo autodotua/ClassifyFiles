@@ -134,17 +134,7 @@ namespace ClassifyFiles.UI.Component
              };
             await Dispatcher.InvokeAsync(() =>
              {
-                 if (Configs.AutoThumbnails && !File.File.HasIconInCurrentSettings())
-                 {
-                     Tasks.Enqueue(() => RealtimeUpdate.UpdateFileIcon(NonDPFile));
-                 }
-                 if (File.Class != null && (!string.IsNullOrEmpty(File.Class.DisplayNameFormat)
-              || !string.IsNullOrEmpty(File.Class.DisplayProperty1)
-              || !string.IsNullOrEmpty(File.Class.DisplayProperty2)
-              || !string.IsNullOrEmpty(File.Class.DisplayProperty3)))
-                 {
-                     Tasks.Enqueue(() => RealtimeUpdate.UpdateDisplay(NonDPFile));
-                 }
+                 RealtimeUpdate.AddTask(NonDPFile);
              }, DispatcherPriority.Background);
         }
 
@@ -229,6 +219,5 @@ namespace ClassifyFiles.UI.Component
             return image;
         }
 
-        public static TaskQueue Tasks { get; private set; } = new TaskQueue();
     }
 }

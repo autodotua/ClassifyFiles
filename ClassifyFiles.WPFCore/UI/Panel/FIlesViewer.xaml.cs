@@ -63,7 +63,7 @@ namespace ClassifyFiles.UI.Panel
                 ViewTypeButton_Click(btn, new RoutedEventArgs());
             }
 
-            FileIcon.Tasks.ProcessStatusChanged += TaskQueue_ProcessStatusChanged;
+            RealtimeUpdate.Tasks.ProcessStatusChanged += TaskQueue_ProcessStatusChanged;
             UpdateVirtualizationCacheLength();
             Configs.StaticPropertyChanged += (p1, p2) =>
             {
@@ -712,8 +712,12 @@ namespace ClassifyFiles.UI.Panel
         /// <param name="e"></param>
         private void ListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) && CurrentFileView != FileView.Detail)
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) )
             {
+                if (CurrentFileView == FileView.Detail || CurrentFileView==FileView.Tree && Configs.TreeSimpleTemplate)
+                {
+                    return;
+                }
                 //基本思路是：
                 //首先根据鼠标位置设置变换起点
                 //然后开始缩放动画

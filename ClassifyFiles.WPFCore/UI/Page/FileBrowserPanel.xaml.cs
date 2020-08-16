@@ -141,7 +141,7 @@ namespace ClassifyFiles.UI.Page
                     {
                         await file.LoadClassesAsync(null);
                     }
-                    await classPanel.UpdateUIClassesAsync();
+                    await classPanel.UpdateUIClassesAsync(e.Class);
                 }
             }
         }
@@ -193,8 +193,6 @@ namespace ClassifyFiles.UI.Page
                     result = true;
                 });
                 await filesViewer.SetFilesAsync(uiFiles, c, type);
-
-                await classPanel.UpdateUIClassesAsync();
                 await ApplyDirs();
             }
             return result;
@@ -622,7 +620,7 @@ namespace ClassifyFiles.UI.Page
             {
                 await filesViewer.AddFilesAsync(dialog.AddedFiles);
             }
-            await classPanel.UpdateUIClassesAsync();
+            await classPanel.UpdateUIClassesAsync(c);
         }
 
         /// <summary>

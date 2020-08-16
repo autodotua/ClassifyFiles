@@ -1,6 +1,7 @@
 ﻿using ClassifyFiles.Data;
 using ClassifyFiles.UI.Component;
 using ClassifyFiles.UI.Page;
+using ClassifyFiles.UI.Util;
 using ClassifyFiles.Util;
 using FzLib.Extension;
 using ModernWpf;
@@ -255,7 +256,7 @@ namespace ClassifyFiles.UI
             {
                 await SaveChangesAsync();
             }
-            await FileIcon.Tasks.StopAsync();
+            await RealtimeUpdate.Tasks.StopAsync();
             if (shutDownApp)
             {
                 mainPage = null;

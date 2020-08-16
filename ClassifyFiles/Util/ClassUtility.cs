@@ -26,11 +26,15 @@ namespace ClassifyFiles.Util
 
         public static int GetFilesCountOfClass(Class c)
         {
-            using var db = GetNewDb();
-            return db.FileClasses
+            Debug.WriteLine("db begin: " + nameof(GetFilesCountOfClass));
+
+            //using var db = GetNewDb();
+            int result = db.FileClasses
                 .Where(p => p.Class == c)
                 .Where(p => p.Status != FileClassStatus.Disabled)
                 .Count();
+            Debug.WriteLine("db end: " + nameof(GetFilesCountOfClass));
+            return result;
         }
 
         public static Class AddClass(Project project)

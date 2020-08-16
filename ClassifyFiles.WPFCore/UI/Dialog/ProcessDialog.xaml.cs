@@ -1,5 +1,6 @@
 ﻿using FzLib.Extension;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Animation;
 
@@ -17,13 +18,11 @@ namespace ClassifyFiles.UI
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            if (!canClose)
+            if (Showing)
             {
                 e.Cancel = true;
             }
         }
-
-        private bool canClose = true;
 
         private string message;
 
@@ -37,26 +36,30 @@ namespace ClassifyFiles.UI
             }
         }
 
-        public bool Showing { get; private set; }
+        public bool Showing => showCount > 0;
 
         private int showCount = 0;
 
         public void Show()
         {
-            showCount++;
-            if (Showing)
+            if (showCount++>0)
             {
                 return;
             }
-            Showing = true;
-            canClose = false;
-            Message = "";
-            grdOverlay.Opacity = 0.75;
-            ring.IsActive = true;
-            Opacity = 0;
+            System.Diagnostics.Debug.WriteLine(showCount);
+            Message = "正在处理";
             Visibility = Visibility.Visible;
-            DoubleAnimation ani = new DoubleAnimation(1, Configs.AnimationDuration);
-            BeginAnimation(OpacityProperty, ani);
+            if (Configs.ShowRing)
+            {
+                ring.IsActive = true;
+                DoubleAnimation ani = new DoubleAnimation(1, Configs.AnimationDuration);
+                Dispatcher.Invoke(() =>
+                BeginAnimation(OpacityProperty, ani));
+            }
+            else
+            {
+                Cursor = System.Windows.Input.Cursors.Wait;
+            }
         }
 
         public void Close()
@@ -65,15 +68,19 @@ namespace ClassifyFiles.UI
             {
                 return;
             }
-            canClose = true;
-            ring.IsActive = false;
-            DoubleAnimation ani = new DoubleAnimation(0, Configs.AnimationDuration);
-            ani.Completed += (p1, p2) =>
+            if (Configs.ShowRing)
             {
+                ring.IsActive = false;
+                DoubleAnimation ani = new DoubleAnimation(0, Configs.AnimationDuration);
+                ani.Completed += (p1, p2) =>
+                    Visibility = Visibility.Collapsed;
+                BeginAnimation(OpacityProperty, ani);
+            }
+            else
+            {
+                Cursor = System.Windows.Input.Cursors.Arrow;
                 Visibility = Visibility.Collapsed;
-                Showing = false;
-            };
-            BeginAnimation(OpacityProperty, ani);
+            }
         }
 
         private void UserControlBase_Loaded(object sender, RoutedEventArgs e)

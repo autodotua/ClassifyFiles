@@ -40,12 +40,12 @@ namespace ClassifyFiles.UI
 
             if (!FileUtility.CanWriteInCurrentDirectory())
             {
-                swtDbInAppDataFolder.IsOn = true;
+                swtDbInAppDataFolder.IsChecked = true;
                 swtDbInAppDataFolder.IsEnabled = false;
             }
             else if (F.Exists(DbUtility.DbInAppDataFolderMarkerFileName))
             {
-                swtDbInAppDataFolder.IsOn = true;
+                swtDbInAppDataFolder.IsChecked = true;
             }
             Projects = projects;
             RefreshCacheText();
@@ -54,6 +54,7 @@ namespace ClassifyFiles.UI
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             Current = null;
+            MainWindow.Current.BringToFront();
         }
 
         private void ThemeButton_Click(object sender, RoutedEventArgs e)
@@ -128,10 +129,6 @@ namespace ClassifyFiles.UI
             }
         }
 
-        private void OpenLogButton_Click(object sender, RoutedEventArgs e)
-        {
-            new LogsWindow().Show();
-        }
 
         private void ResetAutoAddFilesButton_Click(object sender, RoutedEventArgs e)
         {
@@ -159,10 +156,10 @@ namespace ClassifyFiles.UI
                 var windows = App.Current.Windows.Cast<Window>()
                     .Where(p => p != this && !(p is MainWindow));
                 windows.ForEach(p => p.Close());
-                if (FileIcon.Tasks.IsExcuting)
+                if (RealtimeUpdate.Tasks.IsExcuting)
                 {
                     //等待任务结束
-                    await FileIcon.Tasks.StopAsync();
+                    await RealtimeUpdate.Tasks.StopAsync();
                 }
                 await Task.Run(() =>
                 {
@@ -179,7 +176,7 @@ namespace ClassifyFiles.UI
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            SmoothScrollViewerHelper.Regist(scr);
+            //SmoothScrollViewerHelper.Regist(scr);
         }
 
         private async void ChangeThumbnailPositionButton_Click(object sender, RoutedEventArgs e)
@@ -263,13 +260,24 @@ namespace ClassifyFiles.UI
             }
 
             string path = DbUtility.DbInAppDataFolderMarkerFileName;
-            if (F.Exists(path) && !swtDbInAppDataFolder.IsOn)
+            if (F.Exists(path) && !swtDbInAppDataFolder.IsChecked.Value)
             {
                 F.Delete(path);
             }
-            else if (!F.Exists(path) && swtDbInAppDataFolder.IsOn)
+            else if (!F.Exists(path) && swtDbInAppDataFolder.IsChecked.Value)
             {
                 F.Create(path);
+            }
+        }
+
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            await DoProcessAsync(Do());
+
+            async static Task Do()
+            {
+                await RealtimeUpdate.Tasks.StopAsync();
+                RealtimeUpdate.Tasks.Start();
             }
         }
     }

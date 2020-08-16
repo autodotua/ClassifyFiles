@@ -39,10 +39,7 @@ namespace ClassifyFiles.UI.Panel
             UIClasses = new ObservableCollection<UIClass>(classes.Select(p => new UIClass(p)));
             SelectedUIClass = null;
             //不知道为什么，设置了UIClasses以后，会自动设置SelectedUIClass
-            foreach (var c in UIClasses)
-            {
-                await c.UpdatePropertiesAsync();
-            }
+            await UpdateUIClassesAsync();
             isLoading = false;
             if (UIClasses.Any(p => p.Class.ID == Configs.LastClassID))
             {
@@ -101,12 +98,20 @@ namespace ClassifyFiles.UI.Panel
 
         public bool CanReorder { get; set; } = false;
 
-        public async Task UpdateUIClassesAsync()
+        public Task UpdateUIClassesAsync(Class c = null)
         {
-            foreach (var c in UIClasses)
+            if (c != null)
             {
-                await c.UpdatePropertiesAsync();
+                return Task.Run(() => UIClasses.FirstOrDefault(p => p.Class == c)?.UpdateProperties());
             }
+
+            return Task.Run(() =>
+            {
+                foreach (var c in UIClasses)
+                {
+                    c.UpdateProperties();
+                }
+            });
         }
 
         public Project Project { get; protected set; }

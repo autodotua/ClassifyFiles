@@ -13,12 +13,12 @@ namespace ClassifyFiles.UI.Model
             Class = c;
         }
 
-        public async Task UpdatePropertiesAsync()
+        public void UpdateProperties()
         {
-            int count = 0;
-            await Task.Run(() => count = GetFilesCountOfClass(Class));
+            int count = GetFilesCountOfClass(Class);
             FileCount = count;
             MatchConditionsCount = Class.MatchConditions.Count;
+
         }
 
         public Class Class { get; private set; }

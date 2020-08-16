@@ -11,6 +11,23 @@ namespace ClassifyFiles.UI.Util
     /// </summary>
     public static class RealtimeUpdate
     {
+        public static void AddTask(UIFile file)
+        {
+            if (Configs.AutoThumbnails && !file.File.HasIconInCurrentSettings())
+            {
+                Tasks.Enqueue(() => UpdateFileIcon(file));
+            }
+            if (file.Class != null && (!string.IsNullOrEmpty(file.Class.DisplayNameFormat)
+         || !string.IsNullOrEmpty(file.Class.DisplayProperty1)
+         || !string.IsNullOrEmpty(file.Class.DisplayProperty2)
+         || !string.IsNullOrEmpty(file.Class.DisplayProperty3)))
+            {
+                 Tasks.Enqueue(() => UpdateDisplay(file));
+            }
+        }
+        public static TaskQueue Tasks { get; private set; } = new TaskQueue();
+
+
         private static ConcurrentDictionary<int, UIFile> generatedThumbnails = new ConcurrentDictionary<int, UIFile>();
         private static ConcurrentDictionary<int, UIFile> generatedIcons = new ConcurrentDictionary<int, UIFile>();
         private static ConcurrentDictionary<int, UIFile> generatedWin10Icons = new ConcurrentDictionary<int, UIFile>();
@@ -21,7 +38,7 @@ namespace ClassifyFiles.UI.Util
             generatedIcons.Clear();
         }
 
-        public static void UpdateFileIcon(UIFile file)
+        private static void UpdateFileIcon(UIFile file)
         {
             if (!Configs.AutoThumbnails)
             {
@@ -74,7 +91,7 @@ namespace ClassifyFiles.UI.Util
             }
         }
 
-        public static void UpdateDisplay(UIFile file)
+        private static void UpdateDisplay(UIFile file)
         {
             if (file.Class != null)
             {

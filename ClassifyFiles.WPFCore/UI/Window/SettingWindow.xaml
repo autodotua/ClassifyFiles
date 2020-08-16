@@ -2,322 +2,336 @@
     x:Class="ClassifyFiles.UI.SettingWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:component="clr-namespace:ClassifyFiles.UI.Component"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:ClassifyFiles.UI"
     xmlns:m="http://schemas.modernwpf.com/2019"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
     xmlns:root="clr-namespace:ClassifyFiles"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:sys2="clr-namespace:System;assembly=System.Runtime.Extensions"
-    Title="设置" Width="800"
-    Height="450" Closing="Window_Closing"
+    Title="设置" Width="600"
+    Height="400"
+    m:TitleBar.ExtendViewIntoTitleBar="True"
+    Closing="Window_Closing"
+
     Loaded="Window_Loaded"
+    ResizeMode="NoResize" WindowStyle="ToolWindow"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
-    <Grid Margin="4">
+    <local:WindowBase.Resources />
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="8" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <ScrollViewer
-            x:Name="scr"
-            HorizontalScrollBarVisibility="Disabled"
-            VerticalScrollBarVisibility="Auto">
-            <m:SimpleStackPanel
-                Margin="12" Orientation="Vertical"
-                Spacing="12">
-                <GroupBox Header="主题">
-                    <m:SimpleStackPanel
-                        x:Name="stkTheme"
-                        Orientation="Horizontal" Spacing="12">
-                        <RadioButton
-                            x:Name="rbtnThemeAuto"
-                            Click="ThemeButton_Click" Content="自动"
-                            ToolTip="该设置由Windows10的个性化-颜色所提供" />
-                        <RadioButton
-                            x:Name="rbtnThemeLight"
-                            Click="ThemeButton_Click" Content="亮色" />
-                        <RadioButton
-                            x:Name="rbtnThemeDark"
-                            Click="ThemeButton_Click" Content="暗色" />
-                    </m:SimpleStackPanel>
-                </GroupBox>
-
-                <GroupBox Header="显示">
-                    <m:SimpleStackPanel Spacing="12">
-                        <CheckBox Content="平滑滚动" IsChecked="{Binding Path=(root:Configs.SmoothScroll)}">
-                            <CheckBox.ToolTip>
-                                <StackPanel Orientation="Vertical">
-                                    <TextBlock
-                                        Width="240" Margin="0,0,0,8"
-                                        TextWrapping="Wrap">
-                                        开启后将会启动像素级滚动。若设备性能较差，开启该选项可能反而会降低使用体验。
-                                    </TextBlock>
-                                    <TextBlock
-                                        Width="240" Margin="0,8,0,0"
-                                        TextWrapping="Wrap">
-                                        该设置仅针对于文件查看面板，其他区域会保持启用。
-                                    </TextBlock>
-                                </StackPanel>
-                            </CheckBox.ToolTip>
-                        </CheckBox>
-
-                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
-                            <TextBlock VerticalAlignment="Center">主界面侧边栏最小化</TextBlock>
-                            <m:ToggleSwitch VerticalAlignment="Center" IsOn="{Binding Path=(root:Configs.PaneDisplayLeftMinimal)}" />
-                        </m:SimpleStackPanel>
-
-                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
-                            <TextBlock VerticalAlignment="Center">显示优先级：</TextBlock>
-                            <m:ToggleSwitch
-                                VerticalAlignment="Center"
-                                IsOn="{Binding Path=(root:Configs.FluencyFirst)}"
-                                OffContent="内容完整性优先" OnContent="流畅度优先" />
-                            <m:SimpleStackPanel.ToolTip>
-                                <TextBlock Width="240">
-                                    在流畅度优先模式下，程序将会尽可能保证更高的帧率。相应地，内容的显示可能会滞后。
-                                </TextBlock>
-                            </m:SimpleStackPanel.ToolTip>
-                        </m:SimpleStackPanel>
-                    </m:SimpleStackPanel>
-                </GroupBox>
-
-                <GroupBox Header="数据库与缓存">
-                    <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
-                        <CheckBox Content="在浏览时尝试为没有缩略图的对象生成缩略图" IsChecked="{Binding Path=(root:Configs.AutoThumbnails)}">
-                            <CheckBox.ToolTip>
-                                <ToolTip>
-                                    <StackPanel>
-                                        <TextBlock Width="288" TextWrapping="Wrap">开启该选项后，在浏览时，若文件没有缩略图，则会自动生成缩略图。</TextBlock>
-                                        <TextBlock Width="288" TextWrapping="Wrap">这能够提升部分体验，但是会降低一些运行速度，增加卡顿。</TextBlock>
-                                    </StackPanel>
-                                </ToolTip>
-                            </CheckBox.ToolTip>
-                        </CheckBox>
+        <TabControl
+            x:Name="scr" Padding="8,32,8,8"
+            TabStripPlacement="Left">
+            <TabControl.Resources>
+                <Style BasedOn="{StaticResource DefaultTabItemStyle}" TargetType="{x:Type TabItem}">
+                    <Setter Property="VerticalAlignment" Value="Top" />
+                </Style>
+            </TabControl.Resources>
+            <m:TabControlHelper.TabStripHeader>
+                <m:SimpleStackPanel
+                    Margin="0,4,0,0"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal" Spacing="8">
+                    <component:AppIcon Width="24" VerticalAlignment="Center" />
+                    <TextBlock
+                        Margin="0,-4,8,0"
+                        VerticalAlignment="Center" Text="设置"
+                        TextAlignment="Center" />
+                </m:SimpleStackPanel>
+            </m:TabControlHelper.TabStripHeader>
+            <TabItem Header="用户界面">
+                <m:SimpleStackPanel Spacing="12">
+                    <GroupBox Header="主题">
                         <m:SimpleStackPanel
-                            Background="Transparent"
-                            Orientation="Horizontal" Spacing="6">
-                            <m:SimpleStackPanel.ToolTip>
-                                <ToolTip>
-                                    <StackPanel>
-                                        <TextBlock Width="288" TextWrapping="Wrap">同时获取缩略图的线程数。当该值较小时，获取缩略图的速度会比较慢。若该值过大，则界面将会卡顿严重。</TextBlock>
-                                        <TextBlock Width="288" TextWrapping="Wrap">最大线程数不宜超过CPU的核心（线程）数。</TextBlock>
-                                    </StackPanel>
-                                </ToolTip>
-                            </m:SimpleStackPanel.ToolTip>
-                            <TextBlock VerticalAlignment="Center">最大并行线程：</TextBlock>
-                            <m:NumberBox
-                                Width="128" VerticalAlignment="Center"
-                                Maximum="24" Minimum="1"
-                                Value="{Binding Path=(root:Configs.RefreshThreadCount)}" />
-                            <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource SystemControlBackgroundBaseMediumBrush}">
-                                <Run>CPU核心数：</Run>
-                                <Run Text="{Binding Path=(sys2:Environment.ProcessorCount), Mode=OneWay}" />
-                            </TextBlock>
-                        </m:SimpleStackPanel>
-                        <m:SimpleStackPanel
-                            x:Name="stkThumbPath"
-                            VerticalAlignment="Center"
-                            Background="Transparent"
-                            Orientation="Horizontal" Spacing="12"
-                            ToolTip="当程序所在目录可写入时，默认位置为程序目录；否则， 默认目录为Windows应用数据目录">
-                            <TextBlock VerticalAlignment="Center">当前缓存位置：</TextBlock>
-                            <TextBlock x:Name="tbkCachePath" VerticalAlignment="Center" />
-                            <Button Click="ChangeThumbnailPositionButton_Click">
-                                <TextBlock>
-                                    <Run Text="切换到" />
-                                    <Run x:Name="runCachePathTo" />
-                                </TextBlock>
-                            </Button>
-                            <Button Click="Button_Click">打开</Button>
-                        </m:SimpleStackPanel>
-                        <m:SimpleStackPanel
-                            VerticalAlignment="Center"
-                            Background="Transparent"
+                            x:Name="stkTheme"
                             Orientation="Horizontal" Spacing="12">
-                            <TextBlock VerticalAlignment="Center">在程序退出时删除所有缩略图：</TextBlock>
-                            <m:ToggleSwitch IsOn="{Binding Path=(root:Configs.ClearThumbsAfterExiting)}" />
+                            <RadioButton
+                                x:Name="rbtnThemeAuto"
+                                Click="ThemeButton_Click" Content="自动"
+                                ToolTip="该设置由Windows10的个性化-颜色所提供" />
+                            <RadioButton
+                                x:Name="rbtnThemeLight"
+                                Click="ThemeButton_Click" Content="亮色" />
+                            <RadioButton
+                                x:Name="rbtnThemeDark"
+                                Click="ThemeButton_Click" Content="暗色" />
                         </m:SimpleStackPanel>
-                        <Button Click="DeleteThumbnailButton_Click">删除所有缩略图</Button>
-                    </m:SimpleStackPanel>
-                </GroupBox>
+                    </GroupBox>
 
-                <GroupBox Header="数据库">
-                    <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
-                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
-                            <m:SimpleStackPanel.ToolTip>
+                    <CheckBox Content="平滑滚动" IsChecked="{Binding Path=(root:Configs.SmoothScroll)}">
+                        <CheckBox.ToolTip>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock
+                                    Width="240" Margin="0,0,0,8"
+                                    TextWrapping="Wrap">
+                                    开启后将会启动像素级滚动。若设备性能较差，开启该选项可能反而会降低使用体验。建议开启此项时，勾选下方的“流畅度优先”选项
+                                </TextBlock>
+                                <TextBlock
+                                    Width="240" Margin="0,8,0,0"
+                                    TextWrapping="Wrap">
+                                    该设置仅针对于文件查看面板，其他区域会保持启用。
+                                </TextBlock>
+                            </StackPanel>
+                        </CheckBox.ToolTip>
+                    </CheckBox>
+                    <CheckBox
+                        VerticalAlignment="Center"
+                        Content="流畅度优先"
+                        IsChecked="{Binding Path=(root:Configs.FluencyFirst)}">
+                        <CheckBox.ToolTip>
+                            <TextBlock Width="240">
+                                在流畅度优先模式下，程序将会尽可能保证更高的帧率。相应地，内容的显示可能会滞后。
+                            </TextBlock>
+                        </CheckBox.ToolTip>
+                    </CheckBox>
+                    <CheckBox
+                        VerticalAlignment="Center"
+                        Content="主界面侧边栏最小化"
+                        IsChecked="{Binding Path=(root:Configs.PaneDisplayLeftMinimal)}" />
+                    <CheckBox
+                        VerticalAlignment="Center"
+                        Content="处理任务时，显示半透明遮罩和进度环"
+                        IsChecked="{Binding Path=(root:Configs.ShowRing)}" />
+                </m:SimpleStackPanel>
+            </TabItem>
+
+            <TabItem Header="数据">
+                <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
+                    <CheckBox
+                        x:Name="swtDbInAppDataFolder"
+                        Click="swtDbInAppDataFolder_Toggled"
+                        Content="将数据存放于系统默认的程序数据目录下">
+                        <CheckBox.ToolTip>
+                            <StackPanel>
+                                <TextBlock Width="200" TextWrapping="Wrap">默认情况下，若程序目录可写，数据库在程序目录下。程序数据目录位于%APPDATA%/ClassifyFiles。</TextBlock>
+                                <TextBlock>该设置重启后生效。</TextBlock>
+                            </StackPanel>
+                        </CheckBox.ToolTip>
+                    </CheckBox>
+                    <CheckBox Content="在浏览时尝试为没有缩略图的对象生成缩略图" IsChecked="{Binding Path=(root:Configs.AutoThumbnails)}">
+                        <CheckBox.ToolTip>
+                            <ToolTip>
                                 <StackPanel>
-                                    <TextBlock Width="200" TextWrapping="Wrap">默认情况下，若程序目录可写，数据库在程序目录下。程序数据目录位于%APPDATA%/ClassifyFiles。</TextBlock>
-                                    <TextBlock>该设置重启后生效。</TextBlock>
+                                    <TextBlock Width="288" TextWrapping="Wrap">开启该选项后，在浏览时，若文件没有缩略图，则会自动生成缩略图。</TextBlock>
+                                    <TextBlock Width="288" TextWrapping="Wrap">这能够提升部分体验，但是会降低一些运行速度，增加卡顿。</TextBlock>
                                 </StackPanel>
-                            </m:SimpleStackPanel.ToolTip>
-                            <TextBlock VerticalAlignment="Center">将数据库存放于系统默认的程序数据目录下</TextBlock>
-                            <m:ToggleSwitch x:Name="swtDbInAppDataFolder" Toggled="swtDbInAppDataFolder_Toggled" />
-                        </m:SimpleStackPanel>
-                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
-                            <Button Background="Red" Foreground="White">
-                                <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
-                                    <m:SymbolIcon VerticalAlignment="Center" Symbol="Delete" />
-                                    <TextBlock VerticalAlignment="Center">删除所有项目</TextBlock>
-                                </m:SimpleStackPanel>
-                                <m:FlyoutService.Flyout>
-                                    <m:Flyout x:Name="flyoutDeleteProjects">
-                                        <m:SimpleStackPanel Spacing="8">
-                                            <TextBlock>即将删除所有项目。这不会删除硬盘中的物理文件。</TextBlock>
-                                            <Button Click="DeleteProjects_Click" Content="确定" />
-                                        </m:SimpleStackPanel>
-                                    </m:Flyout>
-                                </m:FlyoutService.Flyout>
-                            </Button>
-                            <Button Click="ZipDatabaseButton_Click" Content="压缩数据库" />
-                            <Button Click="ImportMenu_Click" Content="导入" />
-                            <Button Click="ExportMenu_Click" Content="导出" />
-                        </m:SimpleStackPanel>
-                    </m:SimpleStackPanel>
-                </GroupBox>
+                            </ToolTip>
+                        </CheckBox.ToolTip>
+                    </CheckBox>
+                    <CheckBox Content="在程序退出时删除所有缩略图" IsChecked="{Binding Path=(root:Configs.ClearThumbsAfterExiting)}" />
 
-                <GroupBox Header="记忆">
+                    <m:SimpleStackPanel
+                        Background="Transparent"
+                        Orientation="Horizontal" Spacing="6">
+                        <m:SimpleStackPanel.ToolTip>
+                            <ToolTip>
+                                <StackPanel>
+                                    <TextBlock Width="288" TextWrapping="Wrap">同时获取缩略图的线程数。当该值较小时，获取缩略图的速度会比较慢。若该值过大，则界面将会卡顿严重。</TextBlock>
+                                    <TextBlock Width="288" TextWrapping="Wrap">最大线程数不宜超过CPU的核心（线程）数。</TextBlock>
+                                </StackPanel>
+                            </ToolTip>
+                        </m:SimpleStackPanel.ToolTip>
+                        <TextBlock VerticalAlignment="Center">最大并行线程：</TextBlock>
+                        <Slider
+                            Width="128" VerticalAlignment="Center"
+                            Maximum="48" Minimum="1" IsSnapToTickEnabled="True"
+                            TickFrequency="1" LargeChange="8" SmallChange="2"
+                           AutoToolTipPlacement="TopLeft" 
+                            Value="{Binding Path=(root:Configs.RefreshThreadCount)}" />
+                        <Button Click="Button_Click_1">立即应用</Button>
+                        <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource SystemControlBackgroundBaseMediumBrush}">
+                            <Run>CPU核心数：</Run>
+                            <Run Text="{Binding Path=(sys2:Environment.ProcessorCount), Mode=OneWay}" />
+                        </TextBlock>
+                    </m:SimpleStackPanel>
+                    <m:SimpleStackPanel
+                        x:Name="stkThumbPath"
+                        VerticalAlignment="Center"
+                        Background="Transparent"
+                        Orientation="Horizontal" Spacing="12"
+                        ToolTip="当程序所在目录可写入时，默认位置为程序目录；否则， 默认目录为Windows应用数据目录">
+                        <TextBlock VerticalAlignment="Center">当前缓存位置：</TextBlock>
+                        <TextBlock x:Name="tbkCachePath" VerticalAlignment="Center" />
+                        <Button Click="ChangeThumbnailPositionButton_Click">
+                            <TextBlock>
+                                <Run Text="切换到" />
+                                <Run x:Name="runCachePathTo" />
+                            </TextBlock>
+                        </Button>
+                    </m:SimpleStackPanel>
+                    <Button Click="Button_Click">打开缓存目录</Button>
+                    <Button Click="DeleteThumbnailButton_Click">删除所有缩略图</Button>
+
+
+                    <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                        <Button Background="Red" Foreground="White">
+                            <m:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                                <m:SymbolIcon VerticalAlignment="Center" Symbol="Delete" />
+                                <TextBlock VerticalAlignment="Center">删除所有项目</TextBlock>
+                            </m:SimpleStackPanel>
+                            <m:FlyoutService.Flyout>
+                                <m:Flyout x:Name="flyoutDeleteProjects">
+                                    <m:SimpleStackPanel Spacing="8">
+                                        <TextBlock>即将删除所有项目。这不会删除硬盘中的物理文件。</TextBlock>
+                                        <Button Click="DeleteProjects_Click" Content="确定" />
+                                    </m:SimpleStackPanel>
+                                </m:Flyout>
+                            </m:FlyoutService.Flyout>
+                        </Button>
+                        <Button Click="ZipDatabaseButton_Click" Content="压缩数据库" />
+                        <Button Click="ImportMenu_Click" Content="导入" />
+                        <Button Click="ExportMenu_Click" Content="导出" />
+                    </m:SimpleStackPanel>
+                </m:SimpleStackPanel>
+            </TabItem>
+
+            <TabItem Header="记忆">
+                <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
+
                     <Button
                         Click="ResetAutoAddFilesButton_Click"
                         Content="取消自动添加文件"
                         IsEnabled="{Binding Path=(root:Configs.AutoAddFiles)}" />
-                </GroupBox>
+                </m:SimpleStackPanel>
+            </TabItem>
 
-                <GroupBox Header="日志">
-                    <Button Click="OpenLogButton_Click" Content="查看日志" />
-                </GroupBox>
+            <TabItem Header="日志">
+                <panel:LogsPanel />
+            </TabItem>
 
-                <GroupBox Header="关于">
-                    <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
-                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
-                            <TextBlock VerticalAlignment="Center">编写人员：autodotua</TextBlock>
-                            <m:HyperlinkButton VerticalAlignment="Center" NavigateUri="https://github.com/autodotua">我的Github</m:HyperlinkButton>
-                        </m:SimpleStackPanel>
-                        <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
-                            <Viewbox
-                                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                                Width="128" Height="128"
-                                Stretch="Uniform">
-                                <Canvas
-                                    Name="svg8" Width="1444.9778"
-                                    Height="1444.9778">
-                                    <Canvas.RenderTransform>
-                                        <TranslateTransform X="0" Y="0" />
-                                    </Canvas.RenderTransform>
-                                    <Canvas.Resources>
-                                        <PathGeometry
-                                            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                            x:Key="clipPath18"
-                                            Figures="M 0 4000 H 4000 V 0 H 0 Z"
-                                            FillRule="NonZero" />
-                                    </Canvas.Resources>
-                                    <!--  Unknown tag: sodipodi:namedview  -->
-                                    <!--  Unknown tag: metadata  -->
-                                    <Canvas Name="layer1">
-                                        <Canvas Name="g14" Clip="{StaticResource clipPath18}">
+            <TabItem Header="关于">
+                <m:SimpleStackPanel Orientation="Vertical" Spacing="12">
+                    <TextBlock VerticalAlignment="Center">编写人员：autodotua</TextBlock>
+                    <m:HyperlinkButton VerticalAlignment="Center" NavigateUri="https://github.com/autodotua">我的Github</m:HyperlinkButton>
+                    <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
+                        <Viewbox
+                            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                            Width="128" Height="128"
+                            Stretch="Uniform">
+                            <Canvas
+                                Name="svg8" Width="1444.9778"
+                                Height="1444.9778">
+                                <Canvas.RenderTransform>
+                                    <TranslateTransform X="0" Y="0" />
+                                </Canvas.RenderTransform>
+                                <Canvas.Resources>
+                                    <PathGeometry
+                                        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                        x:Key="clipPath18"
+                                        Figures="M 0 4000 H 4000 V 0 H 0 Z"
+                                        FillRule="NonZero" />
+                                </Canvas.Resources>
+                                <!--  Unknown tag: sodipodi:namedview  -->
+                                <!--  Unknown tag: metadata  -->
+                                <Canvas Name="layer1">
+                                    <Canvas Name="g14" Clip="{StaticResource clipPath18}">
+                                        <Canvas.RenderTransform>
+                                            <MatrixTransform Matrix="0.35277777 0 0 -0.35277777 22.426607 1423.7103" />
+                                        </Canvas.RenderTransform>
+                                        <Canvas Name="g20">
                                             <Canvas.RenderTransform>
-                                                <MatrixTransform Matrix="0.35277777 0 0 -0.35277777 22.426607 1423.7103" />
+                                                <TranslateTransform X="2000" Y="50" />
                                             </Canvas.RenderTransform>
-                                            <Canvas Name="g20">
-                                                <Canvas.RenderTransform>
-                                                    <TranslateTransform X="2000" Y="50" />
-                                                </Canvas.RenderTransform>
-                                                <Path
-                                                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                                    Name="path22" Fill="#FFE0E0E0">
-                                                    <Path.Data>
-                                                        <PathGeometry Figures="m 0 0 c -132.337 0 -264.578 13.329 -393.046 39.618 -125.178 25.615 -248.307 63.836 -365.967 113.602 -115.534 48.868 -226.971 109.354 -331.216 179.78 -103.266 69.766 -200.375 149.888 -288.629 238.142 -88.254 88.254 -168.376 185.363 -238.142 288.629 -70.426 104.245 -130.913 215.681 -179.78 331.216 -49.765 117.659 -87.987 240.789 -113.602 365.967 -26.288 128.469 -39.618 260.708 -39.618 393.046 0 132.337 13.33 264.578 39.618 393.046 25.615 125.178 63.837 248.307 113.602 365.967 48.867 115.534 109.354 226.971 179.78 331.216 69.766 103.266 149.888 200.375 238.142 288.629 88.254 88.254 185.363 168.376 288.629 238.142 104.245 70.426 215.682 130.913 331.216 179.78 117.66 49.765 240.789 87.987 365.967 113.602 C -264.578 3886.67 -132.337 3900 0 3900 c 132.338 0 264.577 -13.33 393.046 -39.618 125.178 -25.615 248.308 -63.837 365.967 -113.602 115.535 -48.867 226.971 -109.354 331.216 -179.78 103.266 -69.766 200.375 -149.888 288.629 -238.142 88.254 -88.254 168.376 -185.363 238.142 -288.629 70.426 -104.245 130.912 -215.682 179.78 -331.216 49.766 -117.66 87.987 -240.789 113.602 -365.967 C 1936.671 2214.578 1950 2082.337 1950 1950 c 0 -132.338 -13.329 -264.577 -39.618 -393.046 -25.615 -125.178 -63.836 -248.308 -113.602 -365.967 C 1747.912 1075.452 1687.426 964.016 1617 859.771 1547.234 756.505 1467.112 659.396 1378.858 571.142 1290.604 482.888 1193.495 402.766 1090.229 333 985.984 262.574 874.548 202.088 759.013 153.22 641.354 103.454 518.224 65.233 393.046 39.618 264.577 13.329 132.338 0 0 0" FillRule="NonZero" />
-                                                    </Path.Data>
-                                                </Path>
-                                            </Canvas>
-                                            <Canvas Name="g24">
-                                                <Canvas.RenderTransform>
-                                                    <TranslateTransform X="2000" Y="4000" />
-                                                </Canvas.RenderTransform>
-                                                <Path
-                                                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                                    Name="path26" Fill="#FF000000">
-                                                    <Path.Data>
-                                                        <PathGeometry Figures="m 0 0 c -1104.569 0 -2000 -895.431 -2000 -2000 0 -1104.569 895.431 -2000 2000 -2000 1104.569 0 2000 895.431 2000 2000 C 2000 -895.431 1104.569 0 0 0 m 0 -100 c 128.978 0 257.846 -12.988 383.022 -38.603 121.945 -24.953 241.892 -62.187 356.513 -110.668 112.561 -47.609 221.134 -106.541 322.703 -175.16 100.629 -67.985 195.261 -146.063 281.265 -232.066 86.003 -86.004 164.082 -180.635 232.066 -281.265 68.619 -101.569 127.551 -210.142 175.16 -322.703 48.481 -114.62 85.714 -234.568 110.667 -356.513 25.616 -125.177 38.604 -254.044 38.604 -383.022 0 -128.978 -12.988 -257.846 -38.604 -383.022 -24.953 -121.945 -62.186 -241.892 -110.667 -356.513 -47.609 -112.561 -106.541 -221.134 -175.16 -322.703 -67.984 -100.629 -146.063 -195.261 -232.066 -281.265 -86.004 -86.003 -180.636 -164.082 -281.265 -232.066 -101.569 -68.619 -210.142 -127.551 -322.703 -175.16 -114.621 -48.481 -234.568 -85.714 -356.513 -110.667 C 257.846 -3887.012 128.978 -3900 0 -3900 c -128.978 0 -257.845 12.988 -383.022 38.604 -121.945 24.953 -241.893 62.186 -356.513 110.667 -112.561 47.609 -221.134 106.541 -322.703 175.16 -100.63 67.984 -195.261 146.063 -281.265 232.066 -86.003 86.004 -164.081 180.636 -232.066 281.265 -68.619 101.569 -127.551 210.142 -175.16 322.703 -48.481 114.621 -85.715 234.568 -110.668 356.513 -25.615 125.176 -38.603 254.044 -38.603 383.022 0 128.978 12.988 257.845 38.603 383.022 24.953 121.945 62.187 241.893 110.668 356.513 47.609 112.561 106.541 221.134 175.16 322.703 67.985 100.63 146.063 195.261 232.066 281.265 86.004 86.003 180.635 164.081 281.265 232.066 101.569 68.619 210.142 127.551 322.703 175.16 114.62 48.481 234.568 85.715 356.513 110.668 C -257.845 -112.988 -128.978 -100 0 -100" FillRule="NonZero" />
-                                                    </Path.Data>
-                                                </Path>
-                                            </Canvas>
-                                            <Canvas Name="g28">
-                                                <Canvas.RenderTransform>
-                                                    <TranslateTransform X="50" Y="2000" />
-                                                </Canvas.RenderTransform>
-                                                <Path
-                                                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                                    Name="path30" Stroke="#FF000000"
-                                                    StrokeEndLineCap="Flat"
-                                                    StrokeLineJoin="Miter"
-                                                    StrokeMiterLimit="10"
-                                                    StrokeStartLineCap="Flat"
-                                                    StrokeThickness="100">
-                                                    <Path.Data>
-                                                        <PathGeometry Figures="M 0 0 H 3900" FillRule="NonZero" />
-                                                    </Path.Data>
-                                                </Path>
-                                            </Canvas>
-                                            <Canvas Name="g32">
-                                                <Canvas.RenderTransform>
-                                                    <TranslateTransform X="2000" Y="50" />
-                                                </Canvas.RenderTransform>
-                                                <Path
-                                                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                                    Name="path34" Stroke="#FF000000"
-                                                    StrokeEndLineCap="Flat"
-                                                    StrokeLineJoin="Miter"
-                                                    StrokeMiterLimit="10"
-                                                    StrokeStartLineCap="Flat"
-                                                    StrokeThickness="100">
-                                                    <Path.Data>
-                                                        <PathGeometry Figures="M 0 0 V 3900" FillRule="NonZero" />
-                                                    </Path.Data>
-                                                </Path>
-                                            </Canvas>
-                                            <Canvas Name="g36">
-                                                <Canvas.RenderTransform>
-                                                    <TranslateTransform X="50" Y="2000" />
-                                                </Canvas.RenderTransform>
-                                                <Path
-                                                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                                    Name="path38" Stroke="#FF000000"
-                                                    StrokeEndLineCap="Flat"
-                                                    StrokeLineJoin="Miter"
-                                                    StrokeMiterLimit="10"
-                                                    StrokeStartLineCap="Flat"
-                                                    StrokeThickness="100">
-                                                    <Path.Data>
-                                                        <PathGeometry Figures="M 0 0 H 3900" FillRule="NonZero" />
-                                                    </Path.Data>
-                                                </Path>
-                                            </Canvas>
-                                            <Canvas Name="g40">
-                                                <Canvas.RenderTransform>
-                                                    <TranslateTransform X="3732.4248" Y="3000" />
-                                                </Canvas.RenderTransform>
-                                                <Path
-                                                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                                    Name="path42" Fill="#FF000000">
-                                                    <Path.Data>
-                                                        <PathGeometry Figures="m 0 0 h -3464.85 c -14.555 -25.162 -28.581 -50.668 -42.056 -76.508 l 1686.785 -2921.597 c 29.076 -1.255 58.311 -1.895 87.696 -1.895 29.385 0 58.621 0.64 87.696 1.895 L 42.057 -76.508 C 28.581 -50.668 14.556 -25.162 0 0 m -86.978 -100 -1616.453 -2799.78 c -9.695 -0.147 -19.371 -0.22 -28.994 -0.22 -9.623 0 -19.299 0.073 -28.994 0.22 L -3377.873 -100 H -86.978" FillRule="NonZero" />
-                                                    </Path.Data>
-                                                </Path>
-                                            </Canvas>
+                                            <Path
+                                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                                Name="path22" Fill="#FFE0E0E0">
+                                                <Path.Data>
+                                                    <PathGeometry Figures="m 0 0 c -132.337 0 -264.578 13.329 -393.046 39.618 -125.178 25.615 -248.307 63.836 -365.967 113.602 -115.534 48.868 -226.971 109.354 -331.216 179.78 -103.266 69.766 -200.375 149.888 -288.629 238.142 -88.254 88.254 -168.376 185.363 -238.142 288.629 -70.426 104.245 -130.913 215.681 -179.78 331.216 -49.765 117.659 -87.987 240.789 -113.602 365.967 -26.288 128.469 -39.618 260.708 -39.618 393.046 0 132.337 13.33 264.578 39.618 393.046 25.615 125.178 63.837 248.307 113.602 365.967 48.867 115.534 109.354 226.971 179.78 331.216 69.766 103.266 149.888 200.375 238.142 288.629 88.254 88.254 185.363 168.376 288.629 238.142 104.245 70.426 215.682 130.913 331.216 179.78 117.66 49.765 240.789 87.987 365.967 113.602 C -264.578 3886.67 -132.337 3900 0 3900 c 132.338 0 264.577 -13.33 393.046 -39.618 125.178 -25.615 248.308 -63.837 365.967 -113.602 115.535 -48.867 226.971 -109.354 331.216 -179.78 103.266 -69.766 200.375 -149.888 288.629 -238.142 88.254 -88.254 168.376 -185.363 238.142 -288.629 70.426 -104.245 130.912 -215.682 179.78 -331.216 49.766 -117.66 87.987 -240.789 113.602 -365.967 C 1936.671 2214.578 1950 2082.337 1950 1950 c 0 -132.338 -13.329 -264.577 -39.618 -393.046 -25.615 -125.178 -63.836 -248.308 -113.602 -365.967 C 1747.912 1075.452 1687.426 964.016 1617 859.771 1547.234 756.505 1467.112 659.396 1378.858 571.142 1290.604 482.888 1193.495 402.766 1090.229 333 985.984 262.574 874.548 202.088 759.013 153.22 641.354 103.454 518.224 65.233 393.046 39.618 264.577 13.329 132.338 0 0 0" FillRule="NonZero" />
+                                                </Path.Data>
+                                            </Path>
+                                        </Canvas>
+                                        <Canvas Name="g24">
+                                            <Canvas.RenderTransform>
+                                                <TranslateTransform X="2000" Y="4000" />
+                                            </Canvas.RenderTransform>
+                                            <Path
+                                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                                Name="path26" Fill="#FF000000">
+                                                <Path.Data>
+                                                    <PathGeometry Figures="m 0 0 c -1104.569 0 -2000 -895.431 -2000 -2000 0 -1104.569 895.431 -2000 2000 -2000 1104.569 0 2000 895.431 2000 2000 C 2000 -895.431 1104.569 0 0 0 m 0 -100 c 128.978 0 257.846 -12.988 383.022 -38.603 121.945 -24.953 241.892 -62.187 356.513 -110.668 112.561 -47.609 221.134 -106.541 322.703 -175.16 100.629 -67.985 195.261 -146.063 281.265 -232.066 86.003 -86.004 164.082 -180.635 232.066 -281.265 68.619 -101.569 127.551 -210.142 175.16 -322.703 48.481 -114.62 85.714 -234.568 110.667 -356.513 25.616 -125.177 38.604 -254.044 38.604 -383.022 0 -128.978 -12.988 -257.846 -38.604 -383.022 -24.953 -121.945 -62.186 -241.892 -110.667 -356.513 -47.609 -112.561 -106.541 -221.134 -175.16 -322.703 -67.984 -100.629 -146.063 -195.261 -232.066 -281.265 -86.004 -86.003 -180.636 -164.082 -281.265 -232.066 -101.569 -68.619 -210.142 -127.551 -322.703 -175.16 -114.621 -48.481 -234.568 -85.714 -356.513 -110.667 C 257.846 -3887.012 128.978 -3900 0 -3900 c -128.978 0 -257.845 12.988 -383.022 38.604 -121.945 24.953 -241.893 62.186 -356.513 110.667 -112.561 47.609 -221.134 106.541 -322.703 175.16 -100.63 67.984 -195.261 146.063 -281.265 232.066 -86.003 86.004 -164.081 180.636 -232.066 281.265 -68.619 101.569 -127.551 210.142 -175.16 322.703 -48.481 114.621 -85.715 234.568 -110.668 356.513 -25.615 125.176 -38.603 254.044 -38.603 383.022 0 128.978 12.988 257.845 38.603 383.022 24.953 121.945 62.187 241.893 110.668 356.513 47.609 112.561 106.541 221.134 175.16 322.703 67.985 100.63 146.063 195.261 232.066 281.265 86.004 86.003 180.635 164.081 281.265 232.066 101.569 68.619 210.142 127.551 322.703 175.16 114.62 48.481 234.568 85.715 356.513 110.668 C -257.845 -112.988 -128.978 -100 0 -100" FillRule="NonZero" />
+                                                </Path.Data>
+                                            </Path>
+                                        </Canvas>
+                                        <Canvas Name="g28">
+                                            <Canvas.RenderTransform>
+                                                <TranslateTransform X="50" Y="2000" />
+                                            </Canvas.RenderTransform>
+                                            <Path
+                                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                                Name="path30" Stroke="#FF000000"
+                                                StrokeEndLineCap="Flat"
+                                                StrokeLineJoin="Miter"
+                                                StrokeMiterLimit="10"
+                                                StrokeStartLineCap="Flat"
+                                                StrokeThickness="100">
+                                                <Path.Data>
+                                                    <PathGeometry Figures="M 0 0 H 3900" FillRule="NonZero" />
+                                                </Path.Data>
+                                            </Path>
+                                        </Canvas>
+                                        <Canvas Name="g32">
+                                            <Canvas.RenderTransform>
+                                                <TranslateTransform X="2000" Y="50" />
+                                            </Canvas.RenderTransform>
+                                            <Path
+                                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                                Name="path34" Stroke="#FF000000"
+                                                StrokeEndLineCap="Flat"
+                                                StrokeLineJoin="Miter"
+                                                StrokeMiterLimit="10"
+                                                StrokeStartLineCap="Flat"
+                                                StrokeThickness="100">
+                                                <Path.Data>
+                                                    <PathGeometry Figures="M 0 0 V 3900" FillRule="NonZero" />
+                                                </Path.Data>
+                                            </Path>
+                                        </Canvas>
+                                        <Canvas Name="g36">
+                                            <Canvas.RenderTransform>
+                                                <TranslateTransform X="50" Y="2000" />
+                                            </Canvas.RenderTransform>
+                                            <Path
+                                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                                Name="path38" Stroke="#FF000000"
+                                                StrokeEndLineCap="Flat"
+                                                StrokeLineJoin="Miter"
+                                                StrokeMiterLimit="10"
+                                                StrokeStartLineCap="Flat"
+                                                StrokeThickness="100">
+                                                <Path.Data>
+                                                    <PathGeometry Figures="M 0 0 H 3900" FillRule="NonZero" />
+                                                </Path.Data>
+                                            </Path>
+                                        </Canvas>
+                                        <Canvas Name="g40">
+                                            <Canvas.RenderTransform>
+                                                <TranslateTransform X="3732.4248" Y="3000" />
+                                            </Canvas.RenderTransform>
+                                            <Path
+                                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                                                Name="path42" Fill="#FF000000">
+                                                <Path.Data>
+                                                    <PathGeometry Figures="m 0 0 h -3464.85 c -14.555 -25.162 -28.581 -50.668 -42.056 -76.508 l 1686.785 -2921.597 c 29.076 -1.255 58.311 -1.895 87.696 -1.895 29.385 0 58.621 0.64 87.696 1.895 L 42.057 -76.508 C 28.581 -50.668 14.556 -25.162 0 0 m -86.978 -100 -1616.453 -2799.78 c -9.695 -0.147 -19.371 -0.22 -28.994 -0.22 -9.623 0 -19.299 0.073 -28.994 0.22 L -3377.873 -100 H -86.978" FillRule="NonZero" />
+                                                </Path.Data>
+                                            </Path>
                                         </Canvas>
                                     </Canvas>
                                 </Canvas>
-                            </Viewbox>
-                            <Image
-                                Width="128" Height="128"
-                                Source="../../Images/icon_light.png" />
-                        </m:SimpleStackPanel>
+                            </Canvas>
+                        </Viewbox>
+                        <Image
+                            Width="128" Height="128"
+                            Source="../../Images/icon_light.png" />
                     </m:SimpleStackPanel>
-                </GroupBox>
-            </m:SimpleStackPanel>
-        </ScrollViewer>
+                </m:SimpleStackPanel>
+            </TabItem>
+        </TabControl>
         <local:ProgressDialog
             x:Name="ring" Grid.RowSpan="999"
             Grid.ColumnSpan="999" Margin="-12" />

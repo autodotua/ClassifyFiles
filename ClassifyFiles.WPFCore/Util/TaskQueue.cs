@@ -22,7 +22,42 @@ namespace ClassifyFiles.Util
 
         public TaskQueue()
         {
-            Task.Run(() => CheckAndDo());
+            //Task.Run(() => CheckAndDo());
+            Start();
+        }
+
+        public async void Start()
+        {
+            IsExcuting = true;
+            List<Task> tasks = new List<Task>();
+            // await Task.Run(() =>
+            //{
+            for (int i = 0; i < Configs.RefreshThreadCount; i++)
+            {
+                tasks.Add(Task.Factory.StartNew(Excute, TaskCreationOptions.LongRunning));
+                //用Task.Run会变卡，可能是因为共用了线程;
+                //之前的方法会卡UI可能也是这个原因
+                //tasks.Add(Task.Run(() => Excute()));
+                await Task.Delay(500 / Configs.RefreshThreadCount);
+            }
+            //});
+            await Task.WhenAll(tasks);
+            TaskStopped?.Invoke(this, new EventArgs());
+        }
+
+        private void Excute()
+        {
+            while (!stopping)
+            {
+                if (!tasks.IsEmpty && tasks.TryPop(out Action act))
+                {
+                    act();
+                }
+                else
+                {
+                    Thread.Sleep(500);
+                }
+            }
         }
 
         private void CheckAndDo()
@@ -150,7 +185,8 @@ namespace ClassifyFiles.Util
             }
             TaskStopped += (p1, p2) =>
             {
-                tcs.SetResult(0);
+                stopping = false;
+                tcs.TrySetResult(0);
             };
             stopping = true;
             return tcs.Task;
