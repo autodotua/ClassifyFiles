@@ -26,7 +26,7 @@
         <c:IsNotNull2BoolConverter x:Key="nn2b" />
         <c:IsNotNull2VisibilityConverter x:Key="nn2v" />
         <c:Null2ZeroConverter x:Key="n2z" />
-        <c:Bool2intConverter x:Key="b2i" />
+        <c:Bool2IntConverter x:Key="b2i" />
 
         <sys:Double x:Key="iconViewMinWidth">72</sys:Double>
         <VirtualizationCacheLength x:Key="virtualizingPanelCacheLength">100</VirtualizationCacheLength>

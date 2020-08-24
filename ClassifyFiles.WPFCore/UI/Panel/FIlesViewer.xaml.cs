@@ -712,9 +712,9 @@ namespace ClassifyFiles.UI.Panel
         /// <param name="e"></param>
         private void ListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) )
+            if (Keyboard.IsKeyDown(Key.LeftCtrl))
             {
-                if (CurrentFileView == FileView.Detail || CurrentFileView==FileView.Tree && Configs.TreeSimpleTemplate)
+                if (CurrentFileView == FileView.Detail || CurrentFileView == FileView.Tree && Configs.TreeSimpleTemplate)
                 {
                     return;
                 }
@@ -947,7 +947,7 @@ namespace ClassifyFiles.UI.Panel
 
             if (!IsSingleWindow)
             {
-                MenuItem menuDelete = new MenuItem() { Header = "删除文件", ToolTip = "这不会删除磁盘上的文件，仅仅删除记录" };
+                MenuItem menuDelete = new MenuItem() { Header = "删除文件" };
                 menuDelete.Click += MenuDelete_Click;
                 menu.Items.Add(menuDelete);
 
@@ -972,7 +972,7 @@ namespace ClassifyFiles.UI.Panel
                 menu.Items.Add(menuShowProperties);
             }
             var classesMenus = new List<CheckBox>();
-            if (!IsSingleWindow)
+            if (!IsSingleWindow && Project.Classes != null && Project.Classes.Count > 0)
             {
                 menu.Items.Add(new Separator());
 
@@ -1051,7 +1051,7 @@ namespace ClassifyFiles.UI.Panel
             async Task Do()
             {
                 await Task.Run(() =>
-                FileUtility.DeleteFilesRecord(files.Select(p => p.File)));
+                FileUtility.RecoverFiles(files.Select(p => p.File)));
                 foreach (var file in files)
                 {
                     Files.Remove(file);
@@ -1066,11 +1066,24 @@ namespace ClassifyFiles.UI.Panel
         private async void MenuDelete_Click(object sender, RoutedEventArgs e)
         {
             var files = GetSelectedFiles();
-            await MainWindow.Current.DoProcessAsync(Do());
-            async Task Do()
+            int mode = Configs.AutoDeleteFiles > 0 ?
+                Configs.AutoDeleteFiles :
+                await new DeleteFilesDialog().ShowAsync(files.Count);
+            IReadOnlyCollection<string> faileds = null;
+            if (mode > 0)
+            {
+                await MainWindow.Current.DoProcessAsync(DeleteRecordsOnly());
+                if (faileds != null && faileds.Count > 0)
+                {
+                    await new ErrorDialog().ShowAsync("某一些物理文件可能由于某些原因，无法删除。",
+                        "部分文件删除失败",
+                        string.Join(Environment.NewLine, faileds));
+                }
+            }
+            async Task DeleteRecordsOnly()
             {
                 await Task.Run(() =>
-                FileUtility.DeleteFilesRecord(files.Select(p => p.File)));
+                FileUtility.DeleteFiles(files.Select(p => p.File), mode == 2, out faileds));
                 foreach (var file in files)
                 {
                     Files.Remove(file);

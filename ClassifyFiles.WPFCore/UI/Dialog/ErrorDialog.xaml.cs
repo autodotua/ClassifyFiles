@@ -51,10 +51,14 @@ namespace ClassifyFiles.UI
             await base.ShowAsync();
         }
 
-        public async new Task ShowAsync(string message, string title)
+        public async new Task ShowAsync(string message, string title, string detail = null)
         {
             Message = message;
             Title = title;
+            if (detail != null)
+            {
+                Detail = detail;
+            }
             await base.ShowAsync();
         }
 

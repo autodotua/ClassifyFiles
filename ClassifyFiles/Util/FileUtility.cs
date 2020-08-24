@@ -393,12 +393,25 @@ namespace ClassifyFiles.Util
             return SaveChanges() > 0;
         }
 
-        public static void DeleteFilesRecord(IEnumerable<File> files)
+        public static void DeleteFiles(IEnumerable<File> files, bool includeDiskFiles, out IReadOnlyCollection<string> deleteFailedFiles)
         {
+            List<string> failed = new List<string>();
             foreach (var file in files)
             {
                 db.Entry(file).State = EntityState.Deleted;
+                if (includeDiskFiles)
+                {
+                    try
+                    {
+                        F.Delete(file.GetAbsolutePath());
+                    }
+                    catch (Exception ex)
+                    {
+                        failed.Add(file.GetAbsolutePath());
+                    }
+                }
             }
+            deleteFailedFiles = failed.AsReadOnly();
             SaveChanges();
         }
 

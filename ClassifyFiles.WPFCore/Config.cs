@@ -216,6 +216,14 @@ namespace ClassifyFiles
             set => Set(ref smoothScroll, value, nameof(SmoothScroll));
         }
 
+        private static int? autoDeleteFiles = null;
+
+        public static int AutoDeleteFiles
+        {
+            get => Get(ref autoDeleteFiles, GetInt, 0, nameof(AutoDeleteFiles));
+            set => Set(ref autoDeleteFiles, value, nameof(AutoDeleteFiles));
+        }
+
         private static T Get<T>(ref T? field, Func<string, T, T> dbGet, T defultValue, string key) where T : struct
         {
             if (field == null)

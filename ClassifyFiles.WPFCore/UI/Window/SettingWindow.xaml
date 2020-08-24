@@ -10,7 +10,7 @@
     xmlns:panel="clr-namespace:ClassifyFiles.UI.Panel"
     xmlns:root="clr-namespace:ClassifyFiles"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
-    xmlns:sys2="clr-namespace:System;assembly=System.Runtime.Extensions"
+    xmlns:sys2="clr-namespace:System;assembly=System.Runtime.Extensions" xmlns:converter="clr-namespace:ClassifyFiles.UI.Converter"
     Title="设置" Width="600"
     Height="400"
     m:TitleBar.ExtendViewIntoTitleBar="True"
@@ -20,7 +20,9 @@
     ResizeMode="NoResize" WindowStyle="ToolWindow"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
-    <local:WindowBase.Resources />
+    <local:WindowBase.Resources>
+        <converter:NotZero2BoolConverter x:Key="nz2b" />
+    </local:WindowBase.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -142,7 +144,7 @@
                             Width="128" VerticalAlignment="Center"
                             Maximum="48" Minimum="1" IsSnapToTickEnabled="True"
                             TickFrequency="1" LargeChange="8" SmallChange="2"
-                           AutoToolTipPlacement="TopLeft" 
+                           AutoToolTipPlacement="TopLeft"
                             Value="{Binding Path=(root:Configs.RefreshThreadCount)}" />
                         <Button Click="Button_Click_1">立即应用</Button>
                         <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource SystemControlBackgroundBaseMediumBrush}">
@@ -167,7 +169,6 @@
                     </m:SimpleStackPanel>
                     <Button Click="Button_Click">打开缓存目录</Button>
                     <Button Click="DeleteThumbnailButton_Click">删除所有缩略图</Button>
-
 
                     <m:SimpleStackPanel Orientation="Horizontal" Spacing="12">
                         <Button Background="Red" Foreground="White">
@@ -196,8 +197,12 @@
 
                     <Button
                         Click="ResetAutoAddFilesButton_Click"
-                        Content="取消自动添加文件"
+                        Content="取消记忆添加文件选项"
                         IsEnabled="{Binding Path=(root:Configs.AutoAddFiles)}" />
+                    <Button
+                        Click="ResetAutoDeleteFilesButton_Click"
+                        Content="取消记忆删除文件选项"
+                        IsEnabled="{Binding Path=(root:Configs.AutoDeleteFiles),Converter={StaticResource nz2b}}" />
                 </m:SimpleStackPanel>
             </TabItem>
 

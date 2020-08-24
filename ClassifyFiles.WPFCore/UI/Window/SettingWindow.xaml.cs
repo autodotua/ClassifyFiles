@@ -129,7 +129,6 @@ namespace ClassifyFiles.UI
             }
         }
 
-
         private void ResetAutoAddFilesButton_Click(object sender, RoutedEventArgs e)
         {
             Configs.AutoAddFiles = false;
@@ -279,6 +278,11 @@ namespace ClassifyFiles.UI
                 await RealtimeUpdate.Tasks.StopAsync();
                 RealtimeUpdate.Tasks.Start();
             }
+        }
+
+        private void ResetAutoDeleteFilesButton_Click(object sender, RoutedEventArgs e)
+        {
+            Configs.AutoDeleteFiles = 0;
         }
     }
 }

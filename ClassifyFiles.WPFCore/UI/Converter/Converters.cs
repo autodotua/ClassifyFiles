@@ -10,7 +10,7 @@ using System.Windows.Markup;
 
 namespace ClassifyFiles.UI.Converter
 {
-    public class Bool2intConverter : IValueConverter
+    public class Bool2IntConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -25,6 +25,23 @@ namespace ClassifyFiles.UI.Converter
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class NotZero2BoolConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return ((int)value) > 0;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)value == false)
+            {
+                return 0;
+            }
+            throw new Exception();
         }
     }
 
