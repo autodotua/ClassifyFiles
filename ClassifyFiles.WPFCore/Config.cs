@@ -278,7 +278,7 @@ namespace ClassifyFiles
 
         public static bool ShowRing
         {
-            get => Get(ref showRing, GetBool, true, nameof(ShowRing));
+            get => Get(ref showRing, GetBool, false, nameof(ShowRing));
             set => Set(ref showRing, value, nameof(ShowRing));
         }
 

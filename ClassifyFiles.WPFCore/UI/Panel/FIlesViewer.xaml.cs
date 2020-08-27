@@ -126,9 +126,9 @@ namespace ClassifyFiles.UI.Panel
             }
         }
 
-        private Class currentClass;
+        private UIClass currentClass;
 
-        public Class CurrentClass
+        public UIClass CurrentClass
         {
             get => currentClass; private set
             {
@@ -185,6 +185,9 @@ namespace ClassifyFiles.UI.Panel
 
         #region 文件相关
 
+        /// <summary>
+        /// 当前文件集合的类型
+        /// </summary>
         public FileCollectionType FileCollectionType { get; private set; }
 
         /// <summary>
@@ -192,10 +195,10 @@ namespace ClassifyFiles.UI.Panel
         /// </summary>
         /// <param name="files"></param>
         /// <returns></returns>
-        public async Task SetFilesAsync(IEnumerable<UIFile> files, Class currentClass, FileCollectionType type)
+        public async Task SetFilesAsync(IEnumerable<UIFile> files, UIClass currentClass, FileCollectionType type)
         {
             CurrentClass = currentClass;
-            FileCollectionType = FileCollectionType;
+            FileCollectionType = type;
             if (files == null || !files.Any())
             {
                 //如果为空
@@ -217,7 +220,7 @@ namespace ClassifyFiles.UI.Panel
                     }
                 });
                 await Dispatcher.InvokeAsync(() =>
-                 Files = uiFiles, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+                 Files = uiFiles, DispatcherPriority.ApplicationIdle);
             }
             if (CurrentFileView == FileView.Tree)
             {
@@ -945,20 +948,6 @@ namespace ClassifyFiles.UI.Panel
             menuCopy.Click += MenuCopy_Click;
             menu.Items.Add(menuCopy);
 
-            if (!IsSingleWindow)
-            {
-                MenuItem menuDelete = new MenuItem() { Header = "删除文件" };
-                menuDelete.Click += MenuDelete_Click;
-                menu.Items.Add(menuDelete);
-
-                if (FileCollectionType == FileCollectionType.Disabled || FileCollectionType == FileCollectionType.Manual)
-                {
-                    MenuItem menuRecover = new MenuItem() { Header = "恢复为正常状态", ToolTip = "这将使文件被再次自动分类，剔除手动的任何成分" };
-                    menuRecover.Click += MenuRecover_Click; ;
-                    menu.Items.Add(menuRecover);
-                }
-            }
-
             if (files.Count == 1)
             {
                 MenuItem menuShowExifs = new MenuItem() { Header = "查看文件元数据" };
@@ -971,6 +960,28 @@ namespace ClassifyFiles.UI.Panel
                     FileProperty.ShowFileProperties(files[0].File.GetAbsolutePath());
                 menu.Items.Add(menuShowProperties);
             }
+            if (!IsSingleWindow)//位于主窗体
+            {
+                menu.Items.Add(new Separator());
+                MenuItem menuDelete = new MenuItem() { Header = "删除文件" };
+                menuDelete.Click += MenuDelete_Click;
+                menu.Items.Add(menuDelete);
+
+                if (FileCollectionType == FileCollectionType.Class && CurrentClass != null)
+                {
+                    MenuItem menuRemoveFromClass = new MenuItem() { Header = "从当前类中移出" };
+                    menuRemoveFromClass.Click += MenuRemoveFromClass_Click;
+                    menu.Items.Add(menuRemoveFromClass);
+                }
+
+                if (FileCollectionType == FileCollectionType.Disabled || FileCollectionType == FileCollectionType.Manual)
+                {
+                    MenuItem menuRecover = new MenuItem() { Header = "恢复为正常状态", ToolTip = "这将使文件被再次自动分类，剔除手动的任何成分" };
+                    menuRecover.Click += MenuRecover_Click; ;
+                    menu.Items.Add(menuRecover);
+                }
+            }
+
             var classesMenus = new List<CheckBox>();
             if (!IsSingleWindow && Project.Classes != null && Project.Classes.Count > 0)
             {
@@ -1010,14 +1021,14 @@ namespace ClassifyFiles.UI.Panel
                 int maxClassesMenuCount = 6;
                 if (CurrentClass != null && classesMenus.Count > maxClassesMenuCount)
                 {
-                    if (classesMenus.All(p => (p.Tag as Class).GroupName == CurrentClass.GroupName))
+                    if (classesMenus.All(p => (p.Tag as Class).GroupName == CurrentClass.Class.GroupName))
                     {
                         AddWithoutDiscrimination();
                     }
                     else
                     {
-                        var sameGroup = classesMenus.Where(p => (p.Tag as Class).GroupName == CurrentClass.GroupName);
-                        var otherGroup = classesMenus.Where(p => (p.Tag as Class).GroupName != CurrentClass.GroupName);
+                        var sameGroup = classesMenus.Where(p => (p.Tag as Class).GroupName == CurrentClass.Class.GroupName);
+                        var otherGroup = classesMenus.Where(p => (p.Tag as Class).GroupName != CurrentClass.Class.GroupName);
                         sameGroup.ForEach(p => menu.Items.Add(p));
                         MenuItem menuItem = new MenuItem() { Header = "其它分类" };
                         otherGroup.ForEach(p => menuItem.Items.Add(p));
@@ -1041,6 +1052,28 @@ namespace ClassifyFiles.UI.Panel
                         menu.Items.Add(menuItem);
                     }
                 }
+            }
+        }
+
+        private async void MenuRemoveFromClass_Click(object sender, RoutedEventArgs e)
+        {
+            await MainWindow.Current.DoProcessAsync(Do());
+            async Task Do()
+            {
+                var files = GetSelectedFiles();
+
+                //从类中删除
+                await Task.Run(() => RemoveFilesFromClass(files.Select(p => p.File), CurrentClass.Class));
+                foreach (var file in files)
+                {
+                    //var c = file.Classes.FirstOrDefault(p => p.ID == CurrentClass.ID);
+                    //if (c != null)
+                    //{
+                    //    file.Classes.Remove(c);
+                    //}
+                    Files.Remove(file);
+                }
+                await CurrentClass.UpdatePropertiesAsync();
             }
         }
 

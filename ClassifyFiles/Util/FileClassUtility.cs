@@ -195,7 +195,7 @@ namespace ClassifyFiles.Util
             {
                 var existed = db.FileClasses
                     .FirstOrDefault(p => p.File == file && p.Class == c && p.Status != FileClassStatus.Disabled);
-                var test = db.FileClasses.Where(p => p.FileID == file.ID).ToList();
+                // var test = db.FileClasses.Where(p => p.FileID == file.ID).ToList();
                 if (existed != null)
                 {
                     //如果是手动添加的，那么直接删除记录
@@ -205,6 +205,7 @@ namespace ClassifyFiles.Util
                     }
                     else
                     {
+                        existed.Status = FileClassStatus.Disabled;
                         db.Entry(existed).State = EntityState.Modified;
                     }
                 }
@@ -253,6 +254,7 @@ namespace ClassifyFiles.Util
             int index = 0;
             int count = files.Count;
             DateTime lastCallbackTime = DateTime.MinValue;
+            var classes = db.Classes.ToList();
             foreach (var file in files)
             {
                 File f = null;// new File(file, args.Project);
@@ -290,7 +292,7 @@ namespace ClassifyFiles.Util
                 }
                 if (args.Reclassify)
                 {
-                    foreach (var c in db.Classes.Where(p => p.ProjectID == args.Project.ID).AsEnumerable())
+                    foreach (var c in classes.Where(p => p.ProjectID == args.Project.ID))
                     {
                         FileClass fc = IncludeAll(db.FileClasses)
                             .FirstOrDefault(p => p.Class == c && p.File == f);

@@ -168,7 +168,7 @@ namespace ClassifyFiles.UI.Page
                 Debug.WriteLine("Set Files, Project Hashcode is " + Project.GetHashCode()
             + ", Class is " + (classPanel.SelectedUIClass == null ? "null" : classPanel.SelectedUIClass.Class.Name));
                 IEnumerable<UIFile> uiFiles = null;
-                Class c = classPanel.SelectedUIClass?.Class;
+                UIClass c = classPanel.SelectedUIClass;
                 await Task.Run(() =>
                 {
                     try
@@ -189,7 +189,7 @@ namespace ClassifyFiles.UI.Page
                         Regex r = new Regex(FilterPattern);
                         uiFiles = uiFiles.Where(p => r.IsMatch(p.File.Name));
                     }
-                    uiFiles.ForEach(p => p.Class = c);
+                    uiFiles.ForEach(p => p.Class = c?.Class);
                     result = true;
                 });
                 await filesViewer.SetFilesAsync(uiFiles, c, type);
@@ -220,7 +220,7 @@ namespace ClassifyFiles.UI.Page
                     {
                         files = rawFiles;
                     }
-                    await filesViewer.SetFilesAsync(files, classPanel.SelectedUIClass?.Class, filesViewer.FileCollectionType);
+                    await filesViewer.SetFilesAsync(files, classPanel.SelectedUIClass, filesViewer.FileCollectionType);
                     await ApplyDirs();
                 }
             }
