@@ -4,7 +4,9 @@ using ClassifyFiles.Util;
 using ClassifyFiles.Util.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using static ClassifyFiles.Util.ClassUtility;
@@ -137,8 +139,17 @@ namespace ClassifyFiles.UI.Page
 
         private async void CheckButton_Click(object sender, RoutedEventArgs e)
         {
-            //无用
-            await MainWindow.Current.DoProcessAsync(Task.Run(() => Check(Project)));
+            IReadOnlyList<Data.File> files = null;
+            await MainWindow.Current.DoProcessAsync(Task.Run(() => files = CheckFiles(Project)));
+            if (files.Count == 0)
+            {
+                await new MessageDialog().ShowAsync("没有发现不存在的文件", "文件完整性检查");
+            }
+            else
+            {
+                await new ErrorDialog().ShowAsync($"发现{files.Count}个不存在的文件（夹）", "文件完整性检查",
+                    string.Join(Environment.NewLine, files.Select(p => Path.Combine(p.Dir, p.Name))));
+            }
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)

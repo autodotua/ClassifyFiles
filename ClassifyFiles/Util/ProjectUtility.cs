@@ -107,6 +107,31 @@ namespace ClassifyFiles.Util
             return projects.ToList();
         }
 
+        public static IReadOnlyList<File> CheckFiles(Project project)
+        {
+            var files = db.Files.Where(p => p.Project == project);
+            var lostFiles = new List<File>();
+            foreach (var file in files)
+            {
+                if (file.IsFolder)
+                {
+                    if (!System.IO.Directory.Exists(file.GetAbsolutePath()))
+                    {
+
+                        lostFiles.Add(file);
+                    }
+                }
+                else
+                {
+                    if (!System.IO.File.Exists(file.GetAbsolutePath()))
+                    {
+                        lostFiles.Add(file);
+                    }
+                }
+            }
+            return lostFiles.AsReadOnly();
+        }
+
         public static Dictionary<CheckType, IReadOnlyList<DbModelBase>> Check(Project project)
         {
             Dictionary<CheckType, IReadOnlyList<DbModelBase>> results = new Dictionary<CheckType, IReadOnlyList<DbModelBase>>();
